@@ -2,16 +2,17 @@
 
 import { cn } from "@/lib/utils"
 import { Card } from "@/components/ui/card"
-import type { ReactNode } from "react"
+import type { ReactNode, MouseEvent } from "react"
 
 interface AnimatedCardProps {
   children: ReactNode
   className?: string
   delay?: number
   hover?: boolean
+  onClick?: (e: MouseEvent<HTMLDivElement>) => void
 }
 
-export function AnimatedCard({ children, className, delay = 0, hover = true }: AnimatedCardProps) {
+export function AnimatedCard({ children, className, delay = 0, hover = true, onClick }: AnimatedCardProps) {
   return (
     <Card
       className={cn(
@@ -20,6 +21,7 @@ export function AnimatedCard({ children, className, delay = 0, hover = true }: A
         className,
       )}
       style={{ animationDelay: `${delay}ms` }}
+      onClick={onClick}
     >
       {children}
     </Card>

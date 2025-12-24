@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { AnimatedCard } from "@/components/animated-card"
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -32,13 +33,17 @@ import {
   LayoutGrid,
   List,
   BarChart3,
+  Filter,
+  User,
 } from "lucide-react"
+import Link from "next/link"
 
 interface Project {
   id: string
   name: string
   description: string
   client: string
+  projectManager: string
   status: "planning" | "in-progress" | "review" | "completed" | "on-hold"
   priority: "low" | "medium" | "high"
   progress: number
@@ -49,6 +54,10 @@ interface Project {
   team: string[]
   tasks: { total: number; completed: number }
   category: string
+  // Key Links
+  briefLink?: string
+  driveLink?: string
+  researchLink?: string
 }
 
 const initialProjects: Project[] = [
@@ -57,6 +66,7 @@ const initialProjects: Project[] = [
     name: "E-commerce Redesign",
     description: "Complete website redesign with new branding and improved UX",
     client: "TechMart Solutions",
+    projectManager: "John Smith",
     status: "in-progress",
     priority: "high",
     progress: 75,
@@ -67,12 +77,16 @@ const initialProjects: Project[] = [
     team: ["JD", "SM", "EC"],
     tasks: { total: 24, completed: 18 },
     category: "Web Design",
+    briefLink: "https://docs.google.com/document/d/ecommerce-brief",
+    driveLink: "https://drive.google.com/drive/folders/ecommerce-files",
+    researchLink: "https://notion.so/ecommerce-research",
   },
   {
     id: "2",
     name: "SEO Campaign Q4",
     description: "Comprehensive SEO optimization and content strategy",
     client: "GreenLife Organics",
+    projectManager: "Emily Chen",
     status: "in-progress",
     priority: "medium",
     progress: 45,
@@ -89,6 +103,7 @@ const initialProjects: Project[] = [
     name: "Social Media Strategy",
     description: "Full social media management and content calendar",
     client: "FoodieHub",
+    projectManager: "Sarah Mitchell",
     status: "review",
     priority: "medium",
     progress: 90,
@@ -105,6 +120,7 @@ const initialProjects: Project[] = [
     name: "PPC Management",
     description: "Google Ads and Meta advertising campaigns",
     client: "AutoDeal Motors",
+    projectManager: "David Park",
     status: "on-hold",
     priority: "low",
     progress: 30,
@@ -121,6 +137,7 @@ const initialProjects: Project[] = [
     name: "Brand Identity Overhaul",
     description: "Complete rebranding including logo, colors, and guidelines",
     client: "LuxStay Hotels",
+    projectManager: "John Smith",
     status: "planning",
     priority: "high",
     progress: 15,
@@ -137,6 +154,7 @@ const initialProjects: Project[] = [
     name: "Email Marketing Automation",
     description: "Set up automated email sequences and newsletters",
     client: "TechMart Solutions",
+    projectManager: "Emily Chen",
     status: "completed",
     priority: "medium",
     progress: 100,
@@ -164,10 +182,17 @@ const priorityConfig = {
   high: { label: "High", color: "bg-destructive/20 text-destructive" },
 }
 
+// Get unique values for filters
+const uniqueClients = [...new Set(initialProjects.map(p => p.client))]
+const uniqueManagers = [...new Set(initialProjects.map(p => p.projectManager))]
+
 export default function ProjectsPage() {
+  const router = useRouter()
   const [projects, setProjects] = useState<Project[]>(initialProjects)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [clientFilter, setClientFilter] = useState<string>("all")
+  const [managerFilter, setManagerFilter] = useState<string>("all")
   const [viewMode, setViewMode] = useState<"grid" | "list" | "kanban">("grid")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
@@ -175,9 +200,12 @@ export default function ProjectsPage() {
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
       project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.client.toLowerCase().includes(searchQuery.toLowerCase())
+      project.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project.projectManager.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesStatus = statusFilter === "all" || project.status === statusFilter
-    return matchesSearch && matchesStatus
+    const matchesClient = clientFilter === "all" || project.client === clientFilter
+    const matchesManager = managerFilter === "all" || project.projectManager === managerFilter
+    return matchesSearch && matchesStatus && matchesClient && matchesManager
   })
 
   const stats = {
@@ -196,6 +224,7 @@ export default function ProjectsPage() {
       name: formData.get("name") as string,
       description: formData.get("description") as string,
       client: formData.get("client") as string,
+      projectManager: formData.get("projectManager") as string,
       status: "planning",
       priority: formData.get("priority") as "low" | "medium" | "high",
       progress: 0,
@@ -206,6 +235,10 @@ export default function ProjectsPage() {
       team: [],
       tasks: { total: 0, completed: 0 },
       category: formData.get("category") as string,
+      // Key Links
+      briefLink: formData.get("briefLink") as string || undefined,
+      driveLink: formData.get("driveLink") as string || undefined,
+      researchLink: formData.get("researchLink") as string || undefined,
     }
     setProjects([newProject, ...projects])
     setIsAddDialogOpen(false)
@@ -303,6 +336,26 @@ export default function ProjectsPage() {
                     <Input id="dueDate" name="dueDate" type="date" required />
                   </div>
                 </div>
+
+                {/* Key Links Section */}
+                <div className="pt-4 border-t border-border">
+                  <Label className="text-sm font-medium text-muted-foreground mb-3 block">Key Links (Optional)</Label>
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="briefLink" className="text-xs">Project Brief URL</Label>
+                      <Input id="briefLink" name="briefLink" type="url" placeholder="https://docs.google.com/document/d/..." />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="driveLink" className="text-xs">Google Drive Folder URL</Label>
+                      <Input id="driveLink" name="driveLink" type="url" placeholder="https://drive.google.com/drive/folders/..." />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="researchLink" className="text-xs">Research Documents URL</Label>
+                      <Input id="researchLink" name="researchLink" type="url" placeholder="https://notion.so/..." />
+                    </div>
+                  </div>
+                </div>
+
                 <DialogFooter>
                   <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                     Cancel
@@ -347,30 +400,17 @@ export default function ProjectsPage() {
 
         {/* Filters */}
         <AnimatedCard delay={250} className="p-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search projects..."
-                className="pl-10 bg-secondary border-0"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <div className="flex gap-2">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[140px] bg-secondary border-0">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="planning">Planning</SelectItem>
-                  <SelectItem value="in-progress">In Progress</SelectItem>
-                  <SelectItem value="review">Review</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="on-hold">On Hold</SelectItem>
-                </SelectContent>
-              </Select>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search projects, clients, or managers..."
+                  className="pl-10 bg-secondary border-0"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
               <div className="flex bg-secondary rounded-lg p-1">
                 <button
                   onClick={() => setViewMode("grid")}
@@ -392,6 +432,68 @@ export default function ProjectsPage() {
                 </button>
               </div>
             </div>
+
+            {/* Filter Row */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Filter className="w-4 h-4" />
+                <span>Filters:</span>
+              </div>
+
+              <Select value={clientFilter} onValueChange={setClientFilter}>
+                <SelectTrigger className="w-[160px] h-9 bg-secondary border-0 text-sm">
+                  <SelectValue placeholder="All Clients" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Clients</SelectItem>
+                  {uniqueClients.map(client => (
+                    <SelectItem key={client} value={client}>{client}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={managerFilter} onValueChange={setManagerFilter}>
+                <SelectTrigger className="w-[160px] h-9 bg-secondary border-0 text-sm">
+                  <User className="w-3.5 h-3.5 mr-1" />
+                  <SelectValue placeholder="All Managers" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Managers</SelectItem>
+                  {uniqueManagers.map(manager => (
+                    <SelectItem key={manager} value={manager}>{manager}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[140px] h-9 bg-secondary border-0 text-sm">
+                  <SelectValue placeholder="All Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="planning">Planning</SelectItem>
+                  <SelectItem value="in-progress">In Progress</SelectItem>
+                  <SelectItem value="review">Review</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="on-hold">On Hold</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {(clientFilter !== "all" || managerFilter !== "all" || statusFilter !== "all") && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-9 text-muted-foreground hover:text-foreground"
+                  onClick={() => {
+                    setClientFilter("all")
+                    setManagerFilter("all")
+                    setStatusFilter("all")
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              )}
+            </div>
           </div>
         </AnimatedCard>
 
@@ -401,86 +503,86 @@ export default function ProjectsPage() {
             {filteredProjects.map((project, i) => {
               const StatusIcon = statusConfig[project.status].icon
               return (
-                <AnimatedCard
-                  key={project.id}
-                  delay={300 + i * 50}
-                  className="cursor-pointer"
-                  onClick={() => setSelectedProject(project)}
-                >
-                  <CardContent className="p-5">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs font-normal">
-                            {project.category}
-                          </Badge>
-                          <Badge className={`${priorityConfig[project.priority].color} border-0 text-xs`}>
-                            {priorityConfig[project.priority].label}
-                          </Badge>
-                        </div>
-                        <h3 className="font-semibold mt-2">{project.name}</h3>
-                        <p className="text-sm text-muted-foreground mt-1">{project.client}</p>
-                      </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <button className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
-                            <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>View Details</DropdownMenuItem>
-                          <DropdownMenuItem>Edit Project</DropdownMenuItem>
-                          <DropdownMenuItem>View Tasks</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-
-                    <div className="mt-4 space-y-3">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Progress</span>
-                        <span className="font-medium">{project.progress}%</span>
-                      </div>
-                      <Progress value={project.progress} className="h-2" />
-                    </div>
-
-                    <div className="mt-4 flex items-center justify-between">
-                      <Badge className={`${statusConfig[project.status].color} border-0`}>
-                        <StatusIcon className="w-3 h-3 mr-1" />
-                        {statusConfig[project.status].label}
-                      </Badge>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(project.dueDate).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
-                      <div className="flex -space-x-2">
-                        {project.team.slice(0, 3).map((member, idx) => (
-                          <Avatar key={idx} className="w-7 h-7 border-2 border-card">
-                            <AvatarFallback className="bg-primary/20 text-primary text-xs">{member}</AvatarFallback>
-                          </Avatar>
-                        ))}
-                        {project.team.length > 3 && (
-                          <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center text-xs border-2 border-card">
-                            +{project.team.length - 3}
+                <Link key={project.id} href={`/projects/${project.id}`}>
+                  <AnimatedCard
+                    delay={300 + i * 50}
+                    className="cursor-pointer h-full card-hover"
+                  >
+                    <CardContent className="p-5">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs font-normal">
+                              {project.category}
+                            </Badge>
+                            <Badge className={`${priorityConfig[project.priority].color} border-0 text-xs`}>
+                              {priorityConfig[project.priority].label}
+                            </Badge>
                           </div>
-                        )}
+                          <h3 className="font-semibold mt-2">{project.name}</h3>
+                          <p className="text-sm text-muted-foreground mt-1">{project.client}</p>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                            <button className="p-1.5 rounded-lg hover:bg-secondary transition-colors">
+                              <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>View Details</DropdownMenuItem>
+                            <DropdownMenuItem>Edit Project</DropdownMenuItem>
+                            <DropdownMenuItem>View Tasks</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                        <span>
-                          <CheckCircle className="w-3.5 h-3.5 inline mr-1" />
-                          {project.tasks.completed}/{project.tasks.total}
-                        </span>
-                        <span className="text-primary font-medium">
-                          ${(project.spent / 1000).toFixed(1)}K / ${(project.budget / 1000).toFixed(0)}K
-                        </span>
+
+                      <div className="mt-4 space-y-3">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">Progress</span>
+                          <span className="font-medium">{project.progress}%</span>
+                        </div>
+                        <Progress value={project.progress} className="h-2" />
                       </div>
-                    </div>
-                  </CardContent>
-                </AnimatedCard>
+
+                      <div className="mt-4 flex items-center justify-between">
+                        <Badge className={`${statusConfig[project.status].color} border-0`}>
+                          <StatusIcon className="w-3 h-3 mr-1" />
+                          {statusConfig[project.status].label}
+                        </Badge>
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(project.dueDate).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
+                        <div className="flex -space-x-2">
+                          {project.team.slice(0, 3).map((member, idx) => (
+                            <Avatar key={idx} className="w-7 h-7 border-2 border-card">
+                              <AvatarFallback className="bg-primary/20 text-primary text-xs">{member}</AvatarFallback>
+                            </Avatar>
+                          ))}
+                          {project.team.length > 3 && (
+                            <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center text-xs border-2 border-card">
+                              +{project.team.length - 3}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                          <span>
+                            <CheckCircle className="w-3.5 h-3.5 inline mr-1" />
+                            {project.tasks.completed}/{project.tasks.total}
+                          </span>
+                          <span className="text-primary font-medium">
+                            ${(project.spent / 1000).toFixed(1)}K / ${(project.budget / 1000).toFixed(0)}K
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </AnimatedCard>
+                </Link>
               )
             })}
           </div>
@@ -510,7 +612,7 @@ export default function ProjectsPage() {
                           key={project.id}
                           className="border-b border-border/50 hover:bg-secondary/30 transition-colors cursor-pointer animate-in fade-in slide-in-from-bottom-2 duration-300"
                           style={{ animationDelay: `${i * 50}ms` }}
-                          onClick={() => setSelectedProject(project)}
+                          onClick={() => router.push(`/projects/${project.id}`)}
                         >
                           <td className="py-3 px-4">
                             <div>
@@ -587,7 +689,7 @@ export default function ProjectsPage() {
                         key={project.id}
                         className="p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors cursor-pointer animate-in fade-in slide-in-from-bottom-2 duration-300"
                         style={{ animationDelay: `${i * 50}ms` }}
-                        onClick={() => setSelectedProject(project)}
+                        onClick={() => router.push(`/projects/${project.id}`)}
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">

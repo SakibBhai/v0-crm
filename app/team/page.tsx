@@ -3,14 +3,18 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
+import { DashboardLayout } from "@/components/dashboard-layout"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { AnimatedCard } from "@/components/animated-card"
+import { Progress } from "@/components/ui/progress"
 import {
   Calendar,
   TrendingUp,
@@ -26,27 +30,27 @@ import {
   Briefcase,
   Eye,
   Download,
-  MailIcon,
+  Mail,
+  Edit,
+  Trash2,
+  Clock,
+  Award,
+  Target,
+  LayoutGrid,
+  List,
+  UserPlus,
+  Settings,
+  MoreHorizontal,
 } from "lucide-react"
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
-// Assuming DashboardLayout is defined elsewhere, e.g., in components/dashboard-layout.tsx
-// For demonstration purposes, let's mock it here. In a real app, you'd import it.
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => (
-  <div className="min-h-screen bg-background">
-    {/* Mock Header/Sidebar */}
-    <header className="border-b border-border/40 py-4 px-6 flex items-center justify-between">
-      <h2 className="text-xl font-semibold">AgencyFlow Dashboard</h2>
-      <div className="flex items-center gap-4">
-        <Input placeholder="Search..." className="w-64" />
-        <Avatar>
-          <AvatarFallback>JD</AvatarFallback>
-        </Avatar>
-      </div>
-    </header>
-    <main className="p-6">{children}</main>
-  </div>
-)
 
 interface TeamMember {
   id: string
@@ -971,13 +975,12 @@ export default function TeamPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div
-                        className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-card ${
-                          member.status === "active"
-                            ? "bg-success"
-                            : member.status === "away"
-                              ? "bg-warning"
-                              : "bg-muted"
-                        }`}
+                        className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-card ${member.status === "active"
+                          ? "bg-success"
+                          : member.status === "away"
+                            ? "bg-warning"
+                            : "bg-muted"
+                          }`}
                       />
                     </div>
 
@@ -1526,7 +1529,7 @@ export default function TeamPage() {
                 <TabsContent value="contact" className="space-y-4">
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 p-3 border border-border rounded">
-                      <MailIcon className="w-5 h-5 text-primary" />
+                      <Mail className="w-5 h-5 text-primary" />
                       <div>
                         <p className="text-sm text-muted-foreground">Email</p>
                         <p className="font-medium">{selectedMember.email}</p>
@@ -1578,6 +1581,76 @@ export default function TeamPage() {
             </DialogContent>
           </Dialog>
         )}
+        {/* Add Team Member Dialog */}
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <UserPlus className="w-5 h-5 text-primary" />
+                Add New Team Member
+              </DialogTitle>
+              <DialogDescription>
+                Fill in the details to add a new team member to your organization.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleAddMember} className="space-y-4 mt-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Full Name *</Label>
+                  <Input id="name" name="name" placeholder="John Doe" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="role">Role *</Label>
+                  <Input id="role" name="role" placeholder="Senior Developer" required />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email *</Label>
+                  <Input id="email" name="email" type="email" placeholder="john@company.com" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input id="phone" name="phone" placeholder="+1 (555) 000-0000" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="department">Department *</Label>
+                  <Select name="department" defaultValue="development">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="design">Design</SelectItem>
+                      <SelectItem value="development">Development</SelectItem>
+                      <SelectItem value="marketing">Marketing</SelectItem>
+                      <SelectItem value="content">Content</SelectItem>
+                      <SelectItem value="management">Management</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="location">Location</Label>
+                  <Input id="location" name="location" placeholder="City, State" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="skills">Skills (comma separated)</Label>
+                <Input id="skills" name="skills" placeholder="React, TypeScript, Node.js" />
+              </div>
+              <DialogFooter className="gap-2 sm:gap-0">
+                <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" className="gap-2">
+                  <Plus className="w-4 h-4" />
+                  Add Member
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   )

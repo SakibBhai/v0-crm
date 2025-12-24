@@ -458,10 +458,10 @@ export default function LeadsPage() {
       leads.map((lead) =>
         lead.id === selectedLead.id
           ? {
-              ...lead,
-              ...updatedData,
-              lastContact: new Date().toISOString(), // Update lastContact on any edit
-            }
+            ...lead,
+            ...updatedData,
+            lastContact: new Date().toISOString(), // Update lastContact on any edit
+          }
           : lead,
       ),
     )
@@ -490,10 +490,10 @@ export default function LeadsPage() {
       leads.map((l) =>
         l.id === id
           ? {
-              ...l,
-              status: newStatus,
-              lastContact: new Date().toISOString(),
-            }
+            ...l,
+            status: newStatus,
+            lastContact: new Date().toISOString(),
+          }
           : l,
       ),
     )
@@ -936,9 +936,8 @@ export default function LeadsPage() {
                 return (
                   <div
                     key={stage}
-                    className={`w-[300px] flex flex-col rounded-xl transition-all duration-200 ${
-                      isDropTarget ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
-                    }`}
+                    className={`w-[300px] flex flex-col rounded-xl transition-all duration-200 ${isDropTarget ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
+                      }`}
                     onDragOver={(e) => handleDragOver(e, stage)}
                     onDragLeave={handleDragLeave}
                     onDrop={(e) => handleDrop(e, stage)}
@@ -955,9 +954,8 @@ export default function LeadsPage() {
                     </div>
 
                     <div
-                      className={`flex-1 p-2 bg-secondary/30 rounded-b-xl border border-border border-t-0 min-h-[400px] space-y-2 transition-colors ${
-                        isDropTarget ? "bg-primary/5" : ""
-                      }`}
+                      className={`flex-1 p-2 bg-secondary/30 rounded-b-xl border border-border border-t-0 min-h-[400px] space-y-2 transition-colors ${isDropTarget ? "bg-primary/5" : ""
+                        }`}
                     >
                       {stageLeads.map((lead, i) => {
                         const StatusIcon = statusConfig[lead.status].icon
@@ -969,9 +967,14 @@ export default function LeadsPage() {
                             draggable
                             onDragStart={(e) => handleDragStart(e, lead)}
                             onDragEnd={handleDragEnd}
-                            className={`group bg-card rounded-lg border border-border p-3 cursor-grab active:cursor-grabbing transition-all duration-200 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 animate-in fade-in slide-in-from-bottom-2 ${
-                              draggedLead?.id === lead.id ? "opacity-50 scale-95" : ""
-                            }`}
+                            onClick={(e) => {
+                              // Prevent opening dialog when clicking on interactive elements
+                              if ((e.target as HTMLElement).closest('button, [role="menuitem"], [data-radix-collection-item]')) return;
+                              setSelectedLead(lead);
+                              setIsViewDialogOpen(true);
+                            }}
+                            className={`group bg-card rounded-lg border border-border p-3 cursor-pointer active:cursor-grabbing transition-all duration-200 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 animate-in fade-in slide-in-from-bottom-2 ${draggedLead?.id === lead.id ? "opacity-50 scale-95" : ""
+                              }`}
                             style={{ animationDelay: `${i * 30}ms` }}
                           >
                             <div className="flex items-start justify-between gap-2">
@@ -1151,9 +1154,14 @@ export default function LeadsPage() {
                       return (
                         <tr
                           key={lead.id}
-                          className={`border-b border-border/50 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300 ${
-                            selectedLeads.includes(lead.id) ? "bg-primary/5" : "hover:bg-secondary/30"
-                          }`}
+                          onClick={(e) => {
+                            // Prevent opening dialog when clicking on interactive elements
+                            if ((e.target as HTMLElement).closest('button, input, [role="menuitem"], [data-radix-collection-item]')) return;
+                            setSelectedLead(lead);
+                            setIsViewDialogOpen(true);
+                          }}
+                          className={`border-b border-border/50 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300 cursor-pointer ${selectedLeads.includes(lead.id) ? "bg-primary/5" : "hover:bg-secondary/30"
+                            }`}
                           style={{ animationDelay: `${i * 30}ms` }}
                         >
                           <td className="py-3 px-4">
@@ -1328,7 +1336,17 @@ export default function LeadsPage() {
               const SourceIcon = sourceIcons[lead.source] || Globe
 
               return (
-                <AnimatedCard key={lead.id} delay={i * 30} className="p-4 group">
+                <AnimatedCard
+                  key={lead.id}
+                  delay={i * 30}
+                  className="p-4 group cursor-pointer"
+                  onClick={(e) => {
+                    // Prevent opening dialog when clicking on interactive elements
+                    if ((e.target as HTMLElement).closest('button, [role="menuitem"], [data-radix-collection-item]')) return;
+                    setSelectedLead(lead);
+                    setIsViewDialogOpen(true);
+                  }}
+                >
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <Avatar className="w-10 h-10">
@@ -1514,21 +1532,19 @@ export default function LeadsPage() {
                   <div className="flex gap-2 border-b border-border mb-6">
                     <button
                       onClick={() => setActiveTab("overview")}
-                      className={`px-4 py-2 text-sm font-medium transition-colors ${
-                        activeTab === "overview"
+                      className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === "overview"
                           ? "border-b-2 border-primary text-primary"
                           : "text-muted-foreground hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       Overview
                     </button>
                     <button
                       onClick={() => setActiveTab("history")}
-                      className={`px-4 py-2 text-sm font-medium transition-colors ${
-                        activeTab === "history"
+                      className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === "history"
                           ? "border-b-2 border-primary text-primary"
                           : "text-muted-foreground hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       Activity History
                     </button>

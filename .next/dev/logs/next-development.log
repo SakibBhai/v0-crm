@@ -1,0 +1,539 @@
+[00:00:00.787] Server  WARN     ⚠ Minimum recommended TypeScript version is v5.1.0, older versions can potentially be incompatible with Next.js. Detected: 5.0.2
+[00:00:00.928] Server  LOG      ✓ Ready in 593ms
+[00:00:12.386] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:12.916] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. T
+[00:00:12.916] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. S
+[00:00:12.916] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:12.916] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:00:12.916] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3001/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766563342908}
+[00:00:17.759] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3001/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766563347760}
+[00:00:19.984] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. T
+[00:00:19.984] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. S
+[00:00:19.984] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:00:19.984] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3001/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766563349912}
+[00:00:22.597] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3001/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766563352584}
+[00:00:23.041] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:23.472] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:23.473] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/team","route":"/team"}
+[00:00:23.473] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3001/team","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766563353471}
+[00:00:37.554] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/tasks color: rgb(120, 120, 120) color: inherit {"dp":"/tasks","o":"http://localhost:3001/tasks","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766563367545}
+[00:00:39.344] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:00:39.344] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:02:55.448] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. T
+[00:02:55.448] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. S
+[00:02:55.448] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:02:55.448] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3001/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766563505134}
+[00:03:00.943] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3001/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766563510941}
+[00:03:03.501] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:03:03.501] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:08:29.914] Server  LOG      ✓ Compiled in 168ms
+[00:09:56.171] Server  LOG      ✓ Compiled in 81ms
+[00:10:30.103] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3001/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766563960093}
+[00:10:32.066] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:10:32.066] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:10:43.373] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:10:43.373] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:10:44.422] Server  LOG      ✓ Compiled in 97ms
+[00:10:47.907] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:10:47.907] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:11:17.216] Server  LOG      ✓ Compiled in 74ms
+[00:11:17.321] Browser ERROR   ./app/projects/page.tsx:553:15
+Parsing ecmascript source code failed
+  551 |                   </AnimatedCard>
+  552 |                   )
+> 553 |             })}
+      |               ^
+  554 |                 </div>
+  555 |               )
+  556 |             }
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./app/projects/page.tsx [Client Component Browser]
+    ./app/projects/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/projects/page.tsx [Client Component SSR]
+    ./app/projects/page.tsx [Server Component]
+[00:11:17.901] Browser ERROR   ./app/projects/page.tsx:553:15
+Parsing ecmascript source code failed
+  551 |                   </AnimatedCard>
+  552 |                   )
+> 553 |             })}
+      |               ^
+  554 |                 </div>
+  555 |               )
+  556 |             }
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./app/projects/page.tsx [Client Component Browser]
+    ./app/projects/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/projects/page.tsx [Client Component SSR]
+    ./app/projects/page.tsx [Server Component]
+[00:11:41.355] Server  LOG      ✓ Compiled in 67ms
+[00:11:41.458] Browser ERROR   ./app/projects/page.tsx:549:35
+Parsing ecmascript source code failed
+  547 |                           </span>
+  548 |                         </div>
+> 549 |                     </CardContent>
+      |                                   ^
+> 550 |                   </AnimatedCard>
+      | ^^^^^^^^^^^^^^^^^^^
+  551 |                 </Link>
+  552 |               )
+  553 |             })}
+
+Expected '</', got 'jsx text (
+                  )'
+
+Import traces:
+  Client Component Browser:
+    ./app/projects/page.tsx [Client Component Browser]
+    ./app/projects/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/projects/page.tsx [Client Component SSR]
+    ./app/projects/page.tsx [Server Component]
+[00:11:41.913] Browser ERROR   ./app/projects/page.tsx:549:35
+Parsing ecmascript source code failed
+  547 |                           </span>
+  548 |                         </div>
+> 549 |                     </CardContent>
+      |                                   ^
+> 550 |                   </AnimatedCard>
+      | ^^^^^^^^^^^^^^^^^^^
+  551 |                 </Link>
+  552 |               )
+  553 |             })}
+
+Expected '</', got 'jsx text (
+                  )'
+
+Import traces:
+  Client Component Browser:
+    ./app/projects/page.tsx [Client Component Browser]
+    ./app/projects/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/projects/page.tsx [Client Component SSR]
+    ./app/projects/page.tsx [Server Component]
+[00:12:46.208] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:12:46.347] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/projects" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html lang="en" className="dark" suppressHydrationWarning={true}>
+                          <body
++                           className="inter_2fe1ab3d-module__-T-KAq__variable geist_mono_aed55a57-module__iGg3zq__var..."
+-                           className="inter_2fe1ab3d-module__-T-KAq__variable geist_mono_aed55a57-module__iGg3zq__var..."
+                          >
+                  ...
+
+[00:12:46.884] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:12:46.884] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/projects","route":"/projects"}
+[00:12:46.884] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3001/projects","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564096884}
+[00:12:55.728] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects/1 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3001/projects/1","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564105595}
+[00:12:55.728] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:20:19.308] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3001/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564549304}
+[00:20:20.647] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3001/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564550616}
+[00:20:21.727] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects/1 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3001/projects/1","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564551723}
+[00:20:34.061] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3001/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564564028}
+[00:20:39.148] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:20:39.148] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:20:45.855] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:20:45.855] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:20:53.922] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects/1 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3001/projects/1","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564583920}
+[00:21:29.057] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3001/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564619051}
+[00:21:30.120] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3001/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564620114}
+[00:21:30.918] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3001/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564620893}
+[00:21:34.318] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:21:34.318] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:21:39.460] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects/2 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3001/projects/2","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564629456}
+[00:21:48.503] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/tasks color: rgb(120, 120, 120) color: inherit {"dp":"/tasks","o":"http://localhost:3001/tasks","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564638501}
+[00:21:49.568] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:21:49.568] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:21:52.886] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3001/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564642856}
+[00:22:02.484] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects/5 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3001/projects/5","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564652482}
+[00:22:18.184] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3001/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564668173}
+[00:22:23.022] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3001/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564672987}
+[00:22:24.177] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:22:24.177] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:22:33.129] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects/2 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3001/projects/2","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564683124}
+[00:22:34.450] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3001/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766564684420}
+[00:22:39.105] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:22:39.105] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:28:18.111] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects/1 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3001/projects/1","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766565028100}
+[00:28:33.109] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3001/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766565043067}
+[00:28:35.631] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects/1 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3001/projects/1","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766565045624}
+[00:29:38.125] Server  LOG      ✓ Compiled in 64ms
+[00:29:38.227] Browser ERROR   ./app/projects/page.tsx:61:1
+Parsing ecmascript source code failed
+  59 |   researchLink?: string
+  60 | }
+> 61 | }
+     | ^
+  62 |
+  63 | const initialProjects: Project[] = [
+  64 |   {
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./app/projects/page.tsx [Client Component Browser]
+    ./app/projects/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/projects/page.tsx [Client Component SSR]
+    ./app/projects/page.tsx [Server Component]
+[00:29:38.227] Browser ERROR   ./app/projects/page.tsx:61:1
+Parsing ecmascript source code failed
+  59 |   researchLink?: string
+  60 | }
+> 61 | }
+     | ^
+  62 |
+  63 | const initialProjects: Project[] = [
+  64 |   {
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./app/projects/page.tsx [Client Component Browser]
+    ./app/projects/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/projects/page.tsx [Client Component SSR]
+    ./app/projects/page.tsx [Server Component]
+[00:29:38.914] Browser ERROR   ./app/projects/page.tsx:61:1
+Parsing ecmascript source code failed
+  59 |   researchLink?: string
+  60 | }
+> 61 | }
+     | ^
+  62 |
+  63 | const initialProjects: Project[] = [
+  64 |   {
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./app/projects/page.tsx [Client Component Browser]
+    ./app/projects/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/projects/page.tsx [Client Component SSR]
+    ./app/projects/page.tsx [Server Component]
+[00:30:27.200] Server  LOG      ✓ Compiled in 72ms
+[00:30:49.843] Server  LOG      ✓ Compiled in 65ms
+[00:31:18.470] Server  LOG      ✓ Compiled in 83ms
+[00:32:06.997] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/tasks color: rgb(120, 120, 120) color: inherit {"dp":"/tasks","o":"http://localhost:3001/tasks","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766565256991}
+[00:32:16.164] Server  LOG      ✓ Compiled in 74ms
+[00:32:35.668] Server  LOG      ✓ Compiled in 100ms
+[00:32:43.157] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:32:43.157] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:32:46.957] Browser ERROR   You provided a `checked` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultChecked`. Otherwise, set either `onChange` or `readOnly`.
+[00:32:46.957] Browser ERROR   You provided a `checked` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultChecked`. Otherwise, set either `onChange` or `readOnly`.
+[00:32:46.957] Browser ERROR   You provided a `checked` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultChecked`. Otherwise, set either `onChange` or `readOnly`.
+[00:32:46.957] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:32:46.957] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:32:49.580] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:32:49.580] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:32:54.418] Server  LOG      ✓ Compiled in 70ms
+[00:32:55.670] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:32:55.670] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:33:00.024] Browser ERROR   You provided a `checked` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultChecked`. Otherwise, set either `onChange` or `readOnly`.
+[00:33:00.024] Browser ERROR   You provided a `checked` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultChecked`. Otherwise, set either `onChange` or `readOnly`.
+[00:33:00.024] Browser ERROR   You provided a `checked` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultChecked`. Otherwise, set either `onChange` or `readOnly`.
+[00:33:00.024] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:33:00.024] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:33:01.319] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:33:01.319] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:33:19.377] Server  LOG      ✓ Compiled in 79ms
+[00:34:04.443] Server  LOG      ✓ Compiled in 86ms
+[00:34:34.479] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:34:34.631] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/projects" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html lang="en" className="dark" suppressHydrationWarning={true}>
+                          <body
++                           className="inter_2fe1ab3d-module__-T-KAq__variable geist_mono_aed55a57-module__iGg3zq__var..."
+-                           className="inter_2fe1ab3d-module__-T-KAq__variable geist_mono_aed55a57-module__iGg3zq__var..."
+                          >
+                  ...
+
+[00:34:35.187] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:34:35.187] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/projects","route":"/projects"}
+[00:34:35.187] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3001/projects","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766565405181}
+[00:35:02.948] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects/1 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3001/projects/1","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766565432942}
+[00:35:03.271] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:35:15.804] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:35:15.967] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/projects" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html lang="en" className="dark" suppressHydrationWarning={true}>
+                          <body
++                           className="inter_2fe1ab3d-module__-T-KAq__variable geist_mono_aed55a57-module__iGg3zq__var..."
+-                           className="inter_2fe1ab3d-module__-T-KAq__variable geist_mono_aed55a57-module__iGg3zq__var..."
+                          >
+                  ...
+
+[00:35:16.519] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:35:16.519] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/projects","route":"/projects"}
+[00:35:16.519] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3001/projects","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766565446514}
+[00:35:38.054] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects/5 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3001/projects/5","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766565468043}
+[00:35:38.361] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:36:39.717] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3001/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766565529575}
+[00:36:41.183] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects/2 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3001/projects/2","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766565531171}
+[00:36:44.465] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3001/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766565534357}
+[00:36:48.842] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects/1 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3001/projects/1","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766565538830}
+[00:36:50.657] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3001/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766565540551}
+[00:36:59.687] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects/2 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3001/projects/2","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766565549673}
+[00:37:21.304] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3001/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766565571304}
+[00:37:23.044] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:37:23.044] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[01:04:52.786] Server  LOG      ✓ Compiled in 0ms
+[01:06:45.171] Server  LOG      ✓ Compiled in 125ms
+[01:08:43.037] Server  LOG      ✓ Compiled in 215ms
+[01:09:09.597] Server  LOG      ✓ Compiled in 343ms
+[01:11:08.811] Server  LOG      ✓ Compiled in 138ms
+[01:11:34.903] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:11:35.390] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:11:35.390] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/leads","route":"/leads"}
+[01:11:35.390] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3001/leads","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766567625386}
+[01:11:36.266] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:11:36.680] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/reports" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html lang="en" className="dark" suppressHydrationWarning={true}>
+                          <body
++                           className="inter_2fe1ab3d-module__-T-KAq__variable geist_mono_aed55a57-module__iGg3zq__var..."
+-                           className="inter_2fe1ab3d-module__-T-KAq__variable geist_mono_aed55a57-module__iGg3zq__var..."
+                          >
+                  ...
+
+[01:11:36.859] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:11:36.859] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/reports","route":"/reports"}
+[01:11:36.859] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/reports color: rgb(120, 120, 120) color: inherit {"dp":"/reports","o":"http://localhost:3001/reports","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766567626823}
+[01:11:57.583] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[01:11:57.583] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/reports/builder color: rgb(120, 120, 120) color: inherit {"dp":"/reports/builder","o":"http://localhost:3001/reports/builder","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766567647561}
+[01:12:59.425] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:12:59.739] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/reports/p..." notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html lang="en" className="dark" suppressHydrationWarning={true}>
+                          <body
++                           className="inter_2fe1ab3d-module__-T-KAq__variable geist_mono_aed55a57-module__iGg3zq__var..."
+-                           className="inter_2fe1ab3d-module__-T-KAq__variable geist_mono_aed55a57-module__iGg3zq__var..."
+                          >
+                  ...
+
+[01:12:59.858] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:12:59.858] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/reports/planner","route":"/reports/planner"}
+[01:12:59.858] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/reports/planner color: rgb(120, 120, 120) color: inherit {"dp":"/reports/planner","o":"http://localhost:3001/reports/planner","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766567709864}
+[01:22:22.303] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[01:22:22.303] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/reports color: rgb(120, 120, 120) color: inherit {"dp":"/reports","o":"http://localhost:3001/reports","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766568272140}
+[01:22:36.735] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/reports/planner color: rgb(120, 120, 120) color: inherit {"dp":"/reports/planner","o":"http://localhost:3001/reports/planner","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766568286734}
+[01:23:12.043] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/reports color: rgb(120, 120, 120) color: inherit {"dp":"/reports","o":"http://localhost:3001/reports","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766568321950}
+[01:23:16.810] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/reports/builder color: rgb(120, 120, 120) color: inherit {"dp":"/reports/builder","o":"http://localhost:3001/reports/builder","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766568326807}
+[01:24:01.007] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. T
+[01:24:01.007] Browser ERROR   Encountered two children with the same key, `%s`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. S
+[01:24:01.007] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3001/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766568370788}
+[01:24:04.312] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/reports color: rgb(120, 120, 120) color: inherit {"dp":"/reports","o":"http://localhost:3001/reports","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766568374235}
+[01:24:06.062] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/settings color: rgb(120, 120, 120) color: inherit {"dp":"/settings","o":"http://localhost:3001/settings","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766568375951}
+[01:24:09.750] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3001/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766568379748}
+[01:31:51.795] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:31:52.907] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:31:52.907] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/leads","route":"/leads"}
+[01:31:52.907] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3001/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766568842118}
+[01:36:17.098] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3001/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766569107091}
+[01:36:23.025] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects/1 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3001/projects/1","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766569113017}
+[01:37:33.773] Server  LOG      ✓ Compiled in 82ms
+[01:37:53.313] Server  LOG      ✓ Compiled in 71ms
+[01:38:32.036] Server  LOG      ✓ Compiled in 67ms
+[01:38:59.852] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:38:59.997] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/projects/1" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html lang="en" className="dark" suppressHydrationWarning={true}>
+                          <body
++                           className="inter_2fe1ab3d-module__-T-KAq__variable geist_mono_aed55a57-module__iGg3zq__var..."
+-                           className="inter_2fe1ab3d-module__-T-KAq__variable geist_mono_aed55a57-module__iGg3zq__var..."
+                          >
+                  ...
+
+[01:39:00.303] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:39:00.303] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/projects/1","route":"/projects/[id]"}
+[01:39:00.303] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects/1 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3001/projects/1","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766569270306}
+[01:40:44.514] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:40:44.784] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:40:44.784] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/projects/1","route":"/projects/[id]"}
+[01:40:44.784] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/projects/1 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3001/projects/1","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766569374790}
+[01:47:36.148] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[01:47:36.423] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[01:47:36.423] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/leads","route":"/leads"}
+[01:47:36.423] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3001/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3001/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766569786421}
