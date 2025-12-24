@@ -66,28 +66,39 @@ import {
   SlidersHorizontal,
   Download,
   Upload,
+  History,
 } from "lucide-react"
+
+type Stage = "new" | "contacted" | "qualified" | "proposal" | "negotiation" | "won" | "lost"
 
 interface Lead {
   id: string
   name: string
+  company: string
   email: string
   phone: string
-  company: string
   status: "hot" | "warm" | "cold"
-  stage: "new" | "contacted" | "qualified" | "proposal" | "negotiation" | "won" | "lost"
-  source: string
+  stage: Stage
+  priority: "high" | "medium" | "low"
   value: number
   probability: number
+  source: string
+  assignedTo: string
+  activities: number
+  tags: string[]
+  notes: string
   createdAt: string
   lastContact: string
   nextFollowUp: string
-  notes: string
-  tags: string[]
-  assignedTo: string
-  priority: "high" | "medium" | "low"
   starred: boolean
-  activities: number
+  activityHistory: Array<{
+    id: string
+    type: "created" | "updated" | "note_added" | "status_changed" | "stage_changed"
+    description: string
+    timestamp: string
+    changedBy: string
+    changes?: Record<string, { old: string | number; new: string | number }>
+  }>
 }
 
 const initialLeads: Lead[] = [
@@ -111,6 +122,7 @@ const initialLeads: Lead[] = [
     priority: "high",
     starred: true,
     activities: 12,
+    activityHistory: [],
   },
   {
     id: "2",
@@ -132,6 +144,7 @@ const initialLeads: Lead[] = [
     priority: "medium",
     starred: false,
     activities: 5,
+    activityHistory: [],
   },
   {
     id: "3",
@@ -153,6 +166,7 @@ const initialLeads: Lead[] = [
     priority: "high",
     starred: true,
     activities: 18,
+    activityHistory: [],
   },
   {
     id: "4",
@@ -174,6 +188,7 @@ const initialLeads: Lead[] = [
     priority: "low",
     starred: false,
     activities: 2,
+    activityHistory: [],
   },
   {
     id: "5",
@@ -195,6 +210,7 @@ const initialLeads: Lead[] = [
     priority: "medium",
     starred: false,
     activities: 8,
+    activityHistory: [],
   },
   {
     id: "6",
@@ -216,6 +232,7 @@ const initialLeads: Lead[] = [
     priority: "high",
     starred: true,
     activities: 15,
+    activityHistory: [],
   },
   {
     id: "7",
@@ -237,6 +254,7 @@ const initialLeads: Lead[] = [
     priority: "medium",
     starred: false,
     activities: 4,
+    activityHistory: [],
   },
   {
     id: "8",
@@ -258,6 +276,7 @@ const initialLeads: Lead[] = [
     priority: "low",
     starred: false,
     activities: 1,
+    activityHistory: [],
   },
 ]
 
@@ -293,7 +312,7 @@ const sourceIcons: Record<string, React.ComponentType<{ className?: string }>> =
 }
 
 type ViewMode = "table" | "grid" | "kanban"
-type Stage = Lead["stage"]
+// type Stage = Lead["stage"] // moved Stage type definition up
 
 export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>(initialLeads)
@@ -305,6 +324,8 @@ export default function LeadsPage() {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState("overview")
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false)
   const [viewMode, setViewMode] = useState<ViewMode>("kanban")
   const [selectedLeads, setSelectedLeads] = useState<string[]>([])
@@ -365,27 +386,130 @@ export default function LeadsPage() {
       priority: formData.get("priority") as "high" | "medium" | "low",
       starred: false,
       activities: 0,
+      activityHistory: [
+        {
+          id: Date.now().toString(),
+          type: "created",
+          description: "Lead created",
+          timestamp: new Date().toISOString(),
+          changedBy: "Current User",
+        },
+      ],
     }
     setLeads([newLead, ...leads])
     setIsAddDialogOpen(false)
   }
 
+  const addActivityHistory = (
+    leadId: string,
+    type: Lead["activityHistory"][0]["type"],
+    description: string,
+    changes?: Record<string, { old: string | number; new: string | number }>,
+  ) => {
+    setLeads(
+      leads.map((lead) => {
+        if (lead.id === leadId) {
+          return {
+            ...lead,
+            activityHistory: [
+              {
+                id: Date.now().toString(),
+                type,
+                description,
+                timestamp: new Date().toISOString(),
+                changedBy: "Current User",
+                changes,
+              },
+              ...lead.activityHistory,
+            ],
+          }
+        }
+        return lead
+      }),
+    )
+  }
+
   const handleDeleteLead = (id: string) => {
     setLeads(leads.filter((l) => l.id !== id))
     setSelectedLeads(selectedLeads.filter((sid) => sid !== id))
+    setIsViewDialogOpen(false) // Close the view dialog if the lead being viewed is deleted
   }
 
-  const handleBulkDelete = () => {
-    setLeads(leads.filter((l) => !selectedLeads.includes(l.id)))
-    setSelectedLeads([])
+  const handleUpdateLead = (updatedData: Partial<Lead>) => {
+    if (!selectedLead) return
+
+    const oldLead = leads.find((l) => l.id === selectedLead.id)
+    if (!oldLead) return
+
+    // Track changes
+    const changes: Record<string, { old: string | number; new: string | number }> = {}
+    // Only compare fields that are potentially editable and relevant for history tracking
+    if (oldLead.name !== updatedData.name) changes["name"] = { old: oldLead.name, new: updatedData.name! }
+    if (oldLead.email !== updatedData.email) changes["email"] = { old: oldLead.email, new: updatedData.email! }
+    if (oldLead.phone !== updatedData.phone) changes["phone"] = { old: oldLead.phone, new: updatedData.phone! }
+    if (oldLead.status !== updatedData.status) changes["status"] = { old: oldLead.status, new: updatedData.status! }
+    if (oldLead.stage !== updatedData.stage) changes["stage"] = { old: oldLead.stage, new: updatedData.stage! }
+    if (oldLead.priority !== updatedData.priority)
+      changes["priority"] = { old: oldLead.priority, new: updatedData.priority! }
+    if (oldLead.notes !== updatedData.notes)
+      changes["notes"] = { old: oldLead.notes || "", new: updatedData.notes || "" }
+
+    setLeads(
+      leads.map((lead) =>
+        lead.id === selectedLead.id
+          ? {
+              ...lead,
+              ...updatedData,
+              lastContact: new Date().toISOString(), // Update lastContact on any edit
+            }
+          : lead,
+      ),
+    )
+
+    const updatedLead = { ...selectedLead, ...updatedData, lastContact: new Date().toISOString() }
+    setSelectedLead(updatedLead)
+
+    // Add to activity history only if there were actual changes detected
+    if (Object.keys(changes).length > 0) {
+      addActivityHistory(selectedLead.id, "updated", "Lead information updated", changes)
+    } else if (updatedData.notes && oldLead.notes !== updatedData.notes) {
+      // Special case for notes, even if other fields didn't change, if notes were added/changed
+      addActivityHistory(selectedLead.id, "note_added", "Note added", {
+        notes: { old: oldLead.notes || "", new: updatedData.notes },
+      })
+    }
+
+    setIsEditDialogOpen(false)
   }
 
   const handleStatusChange = (id: string, newStatus: "hot" | "warm" | "cold") => {
-    setLeads(leads.map((l) => (l.id === id ? { ...l, status: newStatus } : l)))
+    const oldLead = leads.find((l) => l.id === id)
+    if (!oldLead) return
+
+    setLeads(
+      leads.map((l) =>
+        l.id === id
+          ? {
+              ...l,
+              status: newStatus,
+              lastContact: new Date().toISOString(),
+            }
+          : l,
+      ),
+    )
+    addActivityHistory(id, "status_changed", `Status changed to ${newStatus}`, {
+      status: { old: oldLead.status, new: newStatus },
+    })
   }
 
   const handleStageChange = (id: string, newStage: Stage) => {
-    setLeads(leads.map((l) => (l.id === id ? { ...l, stage: newStage } : l)))
+    const oldLead = leads.find((l) => l.id === id)
+    if (!oldLead) return
+
+    setLeads(leads.map((l) => (l.id === id ? { ...l, stage: newStage, lastContact: new Date().toISOString() } : l)))
+    addActivityHistory(id, "stage_changed", `Stage changed to ${newStage}`, {
+      stage: { old: oldLead.stage, new: newStage },
+    })
   }
 
   const handleToggleStar = (id: string) => {
@@ -448,6 +572,12 @@ export default function LeadsPage() {
   ).length
 
   const kanbanStages: Stage[] = ["new", "contacted", "qualified", "proposal", "negotiation", "won", "lost"]
+
+  // Bulk delete function (added to fix the lint error)
+  const handleBulkDelete = () => {
+    setLeads(leads.filter((lead) => !selectedLeads.includes(lead.id)))
+    setSelectedLeads([])
+  }
 
   return (
     <DashboardLayout>
@@ -1327,7 +1457,7 @@ export default function LeadsPage() {
 
         {/* View Lead Dialog */}
         <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-          <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
             {selectedLead && (
               <>
                 <DialogHeader>
@@ -1357,138 +1487,395 @@ export default function LeadsPage() {
                         </div>
                       </div>
                     </div>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setIsEditDialogOpen(true)}
+                        className="gap-2 bg-transparent"
+                      >
+                        <Edit className="w-4 h-4" />
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDeleteLead(selectedLead.id)}
+                        className="gap-2"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                      </Button>
+                    </div>
                   </div>
                 </DialogHeader>
 
-                <div className="grid grid-cols-2 gap-6 mt-6">
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                      Contact Info
-                    </h4>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3 p-2 rounded-lg bg-secondary/50">
-                        <Mail className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm">{selectedLead.email}</span>
-                      </div>
-                      <div className="flex items-center gap-3 p-2 rounded-lg bg-secondary/50">
-                        <Phone className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm">{selectedLead.phone}</span>
-                      </div>
-                      <div className="flex items-center gap-3 p-2 rounded-lg bg-secondary/50">
-                        <Building2 className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm">{selectedLead.company}</span>
-                      </div>
-                    </div>
+                <div className="mt-6">
+                  <div className="flex gap-2 border-b border-border mb-6">
+                    <button
+                      onClick={() => setActiveTab("overview")}
+                      className={`px-4 py-2 text-sm font-medium transition-colors ${
+                        activeTab === "overview"
+                          ? "border-b-2 border-primary text-primary"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Overview
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("history")}
+                      className={`px-4 py-2 text-sm font-medium transition-colors ${
+                        activeTab === "history"
+                          ? "border-b-2 border-primary text-primary"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Activity History
+                    </button>
                   </div>
 
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Deal Info</h4>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
-                        <span className="text-sm text-muted-foreground">Deal Value</span>
-                        <span className="font-semibold text-emerald-400">${selectedLead.value.toLocaleString()}</span>
-                      </div>
-                      <div className="p-2 rounded-lg bg-secondary/50">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm text-muted-foreground">Win Probability</span>
-                          <span className="font-semibold">{selectedLead.probability}%</span>
+                  {activeTab === "overview" && (
+                    <>
+                      <div className="grid grid-cols-2 gap-6 mb-6">
+                        <div className="space-y-4">
+                          <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                            Contact Info
+                          </h4>
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-3 p-2 rounded-lg bg-secondary/50">
+                              <Mail className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-sm">{selectedLead.email}</span>
+                            </div>
+                            <div className="flex items-center gap-3 p-2 rounded-lg bg-secondary/50">
+                              <Phone className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-sm">{selectedLead.phone}</span>
+                            </div>
+                            <div className="flex items-center gap-3 p-2 rounded-lg bg-secondary/50">
+                              <Building2 className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-sm">{selectedLead.company}</span>
+                            </div>
+                          </div>
                         </div>
-                        <Progress value={selectedLead.probability} className="h-2" />
+
+                        <div className="space-y-4">
+                          <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                            Deal Info
+                          </h4>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
+                              <span className="text-sm text-muted-foreground">Deal Value</span>
+                              <span className="font-semibold text-emerald-400">
+                                ${selectedLead.value.toLocaleString()}
+                              </span>
+                            </div>
+                            <div className="p-2 rounded-lg bg-secondary/50">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm text-muted-foreground">Win Probability</span>
+                                <span className="font-semibold">{selectedLead.probability}%</span>
+                              </div>
+                              <Progress value={selectedLead.probability} className="h-2" />
+                            </div>
+                            <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
+                              <span className="text-sm text-muted-foreground">Weighted Value</span>
+                              <span className="font-semibold text-violet-400">
+                                ${Math.round((selectedLead.value * selectedLead.probability) / 100).toLocaleString()}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
-                        <span className="text-sm text-muted-foreground">Weighted Value</span>
-                        <span className="font-semibold text-violet-400">
-                          ${Math.round((selectedLead.value * selectedLead.probability) / 100).toLocaleString()}
-                        </span>
+
+                      <div className="grid grid-cols-2 gap-6 mb-6">
+                        <div className="space-y-4">
+                          <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                            Timeline
+                          </h4>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
+                              <span className="text-sm text-muted-foreground">Created</span>
+                              <span className="text-sm">{new Date(selectedLead.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
+                              <span className="text-sm text-muted-foreground">Last Contact</span>
+                              <span className="text-sm">{new Date(selectedLead.lastContact).toLocaleDateString()}</span>
+                            </div>
+                            <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
+                              <span className="text-sm text-muted-foreground">Next Follow-up</span>
+                              <span className="text-sm font-medium text-primary">
+                                {selectedLead.nextFollowUp
+                                  ? new Date(selectedLead.nextFollowUp).toLocaleDateString()
+                                  : "Not set"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4">
+                          <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                            Assignment
+                          </h4>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
+                              <span className="text-sm text-muted-foreground">Assigned To</span>
+                              <span className="text-sm font-medium">{selectedLead.assignedTo}</span>
+                            </div>
+                            <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
+                              <span className="text-sm text-muted-foreground">Source</span>
+                              <span className="text-sm">{selectedLead.source}</span>
+                            </div>
+                            <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
+                              <span className="text-sm text-muted-foreground">Activities</span>
+                              <span className="text-sm">{selectedLead.activities} interactions</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
+
+                      {selectedLead.tags.length > 0 && (
+                        <div className="mb-6 space-y-2">
+                          <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Tags</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedLead.tags.map((tag) => (
+                              <Badge key={tag} variant="outline" className="bg-secondary">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {selectedLead.notes && (
+                        <div className="mb-6 space-y-2">
+                          <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                            Notes
+                          </h4>
+                          <p className="text-sm p-3 rounded-lg bg-secondary/50">{selectedLead.notes}</p>
+                        </div>
+                      )}
+
+                      <div className="flex gap-2">
+                        <Button className="flex-1 gap-2">
+                          <Mail className="w-4 h-4" />
+                          Send Email
+                        </Button>
+                        <Button variant="outline" className="flex-1 gap-2 bg-transparent">
+                          <Phone className="w-4 h-4" />
+                          Call
+                        </Button>
+                        <Button variant="outline" className="flex-1 gap-2 bg-transparent">
+                          <CalendarPlus className="w-4 h-4" />
+                          Schedule
+                        </Button>
+                      </div>
+                    </>
+                  )}
+
+                  {activeTab === "history" && (
+                    <div className="space-y-4">
+                      {selectedLead.activityHistory.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <History className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                          <p>No activity history yet</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {selectedLead.activityHistory.map((activity) => (
+                            <div key={activity.id} className="p-4 rounded-lg bg-secondary/50 border border-border">
+                              <div className="flex items-start justify-between mb-2">
+                                <div>
+                                  <p className="font-medium text-sm">{activity.description}</p>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    {activity.changedBy} • {new Date(activity.timestamp).toLocaleString()}
+                                  </p>
+                                </div>
+                                <Badge variant="outline" className="text-xs">
+                                  {activity.type}
+                                </Badge>
+                              </div>
+                              {activity.changes && Object.keys(activity.changes).length > 0 && (
+                                <div className="mt-3 space-y-1 text-xs">
+                                  {Object.entries(activity.changes).map(([key, value]) => (
+                                    <div key={key} className="flex items-center gap-2 text-muted-foreground">
+                                      <span className="capitalize font-medium">{key}:</span>
+                                      <span className="line-through opacity-60">{String(value.old)}</span>
+                                      <span>→</span>
+                                      <span className="font-medium text-foreground">{String(value.new)}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-6 mt-6">
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Timeline</h4>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
-                        <span className="text-sm text-muted-foreground">Created</span>
-                        <span className="text-sm">{new Date(selectedLead.createdAt).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
-                        <span className="text-sm text-muted-foreground">Last Contact</span>
-                        <span className="text-sm">{new Date(selectedLead.lastContact).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
-                        <span className="text-sm text-muted-foreground">Next Follow-up</span>
-                        <span className="text-sm font-medium text-primary">
-                          {selectedLead.nextFollowUp
-                            ? new Date(selectedLead.nextFollowUp).toLocaleDateString()
-                            : "Not set"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Assignment</h4>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
-                        <span className="text-sm text-muted-foreground">Assigned To</span>
-                        <span className="text-sm font-medium">{selectedLead.assignedTo}</span>
-                      </div>
-                      <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
-                        <span className="text-sm text-muted-foreground">Source</span>
-                        <span className="text-sm">{selectedLead.source}</span>
-                      </div>
-                      <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
-                        <span className="text-sm text-muted-foreground">Activities</span>
-                        <span className="text-sm">{selectedLead.activities} interactions</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {selectedLead.tags.length > 0 && (
-                  <div className="mt-6 space-y-2">
-                    <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Tags</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedLead.tags.map((tag) => (
-                        <Badge key={tag} variant="outline" className="bg-secondary">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {selectedLead.notes && (
-                  <div className="mt-6 space-y-2">
-                    <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Notes</h4>
-                    <p className="text-sm p-3 rounded-lg bg-secondary/50">{selectedLead.notes}</p>
-                  </div>
-                )}
-
-                <div className="mt-6 pt-4 border-t border-border flex gap-2">
-                  <Button className="flex-1 gap-2">
-                    <Mail className="w-4 h-4" />
-                    Send Email
-                  </Button>
-                  <Button variant="outline" className="flex-1 gap-2 bg-transparent">
-                    <Phone className="w-4 h-4" />
-                    Call
-                  </Button>
-                  <Button variant="outline" className="flex-1 gap-2 bg-transparent">
-                    <CalendarPlus className="w-4 h-4" />
-                    Schedule
-                  </Button>
-                  <Button variant="outline" className="gap-2 bg-transparent">
-                    <Edit className="w-4 h-4" />
-                  </Button>
+                  )}
                 </div>
               </>
             )}
           </DialogContent>
         </Dialog>
+
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Edit Lead</DialogTitle>
+              <DialogDescription>
+                Update lead information. Changes will be tracked in activity history.
+              </DialogDescription>
+            </DialogHeader>
+
+            {selectedLead && (
+              <EditLeadForm lead={selectedLead} onSave={handleUpdateLead} onCancel={() => setIsEditDialogOpen(false)} />
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
+  )
+}
+
+function EditLeadForm({
+  lead,
+  onSave,
+  onCancel,
+}: {
+  lead: Lead
+  onSave: (data: Partial<Lead>) => void
+  onCancel: () => void
+}) {
+  const [formData, setFormData] = useState({
+    name: lead.name,
+    email: lead.email,
+    phone: lead.phone,
+    company: lead.company,
+    status: lead.status,
+    stage: lead.stage,
+    priority: lead.priority,
+    assignedTo: lead.assignedTo,
+    notes: lead.notes,
+  })
+
+  const handleChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    onSave(formData)
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Full Name</Label>
+          <Input
+            id="name"
+            value={formData.name}
+            onChange={(e) => handleChange("name", e.target.value)}
+            placeholder="Lead name"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            value={formData.email}
+            onChange={(e) => handleChange("email", e.target.value)}
+            placeholder="email@example.com"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="phone">Phone</Label>
+          <Input
+            id="phone"
+            value={formData.phone}
+            onChange={(e) => handleChange("phone", e.target.value)}
+            placeholder="+1 (555) 123-4567"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="company">Company</Label>
+          <Input
+            id="company"
+            value={formData.company}
+            onChange={(e) => handleChange("company", e.target.value)}
+            placeholder="Company name"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="status">Status</Label>
+          <select
+            id="status"
+            value={formData.status}
+            onChange={(e) => handleChange("status", e.target.value)}
+            className="w-full px-3 py-2 bg-secondary text-foreground rounded-md border border-input"
+          >
+            <option value="hot">Hot</option>
+            <option value="warm">Warm</option>
+            <option value="cold">Cold</option>
+          </select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="stage">Stage</Label>
+          <select
+            id="stage"
+            value={formData.stage}
+            onChange={(e) => handleChange("stage", e.target.value)}
+            className="w-full px-3 py-2 bg-secondary text-foreground rounded-md border border-input"
+          >
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="qualified">Qualified</option>
+            <option value="proposal">Proposal</option>
+            <option value="negotiation">Negotiation</option>
+            <option value="won">Won</option>
+            <option value="lost">Lost</option>
+          </select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="priority">Priority</Label>
+          <select
+            id="priority"
+            value={formData.priority}
+            onChange={(e) => handleChange("priority", e.target.value)}
+            className="w-full px-3 py-2 bg-secondary text-foreground rounded-md border border-input"
+          >
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="assignedTo">Assigned To</Label>
+          <Input
+            id="assignedTo"
+            value={formData.assignedTo}
+            onChange={(e) => handleChange("assignedTo", e.target.value)}
+            placeholder="Team member name"
+          />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="notes">Notes</Label>
+        <textarea
+          id="notes"
+          value={formData.notes}
+          onChange={(e) => handleChange("notes", e.target.value)}
+          placeholder="Add any notes or comments..."
+          className="w-full px-3 py-2 bg-secondary text-foreground rounded-md border border-input min-h-24 resize-none"
+        />
+      </div>
+      <div className="flex gap-2 pt-4">
+        <Button type="submit" className="flex-1">
+          Save Changes
+        </Button>
+        <Button type="button" variant="outline" onClick={onCancel} className="flex-1 bg-transparent">
+          Cancel
+        </Button>
+      </div>
+    </form>
   )
 }

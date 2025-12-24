@@ -770,6 +770,43 @@ export default function FinancesPage() {
   const [selectedExpense, setSelectedExpense] = useState<(typeof expensesData)[0] | null>(null)
   const [draggedInvoice, setDraggedInvoice] = useState<string | null>(null)
   const [dropTarget, setDropTarget] = useState<string | null>(null)
+  const [showAddExpenseDialog, setShowAddExpenseDialog] = useState(false)
+  const [showAddIncomeDialog, setShowAddIncomeDialog] = useState(false)
+
+  const [expenseFormData, setExpenseFormData] = useState({
+    vendor: "",
+    category: "office-supplies",
+    amount: "",
+    date: new Date().toISOString().split("T")[0],
+    description: "",
+    paymentMethod: "bank-transfer",
+    status: "pending",
+    department: "general",
+    project: "",
+    taxDeductible: true,
+    receipt: null as File | null,
+    recurring: false,
+    recurringFrequency: "monthly",
+    notes: "",
+  })
+
+  const [incomeFormData, setIncomeFormData] = useState({
+    source: "",
+    type: "project",
+    amount: "",
+    date: new Date().toISOString().split("T")[0],
+    description: "",
+    paymentMethod: "bank-transfer",
+    status: "completed",
+    client: "",
+    project: "",
+    taxRate: 15,
+    invoiceNumber: "",
+    recurring: false,
+    recurringFrequency: "monthly",
+    notes: "",
+  })
+
   const [filters, setFilters] = useState({
     status: "all",
     client: "all",
@@ -865,6 +902,105 @@ export default function FinancesPage() {
     setDropTarget(null)
   }
 
+  const handleAddExpense = () => {
+    if (!expenseFormData.vendor || !expenseFormData.amount) {
+      alert("Please fill in all required fields")
+      return
+    }
+
+    const expenseAmount = Number.parseFloat(expenseFormData.amount)
+    const newExpense = {
+      id: `EXP${Date.now()}`,
+      vendor: expenseFormData.vendor,
+      category: expenseFormData.category,
+      amount: expenseAmount,
+      date: expenseFormData.date,
+      description: expenseFormData.description,
+      paymentMethod: expenseFormData.paymentMethod,
+      status: expenseFormData.status as "pending" | "approved" | "paid",
+      department: expenseFormData.department,
+      project: expenseFormData.project || "Unassigned",
+      taxDeductible: expenseFormData.taxDeductible,
+      recurring: expenseFormData.recurring,
+      recurringFrequency: expenseFormData.recurring ? expenseFormData.recurringFrequency : null,
+      notes: expenseFormData.notes,
+      attachments: [], // Assuming receipt is handled differently or not directly attached here
+      approvedBy: expenseFormData.status === "approved" ? "Finance Manager" : undefined,
+      receiptUrl: null, // Placeholder, actual receipt handling would be more complex
+      createdAt: new Date().toISOString(),
+    }
+
+    setExpenses([newExpense, ...expenses])
+    setShowAddExpenseDialog(false)
+    setExpenseFormData({
+      vendor: "",
+      category: "office-supplies",
+      amount: "",
+      date: new Date().toISOString().split("T")[0],
+      description: "",
+      paymentMethod: "bank-transfer",
+      status: "pending",
+      department: "general",
+      project: "",
+      taxDeductible: true,
+      receipt: null,
+      recurring: false,
+      recurringFrequency: "monthly",
+      notes: "",
+    })
+  }
+
+  const handleAddIncome = () => {
+    if (!incomeFormData.source || !incomeFormData.amount) {
+      alert("Please fill in all required fields")
+      return
+    }
+
+    const incomeAmount = Number.parseFloat(incomeFormData.amount)
+    const taxAmount = Math.round(incomeAmount * (incomeFormData.taxRate / 100))
+    const netAmount = incomeAmount - taxAmount
+
+    const newIncome = {
+      id: `INC${Date.now()}`,
+      source: incomeFormData.source,
+      type: incomeFormData.type as "project" | "retainer" | "product" | "service",
+      amount: incomeAmount,
+      taxAmount: taxAmount,
+      netAmount: netAmount,
+      taxRate: incomeFormData.taxRate,
+      date: incomeFormData.date,
+      description: incomeFormData.description,
+      paymentMethod: incomeFormData.paymentMethod,
+      status: incomeFormData.status as "pending" | "received" | "completed",
+      client: incomeFormData.client || "Direct",
+      project: incomeFormData.project || "General",
+      invoiceId: incomeFormData.invoiceNumber || null,
+      recurring: incomeFormData.recurring,
+      recurringFrequency: incomeFormData.recurring ? incomeFormData.recurringFrequency : null,
+      notes: incomeFormData.notes,
+      createdAt: new Date().toISOString(),
+    }
+
+    setIncome([newIncome, ...income])
+    setShowAddIncomeDialog(false)
+    setIncomeFormData({
+      source: "",
+      type: "project",
+      amount: "",
+      date: new Date().toISOString().split("T")[0],
+      description: "",
+      paymentMethod: "bank-transfer",
+      status: "completed",
+      client: "",
+      project: "",
+      taxRate: 15,
+      invoiceNumber: "",
+      recurring: false,
+      recurringFrequency: "monthly",
+      notes: "",
+    })
+  }
+
   const activeFiltersCount = Object.values(filters).filter((v) => v !== "all").length
 
   const formatCurrency = (amount: number) =>
@@ -884,7 +1020,7 @@ export default function FinancesPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4 md:flex-col lg:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-balance text-2xl font-bold text-foreground">Financial Management</h1>
             <p className="text-pretty text-muted-foreground">
@@ -1920,10 +2056,6 @@ export default function FinancesPage() {
                                         <Mail className="mr-2 h-3 w-3" />
                                         Send
                                       </DropdownMenuItem>
-                                      <DropdownMenuItem>
-                                        <Download className="mr-2 h-3 w-3" />
-                                        Download
-                                      </DropdownMenuItem>
                                       <DropdownMenuSeparator />
                                       <DropdownMenuItem className="text-red-500">
                                         <Trash2 className="mr-2 h-3 w-3" />
@@ -2030,7 +2162,191 @@ export default function FinancesPage() {
                                 View
                               </Button>
                             </DialogTrigger>
-                            {/* Dialog content same as kanban view */}
+                            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                              <DialogHeader>
+                                <DialogTitle>Invoice Details - {selectedInvoice?.invoiceNumber}</DialogTitle>
+                              </DialogHeader>
+                              {selectedInvoice && (
+                                <div className="space-y-6 py-4">
+                                  <div className="grid grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                      <div>
+                                        <p className="text-sm font-medium text-muted-foreground mb-1">Client</p>
+                                        <div className="flex items-center gap-2">
+                                          <Avatar className="h-8 w-8">
+                                            <AvatarImage src={selectedInvoice.clientLogo || "/placeholder.svg"} />
+                                            <AvatarFallback>{selectedInvoice.client.substring(0, 2)}</AvatarFallback>
+                                          </Avatar>
+                                          <div>
+                                            <p className="font-medium">{selectedInvoice.client}</p>
+                                            <p className="text-xs text-muted-foreground">
+                                              {selectedInvoice.clientEmail}
+                                            </p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-medium text-muted-foreground mb-1">Project</p>
+                                        <p className="font-medium">{selectedInvoice.project}</p>
+                                        <p className="text-xs text-muted-foreground">{selectedInvoice.projectId}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-medium text-muted-foreground mb-1">Payment Terms</p>
+                                        <p className="font-medium">{selectedInvoice.paymentTerms}</p>
+                                      </div>
+                                    </div>
+                                    <div className="space-y-4">
+                                      <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                          <p className="text-sm font-medium text-muted-foreground mb-1">Issue Date</p>
+                                          <p className="font-medium">{formatDate(selectedInvoice.issueDate)}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-sm font-medium text-muted-foreground mb-1">Due Date</p>
+                                          <p className="font-medium">{formatDate(selectedInvoice.dueDate)}</p>
+                                        </div>
+                                      </div>
+                                      {selectedInvoice.paidDate && (
+                                        <div>
+                                          <p className="text-sm font-medium text-muted-foreground mb-1">Paid Date</p>
+                                          <p className="font-medium text-emerald-500">
+                                            {formatDate(selectedInvoice.paidDate)}
+                                          </p>
+                                        </div>
+                                      )}
+                                      <div>
+                                        <p className="text-sm font-medium text-muted-foreground mb-1">Payment Method</p>
+                                        <Badge>{selectedInvoice.paymentMethod}</Badge>
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-medium text-muted-foreground mb-1">Status</p>
+                                        <Badge className={statusConfig[selectedInvoice.status]?.color}>
+                                          {statusConfig[selectedInvoice.status]?.label}
+                                        </Badge>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="border-t pt-4">
+                                    <p className="font-medium mb-3">Line Items</p>
+                                    <div className="space-y-2">
+                                      {selectedInvoice.items.map((item) => (
+                                        <div
+                                          key={item.id}
+                                          className="flex items-start justify-between p-3 rounded-lg bg-muted/50"
+                                        >
+                                          <div className="flex-1">
+                                            <p className="font-medium text-sm">{item.description}</p>
+                                            <p className="text-xs text-muted-foreground">
+                                              {item.quantity} × {formatCurrency(item.rate)}
+                                              {item.taxable && <span className="ml-2 text-blue-500">(Taxable)</span>}
+                                            </p>
+                                          </div>
+                                          <p className="font-bold">{formatCurrency(item.amount)}</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+
+                                  <div className="border-t pt-4">
+                                    <div className="space-y-2 max-w-xs ml-auto">
+                                      <div className="flex items-center justify-between text-sm">
+                                        <span className="text-muted-foreground">Subtotal</span>
+                                        <span className="font-medium">
+                                          {formatCurrency(
+                                            selectedInvoice.amount - selectedInvoice.tax + selectedInvoice.discount,
+                                          )}
+                                        </span>
+                                      </div>
+                                      {selectedInvoice.discount > 0 && (
+                                        <div className="flex items-center justify-between text-sm">
+                                          <span className="text-muted-foreground">Discount</span>
+                                          <span className="font-medium text-emerald-500">
+                                            -{formatCurrency(selectedInvoice.discount)}
+                                          </span>
+                                        </div>
+                                      )}
+                                      <div className="flex items-center justify-between text-sm">
+                                        <span className="text-muted-foreground">Tax</span>
+                                        <span className="font-medium">{formatCurrency(selectedInvoice.tax)}</span>
+                                      </div>
+                                      <div className="flex items-center justify-between text-base font-bold pt-2 border-t">
+                                        <span>Total</span>
+                                        <span className="text-primary">{formatCurrency(selectedInvoice.amount)}</span>
+                                      </div>
+                                      {selectedInvoice.paid > 0 && (
+                                        <div className="flex items-center justify-between text-sm pt-2 border-t">
+                                          <span className="text-emerald-500 font-medium">Amount Paid</span>
+                                          <span className="font-bold text-emerald-500">
+                                            {formatCurrency(selectedInvoice.paid)}
+                                          </span>
+                                        </div>
+                                      )}
+                                      {selectedInvoice.paid < selectedInvoice.amount && (
+                                        <div className="flex items-center justify-between text-sm">
+                                          <span className="text-red-500 font-medium">Amount Due</span>
+                                          <span className="font-bold text-red-500">
+                                            {formatCurrency(selectedInvoice.amount - selectedInvoice.paid)}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {(selectedInvoice.notes || selectedInvoice.internalNotes) && (
+                                    <div className="border-t pt-4 space-y-3">
+                                      {selectedInvoice.notes && (
+                                        <div>
+                                          <p className="text-sm font-medium text-muted-foreground mb-1">
+                                            Invoice Notes
+                                          </p>
+                                          <p className="text-sm bg-muted/50 p-3 rounded-lg">{selectedInvoice.notes}</p>
+                                        </div>
+                                      )}
+                                      {selectedInvoice.internalNotes && (
+                                        <div>
+                                          <p className="text-sm font-medium text-muted-foreground mb-1">
+                                            Internal Notes (Private)
+                                          </p>
+                                          <p className="text-sm bg-amber-500/10 p-3 rounded-lg text-amber-600 dark:text-amber-400">
+                                            {selectedInvoice.internalNotes}
+                                          </p>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+
+                                  {selectedInvoice.attachments && selectedInvoice.attachments.length > 0 && (
+                                    <div className="border-t pt-4">
+                                      <p className="text-sm font-medium text-muted-foreground mb-2">Attachments</p>
+                                      <div className="flex flex-wrap gap-2">
+                                        {selectedInvoice.attachments.map((file, idx) => (
+                                          <Badge key={idx} variant="outline" className="cursor-pointer hover:bg-muted">
+                                            <FileText className="h-3 w-3 mr-1" />
+                                            {file}
+                                          </Badge>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  <div className="flex gap-2 pt-4 border-t">
+                                    <Button variant="outline" className="flex-1 bg-transparent">
+                                      <Mail className="mr-2 h-4 w-4" />
+                                      Send Reminder
+                                    </Button>
+                                    <Button variant="outline" className="flex-1 bg-transparent">
+                                      <Printer className="mr-2 h-4 w-4" />
+                                      Print
+                                    </Button>
+                                    <Button variant="outline" className="flex-1 bg-transparent">
+                                      <Download className="mr-2 h-4 w-4" />
+                                      Download PDF
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
+                            </DialogContent>
                           </Dialog>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -2151,7 +2467,225 @@ export default function FinancesPage() {
                                         <Eye className="h-3 w-3" />
                                       </Button>
                                     </DialogTrigger>
-                                    {/* Dialog content same as kanban view */}
+                                    <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                                      <DialogHeader>
+                                        <DialogTitle>Invoice Details - {selectedInvoice?.invoiceNumber}</DialogTitle>
+                                      </DialogHeader>
+                                      {selectedInvoice && (
+                                        <div className="space-y-6 py-4">
+                                          <div className="grid grid-cols-2 gap-6">
+                                            <div className="space-y-4">
+                                              <div>
+                                                <p className="text-sm font-medium text-muted-foreground mb-1">Client</p>
+                                                <div className="flex items-center gap-2">
+                                                  <Avatar className="h-8 w-8">
+                                                    <AvatarImage
+                                                      src={selectedInvoice.clientLogo || "/placeholder.svg"}
+                                                    />
+                                                    <AvatarFallback>
+                                                      {selectedInvoice.client.substring(0, 2)}
+                                                    </AvatarFallback>
+                                                  </Avatar>
+                                                  <div>
+                                                    <p className="font-medium">{selectedInvoice.client}</p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                      {selectedInvoice.clientEmail}
+                                                    </p>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <div>
+                                                <p className="text-sm font-medium text-muted-foreground mb-1">
+                                                  Project
+                                                </p>
+                                                <p className="font-medium">{selectedInvoice.project}</p>
+                                                <p className="text-xs text-muted-foreground">
+                                                  {selectedInvoice.projectId}
+                                                </p>
+                                              </div>
+                                              <div>
+                                                <p className="text-sm font-medium text-muted-foreground mb-1">
+                                                  Payment Terms
+                                                </p>
+                                                <p className="font-medium">{selectedInvoice.paymentTerms}</p>
+                                              </div>
+                                            </div>
+                                            <div className="space-y-4">
+                                              <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                  <p className="text-sm font-medium text-muted-foreground mb-1">
+                                                    Issue Date
+                                                  </p>
+                                                  <p className="font-medium">{formatDate(selectedInvoice.issueDate)}</p>
+                                                </div>
+                                                <div>
+                                                  <p className="text-sm font-medium text-muted-foreground mb-1">
+                                                    Due Date
+                                                  </p>
+                                                  <p className="font-medium">{formatDate(selectedInvoice.dueDate)}</p>
+                                                </div>
+                                              </div>
+                                              {selectedInvoice.paidDate && (
+                                                <div>
+                                                  <p className="text-sm font-medium text-muted-foreground mb-1">
+                                                    Paid Date
+                                                  </p>
+                                                  <p className="font-medium text-emerald-500">
+                                                    {formatDate(selectedInvoice.paidDate)}
+                                                  </p>
+                                                </div>
+                                              )}
+                                              <div>
+                                                <p className="text-sm font-medium text-muted-foreground mb-1">
+                                                  Payment Method
+                                                </p>
+                                                <Badge>{selectedInvoice.paymentMethod}</Badge>
+                                              </div>
+                                              <div>
+                                                <p className="text-sm font-medium text-muted-foreground mb-1">Status</p>
+                                                <Badge className={statusConfig[selectedInvoice.status]?.color}>
+                                                  {statusConfig[selectedInvoice.status]?.label}
+                                                </Badge>
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          <div className="border-t pt-4">
+                                            <p className="font-medium mb-3">Line Items</p>
+                                            <div className="space-y-2">
+                                              {selectedInvoice.items.map((item) => (
+                                                <div
+                                                  key={item.id}
+                                                  className="flex items-start justify-between p-3 rounded-lg bg-muted/50"
+                                                >
+                                                  <div className="flex-1">
+                                                    <p className="font-medium text-sm">{item.description}</p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                      {item.quantity} × {formatCurrency(item.rate)}
+                                                      {item.taxable && (
+                                                        <span className="ml-2 text-blue-500">(Taxable)</span>
+                                                      )}
+                                                    </p>
+                                                  </div>
+                                                  <p className="font-bold">{formatCurrency(item.amount)}</p>
+                                                </div>
+                                              ))}
+                                            </div>
+                                          </div>
+
+                                          <div className="border-t pt-4">
+                                            <div className="space-y-2 max-w-xs ml-auto">
+                                              <div className="flex items-center justify-between text-sm">
+                                                <span className="text-muted-foreground">Subtotal</span>
+                                                <span className="font-medium">
+                                                  {formatCurrency(
+                                                    selectedInvoice.amount -
+                                                      selectedInvoice.tax +
+                                                      selectedInvoice.discount,
+                                                  )}
+                                                </span>
+                                              </div>
+                                              {selectedInvoice.discount > 0 && (
+                                                <div className="flex items-center justify-between text-sm">
+                                                  <span className="text-muted-foreground">Discount</span>
+                                                  <span className="font-medium text-emerald-500">
+                                                    -{formatCurrency(selectedInvoice.discount)}
+                                                  </span>
+                                                </div>
+                                              )}
+                                              <div className="flex items-center justify-between text-sm">
+                                                <span className="text-muted-foreground">Tax</span>
+                                                <span className="font-medium">
+                                                  {formatCurrency(selectedInvoice.tax)}
+                                                </span>
+                                              </div>
+                                              <div className="flex items-center justify-between text-base font-bold pt-2 border-t">
+                                                <span>Total</span>
+                                                <span className="text-primary">
+                                                  {formatCurrency(selectedInvoice.amount)}
+                                                </span>
+                                              </div>
+                                              {selectedInvoice.paid > 0 && (
+                                                <div className="flex items-center justify-between text-sm pt-2 border-t">
+                                                  <span className="text-emerald-500 font-medium">Amount Paid</span>
+                                                  <span className="font-bold text-emerald-500">
+                                                    {formatCurrency(selectedInvoice.paid)}
+                                                  </span>
+                                                </div>
+                                              )}
+                                              {selectedInvoice.paid < selectedInvoice.amount && (
+                                                <div className="flex items-center justify-between text-sm">
+                                                  <span className="text-red-500 font-medium">Amount Due</span>
+                                                  <span className="font-bold text-red-500">
+                                                    {formatCurrency(selectedInvoice.amount - selectedInvoice.paid)}
+                                                  </span>
+                                                </div>
+                                              )}
+                                            </div>
+                                          </div>
+
+                                          {(selectedInvoice.notes || selectedInvoice.internalNotes) && (
+                                            <div className="border-t pt-4 space-y-3">
+                                              {selectedInvoice.notes && (
+                                                <div>
+                                                  <p className="text-sm font-medium text-muted-foreground mb-1">
+                                                    Invoice Notes
+                                                  </p>
+                                                  <p className="text-sm bg-muted/50 p-3 rounded-lg">
+                                                    {selectedInvoice.notes}
+                                                  </p>
+                                                </div>
+                                              )}
+                                              {selectedInvoice.internalNotes && (
+                                                <div>
+                                                  <p className="text-sm font-medium text-muted-foreground mb-1">
+                                                    Internal Notes (Private)
+                                                  </p>
+                                                  <p className="text-sm bg-amber-500/10 p-3 rounded-lg text-amber-600 dark:text-amber-400">
+                                                    {selectedInvoice.internalNotes}
+                                                  </p>
+                                                </div>
+                                              )}
+                                            </div>
+                                          )}
+
+                                          {selectedInvoice.attachments && selectedInvoice.attachments.length > 0 && (
+                                            <div className="border-t pt-4">
+                                              <p className="text-sm font-medium text-muted-foreground mb-2">
+                                                Attachments
+                                              </p>
+                                              <div className="flex flex-wrap gap-2">
+                                                {selectedInvoice.attachments.map((file, idx) => (
+                                                  <Badge
+                                                    key={idx}
+                                                    variant="outline"
+                                                    className="cursor-pointer hover:bg-muted"
+                                                  >
+                                                    <FileText className="h-3 w-3 mr-1" />
+                                                    {file}
+                                                  </Badge>
+                                                ))}
+                                              </div>
+                                            </div>
+                                          )}
+
+                                          <div className="flex gap-2 pt-4 border-t">
+                                            <Button variant="outline" className="flex-1 bg-transparent">
+                                              <Mail className="mr-2 h-4 w-4" />
+                                              Send Reminder
+                                            </Button>
+                                            <Button variant="outline" className="flex-1 bg-transparent">
+                                              <Printer className="mr-2 h-4 w-4" />
+                                              Print
+                                            </Button>
+                                            <Button variant="outline" className="flex-1 bg-transparent">
+                                              <Download className="mr-2 h-4 w-4" />
+                                              Download PDF
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </DialogContent>
                                   </Dialog>
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
@@ -2171,10 +2705,6 @@ export default function FinancesPage() {
                                       <DropdownMenuItem>
                                         <Mail className="mr-2 h-3 w-3" />
                                         Send
-                                      </DropdownMenuItem>
-                                      <DropdownMenuItem>
-                                        <Download className="mr-2 h-3 w-3" />
-                                        Download PDF
                                       </DropdownMenuItem>
                                       <DropdownMenuSeparator />
                                       <DropdownMenuItem className="text-red-500">
@@ -2202,10 +2732,205 @@ export default function FinancesPage() {
                 <h3 className="text-lg font-semibold">Income Tracking</h3>
                 <p className="text-sm text-muted-foreground">Monitor all revenue streams and payment receipts</p>
               </div>
-              <Button size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                Record Income
-              </Button>
+              <Dialog open={showAddIncomeDialog} onOpenChange={setShowAddIncomeDialog}>
+                <DialogTrigger asChild>
+                  <Button size="sm">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Record Income
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Record New Income</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="incomeSource">Source *</Label>
+                        <Input
+                          id="incomeSource"
+                          placeholder="e.g., Client Name"
+                          value={incomeFormData.source}
+                          onChange={(e) => setIncomeFormData({ ...incomeFormData, source: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="incomeType">Type *</Label>
+                        <Select
+                          value={incomeFormData.type}
+                          onValueChange={(value) => setIncomeFormData({ ...incomeFormData, type: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="project">Project</SelectItem>
+                            <SelectItem value="retainer">Retainer</SelectItem>
+                            <SelectItem value="product">Product Sale</SelectItem>
+                            <SelectItem value="service">Service</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="incomeAmount">Amount *</Label>
+                        <Input
+                          id="incomeAmount"
+                          type="number"
+                          placeholder="0.00"
+                          value={incomeFormData.amount}
+                          onChange={(e) => setIncomeFormData({ ...incomeFormData, amount: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="incomeClient">Client</Label>
+                        <Input
+                          id="incomeClient"
+                          placeholder="Client name (optional)"
+                          value={incomeFormData.client}
+                          onChange={(e) => setIncomeFormData({ ...incomeFormData, client: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="incomeProject">Project</Label>
+                        <Input
+                          id="incomeProject"
+                          placeholder="Project name (optional)"
+                          value={incomeFormData.project}
+                          onChange={(e) => setIncomeFormData({ ...incomeFormData, project: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="incomeInvoice">Invoice #</Label>
+                        <Input
+                          id="incomeInvoice"
+                          placeholder="INV-001"
+                          value={incomeFormData.invoiceNumber}
+                          onChange={(e) => setIncomeFormData({ ...incomeFormData, invoiceNumber: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="incomeDate">Date *</Label>
+                        <Input
+                          id="incomeDate"
+                          type="date"
+                          value={incomeFormData.date}
+                          onChange={(e) => setIncomeFormData({ ...incomeFormData, date: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="incomeTaxRate">Tax Rate (%)</Label>
+                        <Input
+                          id="incomeTaxRate"
+                          type="number"
+                          placeholder="15"
+                          value={incomeFormData.taxRate}
+                          onChange={(e) => setIncomeFormData({ ...incomeFormData, taxRate: Number(e.target.value) })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="incomePaymentMethod">Payment Method</Label>
+                        <Select
+                          value={incomeFormData.paymentMethod}
+                          onValueChange={(value) => setIncomeFormData({ ...incomeFormData, paymentMethod: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select method" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="bank-transfer">Bank Transfer</SelectItem>
+                            <SelectItem value="credit-card">Credit Card</SelectItem>
+                            <SelectItem value="ach">ACH</SelectItem>
+                            <SelectItem value="paypal">PayPal</SelectItem>
+                            <SelectItem value="check">Check</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="incomeStatus">Status</Label>
+                        <Select
+                          value={incomeFormData.status}
+                          onValueChange={(value) => setIncomeFormData({ ...incomeFormData, status: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="received">Received</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="incomeDescription">Description</Label>
+                      <Textarea
+                        id="incomeDescription"
+                        value={incomeFormData.description}
+                        onChange={(e) => setIncomeFormData({ ...incomeFormData, description: e.target.value })}
+                        rows={2}
+                        placeholder="Describe the income source..."
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="incomeNotes">Internal Notes</Label>
+                      <Textarea
+                        id="incomeNotes"
+                        value={incomeFormData.notes}
+                        onChange={(e) => setIncomeFormData({ ...incomeFormData, notes: e.target.value })}
+                        rows={2}
+                        placeholder="Add internal notes..."
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                      <input
+                        type="checkbox"
+                        id="incomeRecurring"
+                        checked={incomeFormData.recurring}
+                        onChange={(e) => setIncomeFormData({ ...incomeFormData, recurring: e.target.checked })}
+                        className="w-4 h-4"
+                      />
+                      <Label htmlFor="incomeRecurring" className="mb-0 cursor-pointer">
+                        Mark as Recurring Income
+                      </Label>
+                      {incomeFormData.recurring && (
+                        <Select
+                          value={incomeFormData.recurringFrequency}
+                          onValueChange={(value) => setIncomeFormData({ ...incomeFormData, recurringFrequency: value })}
+                        >
+                          <SelectTrigger className="w-32">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="monthly">Monthly</SelectItem>
+                            <SelectItem value="quarterly">Quarterly</SelectItem>
+                            <SelectItem value="yearly">Yearly</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-4 border-t">
+                      <Button variant="outline" onClick={() => setShowAddIncomeDialog(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleAddIncome}>Record Income</Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
 
             <div className="grid md:grid-cols-4 gap-4">
@@ -2391,10 +3116,213 @@ export default function FinancesPage() {
                   Track and approve business expenses with detailed categorization
                 </p>
               </div>
-              <Button size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Expense
-              </Button>
+              <Dialog open={showAddExpenseDialog} onOpenChange={setShowAddExpenseDialog}>
+                <DialogTrigger asChild>
+                  <Button size="sm">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Expense
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Add New Expense</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="expenseVendor">Vendor *</Label>
+                        <Input
+                          id="expenseVendor"
+                          placeholder="e.g., Amazon, Google"
+                          value={expenseFormData.vendor}
+                          onChange={(e) => setExpenseFormData({ ...expenseFormData, vendor: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="expenseCategory">Category *</Label>
+                        <Select
+                          value={expenseFormData.category}
+                          onValueChange={(value) => setExpenseFormData({ ...expenseFormData, category: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="office-supplies">Office Supplies</SelectItem>
+                            <SelectItem value="software">Software</SelectItem>
+                            <SelectItem value="advertising">Advertising</SelectItem>
+                            <SelectItem value="travel">Travel</SelectItem>
+                            <SelectItem value="utilities">Utilities</SelectItem>
+                            <SelectItem value="rent">Rent</SelectItem>
+                            <SelectItem value="salaries">Salaries</SelectItem>
+                            <SelectItem value="equipment">Equipment</SelectItem>
+                            <SelectItem value="maintenance">Maintenance</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="expenseAmount">Amount *</Label>
+                        <Input
+                          id="expenseAmount"
+                          type="number"
+                          placeholder="0.00"
+                          value={expenseFormData.amount}
+                          onChange={(e) => setExpenseFormData({ ...expenseFormData, amount: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="expenseDepartment">Department</Label>
+                        <Select
+                          value={expenseFormData.department}
+                          onValueChange={(value) => setExpenseFormData({ ...expenseFormData, department: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="general">General</SelectItem>
+                            <SelectItem value="marketing">Marketing</SelectItem>
+                            <SelectItem value="operations">Operations</SelectItem>
+                            <SelectItem value="it">IT</SelectItem>
+                            <SelectItem value="hr">HR</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="expenseProject">Project</Label>
+                        <Input
+                          id="expenseProject"
+                          placeholder="Project name (optional)"
+                          value={expenseFormData.project}
+                          onChange={(e) => setExpenseFormData({ ...expenseFormData, project: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="expenseDate">Date *</Label>
+                        <Input
+                          id="expenseDate"
+                          type="date"
+                          value={expenseFormData.date}
+                          onChange={(e) => setExpenseFormData({ ...expenseFormData, date: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="expensePaymentMethod">Payment Method</Label>
+                        <Select
+                          value={expenseFormData.paymentMethod}
+                          onValueChange={(value) => setExpenseFormData({ ...expenseFormData, paymentMethod: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select method" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="bank-transfer">Bank Transfer</SelectItem>
+                            <SelectItem value="credit-card">Credit Card</SelectItem>
+                            <SelectItem value="ach">ACH</SelectItem>
+                            <SelectItem value="company-card">Company Card</SelectItem>
+                            <SelectItem value="cash">Cash</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="expenseStatus">Status</Label>
+                        <Select
+                          value={expenseFormData.status}
+                          onValueChange={(value) => setExpenseFormData({ ...expenseFormData, status: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="approved">Approved</SelectItem>
+                            <SelectItem value="paid">Paid</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="expenseDescription">Description</Label>
+                      <Textarea
+                        id="expenseDescription"
+                        value={expenseFormData.description}
+                        onChange={(e) => setExpenseFormData({ ...expenseFormData, description: e.target.value })}
+                        rows={2}
+                        placeholder="Describe the expense..."
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="expenseNotes">Internal Notes</Label>
+                      <Textarea
+                        id="expenseNotes"
+                        value={expenseFormData.notes}
+                        onChange={(e) => setExpenseFormData({ ...expenseFormData, notes: e.target.value })}
+                        rows={2}
+                        placeholder="Add internal notes..."
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-4 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="expenseTaxDeductible"
+                          checked={expenseFormData.taxDeductible}
+                          onChange={(e) => setExpenseFormData({ ...expenseFormData, taxDeductible: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <Label htmlFor="expenseTaxDeductible" className="mb-0 cursor-pointer">
+                          Tax Deductible
+                        </Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="expenseRecurring"
+                          checked={expenseFormData.recurring}
+                          onChange={(e) => setExpenseFormData({ ...expenseFormData, recurring: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <Label htmlFor="expenseRecurring" className="mb-0 cursor-pointer">
+                          Recurring Expense
+                        </Label>
+                        {expenseFormData.recurring && (
+                          <Select
+                            value={expenseFormData.recurringFrequency}
+                            onValueChange={(value) =>
+                              setExpenseFormData({ ...expenseFormData, recurringFrequency: value })
+                            }
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="monthly">Monthly</SelectItem>
+                              <SelectItem value="quarterly">Quarterly</SelectItem>
+                              <SelectItem value="yearly">Yearly</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-4 border-t">
+                      <Button variant="outline" onClick={() => setShowAddExpenseDialog(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleAddExpense}>Add Expense</Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
 
             <div className="grid md:grid-cols-4 gap-4">

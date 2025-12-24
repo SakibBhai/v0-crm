@@ -3,36 +3,50 @@
 import type React from "react"
 
 import { useState } from "react"
-import { DashboardLayout } from "@/components/dashboard-layout"
-import { AnimatedCard } from "@/components/animated-card"
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Progress } from "@/components/ui/progress"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Input } from "@/components/ui/input"
+import { AnimatedCard } from "@/components/animated-card"
 import {
-  Search,
-  Plus,
-  MoreHorizontal,
-  Mail,
-  Phone,
-  MapPin,
   Calendar,
-  CheckCircle,
-  Clock,
-  Users,
-  Star,
-  Award,
-  Briefcase,
   TrendingUp,
+  Users,
+  CheckCircle,
+  AlertCircle,
+  Filter,
+  Plus,
+  Search,
+  Star,
+  MapPin,
+  Phone,
+  Briefcase,
+  Eye,
+  Download,
+  MailIcon,
 } from "lucide-react"
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts"
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+
+// Assuming DashboardLayout is defined elsewhere, e.g., in components/dashboard-layout.tsx
+// For demonstration purposes, let's mock it here. In a real app, you'd import it.
+const DashboardLayout = ({ children }: { children: React.ReactNode }) => (
+  <div className="min-h-screen bg-background">
+    {/* Mock Header/Sidebar */}
+    <header className="border-b border-border/40 py-4 px-6 flex items-center justify-between">
+      <h2 className="text-xl font-semibold">AgencyFlow Dashboard</h2>
+      <div className="flex items-center gap-4">
+        <Input placeholder="Search..." className="w-64" />
+        <Avatar>
+          <AvatarFallback>JD</AvatarFallback>
+        </Avatar>
+      </div>
+    </header>
+    <main className="p-6">{children}</main>
+  </div>
+)
 
 interface TeamMember {
   id: string
@@ -51,6 +65,29 @@ interface TeamMember {
   rating: number
   skills: string[]
   performanceData: { month: string; tasks: number }[]
+  attendance: {
+    date: string
+    status: "present" | "absent" | "late" | "leave"
+    checkIn?: string
+    checkOut?: string
+  }[]
+  salary?: number
+  employmentType: "Full-time" | "Part-time" | "Contract"
+  manager?: string
+  yearsOfExperience: number
+  certifications: string[]
+  emergencyContact?: { name: string; phone: string }
+  performanceRating: number
+  lastReviewDate: string
+  nextReviewDate: string
+  absenceHistory: { type: string; from: string; to: string }[]
+  taskPerformanceHistory: {
+    month: string
+    completed: number
+    onTime: number
+    quality: number
+    deadline: number
+  }[]
 }
 
 const initialTeamMembers: TeamMember[] = [
@@ -77,6 +114,34 @@ const initialTeamMembers: TeamMember[] = [
       { month: "Nov", tasks: 28 },
       { month: "Dec", tasks: 24 },
     ],
+    salary: 120000,
+    employmentType: "Full-time",
+    manager: "David Park",
+    yearsOfExperience: 7,
+    certifications: ["AWS Certified Developer", "Google Cloud Professional"],
+    emergencyContact: { name: "Jane Doe", phone: "+1 (555) 123-4500" },
+    performanceRating: 4.8,
+    lastReviewDate: "2024-11-15",
+    nextReviewDate: "2025-05-15",
+    attendance: [
+      { date: "2024-12-20", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-19", status: "present", checkIn: "08:55", checkOut: "17:55" },
+      { date: "2024-12-18", status: "late", checkIn: "09:30", checkOut: "18:30" },
+      { date: "2024-12-17", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-16", status: "absent", checkIn: undefined, checkOut: undefined },
+    ],
+    absenceHistory: [
+      { type: "Vacation", from: "2024-08-01", to: "2024-08-14" },
+      { type: "Sick Leave", from: "2024-06-10", to: "2024-06-12" },
+    ],
+    taskPerformanceHistory: [
+      { month: "Jul", completed: 18, onTime: 17, quality: 95, deadline: 94 },
+      { month: "Aug", completed: 22, onTime: 21, quality: 96, deadline: 95 },
+      { month: "Sep", completed: 19, onTime: 18, quality: 94, deadline: 92 },
+      { month: "Oct", completed: 25, onTime: 24, quality: 97, deadline: 96 },
+      { month: "Nov", completed: 28, onTime: 27, quality: 98, deadline: 97 },
+      { month: "Dec", completed: 24, onTime: 23, quality: 96, deadline: 95 },
+    ],
   },
   {
     id: "2",
@@ -100,6 +165,31 @@ const initialTeamMembers: TeamMember[] = [
       { month: "Oct", tasks: 22 },
       { month: "Nov", tasks: 25 },
       { month: "Dec", tasks: 21 },
+    ],
+    salary: 95000,
+    employmentType: "Full-time",
+    manager: "Lisa Thompson",
+    yearsOfExperience: 5,
+    certifications: ["Adobe Certified Associate", "Figma Professional"],
+    emergencyContact: { name: "Robert Mitchell", phone: "+1 (555) 234-5700" },
+    performanceRating: 4.7,
+    lastReviewDate: "2024-10-20",
+    nextReviewDate: "2025-04-20",
+    attendance: [
+      { date: "2024-12-20", status: "present", checkIn: "09:05", checkOut: "18:05" },
+      { date: "2024-12-19", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-18", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-17", status: "leave", checkIn: undefined, checkOut: undefined },
+      { date: "2024-12-16", status: "present", checkIn: "09:00", checkOut: "18:00" },
+    ],
+    absenceHistory: [{ type: "Vacation", from: "2024-07-15", to: "2024-07-22" }],
+    taskPerformanceHistory: [
+      { month: "Jul", completed: 15, onTime: 14, quality: 93, deadline: 92 },
+      { month: "Aug", completed: 20, onTime: 19, quality: 95, deadline: 94 },
+      { month: "Sep", completed: 18, onTime: 17, quality: 92, deadline: 91 },
+      { month: "Oct", completed: 22, onTime: 21, quality: 96, deadline: 95 },
+      { month: "Nov", completed: 25, onTime: 24, quality: 97, deadline: 96 },
+      { month: "Dec", completed: 21, onTime: 20, quality: 94, deadline: 93 },
     ],
   },
   {
@@ -125,6 +215,34 @@ const initialTeamMembers: TeamMember[] = [
       { month: "Nov", tasks: 20 },
       { month: "Dec", tasks: 16 },
     ],
+    salary: 75000,
+    employmentType: "Full-time",
+    manager: "David Park",
+    yearsOfExperience: 3,
+    certifications: ["Google Analytics IQ", "HubSpot Certification"],
+    emergencyContact: { name: "Michael Chen", phone: "+1 (555) 345-6700" },
+    performanceRating: 4.5,
+    lastReviewDate: "2024-11-01",
+    nextReviewDate: "2025-05-01",
+    attendance: [
+      { date: "2024-12-20", status: "leave", checkIn: undefined, checkOut: undefined },
+      { date: "2024-12-19", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-18", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-17", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-16", status: "present", checkIn: "09:00", checkOut: "18:00" },
+    ],
+    absenceHistory: [
+      { type: "Vacation", from: "2024-12-20", to: "2024-12-27" },
+      { type: "Sick Leave", from: "2024-09-05", to: "2024-09-06" },
+    ],
+    taskPerformanceHistory: [
+      { month: "Jul", completed: 12, onTime: 11, quality: 91, deadline: 90 },
+      { month: "Aug", completed: 15, onTime: 14, quality: 93, deadline: 92 },
+      { month: "Sep", completed: 14, onTime: 13, quality: 90, deadline: 88 },
+      { month: "Oct", completed: 18, onTime: 17, quality: 94, deadline: 93 },
+      { month: "Nov", completed: 20, onTime: 19, quality: 95, deadline: 94 },
+      { month: "Dec", completed: 16, onTime: 15, quality: 92, deadline: 91 },
+    ],
   },
   {
     id: "4",
@@ -148,6 +266,31 @@ const initialTeamMembers: TeamMember[] = [
       { month: "Oct", tasks: 16 },
       { month: "Nov", tasks: 18 },
       { month: "Dec", tasks: 15 },
+    ],
+    salary: 80000,
+    employmentType: "Full-time",
+    manager: "David Park",
+    yearsOfExperience: 4,
+    certifications: ["Google Ads Certified", "Meta Blueprint Certified"],
+    emergencyContact: { name: "Patricia Wilson", phone: "+1 (555) 456-7800" },
+    performanceRating: 4.4,
+    lastReviewDate: "2024-10-01",
+    nextReviewDate: "2025-04-01",
+    attendance: [
+      { date: "2024-12-20", status: "present", checkIn: "08:50", checkOut: "17:50" },
+      { date: "2024-12-19", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-18", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-17", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-16", status: "present", checkIn: "09:00", checkOut: "18:00" },
+    ],
+    absenceHistory: [],
+    taskPerformanceHistory: [
+      { month: "Jul", completed: 10, onTime: 10, quality: 90, deadline: 90 },
+      { month: "Aug", completed: 14, onTime: 13, quality: 92, deadline: 91 },
+      { month: "Sep", completed: 12, onTime: 11, quality: 91, deadline: 90 },
+      { month: "Oct", completed: 16, onTime: 15, quality: 93, deadline: 92 },
+      { month: "Nov", completed: 18, onTime: 17, quality: 94, deadline: 93 },
+      { month: "Dec", completed: 15, onTime: 14, quality: 92, deadline: 91 },
     ],
   },
   {
@@ -173,6 +316,31 @@ const initialTeamMembers: TeamMember[] = [
       { month: "Nov", tasks: 15 },
       { month: "Dec", tasks: 13 },
     ],
+    salary: 60000,
+    employmentType: "Contract",
+    manager: "David Park",
+    yearsOfExperience: 2,
+    certifications: ["Content Marketing Certified"],
+    emergencyContact: { name: "Carlos Torres", phone: "+1 (555) 567-8900" },
+    performanceRating: 4.3,
+    lastReviewDate: "2024-09-15",
+    nextReviewDate: "2025-03-15",
+    attendance: [
+      { date: "2024-12-20", status: "present", checkIn: "09:15", checkOut: "18:15" },
+      { date: "2024-12-19", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-18", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-17", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-16", status: "present", checkIn: "09:00", checkOut: "18:00" },
+    ],
+    absenceHistory: [],
+    taskPerformanceHistory: [
+      { month: "Jul", completed: 8, onTime: 8, quality: 88, deadline: 88 },
+      { month: "Aug", completed: 12, onTime: 11, quality: 90, deadline: 89 },
+      { month: "Sep", completed: 10, onTime: 9, quality: 89, deadline: 88 },
+      { month: "Oct", completed: 14, onTime: 13, quality: 91, deadline: 90 },
+      { month: "Nov", completed: 15, onTime: 14, quality: 92, deadline: 91 },
+      { month: "Dec", completed: 13, onTime: 12, quality: 90, deadline: 89 },
+    ],
   },
   {
     id: "6",
@@ -196,6 +364,31 @@ const initialTeamMembers: TeamMember[] = [
       { month: "Oct", tasks: 10 },
       { month: "Nov", tasks: 12 },
       { month: "Dec", tasks: 9 },
+    ],
+    salary: 65000,
+    employmentType: "Part-time",
+    manager: "John Doe",
+    yearsOfExperience: 1,
+    certifications: ["JavaScript Fundamentals"],
+    emergencyContact: { name: "Sarah Brown", phone: "+1 (555) 678-9000" },
+    performanceRating: 4.0,
+    lastReviewDate: "2024-12-01",
+    nextReviewDate: "2025-06-01",
+    attendance: [
+      { date: "2024-12-20", status: "present", checkIn: "09:00", checkOut: "17:00" },
+      { date: "2024-12-19", status: "present", checkIn: "09:00", checkOut: "17:00" },
+      { date: "2024-12-18", status: "present", checkIn: "09:00", checkOut: "17:00" },
+      { date: "2024-12-17", status: "present", checkIn: "09:00", checkOut: "17:00" },
+      { date: "2024-12-16", status: "present", checkIn: "09:00", checkOut: "17:00" },
+    ],
+    absenceHistory: [],
+    taskPerformanceHistory: [
+      { month: "Jul", completed: 5, onTime: 5, quality: 85, deadline: 85 },
+      { month: "Aug", completed: 8, onTime: 7, quality: 87, deadline: 86 },
+      { month: "Sep", completed: 7, onTime: 6, quality: 86, deadline: 85 },
+      { month: "Oct", completed: 10, onTime: 9, quality: 88, deadline: 87 },
+      { month: "Nov", completed: 12, onTime: 11, quality: 89, deadline: 88 },
+      { month: "Dec", completed: 9, onTime: 8, quality: 87, deadline: 86 },
     ],
   },
   {
@@ -221,6 +414,31 @@ const initialTeamMembers: TeamMember[] = [
       { month: "Nov", tasks: 22 },
       { month: "Dec", tasks: 19 },
     ],
+    salary: 90000,
+    employmentType: "Full-time",
+    manager: "Lisa Thompson",
+    yearsOfExperience: 6,
+    certifications: ["PMP Certified"],
+    emergencyContact: { name: "Susan Park", phone: "+1 (555) 789-0100" },
+    performanceRating: 4.7,
+    lastReviewDate: "2024-10-25",
+    nextReviewDate: "2025-04-25",
+    attendance: [
+      { date: "2024-12-20", status: "present", checkIn: "08:45", checkOut: "17:45" },
+      { date: "2024-12-19", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-18", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-17", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-16", status: "present", checkIn: "09:00", checkOut: "18:00" },
+    ],
+    absenceHistory: [{ type: "Sick Leave", from: "2024-11-20", to: "2024-11-21" }],
+    taskPerformanceHistory: [
+      { month: "Jul", completed: 14, onTime: 14, quality: 94, deadline: 93 },
+      { month: "Aug", completed: 18, onTime: 17, quality: 95, deadline: 94 },
+      { month: "Sep", completed: 16, onTime: 16, quality: 93, deadline: 92 },
+      { month: "Oct", completed: 20, onTime: 19, quality: 96, deadline: 95 },
+      { month: "Nov", completed: 22, onTime: 21, quality: 97, deadline: 96 },
+      { month: "Dec", completed: 19, onTime: 18, quality: 95, deadline: 94 },
+    ],
   },
   {
     id: "8",
@@ -244,6 +462,31 @@ const initialTeamMembers: TeamMember[] = [
       { month: "Oct", tasks: 28 },
       { month: "Nov", tasks: 30 },
       { month: "Dec", tasks: 26 },
+    ],
+    salary: 150000,
+    employmentType: "Full-time",
+    manager: undefined, // Top level manager
+    yearsOfExperience: 10,
+    certifications: ["Leadership Excellence"],
+    emergencyContact: { name: "Mark Thompson", phone: "+1 (555) 890-1200" },
+    performanceRating: 4.9,
+    lastReviewDate: "2024-11-10",
+    nextReviewDate: "2025-05-10",
+    attendance: [
+      { date: "2024-12-20", status: "present", checkIn: "08:30", checkOut: "17:30" },
+      { date: "2024-12-19", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-18", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-17", status: "present", checkIn: "09:00", checkOut: "18:00" },
+      { date: "2024-12-16", status: "present", checkIn: "09:00", checkOut: "18:00" },
+    ],
+    absenceHistory: [],
+    taskPerformanceHistory: [
+      { month: "Jul", completed: 20, onTime: 20, quality: 98, deadline: 97 },
+      { month: "Aug", completed: 24, onTime: 23, quality: 99, deadline: 98 },
+      { month: "Sep", completed: 22, onTime: 21, quality: 97, deadline: 96 },
+      { month: "Oct", completed: 28, onTime: 27, quality: 100, deadline: 99 },
+      { month: "Nov", completed: 30, onTime: 29, quality: 100, deadline: 99 },
+      { month: "Dec", completed: 26, onTime: 25, quality: 98, deadline: 97 },
     ],
   },
 ]
@@ -269,6 +512,12 @@ export default function TeamPage() {
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 
+  // States for new view and filters
+  const [view, setView] = useState<"grid" | "table" | "detail">("grid")
+  const [searchTerm, setSearchTerm] = useState("")
+  const [filterDepartment, setFilterDepartment] = useState<string>("all")
+  const [filterStatus, setFilterStatus] = useState<string>("all")
+
   const filteredMembers = members.filter((member) => {
     const matchesSearch =
       member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -278,11 +527,41 @@ export default function TeamPage() {
     return matchesSearch && matchesDepartment
   })
 
+  // Adjusted filteredMembers to use new filter states
+  const filteredMembersNew = initialTeamMembers.filter((member) => {
+    const matchSearch =
+      member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.role.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchDept = filterDepartment === "all" || member.department === filterDepartment
+    const matchStatus = filterStatus === "all" || member.status === filterStatus
+    return matchSearch && matchDept && matchStatus
+  })
+
   const stats = {
     total: members.length,
     active: members.filter((m) => m.status === "active").length,
     totalTasksCompleted: members.reduce((sum, m) => sum + m.tasksCompleted, 0),
     avgRating: (members.reduce((sum, m) => sum + m.rating, 0) / members.length).toFixed(1),
+  }
+
+  const attendanceStats = {
+    present: initialTeamMembers.reduce(
+      (sum, m) => sum + (m.attendance?.filter((a) => a.status === "present").length || 0),
+      0,
+    ),
+    absent: initialTeamMembers.reduce(
+      (sum, m) => sum + (m.attendance?.filter((a) => a.status === "absent").length || 0),
+      0,
+    ),
+    late: initialTeamMembers.reduce(
+      (sum, m) => sum + (m.attendance?.filter((a) => a.status === "late").length || 0),
+      0,
+    ),
+    leave: initialTeamMembers.reduce(
+      (sum, m) => sum + (m.attendance?.filter((a) => a.status === "leave").length || 0),
+      0,
+    ),
   }
 
   const departmentStats = Object.keys(departmentConfig).map((dept) => ({
@@ -309,6 +588,18 @@ export default function TeamPage() {
       rating: 0,
       skills: (formData.get("skills") as string).split(",").map((s) => s.trim()),
       performanceData: [],
+      // Default HRM fields for new members
+      salary: 0,
+      employmentType: "Full-time",
+      manager: "",
+      yearsOfExperience: 0,
+      certifications: [],
+      performanceRating: 0,
+      lastReviewDate: new Date().toISOString().split("T")[0],
+      nextReviewDate: new Date().toISOString().split("T")[0],
+      attendance: [],
+      absenceHistory: [],
+      taskPerformanceHistory: [],
     }
     setMembers([newMember, ...members])
     setIsAddDialogOpen(false)
@@ -318,7 +609,7 @@ export default function TeamPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
+        {/* <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Team</h1>
             <p className="text-muted-foreground mt-1">Manage your team members and track performance</p>
@@ -389,10 +680,23 @@ export default function TeamPage() {
               </form>
             </DialogContent>
           </Dialog>
+        </div> */}
+
+        {/* Replaced original header and add member button with new design */}
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">Team Management</h1>
+            <p className="text-muted-foreground">Manage team members, attendance, and performance</p>
+          </div>
+          <Button className="gap-2" onClick={() => setIsAddDialogOpen(true)}>
+            <Plus className="w-4 h-4" />
+            Add Team Member
+          </Button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: "Team Members", value: stats.total, icon: Users, color: "text-foreground" },
             { label: "Active Now", value: stats.active, icon: CheckCircle, color: "text-success" },
@@ -409,10 +713,66 @@ export default function TeamPage() {
               </div>
             </AnimatedCard>
           ))}
+        </div> */}
+
+        {/* Updated Stats Overview with HRM data */}
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <AnimatedCard delay={0}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Team Members</p>
+                  <p className="text-2xl font-bold">{initialTeamMembers.length}</p>
+                </div>
+                <Users className="w-8 h-8 text-primary opacity-20" />
+              </div>
+            </CardContent>
+          </AnimatedCard>
+
+          <AnimatedCard delay={50}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Present Today</p>
+                  <p className="text-2xl font-bold text-success">{attendanceStats.present}</p>
+                </div>
+                <CheckCircle className="w-8 h-8 text-success opacity-20" />
+              </div>
+            </CardContent>
+          </AnimatedCard>
+
+          <AnimatedCard delay={100}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Absent Today</p>
+                  <p className="text-2xl font-bold text-destructive">{attendanceStats.absent}</p>
+                </div>
+                <AlertCircle className="w-8 h-8 text-destructive opacity-20" />
+              </div>
+            </CardContent>
+          </AnimatedCard>
+
+          <AnimatedCard delay={150}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Avg Performance</p>
+                  <p className="text-2xl font-bold">
+                    {(
+                      initialTeamMembers.reduce((sum, m) => sum + m.performanceRating, 0) / initialTeamMembers.length
+                    ).toFixed(1)}
+                  </p>
+                </div>
+                <TrendingUp className="w-8 h-8 text-chart-4 opacity-20" />
+              </div>
+            </CardContent>
+          </AnimatedCard>
         </div>
 
         {/* Department Overview */}
-        <AnimatedCard delay={200}>
+        {/* <AnimatedCard delay={200}>
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-medium">Team by Department</CardTitle>
           </CardHeader>
@@ -442,10 +802,10 @@ export default function TeamPage() {
               </ResponsiveContainer>
             </div>
           </CardContent>
-        </AnimatedCard>
+        </AnimatedCard> */}
 
         {/* Filters */}
-        <AnimatedCard delay={250} className="p-4">
+        {/* <AnimatedCard delay={250} className="p-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -470,10 +830,67 @@ export default function TeamPage() {
               </SelectContent>
             </Select>
           </div>
-        </AnimatedCard>
+        </AnimatedCard> */}
+
+        {/* Consolidated controls for search, filters, and view toggle */}
+        {/* Controls */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2">
+                <Search className="w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name, email, or role..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="flex-1"
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-muted-foreground" />
+                  <select
+                    value={filterDepartment}
+                    onChange={(e) => setFilterDepartment(e.target.value)}
+                    className="px-3 py-2 rounded border border-border bg-background text-sm"
+                  >
+                    <option value="all">All Departments</option>
+                    <option value="design">Design</option>
+                    <option value="development">Development</option>
+                    <option value="marketing">Marketing</option>
+                    <option value="content">Content</option>
+                    <option value="management">Management</option>
+                  </select>
+                </div>
+
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="px-3 py-2 rounded border border-border bg-background text-sm"
+                >
+                  <option value="all">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="away">Away</option>
+                  <option value="offline">Offline</option>
+                </select>
+              </div>
+
+              {/* View Toggle */}
+              <div className="flex gap-2">
+                <Button variant={view === "grid" ? "default" : "outline"} size="sm" onClick={() => setView("grid")}>
+                  Grid
+                </Button>
+                <Button variant={view === "table" ? "default" : "outline"} size="sm" onClick={() => setView("table")}>
+                  Table
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Team Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredMembers.map((member, i) => (
             <AnimatedCard
               key={member.id}
@@ -528,10 +945,153 @@ export default function TeamPage() {
               </CardContent>
             </AnimatedCard>
           ))}
-        </div>
+        </div> */}
+
+        {/* Implemented Grid and Table views with conditional rendering */}
+        {/* Grid View */}
+        {view === "grid" && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredMembersNew.map((member, i) => (
+              <AnimatedCard
+                key={member.id}
+                delay={300 + i * 50}
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => setSelectedMember(member)}
+              >
+                <CardContent className="p-5">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="relative">
+                      <Avatar className="w-16 h-16">
+                        <AvatarImage src={member.avatar || "/placeholder.svg"} />
+                        <AvatarFallback className="bg-primary/20 text-primary text-lg">
+                          {member.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div
+                        className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-card ${
+                          member.status === "active"
+                            ? "bg-success"
+                            : member.status === "away"
+                              ? "bg-warning"
+                              : "bg-muted"
+                        }`}
+                      />
+                    </div>
+
+                    <h3 className="font-semibold mt-3">{member.name}</h3>
+                    <p className="text-sm text-muted-foreground">{member.role}</p>
+
+                    <Badge className="mt-2 bg-primary/20 text-primary border-0">
+                      {member.department.charAt(0).toUpperCase() + member.department.slice(1)}
+                    </Badge>
+
+                    <div className="flex items-center gap-1 mt-3">
+                      <Star className="w-4 h-4 text-chart-4 fill-chart-4" />
+                      <span className="text-sm font-medium">{member.rating}</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-border text-center">
+                    <div>
+                      <p className="text-lg font-bold text-success">{member.tasksCompleted}</p>
+                      <p className="text-[10px] text-muted-foreground">Completed</p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-primary">{member.tasksInProgress}</p>
+                      <p className="text-[10px] text-muted-foreground">Active</p>
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold">{member.projectsActive}</p>
+                      <p className="text-[10px] text-muted-foreground">Projects</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </AnimatedCard>
+            ))}
+          </div>
+        )}
+
+        {/* Table View */}
+        {view === "table" && (
+          <Card>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left p-4 font-semibold">Name</th>
+                      <th className="text-left p-4 font-semibold">Role</th>
+                      <th className="text-left p-4 font-semibold">Department</th>
+                      <th className="text-left p-4 font-semibold">Manager</th>
+                      <th className="text-left p-4 font-semibold">Salary</th>
+                      <th className="text-left p-4 font-semibold">Performance</th>
+                      <th className="text-left p-4 font-semibold">Attendance</th>
+                      <th className="text-center p-4 font-semibold">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredMembersNew.map((member) => (
+                      <tr key={member.id} className="border-b border-border hover:bg-muted/50">
+                        <td className="p-4">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="w-8 h-8">
+                              <AvatarImage src={member.avatar || "/placeholder.svg"} />
+                              <AvatarFallback className="text-xs">
+                                {member.name
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="font-medium">{member.name}</span>
+                          </div>
+                        </td>
+                        <td className="p-4">{member.role}</td>
+                        <td className="p-4">
+                          <Badge variant="outline" className="capitalize">
+                            {member.department}
+                          </Badge>
+                        </td>
+                        <td className="p-4 text-muted-foreground">{member.manager || "-"}</td>
+                        <td className="p-4 font-medium">${(member.salary || 0) / 1000}k</td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-1">
+                            <div className="w-12 bg-muted rounded h-2">
+                              <div
+                                className="bg-success h-full rounded"
+                                style={{ width: `${member.performanceRating * 20}%` }}
+                              />
+                            </div>
+                            <span className="text-xs font-medium">{member.performanceRating}</span>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-1">
+                            <CheckCircle className="w-4 h-4 text-success" />
+                            <span className="text-xs">
+                              {member.attendance?.filter((a) => a.status === "present").length || 0}/5
+                            </span>
+                          </div>
+                        </td>
+                        <td className="p-4 text-center">
+                          <Button variant="ghost" size="sm" onClick={() => setSelectedMember(member)}>
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Member Detail Dialog */}
-        <Dialog open={!!selectedMember} onOpenChange={() => setSelectedMember(null)}>
+        {/* <Dialog open={!!selectedMember} onOpenChange={() => setSelectedMember(null)}>
           <DialogContent className="sm:max-w-[600px]">
             {selectedMember && (
               <>
@@ -684,7 +1244,340 @@ export default function TeamPage() {
               </>
             )}
           </DialogContent>
-        </Dialog>
+        </Dialog> */}
+
+        {/* New Detail Modal with HRM information and Tabs */}
+        {/* Detail Modal */}
+        {selectedMember && (
+          <Dialog open={!!selectedMember} onOpenChange={() => setSelectedMember(null)}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <div className="flex items-center gap-4 mb-4">
+                  <Avatar className="w-16 h-16">
+                    <AvatarImage src={selectedMember.avatar || "/placeholder.svg"} />
+                    <AvatarFallback className="bg-primary/20 text-primary text-xl">
+                      {selectedMember.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <DialogTitle className="text-2xl">{selectedMember.name}</DialogTitle>
+                    <DialogDescription>{selectedMember.role}</DialogDescription>
+                  </div>
+                </div>
+              </DialogHeader>
+
+              <Tabs defaultValue="overview" className="w-full">
+                <TabsList className="grid w-full grid-cols-5">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="attendance">Attendance</TabsTrigger>
+                  <TabsTrigger value="performance">Performance</TabsTrigger>
+                  <TabsTrigger value="documents">Documents</TabsTrigger>
+                  <TabsTrigger value="contact">Contact</TabsTrigger>
+                </TabsList>
+
+                {/* Overview Tab */}
+                <TabsContent value="overview" className="space-y-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-semibold mb-4">Employment Details</h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center pb-2 border-b border-border">
+                          <span className="text-muted-foreground">Employment Type</span>
+                          <span className="font-medium">{selectedMember.employmentType}</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-2 border-b border-border">
+                          <span className="text-muted-foreground">Department</span>
+                          <Badge className="capitalize">{selectedMember.department}</Badge>
+                        </div>
+                        <div className="flex justify-between items-center pb-2 border-b border-border">
+                          <span className="text-muted-foreground">Manager</span>
+                          <span className="font-medium">{selectedMember.manager || "-"}</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-2 border-b border-border">
+                          <span className="text-muted-foreground">Years of Experience</span>
+                          <span className="font-medium">{selectedMember.yearsOfExperience} years</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-2 border-b border-border">
+                          <span className="text-muted-foreground">Joined Date</span>
+                          <span className="font-medium">
+                            {new Date(selectedMember.joinedDate).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center pb-2 border-b border-border">
+                          <span className="text-muted-foreground">Salary</span>
+                          <span className="font-medium">${selectedMember.salary?.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-4">Performance & Rating</h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center pb-2 border-b border-border">
+                          <span className="text-muted-foreground">Overall Rating</span>
+                          <div className="flex items-center gap-1">
+                            <Star className="w-4 h-4 fill-chart-4 text-chart-4" />
+                            <span className="font-bold">{selectedMember.rating}</span>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center pb-2 border-b border-border">
+                          <span className="text-muted-foreground">Performance Rating</span>
+                          <span className="font-medium">{selectedMember.performanceRating}/5.0</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-2 border-b border-border">
+                          <span className="text-muted-foreground">Tasks Completed</span>
+                          <span className="font-bold text-success">{selectedMember.tasksCompleted}</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-2 border-b border-border">
+                          <span className="text-muted-foreground">Tasks In Progress</span>
+                          <span className="font-bold text-primary">{selectedMember.tasksInProgress}</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-2 border-b border-border">
+                          <span className="text-muted-foreground">Last Review</span>
+                          <span className="font-medium">
+                            {new Date(selectedMember.lastReviewDate).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center pb-2 border-b border-border">
+                          <span className="text-muted-foreground">Next Review</span>
+                          <span className="font-medium">
+                            {new Date(selectedMember.nextReviewDate).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Skills */}
+                  <div>
+                    <h4 className="font-semibold mb-3">Skills & Certifications</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-2">Core Skills</p>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedMember.skills.map((skill) => (
+                            <Badge key={skill} variant="secondary">
+                              {skill}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-2">Certifications</p>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedMember.certifications.map((cert) => (
+                            <Badge key={cert} variant="outline">
+                              {cert}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* Attendance Tab */}
+                <TabsContent value="attendance" className="space-y-6">
+                  <div>
+                    <h4 className="font-semibold mb-4">Recent Attendance</h4>
+                    <div className="space-y-2">
+                      {selectedMember.attendance?.slice(0, 10).map((record, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-3 border border-border rounded">
+                          <div className="flex items-center gap-3">
+                            <Calendar className="w-4 h-4 text-muted-foreground" />
+                            <div>
+                              <p className="font-medium">{new Date(record.date).toLocaleDateString()}</p>
+                              {record.checkIn && record.checkOut && (
+                                <p className="text-xs text-muted-foreground">
+                                  {record.checkIn} - {record.checkOut}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <Badge
+                            variant="outline"
+                            className={
+                              record.status === "present"
+                                ? "bg-success/20 text-success"
+                                : record.status === "late"
+                                  ? "bg-warning/20 text-warning"
+                                  : record.status === "leave"
+                                    ? "bg-blue-500/20 text-blue-500"
+                                    : "bg-destructive/20 text-destructive"
+                            }
+                          >
+                            {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-4">Absence History</h4>
+                    <div className="space-y-2">
+                      {selectedMember.absenceHistory?.map((absence, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-3 border border-border rounded">
+                          <div>
+                            <p className="font-medium">{absence.type}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(absence.from).toLocaleDateString()} -{" "}
+                              {new Date(absence.to).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* Performance Tab */}
+                <TabsContent value="performance" className="space-y-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-semibold mb-3">Tasks Performance</h4>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={selectedMember.taskPerformanceHistory}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                          <XAxis dataKey="month" stroke="var(--muted-foreground)" />
+                          <YAxis stroke="var(--muted-foreground)" />
+                          <Tooltip
+                            contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)" }}
+                          />
+                          <Bar dataKey="completed" fill="var(--primary)" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3">Quality Metrics</h4>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={selectedMember.taskPerformanceHistory}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                          <XAxis dataKey="month" stroke="var(--muted-foreground)" />
+                          <YAxis stroke="var(--muted-foreground)" />
+                          <Tooltip
+                            contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)" }}
+                          />
+                          <Bar dataKey="quality" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="onTime" fill="var(--success)" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-3">Performance Trend</h4>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={selectedMember.taskPerformanceHistory}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                        <XAxis dataKey="month" stroke="var(--muted-foreground)" />
+                        <YAxis stroke="var(--muted-foreground)" />
+                        <Tooltip contentStyle={{ backgroundColor: "var(--card)", border: "1px solid var(--border)" }} />
+                        <Line
+                          type="monotone"
+                          dataKey="quality"
+                          stroke="var(--primary)"
+                          strokeWidth={2}
+                          dot={{ fill: "var(--primary)" }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="onTime"
+                          stroke="var(--success)"
+                          strokeWidth={2}
+                          dot={{ fill: "var(--success)" }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </TabsContent>
+
+                {/* Documents Tab */}
+                <TabsContent value="documents" className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold mb-4">Employment Documents</h4>
+                    <div className="space-y-2">
+                      {[
+                        "Employment Contract",
+                        "Offer Letter",
+                        "Performance Reviews",
+                        "Certifications",
+                        "Background Check",
+                      ].map((doc) => (
+                        <div
+                          key={doc}
+                          className="flex items-center justify-between p-3 border border-border rounded hover:bg-muted/50"
+                        >
+                          <span className="font-medium">{doc}</span>
+                          <Button variant="ghost" size="sm">
+                            <Download className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* Contact Tab */}
+                <TabsContent value="contact" className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 border border-border rounded">
+                      <MailIcon className="w-5 h-5 text-primary" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Email</p>
+                        <p className="font-medium">{selectedMember.email}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 p-3 border border-border rounded">
+                      <Phone className="w-5 h-5 text-primary" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Phone</p>
+                        <p className="font-medium">{selectedMember.phone}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 p-3 border border-border rounded">
+                      <MapPin className="w-5 h-5 text-primary" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Location</p>
+                        <p className="font-medium">{selectedMember.location}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 p-3 border border-border rounded">
+                      <Briefcase className="w-5 h-5 text-primary" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Department</p>
+                        <p className="font-medium capitalize">{selectedMember.department}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {selectedMember.emergencyContact && (
+                    <div className="mt-6">
+                      <h4 className="font-semibold mb-3">Emergency Contact</h4>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center pb-2 border-b border-border">
+                          <span className="text-muted-foreground">Name</span>
+                          <span className="font-medium">{selectedMember.emergencyContact.name}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">Phone</span>
+                          <span className="font-medium">{selectedMember.emergencyContact.phone}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </DashboardLayout>
   )
