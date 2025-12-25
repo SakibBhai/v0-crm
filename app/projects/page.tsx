@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Progress } from "@/components/ui/progress"
+import { DatePicker } from "@/components/ui/date-picker"
 import {
   Search,
   Plus,
@@ -262,105 +263,252 @@ export default function ProjectsPage() {
                 New Project
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>Create New Project</DialogTitle>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader className="pb-4 border-b border-border">
+                <DialogTitle className="flex items-center gap-3 text-xl">
+                  <div className="p-2 rounded-lg bg-primary/20">
+                    <FolderKanban className="w-5 h-5 text-primary" />
+                  </div>
+                  Create New Project
+                </DialogTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Set up a new client project with all the essential details
+                </p>
               </DialogHeader>
-              <form onSubmit={handleAddProject} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Project Name</Label>
-                  <Input id="name" name="name" placeholder="Website Redesign" required />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea id="description" name="description" placeholder="Brief project description..." />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="client">Client</Label>
-                    <Select name="client" defaultValue="TechMart Solutions">
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select client" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="TechMart Solutions">TechMart Solutions</SelectItem>
-                        <SelectItem value="GreenLife Organics">GreenLife Organics</SelectItem>
-                        <SelectItem value="FoodieHub">FoodieHub</SelectItem>
-                        <SelectItem value="LuxStay Hotels">LuxStay Hotels</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="category">Category</Label>
-                    <Select name="category" defaultValue="Web Design">
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Web Design">Web Design</SelectItem>
-                        <SelectItem value="SEO">SEO</SelectItem>
-                        <SelectItem value="Social Media">Social Media</SelectItem>
-                        <SelectItem value="PPC">PPC</SelectItem>
-                        <SelectItem value="Branding">Branding</SelectItem>
-                        <SelectItem value="Email Marketing">Email Marketing</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="priority">Priority</Label>
-                    <Select name="priority" defaultValue="medium">
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select priority" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="budget">Budget ($)</Label>
-                    <Input id="budget" name="budget" type="number" placeholder="10000" required />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="startDate">Start Date</Label>
-                    <Input id="startDate" name="startDate" type="date" required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="dueDate">Due Date</Label>
-                    <Input id="dueDate" name="dueDate" type="date" required />
-                  </div>
-                </div>
 
-                {/* Key Links Section */}
-                <div className="pt-4 border-t border-border">
-                  <Label className="text-sm font-medium text-muted-foreground mb-3 block">Key Links (Optional)</Label>
-                  <div className="space-y-3">
+              <form onSubmit={handleAddProject} className="space-y-6 pt-4">
+                {/* Project Details Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                    <Target className="w-4 h-4" />
+                    Project Details
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-sm">
+                      Project Name <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      placeholder="e.g., E-commerce Website Redesign"
+                      required
+                      className="bg-secondary/50 border-border"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="description" className="text-sm">Description</Label>
+                    <Textarea
+                      id="description"
+                      name="description"
+                      placeholder="Describe the project scope, goals, and deliverables..."
+                      rows={3}
+                      className="bg-secondary/50 border-border resize-none"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="briefLink" className="text-xs">Project Brief URL</Label>
-                      <Input id="briefLink" name="briefLink" type="url" placeholder="https://docs.google.com/document/d/..." />
+                      <Label htmlFor="client" className="text-sm">
+                        Client <span className="text-destructive">*</span>
+                      </Label>
+                      <Select name="client" defaultValue="TechMart Solutions">
+                        <SelectTrigger className="bg-secondary/50 border-border">
+                          <SelectValue placeholder="Select client" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="TechMart Solutions">TechMart Solutions</SelectItem>
+                          <SelectItem value="GreenLife Organics">GreenLife Organics</SelectItem>
+                          <SelectItem value="FoodieHub">FoodieHub</SelectItem>
+                          <SelectItem value="LuxStay Hotels">LuxStay Hotels</SelectItem>
+                          <SelectItem value="StartupX">StartupX</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="driveLink" className="text-xs">Google Drive Folder URL</Label>
-                      <Input id="driveLink" name="driveLink" type="url" placeholder="https://drive.google.com/drive/folders/..." />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="researchLink" className="text-xs">Research Documents URL</Label>
-                      <Input id="researchLink" name="researchLink" type="url" placeholder="https://notion.so/..." />
+                      <Label htmlFor="category" className="text-sm">
+                        Category <span className="text-destructive">*</span>
+                      </Label>
+                      <Select name="category" defaultValue="Web Design">
+                        <SelectTrigger className="bg-secondary/50 border-border">
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Web Design">🎨 Web Design</SelectItem>
+                          <SelectItem value="SEO">📈 SEO</SelectItem>
+                          <SelectItem value="Social Media">📱 Social Media</SelectItem>
+                          <SelectItem value="PPC">💰 PPC</SelectItem>
+                          <SelectItem value="Branding">✨ Branding</SelectItem>
+                          <SelectItem value="Email Marketing">📧 Email Marketing</SelectItem>
+                          <SelectItem value="Content">📝 Content</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </div>
 
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                {/* Team & Budget Section */}
+                <div className="space-y-4 pt-4 border-t border-border">
+                  <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                    <User className="w-4 h-4" />
+                    Team & Budget
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="projectManager" className="text-sm">Project Manager</Label>
+                      <Select name="projectManager" defaultValue="John Smith">
+                        <SelectTrigger className="bg-secondary/50 border-border">
+                          <SelectValue placeholder="Select manager" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {uniqueManagers.map((manager) => (
+                            <SelectItem key={manager} value={manager}>
+                              <span className="flex items-center gap-2">
+                                <span className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-medium">
+                                  {manager.split(" ").map(n => n[0]).join("")}
+                                </span>
+                                {manager}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="priority" className="text-sm">Priority</Label>
+                      <Select name="priority" defaultValue="medium">
+                        <SelectTrigger className="bg-secondary/50 border-border">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">
+                            <span className="flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full bg-blue-500" />
+                              Low
+                            </span>
+                          </SelectItem>
+                          <SelectItem value="medium">
+                            <span className="flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full bg-yellow-500" />
+                              Medium
+                            </span>
+                          </SelectItem>
+                          <SelectItem value="high">
+                            <span className="flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full bg-red-500" />
+                              High
+                            </span>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="budget" className="text-sm">
+                      <span className="flex items-center gap-1">
+                        <DollarSign className="w-3 h-3" />
+                        Project Budget <span className="text-destructive">*</span>
+                      </span>
+                    </Label>
+                    <div className="relative">
+                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        id="budget"
+                        name="budget"
+                        type="number"
+                        placeholder="25000"
+                        required
+                        className="pl-9 bg-secondary/50 border-border"
+                      />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">Enter the total project budget in USD</p>
+                  </div>
+                </div>
+
+                {/* Timeline Section */}
+                <div className="space-y-4 pt-4 border-t border-border">
+                  <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                    <Calendar className="w-4 h-4" />
+                    Timeline
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="startDate" className="text-sm">
+                        Start Date <span className="text-destructive">*</span>
+                      </Label>
+                      <DatePicker
+                        name="startDate"
+                        placeholder="Select start date"
+                        date={new Date()}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="dueDate" className="text-sm">
+                        Due Date <span className="text-destructive">*</span>
+                      </Label>
+                      <DatePicker
+                        name="dueDate"
+                        placeholder="Select due date"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Resources Section */}
+                <div className="space-y-4 pt-4 border-t border-border">
+                  <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                    <ArrowRight className="w-4 h-4" />
+                    Key Resources
+                    <Badge variant="secondary" className="text-[10px] ml-auto">Optional</Badge>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="briefLink" className="text-sm">Project Brief URL</Label>
+                      <Input
+                        id="briefLink"
+                        name="briefLink"
+                        type="url"
+                        placeholder="https://docs.google.com/document/d/..."
+                        className="bg-secondary/50 border-border"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="driveLink" className="text-sm">Google Drive Folder</Label>
+                      <Input
+                        id="driveLink"
+                        name="driveLink"
+                        type="url"
+                        placeholder="https://drive.google.com/drive/folders/..."
+                        className="bg-secondary/50 border-border"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="researchLink" className="text-sm">Research Documents</Label>
+                      <Input
+                        id="researchLink"
+                        name="researchLink"
+                        type="url"
+                        placeholder="https://notion.so/..."
+                        className="bg-secondary/50 border-border"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Actions */}
+                <DialogFooter className="pt-4 border-t border-border gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsAddDialogOpen(false)}
+                    className="gap-2"
+                  >
                     Cancel
                   </Button>
-                  <Button type="submit">Create Project</Button>
+                  <Button type="submit" className="gap-2 min-w-[140px]">
+                    <Plus className="w-4 h-4" />
+                    Create Project
+                  </Button>
                 </DialogFooter>
               </form>
             </DialogContent>
