@@ -16,6 +16,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { InvoiceDetailDialog } from "@/components/invoices/invoice-detail-dialog"
+import { sampleInvoices, samplePayments } from "@/lib/data/invoices"
+import type { Invoice, Payment } from "@/lib/types/finance"
 import {
     ArrowLeft,
     Calendar,
@@ -44,6 +47,8 @@ import {
     Image,
     FileSpreadsheet,
     Presentation,
+    Receipt,
+    Eye,
 } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
 import Link from "next/link"
@@ -203,8 +208,16 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     const [activeTab, setActiveTab] = useState("overview")
     const [isAddTaskOpen, setIsAddTaskOpen] = useState(false)
     const [isEditOpen, setIsEditOpen] = useState(false)
+    const [isRecordPaymentOpen, setIsRecordPaymentOpen] = useState(false)
+    const [isGenerateInvoiceOpen, setIsGenerateInvoiceOpen] = useState(false)
     const [newMessage, setNewMessage] = useState("")
     const [taskViewMode, setTaskViewMode] = useState<"list" | "kanban">("kanban")
+
+    // Invoice state
+    const [invoices, setInvoices] = useState<Invoice[]>(sampleInvoices.filter(inv => inv.projectId === resolvedParams.id || inv.projectId === "1"))
+    const [payments, setPayments] = useState<Payment[]>(samplePayments)
+    const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
+    const [isInvoiceDetailOpen, setIsInvoiceDetailOpen] = useState(false)
 
     const StatusIcon = statusConfig[project.status].icon
 
@@ -242,6 +255,62 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
 
         setIsEditOpen(false)
     }
+
+    // Invoice handlers
+    const handleViewInvoice = (invoice: Invoice) => {
+        setSelectedInvoice(invoice)
+        setIsInvoiceDetailOpen(true)
+    }
+
+    const handleUpdateInvoice = (updatedInvoice: Invoice) => {
+        setInvoices(prev => prev.map(inv =>
+            inv.id === updatedInvoice.id ? updatedInvoice : inv
+        ))
+        setSelectedInvoice(updatedInvoice)
+    }
+
+    const handleRecordPaymentForInvoice = (invoiceId: string, amount: number) => {
+        const invoice = invoices.find(inv => inv.id === invoiceId)
+        if (!invoice) return
+
+        const newPayment: Payment = {
+            id: `pay-${Date.now()}`,
+            invoiceId,
+            invoiceNumber: invoice.invoiceNumber,
+            projectId: invoice.projectId,
+            projectName: invoice.projectName,
+            clientName: invoice.clientName,
+            amount,
+            paymentDate: new Date().toISOString().split('T')[0],
+            paymentMethod: 'bank_transfer',
+            createdAt: new Date().toISOString(),
+        }
+        setPayments(prev => [...prev, newPayment])
+
+        // Update invoice
+        setInvoices(prev => prev.map(inv => {
+            if (inv.id === invoiceId) {
+                const newAmountPaid = inv.amountPaid + amount
+                const newAmountDue = inv.totalAmount - newAmountPaid
+                const newStatus = newAmountDue <= 0 ? 'paid' : 'partial'
+                const updatedInvoice = {
+                    ...inv,
+                    amountPaid: newAmountPaid,
+                    amountDue: Math.max(0, newAmountDue),
+                    status: newStatus as Invoice['status'],
+                    paidDate: newAmountDue <= 0 ? new Date().toISOString().split('T')[0] : undefined,
+                }
+                setSelectedInvoice(updatedInvoice)
+                return updatedInvoice
+            }
+            return inv
+        }))
+    }
+
+    // Invoice stats
+    const totalBilled = invoices.reduce((sum, inv) => sum + inv.totalAmount, 0)
+    const totalPaid = invoices.reduce((sum, inv) => sum + inv.amountPaid, 0)
+    const totalOutstanding = invoices.reduce((sum, inv) => sum + inv.amountDue, 0)
 
     const taskStatuses: Array<"todo" | "in-progress" | "review" | "done"> = ["todo", "in-progress", "review", "done"]
 
@@ -311,6 +380,10 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                         <TabsTrigger value="discussion" className="gap-1.5">
                             <MessageSquare className="w-4 h-4" />
                             <span className="hidden sm:inline">Discussion</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="billing" className="gap-1.5">
+                            <Receipt className="w-4 h-4" />
+                            <span className="hidden sm:inline">Billing</span>
                         </TabsTrigger>
                     </TabsList>
 
@@ -757,6 +830,140 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                             </div>
                         </AnimatedCard>
                     </TabsContent>
+
+                    {/* Billing Tab */}
+                    <TabsContent value="billing" className="space-y-6 mt-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <h3 className="font-semibold text-lg">Invoices & Payments</h3>
+                                <p className="text-sm text-muted-foreground">Manage billing for this project</p>
+                            </div>
+                            <div className="flex gap-2">
+                                <Button variant="outline" className="gap-2" onClick={() => setIsRecordPaymentOpen(true)}>
+                                    <DollarSign className="w-4 h-4" />
+                                    Record Payment
+                                </Button>
+                                <Button className="gap-2" onClick={() => setIsGenerateInvoiceOpen(true)}>
+                                    <Plus className="w-4 h-4" />
+                                    Generate Invoice
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Billing Stats */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <AnimatedCard className="p-4">
+                                <div className="flex items-center gap-2 text-muted-foreground text-sm mb-2">
+                                    <DollarSign className="w-4 h-4" />
+                                    Total Billed
+                                </div>
+                                <p className="text-2xl font-bold text-primary">${totalBilled.toLocaleString()}</p>
+                            </AnimatedCard>
+                            <AnimatedCard className="p-4" delay={50}>
+                                <div className="flex items-center gap-2 text-muted-foreground text-sm mb-2">
+                                    <CheckCircle className="w-4 h-4" />
+                                    Paid
+                                </div>
+                                <p className="text-2xl font-bold text-green-500">${totalPaid.toLocaleString()}</p>
+                            </AnimatedCard>
+                            <AnimatedCard className="p-4" delay={100}>
+                                <div className="flex items-center gap-2 text-muted-foreground text-sm mb-2">
+                                    <Clock className="w-4 h-4" />
+                                    Outstanding
+                                </div>
+                                <p className="text-2xl font-bold text-yellow-500">${totalOutstanding.toLocaleString()}</p>
+                            </AnimatedCard>
+                        </div>
+
+                        {/* Invoices Table */}
+                        <AnimatedCard delay={150}>
+                            <CardContent className="p-0">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full">
+                                        <thead>
+                                            <tr className="border-b border-border">
+                                                <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Invoice #</th>
+                                                <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Date</th>
+                                                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">Amount</th>
+                                                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">Paid</th>
+                                                <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Status</th>
+                                                <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Due Date</th>
+                                                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {invoices.map((invoice) => {
+                                                const statusColors: Record<string, string> = {
+                                                    draft: "bg-muted text-muted-foreground",
+                                                    sent: "bg-blue-500/20 text-blue-400",
+                                                    partial: "bg-yellow-500/20 text-yellow-400",
+                                                    paid: "bg-green-500/20 text-green-400",
+                                                    overdue: "bg-red-500/20 text-red-400",
+                                                    cancelled: "bg-gray-500/20 text-gray-400",
+                                                }
+                                                return (
+                                                    <tr key={invoice.id} className="border-b border-border/50 hover:bg-secondary/30 transition-colors">
+                                                        <td className="py-3 px-4 font-mono text-sm">{invoice.invoiceNumber}</td>
+                                                        <td className="py-3 px-4 text-sm">{new Date(invoice.issueDate).toLocaleDateString()}</td>
+                                                        <td className="py-3 px-4 text-sm font-medium text-right">${invoice.totalAmount.toLocaleString()}</td>
+                                                        <td className="py-3 px-4 text-sm text-green-500 text-right">${invoice.amountPaid.toLocaleString()}</td>
+                                                        <td className="py-3 px-4">
+                                                            <Badge className={`${statusColors[invoice.status]} border-0 capitalize`}>
+                                                                {invoice.status}
+                                                            </Badge>
+                                                        </td>
+                                                        <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(invoice.dueDate).toLocaleDateString()}</td>
+                                                        <td className="py-3 px-4 text-right">
+                                                            <div className="flex items-center justify-end gap-1">
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    className="gap-1"
+                                                                    onClick={() => handleViewInvoice(invoice)}
+                                                                >
+                                                                    <Eye className="w-3.5 h-3.5" />
+                                                                    View
+                                                                </Button>
+                                                                <Button variant="ghost" size="sm">
+                                                                    <Download className="w-3.5 h-3.5" />
+                                                                </Button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            })}
+                                            {invoices.length === 0 && (
+                                                <tr>
+                                                    <td colSpan={7} className="py-8 text-center text-muted-foreground">
+                                                        No invoices yet. Click "Generate Invoice" to create one.
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </CardContent>
+                        </AnimatedCard>
+
+                        {/* Payment History */}
+                        <div>
+                            <h4 className="font-medium mb-3">Recent Payments</h4>
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 rounded-lg bg-green-500/20">
+                                            <CheckCircle className="w-4 h-4 text-green-500" />
+                                        </div>
+                                        <div>
+                                            <p className="font-medium text-sm">$10,000.00 received</p>
+                                            <p className="text-xs text-muted-foreground">INV-2024-001 • Bank Transfer</p>
+                                        </div>
+                                    </div>
+                                    <span className="text-xs text-muted-foreground">Dec 10, 2024</span>
+                                </div>
+                            </div>
+                        </div>
+                    </TabsContent>
                 </Tabs>
 
                 {/* Add Task Dialog */}
@@ -903,6 +1110,181 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                         </form>
                     </DialogContent>
                 </Dialog>
+
+                {/* Record Payment Dialog */}
+                <Dialog open={isRecordPaymentOpen} onOpenChange={setIsRecordPaymentOpen}>
+                    <DialogContent className="sm:max-w-[500px]">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                                <DollarSign className="w-5 h-5 text-green-500" />
+                                Record Payment
+                            </DialogTitle>
+                            <DialogDescription>Record a payment received for this project</DialogDescription>
+                        </DialogHeader>
+                        <form className="space-y-4">
+                            <div className="space-y-2">
+                                <Label>Invoice</Label>
+                                <Select defaultValue="inv-001">
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select invoice" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="inv-001">INV-2024-001 - $19,425.00 (Partial)</SelectItem>
+                                        <SelectItem value="inv-004">INV-2024-004 - $5,512.50 (Sent)</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Amount ($)</Label>
+                                    <Input type="number" placeholder="0.00" defaultValue="9425" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Payment Date</Label>
+                                    <Input type="date" defaultValue={new Date().toISOString().split('T')[0]} />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Payment Method</Label>
+                                <Select defaultValue="bank_transfer">
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="bank_transfer">🏦 Bank Transfer</SelectItem>
+                                        <SelectItem value="credit_card">💳 Credit Card</SelectItem>
+                                        <SelectItem value="cash">💵 Cash</SelectItem>
+                                        <SelectItem value="check">📝 Check</SelectItem>
+                                        <SelectItem value="other">📋 Other</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Transaction ID (Optional)</Label>
+                                <Input placeholder="TXN-2024-XXX" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Notes (Optional)</Label>
+                                <Textarea placeholder="Add any notes about this payment..." rows={2} />
+                            </div>
+                            <DialogFooter>
+                                <Button type="button" variant="outline" onClick={() => setIsRecordPaymentOpen(false)}>Cancel</Button>
+                                <Button type="submit" className="gap-2">
+                                    <CheckCircle className="w-4 h-4" />
+                                    Record Payment
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Generate Invoice Dialog */}
+                <Dialog open={isGenerateInvoiceOpen} onOpenChange={setIsGenerateInvoiceOpen}>
+                    <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                                <Receipt className="w-5 h-5 text-primary" />
+                                Generate Invoice
+                            </DialogTitle>
+                            <DialogDescription>Create a new invoice for {project.name}</DialogDescription>
+                        </DialogHeader>
+                        <form className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Invoice Number</Label>
+                                    <Input value="INV-2024-005" readOnly className="bg-secondary" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Issue Date</Label>
+                                    <Input type="date" defaultValue={new Date().toISOString().split('T')[0]} />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Client</Label>
+                                    <Input value={project.client} readOnly className="bg-secondary" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Due Date</Label>
+                                    <Input type="date" />
+                                </div>
+                            </div>
+
+                            <div className="space-y-3">
+                                <Label>Line Items</Label>
+                                <div className="border border-border rounded-lg overflow-hidden">
+                                    <table className="w-full text-sm">
+                                        <thead className="bg-secondary">
+                                            <tr>
+                                                <th className="text-left py-2 px-3 font-medium">Description</th>
+                                                <th className="text-center py-2 px-3 font-medium w-16">Qty</th>
+                                                <th className="text-right py-2 px-3 font-medium w-24">Rate</th>
+                                                <th className="text-right py-2 px-3 font-medium w-24">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr className="border-t border-border">
+                                                <td className="py-2 px-3">
+                                                    <Input placeholder="Service description" className="h-8" defaultValue="Project Development" />
+                                                </td>
+                                                <td className="py-2 px-3">
+                                                    <Input type="number" className="h-8 text-center" defaultValue="1" />
+                                                </td>
+                                                <td className="py-2 px-3">
+                                                    <Input type="number" className="h-8 text-right" defaultValue="5000" />
+                                                </td>
+                                                <td className="py-2 px-3 text-right font-medium">$5,000</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <Button type="button" variant="outline" size="sm" className="gap-1">
+                                    <Plus className="w-3 h-3" /> Add Line Item
+                                </Button>
+                            </div>
+
+                            <div className="flex justify-end">
+                                <div className="w-48 space-y-2 text-sm">
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Subtotal</span>
+                                        <span>$5,000.00</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Tax (5%)</span>
+                                        <span>$250.00</span>
+                                    </div>
+                                    <div className="flex justify-between font-semibold border-t pt-2">
+                                        <span>Total</span>
+                                        <span>$5,250.00</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Notes (Optional)</Label>
+                                <Textarea placeholder="Add any notes for the client..." rows={2} />
+                            </div>
+
+                            <DialogFooter>
+                                <Button type="button" variant="outline" onClick={() => setIsGenerateInvoiceOpen(false)}>Cancel</Button>
+                                <Button type="submit" className="gap-2">
+                                    <Receipt className="w-4 h-4" />
+                                    Create Invoice
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Invoice Detail Dialog */}
+                <InvoiceDetailDialog
+                    invoice={selectedInvoice}
+                    isOpen={isInvoiceDetailOpen}
+                    onClose={() => setIsInvoiceDetailOpen(false)}
+                    onUpdate={handleUpdateInvoice}
+                    onRecordPayment={handleRecordPaymentForInvoice}
+                    payments={payments}
+                />
             </div>
         </DashboardLayout>
     )

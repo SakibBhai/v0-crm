@@ -67,9 +67,25 @@ import {
   Download,
   Upload,
   History,
+  FolderOpen,
+  Tag,
 } from "lucide-react"
 
 type Stage = "new" | "contacted" | "qualified" | "proposal" | "negotiation" | "won" | "lost"
+
+// Category type for leads
+type LeadCategory = "digital_marketing" | "seo" | "social_media" | "content" | "branding" | "web_development" | "ppc" | "other"
+
+const categoryConfig: Record<LeadCategory, { label: string; color: string }> = {
+  digital_marketing: { label: "Digital Marketing", color: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
+  seo: { label: "SEO", color: "bg-green-500/20 text-green-400 border-green-500/30" },
+  social_media: { label: "Social Media", color: "bg-pink-500/20 text-pink-400 border-pink-500/30" },
+  content: { label: "Content", color: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" },
+  branding: { label: "Branding", color: "bg-orange-500/20 text-orange-400 border-orange-500/30" },
+  web_development: { label: "Web Development", color: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30" },
+  ppc: { label: "PPC", color: "bg-rose-500/20 text-rose-400 border-rose-500/30" },
+  other: { label: "Other", color: "bg-slate-500/20 text-slate-400 border-slate-500/30" },
+}
 
 interface Lead {
   id: string
@@ -80,6 +96,7 @@ interface Lead {
   status: "hot" | "warm" | "cold"
   stage: Stage
   priority: "high" | "medium" | "low"
+  category: LeadCategory
   value: number
   probability: number
   source: string
@@ -87,13 +104,19 @@ interface Lead {
   activities: number
   tags: string[]
   notes: string
+  noteHistory: Array<{
+    id: string
+    content: string
+    createdAt: string
+    createdBy: string
+  }>
   createdAt: string
   lastContact: string
   nextFollowUp: string
   starred: boolean
   activityHistory: Array<{
     id: string
-    type: "created" | "updated" | "note_added" | "status_changed" | "stage_changed"
+    type: "created" | "updated" | "note_added" | "status_changed" | "stage_changed" | "category_changed"
     description: string
     timestamp: string
     changedBy: string
@@ -117,9 +140,14 @@ const initialLeads: Lead[] = [
     lastContact: "2024-12-15",
     nextFollowUp: "2024-12-18",
     notes: "Very interested in our SEO services. Follow up scheduled for next week.",
+    noteHistory: [
+      { id: "n1", content: "Very interested in our SEO services. Follow up scheduled for next week.", createdAt: "2024-12-15T10:30:00Z", createdBy: "John Smith" },
+      { id: "n2", content: "Initial call went well. Client has budget approved.", createdAt: "2024-12-12T14:00:00Z", createdBy: "John Smith" },
+    ],
     tags: ["SEO", "Enterprise"],
     assignedTo: "John Smith",
     priority: "high",
+    category: "seo",
     starred: true,
     activities: 12,
     activityHistory: [],
@@ -139,9 +167,13 @@ const initialLeads: Lead[] = [
     lastContact: "2024-12-14",
     nextFollowUp: "2024-12-19",
     notes: "Needs proposal for social media management.",
+    noteHistory: [
+      { id: "n1", content: "Needs proposal for social media management.", createdAt: "2024-12-14T09:15:00Z", createdBy: "Emma Davis" },
+    ],
     tags: ["Social Media"],
     assignedTo: "Emma Davis",
     priority: "medium",
+    category: "social_media",
     starred: false,
     activities: 5,
     activityHistory: [],
@@ -161,9 +193,15 @@ const initialLeads: Lead[] = [
     lastContact: "2024-12-16",
     nextFollowUp: "2024-12-17",
     notes: "Looking for full-service digital marketing. High budget project.",
+    noteHistory: [
+      { id: "n1", content: "Looking for full-service digital marketing. High budget project.", createdAt: "2024-12-16T11:00:00Z", createdBy: "John Smith" },
+      { id: "n2", content: "Discussed project scope. Client wants comprehensive solution.", createdAt: "2024-12-10T15:30:00Z", createdBy: "John Smith" },
+      { id: "n3", content: "Connected via LinkedIn. Very responsive.", createdAt: "2024-12-05T09:00:00Z", createdBy: "John Smith" },
+    ],
     tags: ["Full Service", "Priority"],
     assignedTo: "John Smith",
     priority: "high",
+    category: "digital_marketing",
     starred: true,
     activities: 18,
     activityHistory: [],
@@ -183,9 +221,13 @@ const initialLeads: Lead[] = [
     lastContact: "2024-12-10",
     nextFollowUp: "2024-12-20",
     notes: "Initial contact made. Waiting for response.",
+    noteHistory: [
+      { id: "n1", content: "Initial contact made. Waiting for response.", createdAt: "2024-12-10T08:45:00Z", createdBy: "Alex Johnson" },
+    ],
     tags: ["PPC"],
     assignedTo: "Alex Johnson",
     priority: "low",
+    category: "ppc",
     starred: false,
     activities: 2,
     activityHistory: [],
@@ -205,9 +247,14 @@ const initialLeads: Lead[] = [
     lastContact: "2024-12-13",
     nextFollowUp: "2024-12-18",
     notes: "Met at MarketingCon. Interested in PPC campaigns.",
+    noteHistory: [
+      { id: "n1", content: "Met at MarketingCon. Interested in PPC campaigns.", createdAt: "2024-12-13T16:20:00Z", createdBy: "Emma Davis" },
+      { id: "n2", content: "Great conversation at the conference booth.", createdAt: "2024-12-03T14:00:00Z", createdBy: "Emma Davis" },
+    ],
     tags: ["PPC", "Conference Lead"],
     assignedTo: "Emma Davis",
     priority: "medium",
+    category: "ppc",
     starred: false,
     activities: 8,
     activityHistory: [],
@@ -227,9 +274,13 @@ const initialLeads: Lead[] = [
     lastContact: "2024-12-16",
     nextFollowUp: "2024-12-17",
     notes: "Enterprise client. Looking for comprehensive brand overhaul.",
+    noteHistory: [
+      { id: "n1", content: "Enterprise client. Looking for comprehensive brand overhaul.", createdAt: "2024-12-16T13:45:00Z", createdBy: "John Smith" },
+    ],
     tags: ["Branding", "Enterprise", "Priority"],
     assignedTo: "John Smith",
     priority: "high",
+    category: "branding",
     starred: true,
     activities: 15,
     activityHistory: [],
@@ -249,9 +300,13 @@ const initialLeads: Lead[] = [
     lastContact: "2024-12-15",
     nextFollowUp: "2024-12-19",
     notes: "Interested in content marketing strategy.",
+    noteHistory: [
+      { id: "n1", content: "Interested in content marketing strategy.", createdAt: "2024-12-15T10:00:00Z", createdBy: "Alex Johnson" },
+    ],
     tags: ["Content"],
     assignedTo: "Alex Johnson",
     priority: "medium",
+    category: "content",
     starred: false,
     activities: 4,
     activityHistory: [],
@@ -271,9 +326,13 @@ const initialLeads: Lead[] = [
     lastContact: "2024-12-14",
     nextFollowUp: "2024-12-21",
     notes: "Attended webinar on digital transformation.",
+    noteHistory: [
+      { id: "n1", content: "Attended webinar on digital transformation.", createdAt: "2024-12-14T17:30:00Z", createdBy: "Emma Davis" },
+    ],
     tags: ["Webinar Lead", "Finance"],
     assignedTo: "Emma Davis",
     priority: "low",
+    category: "digital_marketing",
     starred: false,
     activities: 1,
     activityHistory: [],
@@ -314,6 +373,39 @@ const sourceIcons: Record<string, React.ComponentType<{ className?: string }>> =
 type ViewMode = "table" | "grid" | "kanban"
 // type Stage = Lead["stage"] // moved Stage type definition up
 
+// Helper function to format time ago
+const getTimeAgo = (dateString: string): string => {
+  const now = new Date()
+  const date = new Date(dateString)
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+
+  if (diffInSeconds < 60) {
+    return "just now"
+  }
+  const diffInMinutes = Math.floor(diffInSeconds / 60)
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`
+  }
+  const diffInHours = Math.floor(diffInMinutes / 60)
+  if (diffInHours < 24) {
+    return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`
+  }
+  const diffInDays = Math.floor(diffInHours / 24)
+  if (diffInDays < 7) {
+    return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`
+  }
+  const diffInWeeks = Math.floor(diffInDays / 7)
+  if (diffInWeeks < 4) {
+    return `${diffInWeeks} week${diffInWeeks > 1 ? "s" : ""} ago`
+  }
+  const diffInMonths = Math.floor(diffInDays / 30)
+  if (diffInMonths < 12) {
+    return `${diffInMonths} month${diffInMonths > 1 ? "s" : ""} ago`
+  }
+  const diffInYears = Math.floor(diffInDays / 365)
+  return `${diffInYears} year${diffInYears > 1 ? "s" : ""} ago`
+}
+
 export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>(initialLeads)
   const [searchQuery, setSearchQuery] = useState("")
@@ -321,6 +413,7 @@ export default function LeadsPage() {
   const [sourceFilter, setSourceFilter] = useState<string>("all")
   const [priorityFilter, setPriorityFilter] = useState<string>("all")
   const [assigneeFilter, setAssigneeFilter] = useState<string>("all")
+  const [categoryFilter, setCategoryFilter] = useState<string>("all")
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
@@ -331,6 +424,7 @@ export default function LeadsPage() {
   const [selectedLeads, setSelectedLeads] = useState<string[]>([])
   const [draggedLead, setDraggedLead] = useState<Lead | null>(null)
   const [dragOverStage, setDragOverStage] = useState<Stage | null>(null)
+  const [newNoteText, setNewNoteText] = useState("")
 
   const filteredLeads = leads.filter((lead) => {
     const matchesSearch =
@@ -342,7 +436,8 @@ export default function LeadsPage() {
     const matchesSource = sourceFilter === "all" || lead.source === sourceFilter
     const matchesPriority = priorityFilter === "all" || lead.priority === priorityFilter
     const matchesAssignee = assigneeFilter === "all" || lead.assignedTo === assigneeFilter
-    return matchesSearch && matchesStatus && matchesSource && matchesPriority && matchesAssignee
+    const matchesCategory = categoryFilter === "all" || lead.category === categoryFilter
+    return matchesSearch && matchesStatus && matchesSource && matchesPriority && matchesAssignee && matchesCategory
   })
 
   const stats = {
@@ -384,8 +479,17 @@ export default function LeadsPage() {
           .filter(Boolean) || [],
       assignedTo: (formData.get("assignedTo") as string) || "Unassigned",
       priority: formData.get("priority") as "high" | "medium" | "low",
+      category: (formData.get("category") as LeadCategory) || "other",
       starred: false,
       activities: 0,
+      noteHistory: formData.get("notes") ? [
+        {
+          id: Date.now().toString(),
+          content: formData.get("notes") as string,
+          createdAt: new Date().toISOString(),
+          createdBy: "Current User",
+        },
+      ] : [],
       activityHistory: [
         {
           id: Date.now().toString(),
@@ -564,10 +668,11 @@ export default function LeadsPage() {
     setSourceFilter("all")
     setPriorityFilter("all")
     setAssigneeFilter("all")
+    setCategoryFilter("all")
     setSearchQuery("")
   }
 
-  const activeFiltersCount = [statusFilter, sourceFilter, priorityFilter, assigneeFilter].filter(
+  const activeFiltersCount = [statusFilter, sourceFilter, priorityFilter, assigneeFilter, categoryFilter].filter(
     (f) => f !== "all",
   ).length
 
@@ -577,6 +682,49 @@ export default function LeadsPage() {
   const handleBulkDelete = () => {
     setLeads(leads.filter((lead) => !selectedLeads.includes(lead.id)))
     setSelectedLeads([])
+  }
+
+  // Add note to lead
+  const handleAddNote = (leadId: string, noteContent: string) => {
+    if (!noteContent.trim()) return
+
+    const newNote = {
+      id: Date.now().toString(),
+      content: noteContent.trim(),
+      createdAt: new Date().toISOString(),
+      createdBy: "Current User",
+    }
+
+    setLeads(
+      leads.map((lead) => {
+        if (lead.id === leadId) {
+          return {
+            ...lead,
+            notes: noteContent.trim(),
+            noteHistory: [newNote, ...lead.noteHistory],
+            lastContact: new Date().toISOString(),
+          }
+        }
+        return lead
+      }),
+    )
+
+    // Update selectedLead if it's the same lead
+    if (selectedLead && selectedLead.id === leadId) {
+      setSelectedLead({
+        ...selectedLead,
+        notes: noteContent.trim(),
+        noteHistory: [newNote, ...selectedLead.noteHistory],
+        lastContact: new Date().toISOString(),
+      })
+    }
+
+    // Add to activity history
+    addActivityHistory(leadId, "note_added", "Note added", {
+      note: { old: "", new: noteContent.trim() }
+    })
+
+    setNewNoteText("")
   }
 
   return (
@@ -720,9 +868,26 @@ export default function LeadsPage() {
                     <Label htmlFor="nextFollowUp">Next Follow-up</Label>
                     <Input id="nextFollowUp" name="nextFollowUp" type="date" />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="tags">Tags (comma separated)</Label>
-                    <Input id="tags" name="tags" placeholder="SEO, Enterprise, Priority" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="category">Category</Label>
+                      <Select name="category" defaultValue="other">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(categoryConfig).map(([key, config]) => (
+                            <SelectItem key={key} value={key}>
+                              {config.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="tags">Tags (comma separated)</Label>
+                      <Input id="tags" name="tags" placeholder="SEO, Enterprise, Priority" />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="notes">Notes</Label>
@@ -913,6 +1078,21 @@ export default function LeadsPage() {
                   </SelectContent>
                 </Select>
 
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="w-[160px] bg-secondary border-0">
+                    <FolderOpen className="w-4 h-4 mr-2" />
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {Object.entries(categoryConfig).map(([key, config]) => (
+                      <SelectItem key={key} value={key}>
+                        {config.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
                 {activeFiltersCount > 0 && (
                   <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground">
                     <X className="w-4 h-4 mr-1" />
@@ -1006,10 +1186,13 @@ export default function LeadsPage() {
                             </div>
 
                             <div className="mt-3 flex items-center justify-between">
-                              <div className="flex items-center gap-1.5">
+                              <div className="flex items-center gap-1.5 flex-wrap">
                                 <Badge className={`${statusConfig[lead.status].color} border text-[10px] px-1.5 py-0`}>
                                   <StatusIcon className="w-2.5 h-2.5 mr-0.5" />
                                   {statusConfig[lead.status].label}
+                                </Badge>
+                                <Badge className={`${categoryConfig[lead.category].color} border text-[10px] px-1.5 py-0`}>
+                                  {categoryConfig[lead.category].label}
                                 </Badge>
                               </div>
                               <span className={`text-xs font-medium ${priorityConfig[lead.priority].color}`}>
@@ -1065,7 +1248,12 @@ export default function LeadsPage() {
                                     <Eye className="w-4 h-4 mr-2" />
                                     View Details
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setSelectedLead(lead)
+                                      setIsEditDialogOpen(true)
+                                    }}
+                                  >
                                     <Edit className="w-4 h-4 mr-2" />
                                     Edit Lead
                                   </DropdownMenuItem>
@@ -1290,7 +1478,12 @@ export default function LeadsPage() {
                                     <Phone className="w-4 h-4 mr-2" />
                                     Call
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setSelectedLead(lead)
+                                      setIsEditDialogOpen(true)
+                                    }}
+                                  >
                                     <Edit className="w-4 h-4 mr-2" />
                                     Edit
                                   </DropdownMenuItem>
@@ -1387,7 +1580,12 @@ export default function LeadsPage() {
                           <Eye className="w-4 h-4 mr-2" />
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedLead(lead)
+                            setIsEditDialogOpen(true)
+                          }}
+                        >
                           <Edit className="w-4 h-4 mr-2" />
                           Edit
                         </DropdownMenuItem>
@@ -1400,13 +1598,16 @@ export default function LeadsPage() {
                     </DropdownMenu>
                   </div>
 
-                  <div className="mt-4 flex items-center gap-2">
+                  <div className="mt-4 flex items-center gap-2 flex-wrap">
                     <Badge className={`${statusConfig[lead.status].color} border`}>
                       <StatusIcon className="w-3 h-3 mr-1" />
                       {statusConfig[lead.status].label}
                     </Badge>
                     <Badge className={`${stageConfig[lead.stage].color} border-0`}>
                       {stageConfig[lead.stage].label}
+                    </Badge>
+                    <Badge className={`${categoryConfig[lead.category].color} border`}>
+                      {categoryConfig[lead.category].label}
                     </Badge>
                   </div>
 
@@ -1492,7 +1693,7 @@ export default function LeadsPage() {
                       <div>
                         <DialogTitle className="text-xl">{selectedLead.name}</DialogTitle>
                         <p className="text-muted-foreground">{selectedLead.company}</p>
-                        <div className="flex items-center gap-2 mt-2">
+                        <div className="flex items-center gap-2 mt-2 flex-wrap">
                           <Badge className={`${statusConfig[selectedLead.status].color} border`}>
                             {statusConfig[selectedLead.status].label}
                           </Badge>
@@ -1501,6 +1702,9 @@ export default function LeadsPage() {
                           </Badge>
                           <Badge className={`${priorityConfig[selectedLead.priority].color} bg-transparent border`}>
                             {priorityConfig[selectedLead.priority].label} Priority
+                          </Badge>
+                          <Badge className={`${categoryConfig[selectedLead.category].color} border`}>
+                            {categoryConfig[selectedLead.category].label}
                           </Badge>
                         </div>
                       </div>
@@ -1533,17 +1737,26 @@ export default function LeadsPage() {
                     <button
                       onClick={() => setActiveTab("overview")}
                       className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === "overview"
-                          ? "border-b-2 border-primary text-primary"
-                          : "text-muted-foreground hover:text-foreground"
+                        ? "border-b-2 border-primary text-primary"
+                        : "text-muted-foreground hover:text-foreground"
                         }`}
                     >
                       Overview
                     </button>
                     <button
+                      onClick={() => setActiveTab("notes")}
+                      className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === "notes"
+                        ? "border-b-2 border-primary text-primary"
+                        : "text-muted-foreground hover:text-foreground"
+                        }`}
+                    >
+                      Notes ({selectedLead.noteHistory.length})
+                    </button>
+                    <button
                       onClick={() => setActiveTab("history")}
                       className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === "history"
-                          ? "border-b-2 border-primary text-primary"
-                          : "text-muted-foreground hover:text-foreground"
+                        ? "border-b-2 border-primary text-primary"
+                        : "text-muted-foreground hover:text-foreground"
                         }`}
                     >
                       Activity History
@@ -1686,6 +1899,63 @@ export default function LeadsPage() {
                     </>
                   )}
 
+                  {activeTab === "notes" && (
+                    <div className="space-y-4">
+                      {/* Add new note */}
+                      <div className="space-y-3">
+                        <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                          Add New Note
+                        </h4>
+                        <div className="flex gap-2">
+                          <Textarea
+                            value={newNoteText}
+                            onChange={(e) => setNewNoteText(e.target.value)}
+                            placeholder="Write your note here..."
+                            className="flex-1 min-h-[80px] resize-none"
+                          />
+                        </div>
+                        <Button
+                          onClick={() => handleAddNote(selectedLead.id, newNoteText)}
+                          disabled={!newNoteText.trim()}
+                          className="gap-2"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Add Note
+                        </Button>
+                      </div>
+
+                      {/* Notes history */}
+                      <div className="space-y-3 mt-6">
+                        <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                          Note History ({selectedLead.noteHistory.length})
+                        </h4>
+                        {selectedLead.noteHistory.length === 0 ? (
+                          <div className="text-center py-8 text-muted-foreground">
+                            <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                            <p>No notes yet</p>
+                            <p className="text-sm">Add your first note above</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            {selectedLead.noteHistory.map((note) => (
+                              <div key={note.id} className="p-4 rounded-lg bg-secondary/50 border border-border">
+                                <p className="text-sm whitespace-pre-wrap">{note.content}</p>
+                                <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/50">
+                                  <span className="text-xs text-muted-foreground">
+                                    {note.createdBy}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground">
+                                    {getTimeAgo(note.createdAt)}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {activeTab === "history" && (
                     <div className="space-y-4">
                       {selectedLead.activityHistory.length === 0 ? (
@@ -1768,6 +2038,7 @@ function EditLeadForm({
     status: lead.status,
     stage: lead.stage,
     priority: lead.priority,
+    category: lead.category,
     assignedTo: lead.assignedTo,
     notes: lead.notes,
   })
@@ -1865,14 +2136,29 @@ function EditLeadForm({
           </select>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="assignedTo">Assigned To</Label>
-          <Input
-            id="assignedTo"
-            value={formData.assignedTo}
-            onChange={(e) => handleChange("assignedTo", e.target.value)}
-            placeholder="Team member name"
-          />
+          <Label htmlFor="category">Category</Label>
+          <select
+            id="category"
+            value={formData.category}
+            onChange={(e) => handleChange("category", e.target.value)}
+            className="w-full px-3 py-2 bg-secondary text-foreground rounded-md border border-input"
+          >
+            {Object.entries(categoryConfig).map(([key, config]) => (
+              <option key={key} value={key}>
+                {config.label}
+              </option>
+            ))}
+          </select>
         </div>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="assignedTo">Assigned To</Label>
+        <Input
+          id="assignedTo"
+          value={formData.assignedTo}
+          onChange={(e) => handleChange("assignedTo", e.target.value)}
+          placeholder="Team member name"
+        />
       </div>
       <div className="space-y-2">
         <Label htmlFor="notes">Notes</Label>

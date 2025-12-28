@@ -69,6 +69,13 @@ export interface ActivityLogEntry {
     newValue?: string
 }
 
+export interface ReferenceLink {
+    id: string
+    title: string
+    url: string
+    type: "figma" | "doc" | "sheet" | "github" | "link" | "other"
+}
+
 export interface Task {
     id: string
     title: string
@@ -88,6 +95,7 @@ export interface Task {
     attachments: Attachment[]
     dependencies: TaskDependency[]
     timeEntries: TimeEntry[]
+    referenceLinks: ReferenceLink[]
     estimatedHours: number
     actualHours: number
     createdAt: string

@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useTheme } from "next-themes"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { AnimatedCard } from "@/components/animated-card"
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -29,6 +30,9 @@ import {
   Trash2,
   Upload,
   Check,
+  Moon,
+  Sun,
+  Monitor,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -103,6 +107,13 @@ export default function SettingsPage() {
   const [notifications, setNotifications] = useState<NotificationSetting[]>(initialNotifications)
   const [activeTab, setActiveTab] = useState("profile")
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle")
+  const { theme, setTheme, resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleSave = () => {
     setSaveStatus("saving")
@@ -117,9 +128,9 @@ export default function SettingsPage() {
       prev.map((n) =>
         n.id === id
           ? {
-              ...n,
-              [type]: !n[type],
-            }
+            ...n,
+            [type]: !n[type],
+          }
           : n,
       ),
     )
@@ -549,28 +560,42 @@ export default function SettingsPage() {
                   <div className="space-y-4">
                     <Label>Theme</Label>
                     <div className="grid grid-cols-3 gap-4">
-                      {["Light", "Dark", "System"].map((theme, i) => (
-                        <button
-                          key={theme}
-                          className={cn(
-                            "p-4 rounded-lg border-2 transition-all text-center animate-in fade-in zoom-in duration-300",
-                            theme === "Dark" ? "border-primary bg-primary/10" : "border-border hover:border-primary/50",
-                          )}
-                          style={{ animationDelay: `${i * 100}ms` }}
-                        >
-                          <div
+                      {[
+                        { name: "Light", value: "light", icon: Sun },
+                        { name: "Dark", value: "dark", icon: Moon },
+                        { name: "System", value: "system", icon: Monitor },
+                      ].map((themeOption, i) => {
+                        const isActive = mounted && theme === themeOption.value
+                        const ThemeIcon = themeOption.icon
+                        return (
+                          <button
+                            key={themeOption.value}
+                            onClick={() => setTheme(themeOption.value)}
                             className={cn(
-                              "w-full h-16 rounded-lg mb-2",
-                              theme === "Light"
-                                ? "bg-white border"
-                                : theme === "Dark"
-                                  ? "bg-zinc-900 border border-zinc-700"
-                                  : "bg-gradient-to-r from-white to-zinc-900 border",
+                              "p-4 rounded-lg border-2 transition-all text-center animate-in fade-in zoom-in duration-300",
+                              isActive ? "border-primary bg-primary/10" : "border-border hover:border-primary/50",
                             )}
-                          />
-                          <span className="text-sm font-medium">{theme}</span>
-                        </button>
-                      ))}
+                            style={{ animationDelay: `${i * 100}ms` }}
+                          >
+                            <div
+                              className={cn(
+                                "w-full h-16 rounded-lg mb-2 flex items-center justify-center",
+                                themeOption.value === "light"
+                                  ? "bg-white border text-zinc-900"
+                                  : themeOption.value === "dark"
+                                    ? "bg-zinc-900 border border-zinc-700 text-white"
+                                    : "bg-gradient-to-r from-white to-zinc-900 border",
+                              )}
+                            >
+                              <ThemeIcon className="w-8 h-8" />
+                            </div>
+                            <span className="text-sm font-medium">{themeOption.name}</span>
+                            {isActive && (
+                              <Badge className="ml-2 bg-primary/20 text-primary border-0">Active</Badge>
+                            )}
+                          </button>
+                        )
+                      })}
                     </div>
                   </div>
 

@@ -484,6 +484,8 @@ export default function ClientsPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [viewMode, setViewMode] = useState<"grid" | "list" | "kanban">("kanban")
   const [selectedClients, setSelectedClients] = useState<string[]>([])
+  const [newClientTags, setNewClientTags] = useState<string[]>([])
+  const [tagInput, setTagInput] = useState("")
 
   // Filters
   const [statusFilter, setStatusFilter] = useState<string>("all")
@@ -544,7 +546,7 @@ export default function ClientsPage() {
     activeProjects: clients.reduce((sum, c) => sum + c.activeProjects, 0),
     avgHealthScore: Math.round(
       clients.filter((c) => c.status === "active").reduce((sum, c) => sum + c.healthScore, 0) /
-        clients.filter((c) => c.status === "active").length,
+      clients.filter((c) => c.status === "active").length,
     ),
     avgNPS: (
       clients.filter((c) => c.npsScore > 0).reduce((sum, c) => sum + c.npsScore, 0) /
@@ -611,26 +613,26 @@ export default function ClientsPage() {
       id: Date.now().toString(),
       name: formData.get("name") as string,
       email: formData.get("email") as string,
-      phone: formData.get("phone") as string,
+      phone: (formData.get("phone") as string) || "",
       company: formData.get("company") as string,
-      website: formData.get("website") as string,
-      address: formData.get("address") as string,
-      status: "prospect",
-      industry: formData.get("industry") as string,
+      website: (formData.get("website") as string) || "",
+      address: (formData.get("address") as string) || "",
+      status: (formData.get("status") as Client["status"]) || "prospect",
+      industry: (formData.get("industry") as string) || "Technology",
       totalRevenue: 0,
-      monthlyRevenue: 0,
+      monthlyRevenue: Number(formData.get("monthlyRevenue")) || 0,
       activeProjects: 0,
       completedProjects: 0,
       joinedDate: new Date().toISOString().split("T")[0],
       lastContact: new Date().toISOString().split("T")[0],
-      notes: formData.get("notes") as string,
+      notes: (formData.get("notes") as string) || "",
       starred: false,
       healthScore: 50,
       satisfaction: 0,
       contractValue: Number(formData.get("contractValue")) || 0,
-      contractEnd: "",
+      contractEnd: (formData.get("contractEnd") as string) || "",
       paymentStatus: "pending",
-      tags: [],
+      tags: newClientTags,
       accountManager: (formData.get("accountManager") as string) || "Alex Johnson",
       tier: (formData.get("tier") as Client["tier"]) || "starter",
       engagementScore: 50,
@@ -641,6 +643,8 @@ export default function ClientsPage() {
       activeCampaigns: 0,
     }
     setClients([newClient, ...clients])
+    setNewClientTags([])
+    setTagInput("")
     setIsAddDialogOpen(false)
   }
 
@@ -683,101 +687,297 @@ export default function ClientsPage() {
                   Add Client
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px]">
+              <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Add New Client</DialogTitle>
+                  <DialogTitle className="flex items-center gap-2 text-xl">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <Plus className="w-5 h-5 text-primary" />
+                    </div>
+                    Add New Client
+                  </DialogTitle>
+                  <p className="text-sm text-muted-foreground">Fill in the details to create a new client profile</p>
                 </DialogHeader>
-                <form onSubmit={handleAddClient} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Contact Name</Label>
-                      <Input id="name" name="name" placeholder="John Doe" required />
+                <form onSubmit={handleAddClient} className="space-y-6 mt-4">
+                  {/* Basic Information Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                      <Users className="w-4 h-4" />
+                      Basic Information
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="company">Company</Label>
-                      <Input id="company" name="company" placeholder="Acme Inc" required />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="name" className="flex items-center gap-1">
+                          Contact Name <span className="text-destructive">*</span>
+                        </Label>
+                        <div className="relative">
+                          <Input id="name" name="name" placeholder="John Doe" required className="pl-9" />
+                          <Users className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="company" className="flex items-center gap-1">
+                          Company <span className="text-destructive">*</span>
+                        </Label>
+                        <div className="relative">
+                          <Input id="company" name="company" placeholder="Acme Inc" required className="pl-9" />
+                          <Building2 className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="flex items-center gap-1">
+                          Email <span className="text-destructive">*</span>
+                        </Label>
+                        <div className="relative">
+                          <Input id="email" name="email" type="email" placeholder="john@acme.com" required className="pl-9" />
+                          <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Phone</Label>
+                        <div className="relative">
+                          <Input id="phone" name="phone" placeholder="+1 (555) 000-0000" className="pl-9" />
+                          <Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input id="email" name="email" type="email" placeholder="john@acme.com" required />
+
+                  <Separator />
+
+                  {/* Business Details Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                      <Briefcase className="w-4 h-4" />
+                      Business Details
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone</Label>
-                      <Input id="phone" name="phone" placeholder="+1 (555) 000-0000" />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="website">Website</Label>
+                        <div className="relative">
+                          <Input id="website" name="website" placeholder="acme.com" className="pl-9" />
+                          <Globe className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="industry">Industry</Label>
+                        <Select name="industry" defaultValue="Technology">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select industry" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {industries.slice(1).map((ind) => (
+                              <SelectItem key={ind} value={ind}>
+                                {ind}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="website">Website</Label>
-                      <Input id="website" name="website" placeholder="acme.com" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="industry">Industry</Label>
-                      <Select name="industry" defaultValue="Technology">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select industry" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {industries.slice(1).map((ind) => (
-                            <SelectItem key={ind} value={ind}>
-                              {ind}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="status">Client Status</Label>
+                        <Select name="status" defaultValue="prospect">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="prospect">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-violet-400" />
+                                Prospect
+                              </div>
                             </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="tier">Client Tier</Label>
-                      <Select name="tier" defaultValue="starter">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select tier" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="enterprise">Enterprise</SelectItem>
-                          <SelectItem value="professional">Professional</SelectItem>
-                          <SelectItem value="starter">Starter</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="accountManager">Account Manager</Label>
-                      <Select name="accountManager" defaultValue="Alex Johnson">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select manager" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {accountManagers.slice(1).map((mgr) => (
-                            <SelectItem key={mgr} value={mgr}>
-                              {mgr}
+                            <SelectItem value="active">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                                Active
+                              </div>
                             </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                            <SelectItem value="paused">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-amber-400" />
+                                Paused
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="inactive">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-zinc-400" />
+                                Inactive
+                              </div>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="address">Address</Label>
+                        <div className="relative">
+                          <Input id="address" name="address" placeholder="123 Main St, City, State" className="pl-9" />
+                          <MapPin className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+
+                  <Separator />
+
+                  {/* Client Classification Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                      <Target className="w-4 h-4" />
+                      Client Classification
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="tier">Client Tier</Label>
+                        <Select name="tier" defaultValue="starter">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select tier" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="enterprise">
+                              <div className="flex items-center gap-2">
+                                <Star className="w-4 h-4 text-amber-400" />
+                                Enterprise
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="professional">
+                              <div className="flex items-center gap-2">
+                                <Star className="w-4 h-4 text-blue-400" />
+                                Professional
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="starter">
+                              <div className="flex items-center gap-2">
+                                <Star className="w-4 h-4 text-zinc-400" />
+                                Starter
+                              </div>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="accountManager">Account Manager</Label>
+                        <Select name="accountManager" defaultValue="Alex Johnson">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select manager" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {accountManagers.slice(1).map((mgr) => (
+                              <SelectItem key={mgr} value={mgr}>
+                                {mgr}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    {/* Tags Input */}
                     <div className="space-y-2">
-                      <Label htmlFor="contractValue">Est. Contract Value</Label>
-                      <Input id="contractValue" name="contractValue" type="number" placeholder="50000" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="address">Address</Label>
-                      <Input id="address" name="address" placeholder="123 Main St, City, State" />
+                      <Label>Tags</Label>
+                      <div className="flex flex-wrap gap-2 p-3 rounded-lg border bg-secondary/30 min-h-[44px]">
+                        {newClientTags.map((tag, index) => (
+                          <Badge key={index} variant="secondary" className="gap-1 pr-1">
+                            {tag}
+                            <button
+                              type="button"
+                              onClick={() => setNewClientTags(newClientTags.filter((_, i) => i !== index))}
+                              className="hover:bg-destructive/20 rounded p-0.5 ml-1"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                        <input
+                          type="text"
+                          value={tagInput}
+                          onChange={(e) => setTagInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === ",") {
+                              e.preventDefault()
+                              const tag = tagInput.trim()
+                              if (tag && !newClientTags.includes(tag)) {
+                                setNewClientTags([...newClientTags, tag])
+                                setTagInput("")
+                              }
+                            }
+                          }}
+                          placeholder={newClientTags.length === 0 ? "Type and press Enter to add tags..." : "Add more..."}
+                          className="flex-1 min-w-[120px] bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground"
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">Press Enter or comma to add a tag</p>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="notes">Notes</Label>
-                    <Textarea id="notes" name="notes" placeholder="Additional notes about the client..." />
+
+                  <Separator />
+
+                  {/* Contract Details Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                      <DollarSign className="w-4 h-4" />
+                      Contract Details
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="contractValue">Contract Value ($)</Label>
+                        <div className="relative">
+                          <Input id="contractValue" name="contractValue" type="number" placeholder="50000" className="pl-9" />
+                          <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="monthlyRevenue">Monthly Revenue ($)</Label>
+                        <div className="relative">
+                          <Input id="monthlyRevenue" name="monthlyRevenue" type="number" placeholder="5000" className="pl-9" />
+                          <TrendingUp className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="contractEnd">Contract End Date</Label>
+                        <div className="relative">
+                          <Input id="contractEnd" name="contractEnd" type="date" className="pl-9" />
+                          <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+
+                  <Separator />
+
+                  {/* Notes Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                      <FileText className="w-4 h-4" />
+                      Additional Notes
+                    </div>
+                    <Textarea
+                      id="notes"
+                      name="notes"
+                      placeholder="Enter any additional notes about the client, project requirements, special instructions..."
+                      className="min-h-[100px] resize-none"
+                    />
+                  </div>
+
+                  <DialogFooter className="gap-2 pt-4 border-t">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setIsAddDialogOpen(false)
+                        setNewClientTags([])
+                        setTagInput("")
+                      }}
+                      className="bg-transparent"
+                    >
                       Cancel
                     </Button>
-                    <Button type="submit">Add Client</Button>
+                    <Button type="submit" className="gap-2">
+                      <Plus className="w-4 h-4" />
+                      Add Client
+                    </Button>
                   </DialogFooter>
                 </form>
               </DialogContent>
@@ -1008,9 +1208,8 @@ export default function ClientsPage() {
               return (
                 <div
                   key={status}
-                  className={`flex-shrink-0 w-[320px] rounded-xl transition-all duration-200 ${
-                    dragOverStatus === status ? "bg-primary/10 ring-2 ring-primary/50" : "bg-card/30"
-                  }`}
+                  className={`flex-shrink-0 w-[320px] rounded-xl transition-all duration-200 ${dragOverStatus === status ? "bg-primary/10 ring-2 ring-primary/50" : "bg-card/30"
+                    }`}
                   onDragOver={(e) => handleDragOver(e, status)}
                   onDragLeave={handleDragLeave}
                   onDrop={(e) => handleDrop(e, status)}
@@ -1038,9 +1237,8 @@ export default function ClientsPage() {
                           draggable
                           onDragStart={(e) => handleDragStart(e, client)}
                           onClick={() => setSelectedClient(client)}
-                          className={`group p-3 bg-card border border-border/50 rounded-lg cursor-grab active:cursor-grabbing hover:border-border hover:shadow-lg transition-all duration-200 animate-in fade-in slide-in-from-bottom-2 ${
-                            draggedClient?.id === client.id ? "opacity-50 scale-95" : ""
-                          }`}
+                          className={`group p-3 bg-card border border-border/50 rounded-lg cursor-grab active:cursor-grabbing hover:border-border hover:shadow-lg transition-all duration-200 animate-in fade-in slide-in-from-bottom-2 ${draggedClient?.id === client.id ? "opacity-50 scale-95" : ""
+                            }`}
                           style={{ animationDelay: `${i * 30}ms` }}
                         >
                           {/* Card Header */}

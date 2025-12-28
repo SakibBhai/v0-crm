@@ -15,6 +15,7 @@ import {
   Zap,
   DollarSign,
   BarChart3,
+  CalendarDays,
 } from "lucide-react"
 import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -28,6 +29,7 @@ const navItems = [
   { href: "/team", label: "Team", icon: UsersRound },
   { href: "/finances", label: "Finances", icon: DollarSign },
   { href: "/reports", label: "Reports", icon: BarChart3 },
+  { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/settings", label: "Settings", icon: Settings },
 ]
 

@@ -19,6 +19,13 @@ import {
   CheckCircle,
   Activity,
   Target,
+  TrendingUp,
+  TrendingDown,
+  Clock,
+  Zap,
+  Award,
+  BarChart3,
+  PieChart as PieChartIcon,
 } from "lucide-react"
 import {
   Area,
@@ -172,13 +179,72 @@ const kpis = [
 export default function DashboardPage() {
   const [selectedDate, setSelectedDate] = useState(24)
 
+  // Calculate totals for hero section
+  const todayStats = {
+    newLeads: 12,
+    meetings: 3,
+    tasksCompleted: 8,
+    revenue: "$15,420",
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* Page Header */}
-        <div className="animate-in fade-in slide-in-from-top-4 duration-500">
-          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Welcome back! Here's your agency performance overview.</p>
+        {/* Hero Welcome Section */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-chart-2/10 to-chart-3/20 border border-primary/20 p-6 md:p-8 animate-in fade-in slide-in-from-top-4 duration-700">
+          <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.5))]" />
+          <div className="relative z-10">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground">Welcome back! 👋</h1>
+                <p className="text-muted-foreground mt-1">Here's what's happening with your agency today.</p>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Clock className="w-4 h-4 text-muted-foreground" />
+                <span className="text-muted-foreground">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              </div>
+            </div>
+
+            {/* Today's Quick Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+              <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-blue-500/20">
+                    <Zap className="w-4 h-4 text-blue-400" />
+                  </div>
+                  <span className="text-sm text-muted-foreground">New Leads</span>
+                </div>
+                <p className="text-2xl font-bold mt-2">+{todayStats.newLeads}</p>
+              </div>
+              <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-purple-500/20">
+                    <Calendar className="w-4 h-4 text-purple-400" />
+                  </div>
+                  <span className="text-sm text-muted-foreground">Meetings</span>
+                </div>
+                <p className="text-2xl font-bold mt-2">{todayStats.meetings}</p>
+              </div>
+              <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-green-500/20">
+                    <CheckCircle className="w-4 h-4 text-green-400" />
+                  </div>
+                  <span className="text-sm text-muted-foreground">Tasks Done</span>
+                </div>
+                <p className="text-2xl font-bold mt-2">{todayStats.tasksCompleted}</p>
+              </div>
+              <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-amber-500/20">
+                    <DollarSign className="w-4 h-4 text-amber-400" />
+                  </div>
+                  <span className="text-sm text-muted-foreground">Today's Revenue</span>
+                </div>
+                <p className="text-2xl font-bold mt-2">{todayStats.revenue}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Quick Action Shortcuts */}
@@ -223,21 +289,34 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* Advanced KPIs */}
+        {/* Advanced KPIs with Icons */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {kpis.map((kpi, i) => (
-            <AnimatedCard key={i} delay={400 + i * 100}>
-              <CardContent className="pt-6">
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">{kpi.label}</p>
-                  <div className="flex items-end justify-between">
-                    <div className="text-2xl font-bold">{kpi.value}</div>
-                    <span className={`text-xs font-medium ${kpi.color}`}>{kpi.trend}</span>
+          {kpis.map((kpi, i) => {
+            const isPositive = kpi.trend.startsWith("+")
+            const TrendIcon = isPositive ? TrendingUp : TrendingDown
+            return (
+              <AnimatedCard key={i} delay={400 + i * 100}>
+                <CardContent className="pt-6">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-muted-foreground">{kpi.label}</p>
+                      <div className={`flex items-center gap-1 text-xs font-medium ${kpi.color}`}>
+                        <TrendIcon className="w-3 h-3" />
+                        {kpi.trend}
+                      </div>
+                    </div>
+                    <div className="text-3xl font-bold">{kpi.value}</div>
+                    <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-1000 ${isPositive ? 'bg-green-500' : 'bg-red-500'}`}
+                        style={{ width: `${Math.abs(parseFloat(kpi.trend)) * 10}%` }}
+                      />
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </AnimatedCard>
-          ))}
+                </CardContent>
+              </AnimatedCard>
+            )
+          })}
         </div>
 
         {/* Charts Row 1 */}
@@ -433,8 +512,8 @@ export default function DashboardPage() {
             <CardContent>
               <div className="space-y-3">
                 <div className="grid grid-cols-7 gap-1 text-center text-xs mb-3">
-                  {["S", "M", "T", "W", "T", "F", "S"].map((day) => (
-                    <div key={day} className="font-semibold text-muted-foreground">
+                  {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
+                    <div key={index} className="font-semibold text-muted-foreground">
                       {day}
                     </div>
                   ))}
@@ -445,13 +524,12 @@ export default function DashboardPage() {
                       <button
                         key={date}
                         onClick={() => setSelectedDate(date)}
-                        className={`py-1.5 rounded text-xs font-medium transition-colors ${
-                          selectedDate === date
-                            ? "bg-primary text-primary-foreground"
-                            : hasEvent
-                              ? "bg-secondary text-foreground border border-primary/50"
-                              : "text-muted-foreground hover:bg-secondary/50"
-                        }`}
+                        className={`py-1.5 rounded text-xs font-medium transition-colors ${selectedDate === date
+                          ? "bg-primary text-primary-foreground"
+                          : hasEvent
+                            ? "bg-secondary text-foreground border border-primary/50"
+                            : "text-muted-foreground hover:bg-secondary/50"
+                          }`}
                       >
                         {date}
                       </button>
@@ -616,6 +694,6 @@ export default function DashboardPage() {
           </AnimatedCard>
         </div>
       </div>
-    </DashboardLayout>
+    </DashboardLayout >
   )
 }

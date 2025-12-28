@@ -214,6 +214,11 @@ export default function ReportsPage() {
                             <span className="hidden sm:inline">Client Health</span>
                             <span className="sm:hidden">Clients</span>
                         </TabsTrigger>
+                        <TabsTrigger value="tax" className="gap-1.5">
+                            <DollarSign className="w-4 h-4" />
+                            <span className="hidden sm:inline">Tax Report</span>
+                            <span className="sm:hidden">Tax</span>
+                        </TabsTrigger>
                     </TabsList>
 
                     {/* Performance Overview Tab */}
@@ -385,8 +390,8 @@ export default function ReportsPage() {
                                                         <p className="text-xs text-muted-foreground mt-1">{report.client}</p>
                                                     </div>
                                                     <Badge className={`text-xs ${report.status === 'delivered' ? 'bg-success/20 text-success' :
-                                                            report.status === 'pending' ? 'bg-warning/20 text-warning' :
-                                                                'bg-muted text-muted-foreground'
+                                                        report.status === 'pending' ? 'bg-warning/20 text-warning' :
+                                                            'bg-muted text-muted-foreground'
                                                         } border-0`}>
                                                         {report.status}
                                                     </Badge>
@@ -486,6 +491,113 @@ export default function ReportsPage() {
                                     </table>
                                 </div>
                             </CardContent>
+                        </AnimatedCard>
+                    </TabsContent>
+
+                    {/* Tax Report Tab */}
+                    <TabsContent value="tax" className="space-y-6 mt-6">
+                        {/* Tax Header */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <h3 className="font-semibold text-lg">Tax Report - 2024</h3>
+                                <p className="text-sm text-muted-foreground">Annual tax summary and quarterly breakdown</p>
+                            </div>
+                            <div className="flex gap-2">
+                                <Button variant="outline" className="gap-2">
+                                    <Download className="w-4 h-4" />
+                                    Export PDF
+                                </Button>
+                                <Button className="gap-2">
+                                    <FileText className="w-4 h-4" />
+                                    Export CSV
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Tax Summary Cards */}
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                            <AnimatedCard className="p-4">
+                                <p className="text-sm text-muted-foreground">Total Revenue</p>
+                                <p className="text-2xl font-bold text-green-500 mt-1">$792,000</p>
+                            </AnimatedCard>
+                            <AnimatedCard className="p-4" delay={50}>
+                                <p className="text-sm text-muted-foreground">Total Expenses</p>
+                                <p className="text-2xl font-bold text-red-400 mt-1">$495,000</p>
+                            </AnimatedCard>
+                            <AnimatedCard className="p-4" delay={100}>
+                                <p className="text-sm text-muted-foreground">Taxable Income</p>
+                                <p className="text-2xl font-bold mt-1">$297,000</p>
+                            </AnimatedCard>
+                            <AnimatedCard className="p-4" delay={150}>
+                                <p className="text-sm text-muted-foreground">Est. Tax (22%)</p>
+                                <p className="text-2xl font-bold text-primary mt-1">$65,340</p>
+                            </AnimatedCard>
+                        </div>
+
+                        {/* Quarterly Breakdown */}
+                        <AnimatedCard delay={200}>
+                            <CardHeader>
+                                <CardTitle>Quarterly Tax Summary</CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-0">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full">
+                                        <thead>
+                                            <tr className="border-b border-border">
+                                                <th className="text-left py-3 px-4 font-medium text-muted-foreground">Quarter</th>
+                                                <th className="text-right py-3 px-4 font-medium text-muted-foreground">Revenue</th>
+                                                <th className="text-right py-3 px-4 font-medium text-muted-foreground">Expenses</th>
+                                                <th className="text-right py-3 px-4 font-medium text-muted-foreground">Taxable Income</th>
+                                                <th className="text-right py-3 px-4 font-medium text-muted-foreground">Est. Tax</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {[
+                                                { q: "Q1 2024", rev: 145000, exp: 97000 },
+                                                { q: "Q2 2024", rev: 183000, exp: 114000 },
+                                                { q: "Q3 2024", rev: 219000, exp: 136000 },
+                                                { q: "Q4 2024", rev: 245000, exp: 148000 },
+                                            ].map((row) => (
+                                                <tr key={row.q} className="border-b border-border/50 hover:bg-secondary/30">
+                                                    <td className="py-3 px-4 font-medium">{row.q}</td>
+                                                    <td className="py-3 px-4 text-right text-green-500">${row.rev.toLocaleString()}</td>
+                                                    <td className="py-3 px-4 text-right text-red-400">${row.exp.toLocaleString()}</td>
+                                                    <td className="py-3 px-4 text-right">${(row.rev - row.exp).toLocaleString()}</td>
+                                                    <td className="py-3 px-4 text-right font-semibold text-primary">
+                                                        ${Math.round((row.rev - row.exp) * 0.22).toLocaleString()}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            <tr className="bg-primary/5 font-semibold">
+                                                <td className="py-3 px-4">Total</td>
+                                                <td className="py-3 px-4 text-right text-green-500">$792,000</td>
+                                                <td className="py-3 px-4 text-right text-red-400">$495,000</td>
+                                                <td className="py-3 px-4 text-right">$297,000</td>
+                                                <td className="py-3 px-4 text-right text-primary">$65,340</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </CardContent>
+                        </AnimatedCard>
+
+                        {/* Tax Breakdown */}
+                        <AnimatedCard className="p-6" delay={250}>
+                            <h4 className="font-semibold mb-4">Tax Breakdown by Category</h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                                    <p className="text-sm text-muted-foreground">Service Tax (18%)</p>
+                                    <p className="text-xl font-bold text-blue-400 mt-1">$53,460</p>
+                                </div>
+                                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+                                    <p className="text-sm text-muted-foreground">GST (5%)</p>
+                                    <p className="text-xl font-bold text-green-400 mt-1">$14,850</p>
+                                </div>
+                                <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                                    <p className="text-sm text-muted-foreground">Withholding Tax</p>
+                                    <p className="text-xl font-bold text-yellow-400 mt-1">$8,910</p>
+                                </div>
+                            </div>
                         </AnimatedCard>
                     </TabsContent>
                 </Tabs>

@@ -75,6 +75,11 @@ export const sampleTasks: Task[] = [
             { id: "t1", date: "2024-12-19", hours: 2, description: "Wireframe creation", isBillable: true, userId: "1" },
             { id: "t2", date: "2024-12-20", hours: 0.5, description: "Client meeting", isBillable: false, userId: "1" },
         ],
+        referenceLinks: [
+            { id: "r1", title: "Figma Design", url: "https://figma.com/file/hero-design", type: "figma" },
+            { id: "r2", title: "Brand Guidelines", url: "https://docs.google.com/brand-guidelines", type: "doc" },
+            { id: "r3", title: "Pinterest Inspiration", url: "https://pinterest.com/board/hero", type: "link" }
+        ],
         estimatedHours: 4,
         actualHours: 2.5,
         createdAt: "2024-12-18T10:00:00Z",
@@ -110,6 +115,10 @@ export const sampleTasks: Task[] = [
         attachments: [],
         dependencies: [{ taskId: "TSK-101", taskTitle: "Design hero section for homepage", type: "blocked-by" }],
         timeEntries: [],
+        referenceLinks: [
+            { id: "r4", title: "Navigation Component Design", url: "https://figma.com/file/nav-design", type: "figma" },
+            { id: "r5", title: "Component Library Doc", url: "https://docs.google.com/component-lib", type: "doc" }
+        ],
         estimatedHours: 6,
         actualHours: 0,
         createdAt: "2024-12-19T09:00:00Z",
@@ -136,6 +145,10 @@ export const sampleTasks: Task[] = [
         attachments: [],
         dependencies: [],
         timeEntries: [],
+        referenceLinks: [
+            { id: "r6", title: "Database Schema", url: "https://github.com/repo/db-schema", type: "github" },
+            { id: "r7", title: "Migration Guide", url: "https://docs.google.com/migration", type: "doc" }
+        ],
         estimatedHours: 8,
         actualHours: 0,
         createdAt: "2024-12-17T11:00:00Z",
@@ -169,6 +182,10 @@ export const sampleTasks: Task[] = [
             { id: "t3", date: "2024-12-18", hours: 4, description: "Initial documentation", isBillable: true, userId: "5" },
             { id: "t4", date: "2024-12-19", hours: 3, description: "Review and finalize", isBillable: true, userId: "5" },
         ],
+        referenceLinks: [
+            { id: "r8", title: "API Docs Swagger", url: "https://swagger.io/api-docs", type: "doc" },
+            { id: "r9", title: "GitHub Wiki", url: "https://github.com/repo/wiki", type: "github" }
+        ],
         estimatedHours: 6,
         actualHours: 7,
         createdAt: "2024-12-16T10:00:00Z",
@@ -199,6 +216,10 @@ export const sampleTasks: Task[] = [
         attachments: [],
         dependencies: [],
         timeEntries: [],
+        referenceLinks: [
+            { id: "r10", title: "SEO Audit Spreadsheet", url: "https://sheets.google.com/seo-audit", type: "sheet" },
+            { id: "r11", title: "Current Analytics", url: "https://analytics.google.com", type: "link" }
+        ],
         estimatedHours: 5,
         actualHours: 4,
         createdAt: "2024-12-15T14:00:00Z",
@@ -225,6 +246,9 @@ export const sampleTasks: Task[] = [
         attachments: [],
         dependencies: [],
         timeEntries: [],
+        referenceLinks: [
+            { id: "r12", title: "Report Template", url: "https://docs.google.com/report-template", type: "doc" }
+        ],
         estimatedHours: 1,
         actualHours: 0,
         createdAt: "2024-12-20T09:00:00Z",

@@ -9,21 +9,26 @@ interface AnimatedCardProps {
   className?: string
   delay?: number
   hover?: boolean
+  glow?: boolean
   onClick?: (e: MouseEvent<HTMLDivElement>) => void
 }
 
-export function AnimatedCard({ children, className, delay = 0, hover = true, onClick }: AnimatedCardProps) {
+export function AnimatedCard({ children, className, delay = 0, hover = true, glow = false, onClick }: AnimatedCardProps) {
   return (
     <Card
       className={cn(
         "bg-card border-border animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both",
-        hover && "transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1",
+        hover && "transition-all duration-300 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1.5",
+        glow && "animate-glow-pulse",
         className,
       )}
-      style={{ animationDelay: `${delay}ms` }}
+      style={{
+        animationDelay: `${delay}ms`,
+      }}
       onClick={onClick}
     >
       {children}
     </Card>
   )
 }
+

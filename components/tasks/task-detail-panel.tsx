@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import type { Task, TaskStatus, TaskPriority, SubTask, Comment, TimeEntry } from "@/lib/types/task"
+import type { Task, TaskStatus, TaskPriority, SubTask, Comment, TimeEntry, ReferenceLink } from "@/lib/types/task"
 import { PRIORITY_CONFIG, STATUS_CONFIG } from "@/lib/types/task"
 import { teamMembers, projects } from "@/lib/data/tasks"
 import { TimeTracker } from "./time-tracker"
@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { Progress } from "@/components/ui/progress"
 import {
     X,
     ChevronRight,
@@ -38,6 +39,11 @@ import {
     FileText,
     Image,
     File,
+    Plus,
+    Figma,
+    Github,
+    FileSpreadsheet,
+    Globe,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -164,13 +170,13 @@ export function TaskDetailPanel({ task, isOpen, onClose, onUpdate, onDelete }: T
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-50 flex justify-end">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
-            {/* Panel */}
-            <div className="relative w-full max-w-3xl bg-background border-l border-border shadow-2xl animate-in slide-in-from-right duration-300">
-                <ScrollArea className="h-full">
+            {/* Dialog Popup */}
+            <div className="relative w-full max-w-4xl max-h-[90vh] bg-background rounded-2xl border border-border shadow-2xl animate-in zoom-in-95 fade-in duration-300 overflow-hidden">
+                <ScrollArea className="h-full max-h-[90vh]">
                     {/* Header */}
                     <div className="sticky top-0 bg-background z-10 border-b border-border">
                         {/* Breadcrumb & Actions */}
@@ -309,17 +315,72 @@ export function TaskDetailPanel({ task, isOpen, onClose, onUpdate, onDelete }: T
 
                                 {activeTab === "details" && (
                                     <div className="space-y-6">
-                                        {/* Time Tracking */}
+                                        {/* Reference Links - New Section */}
                                         <div className="space-y-3">
                                             <h3 className="text-sm font-medium flex items-center gap-2">
-                                                <Clock className="w-4 h-4" /> Time Tracking
+                                                <Link2 className="w-4 h-4" /> Reference Links ({task.referenceLinks?.length || 0})
                                             </h3>
-                                            <TimeTracker
-                                                taskId={task.id}
-                                                estimatedHours={task.estimatedHours}
-                                                actualHours={task.actualHours}
-                                                onLogTime={handleLogTime}
-                                            />
+                                            <div className="space-y-2">
+                                                {task.referenceLinks?.map((link) => {
+                                                    const getIcon = () => {
+                                                        switch (link.type) {
+                                                            case "figma": return <Figma className="w-4 h-4 text-purple-400" />
+                                                            case "github": return <Github className="w-4 h-4 text-gray-400" />
+                                                            case "doc": return <FileText className="w-4 h-4 text-blue-400" />
+                                                            case "sheet": return <FileSpreadsheet className="w-4 h-4 text-green-400" />
+                                                            default: return <Globe className="w-4 h-4 text-muted-foreground" />
+                                                        }
+                                                    }
+                                                    return (
+                                                        <a
+                                                            key={link.id}
+                                                            href={link.url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="flex items-center gap-3 p-2.5 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors group"
+                                                        >
+                                                            {getIcon()}
+                                                            <div className="flex-1 min-w-0">
+                                                                <p className="text-sm font-medium truncate">{link.title}</p>
+                                                                <p className="text-xs text-muted-foreground truncate">{link.url}</p>
+                                                            </div>
+                                                            <ExternalLink className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                        </a>
+                                                    )
+                                                })}
+                                                {(!task.referenceLinks || task.referenceLinks.length === 0) && (
+                                                    <p className="text-sm text-muted-foreground text-center py-3">No reference links yet</p>
+                                                )}
+                                                <Button variant="outline" size="sm" className="w-full gap-2 mt-2">
+                                                    <Plus className="w-3 h-3" /> Add Reference Link
+                                                </Button>
+                                            </div>
+                                        </div>
+
+                                        <Separator />
+
+                                        {/* Time Tracking - Compact Version */}
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <h3 className="text-sm font-medium flex items-center gap-2">
+                                                    <Clock className="w-4 h-4" /> Time
+                                                </h3>
+                                                <Button variant="ghost" size="sm" className="h-7 text-xs gap-1">
+                                                    <Plus className="w-3 h-3" /> Log Time
+                                                </Button>
+                                            </div>
+                                            <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center justify-between text-sm mb-1.5">
+                                                        <span className="text-muted-foreground">Progress</span>
+                                                        <span className="font-medium">{task.actualHours}h / {task.estimatedHours}h</span>
+                                                    </div>
+                                                    <Progress
+                                                        value={task.estimatedHours > 0 ? (task.actualHours / task.estimatedHours) * 100 : 0}
+                                                        className="h-2"
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <Separator />

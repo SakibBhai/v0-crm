@@ -43,6 +43,7 @@ import {
   Users,
   FileText,
   X,
+  Link,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -195,6 +196,7 @@ export default function TasksPage() {
       attachments: [],
       dependencies: [],
       timeEntries: [],
+      referenceLinks: [],
       estimatedHours: Number(formData.get("estimatedHours")) || 0,
       actualHours: 0,
       createdAt: new Date().toISOString(),
@@ -230,6 +232,7 @@ export default function TasksPage() {
       attachments: [],
       dependencies: [],
       timeEntries: [],
+      referenceLinks: [],
       estimatedHours: template.estimatedHours,
       actualHours: 0,
       createdAt: new Date().toISOString(),
@@ -412,6 +415,49 @@ export default function TasksPage() {
                         required
                       />
                     </div>
+                  </div>
+                </div>
+
+                {/* Reference Links Section */}
+                <div className="space-y-4 pt-4 border-t border-border">
+                  <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                    <Link className="w-4 h-4" />
+                    Reference Links
+                  </div>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="col-span-2">
+                        <Input
+                          id="referenceUrl1"
+                          name="referenceUrl1"
+                          placeholder="https://figma.com/design/..."
+                          className="bg-secondary/50 border-border text-sm"
+                        />
+                      </div>
+                      <Input
+                        id="referenceTitle1"
+                        name="referenceTitle1"
+                        placeholder="Link title"
+                        className="bg-secondary/50 border-border text-sm"
+                      />
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="col-span-2">
+                        <Input
+                          id="referenceUrl2"
+                          name="referenceUrl2"
+                          placeholder="https://docs.google.com/..."
+                          className="bg-secondary/50 border-border text-sm"
+                        />
+                      </div>
+                      <Input
+                        id="referenceTitle2"
+                        name="referenceTitle2"
+                        placeholder="Link title"
+                        className="bg-secondary/50 border-border text-sm"
+                      />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">Add Figma, Docs, or other reference links</p>
                   </div>
                 </div>
 

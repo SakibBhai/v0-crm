@@ -36,6 +36,8 @@ import {
   BarChart3,
   Filter,
   User,
+  Repeat,
+  CreditCard,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -59,6 +61,12 @@ interface Project {
   briefLink?: string
   driveLink?: string
   researchLink?: string
+  // Billing
+  billingType: "one-time" | "recurring"
+  recurringInterval?: "7-days" | "15-days" | "30-days" | "monthly"
+  nextBillingDate?: string
+  totalBilled: number
+  paymentStatus: "pending" | "partial" | "paid" | "overdue"
 }
 
 const initialProjects: Project[] = [
@@ -81,6 +89,9 @@ const initialProjects: Project[] = [
     briefLink: "https://docs.google.com/document/d/ecommerce-brief",
     driveLink: "https://drive.google.com/drive/folders/ecommerce-files",
     researchLink: "https://notion.so/ecommerce-research",
+    billingType: "one-time",
+    totalBilled: 18500,
+    paymentStatus: "partial",
   },
   {
     id: "2",
@@ -98,6 +109,11 @@ const initialProjects: Project[] = [
     team: ["JW", "AT"],
     tasks: { total: 18, completed: 8 },
     category: "SEO",
+    billingType: "recurring",
+    recurringInterval: "30-days",
+    nextBillingDate: "2025-01-01",
+    totalBilled: 4000,
+    paymentStatus: "paid",
   },
   {
     id: "3",
@@ -115,6 +131,11 @@ const initialProjects: Project[] = [
     team: ["EC", "MB"],
     tasks: { total: 32, completed: 29 },
     category: "Social Media",
+    billingType: "recurring",
+    recurringInterval: "15-days",
+    nextBillingDate: "2025-01-05",
+    totalBilled: 6400,
+    paymentStatus: "paid",
   },
   {
     id: "4",
@@ -132,6 +153,11 @@ const initialProjects: Project[] = [
     team: ["DP", "JW"],
     tasks: { total: 12, completed: 4 },
     category: "PPC",
+    billingType: "recurring",
+    recurringInterval: "7-days",
+    nextBillingDate: "2025-01-10",
+    totalBilled: 3000,
+    paymentStatus: "pending",
   },
   {
     id: "5",
@@ -149,6 +175,9 @@ const initialProjects: Project[] = [
     team: ["SM", "JD", "LT", "EC"],
     tasks: { total: 28, completed: 4 },
     category: "Branding",
+    billingType: "one-time",
+    totalBilled: 5250,
+    paymentStatus: "partial",
   },
   {
     id: "6",
@@ -166,6 +195,9 @@ const initialProjects: Project[] = [
     team: ["AT", "MB"],
     tasks: { total: 15, completed: 15 },
     category: "Email Marketing",
+    billingType: "one-time",
+    totalBilled: 6000,
+    paymentStatus: "paid",
   },
 ]
 
@@ -220,6 +252,18 @@ export default function ProjectsPage() {
   const handleAddProject = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
+    const billingType = formData.get("billingType") as "one-time" | "recurring"
+    const recurringInterval = formData.get("recurringInterval") as "7-days" | "15-days" | "30-days" | "monthly" | undefined
+
+    // Calculate next billing date for recurring projects
+    let nextBillingDate: string | undefined
+    if (billingType === "recurring" && recurringInterval) {
+      const startDate = new Date(formData.get("startDate") as string)
+      const days = recurringInterval === "7-days" ? 7 : recurringInterval === "15-days" ? 15 : 30
+      const nextDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000)
+      nextBillingDate = nextDate.toISOString().split("T")[0]
+    }
+
     const newProject: Project = {
       id: Date.now().toString(),
       name: formData.get("name") as string,
@@ -240,6 +284,12 @@ export default function ProjectsPage() {
       briefLink: formData.get("briefLink") as string || undefined,
       driveLink: formData.get("driveLink") as string || undefined,
       researchLink: formData.get("researchLink") as string || undefined,
+      // Billing
+      billingType,
+      recurringInterval: billingType === "recurring" ? recurringInterval : undefined,
+      nextBillingDate,
+      totalBilled: 0,
+      paymentStatus: "pending",
     }
     setProjects([newProject, ...projects])
     setIsAddDialogOpen(false)
@@ -420,6 +470,77 @@ export default function ProjectsPage() {
                       />
                     </div>
                     <p className="text-[10px] text-muted-foreground">Enter the total project budget in USD</p>
+                  </div>
+                </div>
+
+                {/* Billing Type Section */}
+                <div className="space-y-4 pt-4 border-t border-border">
+                  <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                    <CreditCard className="w-4 h-4" />
+                    Billing Type
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="billingType" className="text-sm">
+                        Payment Model <span className="text-destructive">*</span>
+                      </Label>
+                      <Select name="billingType" defaultValue="one-time">
+                        <SelectTrigger className="bg-secondary/50 border-border">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="one-time">
+                            <span className="flex items-center gap-2">
+                              <DollarSign className="w-3.5 h-3.5 text-green-500" />
+                              One-time Payment
+                            </span>
+                          </SelectItem>
+                          <SelectItem value="recurring">
+                            <span className="flex items-center gap-2">
+                              <Repeat className="w-3.5 h-3.5 text-blue-500" />
+                              Recurring
+                            </span>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="recurringInterval" className="text-sm">
+                        Billing Interval
+                      </Label>
+                      <Select name="recurringInterval" defaultValue="30-days">
+                        <SelectTrigger className="bg-secondary/50 border-border">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="7-days">
+                            <span className="flex items-center gap-2">
+                              <Clock className="w-3.5 h-3.5" />
+                              Every 7 Days (Weekly)
+                            </span>
+                          </SelectItem>
+                          <SelectItem value="15-days">
+                            <span className="flex items-center gap-2">
+                              <Clock className="w-3.5 h-3.5" />
+                              Every 15 Days (Bi-weekly)
+                            </span>
+                          </SelectItem>
+                          <SelectItem value="30-days">
+                            <span className="flex items-center gap-2">
+                              <Clock className="w-3.5 h-3.5" />
+                              Every 30 Days (Monthly)
+                            </span>
+                          </SelectItem>
+                          <SelectItem value="monthly">
+                            <span className="flex items-center gap-2">
+                              <Calendar className="w-3.5 h-3.5" />
+                              Monthly (Calendar)
+                            </span>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-[10px] text-muted-foreground">Only applicable for recurring projects</p>
+                    </div>
                   </div>
                 </div>
 
@@ -659,12 +780,30 @@ export default function ProjectsPage() {
                     <CardContent className="p-5">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <Badge variant="outline" className="text-xs font-normal">
                               {project.category}
                             </Badge>
                             <Badge className={`${priorityConfig[project.priority].color} border-0 text-xs`}>
                               {priorityConfig[project.priority].label}
+                            </Badge>
+                            <Badge
+                              className={`text-xs border-0 ${project.billingType === "recurring"
+                                  ? "bg-blue-500/20 text-blue-400"
+                                  : "bg-green-500/20 text-green-400"
+                                }`}
+                            >
+                              {project.billingType === "recurring" ? (
+                                <>
+                                  <Repeat className="w-3 h-3 mr-1" />
+                                  {project.recurringInterval?.replace("-", " ")}
+                                </>
+                              ) : (
+                                <>
+                                  <DollarSign className="w-3 h-3 mr-1" />
+                                  One-time
+                                </>
+                              )}
                             </Badge>
                           </div>
                           <h3 className="font-semibold mt-2">{project.name}</h3>
