@@ -206,6 +206,35 @@ export interface TimeEntry {
     notes?: string
 }
 
+// Enhanced Attendance Record for daily tracking
+export interface AttendanceRecord {
+    id: string
+    employeeId: string
+    employeeName: string
+    date: string
+    status: AttendanceStatus
+    clockIn?: string
+    clockOut?: string
+    breakMinutes?: number
+    totalHours?: number
+    workLocation?: "office" | "remote" | "hybrid"
+    notes?: string
+    markedBy?: string
+    markedAt?: string
+    isAutoMarked?: boolean
+}
+
+export interface AttendanceStats {
+    totalWorkingDays: number
+    present: number
+    absent: number
+    late: number
+    halfDay: number
+    remote: number
+    attendancePercentage: number
+    onTimePercentage: number
+}
+
 export interface LeaveType {
     id: string
     name: string
@@ -419,4 +448,12 @@ export const CANDIDATE_STAGE_CONFIG: Record<CandidateStage, { label: string; col
     offer: { label: "Offer", color: "bg-purple-500" },
     hired: { label: "Hired", color: "bg-green-500" },
     rejected: { label: "Rejected", color: "bg-red-500" },
+}
+
+export const ATTENDANCE_STATUS_CONFIG: Record<AttendanceStatus, { label: string; color: string; bgColor: string; icon: string }> = {
+    present: { label: "Present", color: "text-green-500", bgColor: "bg-green-500/20", icon: "CheckCircle" },
+    absent: { label: "Absent", color: "text-red-500", bgColor: "bg-red-500/20", icon: "XCircle" },
+    late: { label: "Late", color: "text-yellow-500", bgColor: "bg-yellow-500/20", icon: "Clock" },
+    "half-day": { label: "Half Day", color: "text-orange-500", bgColor: "bg-orange-500/20", icon: "Sun" },
+    remote: { label: "Remote", color: "text-blue-500", bgColor: "bg-blue-500/20", icon: "Home" },
 }

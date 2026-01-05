@@ -12,6 +12,7 @@ import type {
     SkillDefinition,
     Expense,
     HRMetrics,
+    AttendanceRecord,
 } from "@/lib/types/hr"
 
 // ==================== Employees ====================
@@ -510,3 +511,81 @@ export const onboardingChecklists: OnboardingChecklist[] = [
         ],
     },
 ]
+
+// ==================== Attendance Records ====================
+
+// Helper to generate dates
+const generateAttendanceRecords = (): AttendanceRecord[] => {
+    const records: AttendanceRecord[] = []
+    const employees = [
+        { id: "EMP001", name: "John Doe" },
+        { id: "EMP002", name: "Sarah Mitchell" },
+        { id: "EMP003", name: "David Park" },
+        { id: "EMP008", name: "Lisa Thompson" },
+    ]
+
+    // Generate records for the last 30 days
+    const today = new Date()
+    for (let i = 0; i < 30; i++) {
+        const date = new Date(today)
+        date.setDate(date.getDate() - i)
+        const dateStr = date.toISOString().split("T")[0]
+        const dayOfWeek = date.getDay()
+
+        // Skip weekends
+        if (dayOfWeek === 0 || dayOfWeek === 6) continue
+
+        employees.forEach((emp, empIndex) => {
+            // Create varied attendance patterns
+            const randomFactor = (i + empIndex) % 10
+            let status: AttendanceRecord["status"] = "present"
+            let clockIn = "09:00"
+            let clockOut = "18:00"
+            let workLocation: AttendanceRecord["workLocation"] = "office"
+            let notes: string | undefined = undefined
+
+            if (randomFactor === 0) {
+                status = "late"
+                clockIn = "09:45"
+                notes = "Traffic delay"
+            } else if (randomFactor === 1) {
+                status = "remote"
+                workLocation = "remote"
+                clockIn = "08:30"
+                clockOut = "17:30"
+            } else if (randomFactor === 2 && empIndex === 0) {
+                status = "absent"
+                clockIn = undefined as any
+                clockOut = undefined as any
+                notes = "Sick leave"
+            } else if (randomFactor === 3) {
+                status = "half-day"
+                clockOut = "13:00"
+                notes = "Doctor appointment"
+            } else if (randomFactor === 4) {
+                status = "remote"
+                workLocation = "remote"
+            }
+
+            records.push({
+                id: `ATT_${emp.id}_${dateStr}`,
+                employeeId: emp.id,
+                employeeName: emp.name,
+                date: dateStr,
+                status,
+                clockIn: status !== "absent" ? clockIn : undefined,
+                clockOut: status !== "absent" ? clockOut : undefined,
+                totalHours: status === "half-day" ? 4 : status === "absent" ? 0 : 8,
+                workLocation: status !== "absent" ? workLocation : undefined,
+                notes,
+                markedBy: "system",
+                markedAt: dateStr + "T09:00:00",
+                isAutoMarked: false,
+            })
+        })
+    }
+
+    return records
+}
+
+export const attendanceRecords: AttendanceRecord[] = generateAttendanceRecords()

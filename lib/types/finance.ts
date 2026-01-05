@@ -81,3 +81,349 @@ export const PAYMENT_METHOD_CONFIG = {
     check: { label: "Check", icon: "📝" },
     other: { label: "Other", icon: "📋" },
 }
+
+// ==================== Income Types ====================
+
+export type IncomeSourceType = "client_payment" | "office_income" | "personal" | "other"
+
+export interface IncomeSubCategory {
+    id: string
+    label: string
+}
+
+export interface IncomeCategoryConfig {
+    id: string
+    label: string
+    icon: string
+    color: string
+    bgColor: string
+    subCategories: IncomeSubCategory[]
+}
+
+export const INCOME_SOURCE_TYPES: Record<IncomeSourceType, { label: string; icon: string; description: string; color: string }> = {
+    client_payment: {
+        label: "Client Payment",
+        icon: "👤",
+        description: "Payment from a client for services or projects",
+        color: "text-green-500"
+    },
+    office_income: {
+        label: "Office Income",
+        icon: "🏢",
+        description: "Income from company operations or other sources",
+        color: "text-blue-500"
+    },
+    personal: {
+        label: "Personal / Owner",
+        icon: "💰",
+        description: "Owner contribution or personal investment",
+        color: "text-purple-500"
+    },
+    other: {
+        label: "Other Income",
+        icon: "📦",
+        description: "Miscellaneous income sources",
+        color: "text-gray-500"
+    },
+}
+
+export const INCOME_CATEGORIES: IncomeCategoryConfig[] = [
+    {
+        id: "project_payment",
+        label: "Project Payment",
+        icon: "📋",
+        color: "text-green-500",
+        bgColor: "bg-green-500/10",
+        subCategories: [
+            { id: "milestone", label: "Milestone Payment" },
+            { id: "final_delivery", label: "Final Delivery" },
+            { id: "advance", label: "Advance Payment" },
+            { id: "partial", label: "Partial Payment" },
+        ]
+    },
+    {
+        id: "retainer",
+        label: "Retainer",
+        icon: "🔄",
+        color: "text-blue-500",
+        bgColor: "bg-blue-500/10",
+        subCategories: [
+            { id: "monthly", label: "Monthly Retainer" },
+            { id: "quarterly", label: "Quarterly Retainer" },
+            { id: "annual", label: "Annual Retainer" },
+        ]
+    },
+    {
+        id: "consulting",
+        label: "Consulting",
+        icon: "💼",
+        color: "text-purple-500",
+        bgColor: "bg-purple-500/10",
+        subCategories: [
+            { id: "hourly", label: "Hourly Consulting" },
+            { id: "advisory", label: "Advisory Services" },
+            { id: "strategy", label: "Strategy Session" },
+        ]
+    },
+    {
+        id: "other_income",
+        label: "Other Income",
+        icon: "📦",
+        color: "text-amber-500",
+        bgColor: "bg-amber-500/10",
+        subCategories: [
+            { id: "interest", label: "Interest Income" },
+            { id: "refund", label: "Refund" },
+            { id: "asset_sale", label: "Asset Sale" },
+            { id: "commission", label: "Commission" },
+        ]
+    },
+]
+
+// ==================== Expense Types ====================
+
+export type ExpenseSourceType = "client_project" | "office" | "personal"
+
+export interface ExpenseSubCategory {
+    id: string
+    label: string
+}
+
+export interface ExpenseCategoryConfig {
+    id: string
+    label: string
+    icon: string
+    color: string
+    bgColor: string
+    subCategories: ExpenseSubCategory[]
+}
+
+export const EXPENSE_SOURCE_TYPES: Record<ExpenseSourceType, { label: string; icon: string; description: string; color: string }> = {
+    client_project: {
+        label: "Client Project",
+        icon: "👤",
+        description: "Expense for a specific client project (billable)",
+        color: "text-green-500"
+    },
+    office: {
+        label: "Office / Company",
+        icon: "🏢",
+        description: "General office and business operations expense",
+        color: "text-blue-500"
+    },
+    personal: {
+        label: "Personal / Owner",
+        icon: "💰",
+        description: "Owner withdrawal or personal expense",
+        color: "text-purple-500"
+    },
+}
+
+export const EXPENSE_CATEGORIES: ExpenseCategoryConfig[] = [
+    {
+        id: "office_operations",
+        label: "Office Operations",
+        icon: "🏢",
+        color: "text-blue-500",
+        bgColor: "bg-blue-500/10",
+        subCategories: [
+            { id: "rent", label: "Rent & Lease" },
+            { id: "utilities", label: "Utilities" },
+            { id: "supplies", label: "Office Supplies" },
+            { id: "maintenance", label: "Maintenance" },
+            { id: "furniture", label: "Furniture" },
+        ]
+    },
+    {
+        id: "software_tools",
+        label: "Software & Tools",
+        icon: "💻",
+        color: "text-purple-500",
+        bgColor: "bg-purple-500/10",
+        subCategories: [
+            { id: "subscription", label: "Subscriptions" },
+            { id: "license", label: "Licenses" },
+            { id: "cloud", label: "Cloud Services" },
+            { id: "saas", label: "SaaS Products" },
+        ]
+    },
+    {
+        id: "marketing",
+        label: "Marketing & Advertising",
+        icon: "📢",
+        color: "text-pink-500",
+        bgColor: "bg-pink-500/10",
+        subCategories: [
+            { id: "ads", label: "Paid Advertising" },
+            { id: "events", label: "Events & Sponsorship" },
+            { id: "promotions", label: "Promotions" },
+            { id: "content", label: "Content Creation" },
+        ]
+    },
+    {
+        id: "contractors",
+        label: "Contractors & Freelancers",
+        icon: "👥",
+        color: "text-orange-500",
+        bgColor: "bg-orange-500/10",
+        subCategories: [
+            { id: "freelancer", label: "Freelancer Payment" },
+            { id: "agency", label: "Agency Fee" },
+            { id: "consultant", label: "Consultant" },
+        ]
+    },
+    {
+        id: "infrastructure",
+        label: "Infrastructure",
+        icon: "🔧",
+        color: "text-cyan-500",
+        bgColor: "bg-cyan-500/10",
+        subCategories: [
+            { id: "hosting", label: "Web Hosting" },
+            { id: "domain", label: "Domains" },
+            { id: "server", label: "Server Costs" },
+            { id: "cdn", label: "CDN Services" },
+        ]
+    },
+    {
+        id: "team",
+        label: "Team & HR",
+        icon: "👨‍💼",
+        color: "text-green-500",
+        bgColor: "bg-green-500/10",
+        subCategories: [
+            { id: "salaries", label: "Salaries" },
+            { id: "benefits", label: "Benefits" },
+            { id: "training", label: "Training & Development" },
+            { id: "team_building", label: "Team Building" },
+        ]
+    },
+    {
+        id: "travel",
+        label: "Travel & Transportation",
+        icon: "✈️",
+        color: "text-amber-500",
+        bgColor: "bg-amber-500/10",
+        subCategories: [
+            { id: "flight", label: "Flights" },
+            { id: "hotel", label: "Hotels" },
+            { id: "transport", label: "Local Transport" },
+            { id: "meals", label: "Meals & Entertainment" },
+        ]
+    },
+    {
+        id: "client_expense",
+        label: "Client Project Expense",
+        icon: "📁",
+        color: "text-emerald-500",
+        bgColor: "bg-emerald-500/10",
+        subCategories: [
+            { id: "production", label: "Production Costs" },
+            { id: "third_party", label: "Third-party Services" },
+            { id: "assets", label: "Asset Purchases" },
+            { id: "tools", label: "Project Tools" },
+        ]
+    },
+]
+
+// ==================== Activity Log Types ====================
+
+export type EntityStatus = "active" | "neutralized"
+
+export type ActivityAction =
+    | "created"
+    | "updated"
+    | "deleted"
+    | "neutralized"
+    | "restored"
+    | "status_changed"
+    | "payment_recorded"
+
+export interface ActivityLogChange {
+    field: string
+    oldValue: any
+    newValue: any
+}
+
+export interface ActivityLogEntry {
+    id: string
+    entityType: "expense" | "income" | "invoice"
+    entityId: string | number
+    entityDescription: string  // For display purposes
+    action: ActivityAction
+    changes?: ActivityLogChange[]
+    performedBy: string
+    performedByAvatar?: string
+    performedAt: string
+    notes?: string
+}
+
+// ==================== Income Entity ====================
+
+export interface Income {
+    id: number
+    description: string
+    category: string
+    subCategory?: string
+    amount: number
+    date: string
+    client: string
+    project: string
+    status: "received" | "pending"
+    entityStatus: EntityStatus  // For neutralization
+    invoiceId?: string
+    paymentMethod: string
+    recurring: boolean
+    recurringFrequency?: string
+    taxAmount: number
+    notes?: string
+    createdAt: string
+    updatedAt: string
+    createdBy?: string
+}
+
+// ==================== Expense Entity ====================
+
+export interface Expense {
+    id: number
+    description: string
+    category: string
+    subCategory?: string
+    amount: number
+    date: string
+    vendor: string
+    status: "paid" | "pending" | "pending_approval"
+    entityStatus: EntityStatus  // For neutralization
+    recurring: boolean
+    recurringFrequency: string | null
+    approvalStatus: "approved" | "pending" | "rejected"
+    approvedBy: string | null
+    paymentMethod: string
+    receiptUrl: string | null
+    taxDeductible: boolean
+    notes: string
+    department: string
+    project: string | null
+    sourceType?: ExpenseSourceType
+    clientId?: string
+    clientName?: string
+    createdAt: string
+    updatedAt: string
+    createdBy?: string
+}
+
+// Activity Log Status Config
+export const ACTIVITY_ACTION_CONFIG: Record<ActivityAction, { label: string; icon: string; color: string }> = {
+    created: { label: "Created", icon: "➕", color: "text-green-500" },
+    updated: { label: "Updated", icon: "✏️", color: "text-blue-500" },
+    deleted: { label: "Deleted", icon: "🗑️", color: "text-red-500" },
+    neutralized: { label: "Neutralized", icon: "⚪", color: "text-gray-500" },
+    restored: { label: "Restored", icon: "♻️", color: "text-emerald-500" },
+    status_changed: { label: "Status Changed", icon: "🔄", color: "text-amber-500" },
+    payment_recorded: { label: "Payment Recorded", icon: "💰", color: "text-green-500" },
+}
+
+export const ENTITY_STATUS_CONFIG: Record<EntityStatus, { label: string; color: string; bgColor: string }> = {
+    active: { label: "Active", color: "text-green-500", bgColor: "bg-green-500/10" },
+    neutralized: { label: "Neutralized", color: "text-gray-500", bgColor: "bg-gray-500/10" },
+}

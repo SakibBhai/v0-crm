@@ -1,14 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import type { Employee, Candidate, LeaveRequest, OKR } from "@/lib/types/hr"
-import { employees as initialEmployees, candidates as initialCandidates, leaveRequests as initialLeaveRequests, okrs as initialOkrs, skillDefinitions, trainingCourses, courseEnrollments as initialEnrollments, hrMetrics } from "@/lib/data/hr"
+import type { Employee, Candidate, LeaveRequest, OKR, AttendanceRecord } from "@/lib/types/hr"
+import { employees as initialEmployees, candidates as initialCandidates, leaveRequests as initialLeaveRequests, okrs as initialOkrs, skillDefinitions, trainingCourses, courseEnrollments as initialEnrollments, hrMetrics, attendanceRecords as initialAttendanceRecords } from "@/lib/data/hr"
 import { DEPARTMENT_CONFIG } from "@/lib/types/hr"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { EmployeeProfile } from "@/components/team/employee-profile"
 import { OrgChart } from "@/components/team/org-chart"
 import { ApplicantTracker } from "@/components/team/applicant-tracker"
 import { LeaveManagement } from "@/components/team/leave-management"
+import { AttendanceTracker } from "@/components/team/attendance-tracker"
 import { PerformanceDashboard } from "@/components/team/performance-dashboard"
 import { SkillsMatrix } from "@/components/team/skills-matrix"
 import { TrainingCenter } from "@/components/team/training-center"
@@ -61,6 +62,7 @@ export default function TeamPage() {
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>(initialLeaveRequests)
   const [okrs, setOkrs] = useState<OKR[]>(initialOkrs)
   const [enrollments, setEnrollments] = useState(initialEnrollments)
+  const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>(initialAttendanceRecords)
 
   // UI state
   const [activeTab, setActiveTab] = useState<TabMode>("directory")
@@ -220,6 +222,22 @@ export default function TeamPage() {
         enrolledAt: new Date().toISOString(),
       }])
     }
+  }
+
+  // Attendance handlers
+  const handleMarkAttendance = (record: Omit<AttendanceRecord, "id" | "markedAt">) => {
+    const newRecord: AttendanceRecord = {
+      ...record,
+      id: `ATT_${Date.now()}`,
+      markedAt: new Date().toISOString(),
+    }
+    setAttendanceRecords(prev => [...prev, newRecord])
+  }
+
+  const handleUpdateAttendance = (id: string, updates: Partial<AttendanceRecord>) => {
+    setAttendanceRecords(prev => prev.map(r =>
+      r.id === id ? { ...r, ...updates, markedAt: new Date().toISOString() } : r
+    ))
   }
 
   const tabs = [
@@ -461,14 +479,30 @@ export default function TeamPage() {
 
         {/* Attendance Tab */}
         {activeTab === "attendance" && (
-          <LeaveManagement
-            requests={leaveRequests}
-            employees={employees}
-            currentUserId={currentUserId}
-            onSubmitRequest={handleLeaveSubmit}
-            onApprove={handleLeaveApprove}
-            onReject={handleLeaveReject}
-          />
+          <div className="space-y-6">
+            <AttendanceTracker
+              employees={employees}
+              attendanceRecords={attendanceRecords}
+              onMarkAttendance={handleMarkAttendance}
+              onUpdateAttendance={handleUpdateAttendance}
+            />
+
+            {/* Leave Management Section */}
+            <div className="pt-6 border-t border-border">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                Leave Management
+              </h3>
+              <LeaveManagement
+                requests={leaveRequests}
+                employees={employees}
+                currentUserId={currentUserId}
+                onSubmitRequest={handleLeaveSubmit}
+                onApprove={handleLeaveApprove}
+                onReject={handleLeaveReject}
+              />
+            </div>
+          </div>
         )}
 
         {/* Performance Tab */}

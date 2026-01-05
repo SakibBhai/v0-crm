@@ -4,6 +4,8 @@ module.exports = [
 
 // Sample HR Data for Development
 __turbopack_context__.s([
+    "attendanceRecords",
+    ()=>attendanceRecords,
     "candidates",
     ()=>candidates,
     "courseEnrollments",
@@ -957,6 +959,87 @@ const onboardingChecklists = [
         ]
     }
 ];
+// ==================== Attendance Records ====================
+// Helper to generate dates
+const generateAttendanceRecords = ()=>{
+    const records = [];
+    const employees = [
+        {
+            id: "EMP001",
+            name: "John Doe"
+        },
+        {
+            id: "EMP002",
+            name: "Sarah Mitchell"
+        },
+        {
+            id: "EMP003",
+            name: "David Park"
+        },
+        {
+            id: "EMP008",
+            name: "Lisa Thompson"
+        }
+    ];
+    // Generate records for the last 30 days
+    const today = new Date();
+    for(let i = 0; i < 30; i++){
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split("T")[0];
+        const dayOfWeek = date.getDay();
+        // Skip weekends
+        if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+        employees.forEach((emp, empIndex)=>{
+            // Create varied attendance patterns
+            const randomFactor = (i + empIndex) % 10;
+            let status = "present";
+            let clockIn = "09:00";
+            let clockOut = "18:00";
+            let workLocation = "office";
+            let notes = undefined;
+            if (randomFactor === 0) {
+                status = "late";
+                clockIn = "09:45";
+                notes = "Traffic delay";
+            } else if (randomFactor === 1) {
+                status = "remote";
+                workLocation = "remote";
+                clockIn = "08:30";
+                clockOut = "17:30";
+            } else if (randomFactor === 2 && empIndex === 0) {
+                status = "absent";
+                clockIn = undefined;
+                clockOut = undefined;
+                notes = "Sick leave";
+            } else if (randomFactor === 3) {
+                status = "half-day";
+                clockOut = "13:00";
+                notes = "Doctor appointment";
+            } else if (randomFactor === 4) {
+                status = "remote";
+                workLocation = "remote";
+            }
+            records.push({
+                id: `ATT_${emp.id}_${dateStr}`,
+                employeeId: emp.id,
+                employeeName: emp.name,
+                date: dateStr,
+                status,
+                clockIn: status !== "absent" ? clockIn : undefined,
+                clockOut: status !== "absent" ? clockOut : undefined,
+                totalHours: status === "half-day" ? 4 : status === "absent" ? 0 : 8,
+                workLocation: status !== "absent" ? workLocation : undefined,
+                notes,
+                markedBy: "system",
+                markedAt: dateStr + "T09:00:00",
+                isAutoMarked: false
+            });
+        });
+    }
+    return records;
+};
+const attendanceRecords = generateAttendanceRecords();
 }),
 "[project]/lib/types/hr.ts [app-ssr] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
@@ -964,6 +1047,8 @@ const onboardingChecklists = [
 // HR & Team Management Types and Interfaces
 // ==================== Core Employee Types ====================
 __turbopack_context__.s([
+    "ATTENDANCE_STATUS_CONFIG",
+    ()=>ATTENDANCE_STATUS_CONFIG,
     "CANDIDATE_STAGE_CONFIG",
     ()=>CANDIDATE_STAGE_CONFIG,
     "DEPARTMENT_CONFIG",
@@ -1056,6 +1141,38 @@ const CANDIDATE_STAGE_CONFIG = {
         color: "bg-red-500"
     }
 };
+const ATTENDANCE_STATUS_CONFIG = {
+    present: {
+        label: "Present",
+        color: "text-green-500",
+        bgColor: "bg-green-500/20",
+        icon: "CheckCircle"
+    },
+    absent: {
+        label: "Absent",
+        color: "text-red-500",
+        bgColor: "bg-red-500/20",
+        icon: "XCircle"
+    },
+    late: {
+        label: "Late",
+        color: "text-yellow-500",
+        bgColor: "bg-yellow-500/20",
+        icon: "Clock"
+    },
+    "half-day": {
+        label: "Half Day",
+        color: "text-orange-500",
+        bgColor: "bg-orange-500/20",
+        icon: "Sun"
+    },
+    remote: {
+        label: "Remote",
+        color: "text-blue-500",
+        bgColor: "bg-blue-500/20",
+        icon: "Home"
+    }
+};
 }),
 "[project]/lib/utils.ts [app-ssr] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
@@ -1064,12 +1181,12 @@ __turbopack_context__.s([
     "cn",
     ()=>cn
 ]);
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$clsx$40$2$2e$1$2e$1$2f$node_modules$2f$clsx$2f$dist$2f$clsx$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.pnpm/clsx@2.1.1/node_modules/clsx/dist/clsx.mjs [app-ssr] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$tailwind$2d$merge$40$3$2e$3$2e$1$2f$node_modules$2f$tailwind$2d$merge$2f$dist$2f$bundle$2d$mjs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.pnpm/tailwind-merge@3.3.1/node_modules/tailwind-merge/dist/bundle-mjs.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$clsx$2f$dist$2f$clsx$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/clsx/dist/clsx.mjs [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$tailwind$2d$merge$2f$dist$2f$bundle$2d$mjs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/tailwind-merge/dist/bundle-mjs.mjs [app-ssr] (ecmascript)");
 ;
 ;
 function cn(...inputs) {
-    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$tailwind$2d$merge$40$3$2e$3$2e$1$2f$node_modules$2f$tailwind$2d$merge$2f$dist$2f$bundle$2d$mjs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["twMerge"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$clsx$40$2$2e$1$2e$1$2f$node_modules$2f$clsx$2f$dist$2f$clsx$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["clsx"])(inputs));
+    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$tailwind$2d$merge$2f$dist$2f$bundle$2d$mjs$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["twMerge"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$clsx$2f$dist$2f$clsx$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["clsx"])(inputs));
 }
 }),
 ];

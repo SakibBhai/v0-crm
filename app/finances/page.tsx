@@ -61,6 +61,9 @@ import {
   Percent,
   CircleDollarSign,
   Banknote,
+  History,
+  RotateCcw,
+  Ban,
 } from "lucide-react"
 import {
   Area,
@@ -386,94 +389,159 @@ const invoicesData = [
   },
 ]
 
-const incomeData = [
-  {
-    id: 1,
-    description: "Monthly Retainer - TechCorp Inc",
-    category: "Retainer",
-    amount: 15000,
-    date: "2024-01-15",
-    client: "TechCorp Inc",
-    project: "Website Redesign",
-    status: "received",
-    invoiceId: "INV-2024-001",
-    paymentMethod: "Bank Transfer",
-    recurring: true,
-    taxAmount: 1200,
-  },
-  {
-    id: 2,
-    description: "Project Payment - E-commerce Platform",
-    category: "Project",
-    amount: 45000,
-    date: "2024-01-24",
-    client: "E-Shop Pro",
-    project: "E-commerce Platform",
-    status: "received",
-    invoiceId: "INV-2024-006",
-    paymentMethod: "Bank Transfer",
-    recurring: false,
-    taxAmount: 3600,
-  },
-  {
-    id: 3,
-    description: "Partial Payment - SEO Campaign",
-    category: "Project",
-    amount: 4250,
-    date: "2024-01-06",
-    client: "StartupXYZ",
-    project: "SEO Campaign Q1",
-    status: "received",
-    invoiceId: "INV-2024-002",
-    paymentMethod: "Credit Card",
-    recurring: false,
-    taxAmount: 340,
-  },
-  {
-    id: 4,
-    description: "Monthly Retainer - FinanceFirst",
-    category: "Retainer",
-    amount: 9000,
-    date: "2024-01-03",
-    client: "FinanceFirst",
-    project: "Content Marketing",
-    status: "received",
-    invoiceId: "INV-2024-008",
-    paymentMethod: "ACH",
-    recurring: true,
-    taxAmount: 720,
-  },
-  {
-    id: 5,
-    description: "Consulting Services - Brand Strategy",
-    category: "Consulting",
-    amount: 3500,
-    date: "2024-01-18",
-    client: "BrandFirst",
-    project: "Brand Identity",
-    status: "pending",
-    invoiceId: "INV-2024-009",
-    paymentMethod: "Wire Transfer",
-    recurring: false,
-    taxAmount: 280,
-  },
-  {
-    id: 6,
-    description: "Ad Management Fee - GrowthLabs",
-    category: "Management Fee",
-    amount: 2500,
-    date: "2024-01-12",
-    client: "GrowthLabs",
-    project: "Social Media Management",
-    status: "received",
-    invoiceId: "INV-2024-010",
-    paymentMethod: "ACH",
-    recurring: true,
-    taxAmount: 200,
-  },
-]
+const incomeData: {
+  id: number
+  description: string
+  category: string
+  amount: number
+  date: string
+  client: string
+  project: string
+  status: string
+  entityStatus: "active" | "neutralized"
+  invoiceId: string
+  paymentMethod: string
+  recurring: boolean
+  taxAmount: number
+  createdAt: string
+  updatedAt: string
+  createdBy: string
+}[] = [
+    {
+      id: 1,
+      description: "Monthly Retainer - TechCorp Inc",
+      category: "Retainer",
+      amount: 15000,
+      date: "2024-01-15",
+      client: "TechCorp Inc",
+      project: "Website Redesign",
+      status: "received",
+      entityStatus: "active",
+      invoiceId: "INV-2024-001",
+      paymentMethod: "Bank Transfer",
+      recurring: true,
+      taxAmount: 1200,
+      createdAt: "2024-01-15T10:00:00Z",
+      updatedAt: "2024-01-15T10:00:00Z",
+      createdBy: "Sarah Chen",
+    },
+    {
+      id: 2,
+      description: "Project Payment - E-commerce Platform",
+      category: "Project",
+      amount: 45000,
+      date: "2024-01-24",
+      client: "E-Shop Pro",
+      project: "E-commerce Platform",
+      status: "received",
+      entityStatus: "active",
+      invoiceId: "INV-2024-006",
+      paymentMethod: "Bank Transfer",
+      recurring: false,
+      taxAmount: 3600,
+      createdAt: "2024-01-24T09:30:00Z",
+      updatedAt: "2024-01-24T09:30:00Z",
+      createdBy: "Michael Torres",
+    },
+    {
+      id: 3,
+      description: "Partial Payment - SEO Campaign",
+      category: "Project",
+      amount: 4250,
+      date: "2024-01-06",
+      client: "StartupXYZ",
+      project: "SEO Campaign Q1",
+      status: "received",
+      entityStatus: "active",
+      invoiceId: "INV-2024-002",
+      paymentMethod: "Credit Card",
+      recurring: false,
+      taxAmount: 340,
+      createdAt: "2024-01-06T14:00:00Z",
+      updatedAt: "2024-01-06T14:00:00Z",
+      createdBy: "Sarah Chen",
+    },
+    {
+      id: 4,
+      description: "Monthly Retainer - FinanceFirst",
+      category: "Retainer",
+      amount: 9000,
+      date: "2024-01-03",
+      client: "FinanceFirst",
+      project: "Content Marketing",
+      status: "received",
+      entityStatus: "active",
+      invoiceId: "INV-2024-008",
+      paymentMethod: "ACH",
+      recurring: true,
+      taxAmount: 720,
+      createdAt: "2024-01-03T11:00:00Z",
+      updatedAt: "2024-01-03T11:00:00Z",
+      createdBy: "Sarah Chen",
+    },
+    {
+      id: 5,
+      description: "Consulting Services - Brand Strategy",
+      category: "Consulting",
+      amount: 3500,
+      date: "2024-01-18",
+      client: "BrandFirst",
+      project: "Brand Identity",
+      status: "pending",
+      entityStatus: "active",
+      invoiceId: "INV-2024-009",
+      paymentMethod: "Wire Transfer",
+      recurring: false,
+      taxAmount: 280,
+      createdAt: "2024-01-18T10:30:00Z",
+      updatedAt: "2024-01-18T10:30:00Z",
+      createdBy: "Michael Torres",
+    },
+    {
+      id: 6,
+      description: "Ad Management Fee - GrowthLabs",
+      category: "Management Fee",
+      amount: 2500,
+      date: "2024-01-12",
+      client: "GrowthLabs",
+      project: "Social Media Management",
+      status: "received",
+      entityStatus: "active",
+      invoiceId: "INV-2024-010",
+      paymentMethod: "ACH",
+      recurring: true,
+      taxAmount: 200,
+      createdAt: "2024-01-12T15:00:00Z",
+      updatedAt: "2024-01-12T15:00:00Z",
+      createdBy: "Sarah Chen",
+    },
+  ]
 
-const expensesData = [
+type ExpenseDataType = {
+  id: number
+  description: string
+  category: string
+  amount: number
+  date: string
+  vendor: string
+  status: string
+  entityStatus: "active" | "neutralized"
+  recurring: boolean
+  recurringFrequency: string | null
+  approvalStatus: string
+  approvedBy: string | null
+  paymentMethod: string
+  receiptUrl: string | null
+  taxDeductible: boolean
+  notes: string
+  department: string
+  project: string | null
+  createdAt: string
+  updatedAt: string
+  createdBy: string
+}
+
+const expensesData: ExpenseDataType[] = [
   {
     id: 1,
     description: "Adobe Creative Cloud - Team Plan",
@@ -482,6 +550,7 @@ const expensesData = [
     date: "2024-01-15",
     vendor: "Adobe Inc",
     status: "paid",
+    entityStatus: "active",
     recurring: true,
     recurringFrequency: "monthly",
     approvalStatus: "approved",
@@ -492,6 +561,9 @@ const expensesData = [
     notes: "Annual subscription billed monthly",
     department: "Creative",
     project: null,
+    createdAt: "2024-01-15T08:00:00Z",
+    updatedAt: "2024-01-15T08:00:00Z",
+    createdBy: "Sarah Chen",
   },
   {
     id: 2,
@@ -501,6 +573,7 @@ const expensesData = [
     date: "2024-01-14",
     vendor: "Google LLC",
     status: "paid",
+    entityStatus: "active" as const,
     recurring: false,
     recurringFrequency: null,
     approvalStatus: "approved",
@@ -511,6 +584,9 @@ const expensesData = [
     notes: "Campaign for StartupXYZ - billable to client",
     department: "Marketing",
     project: "PRJ-002",
+    createdAt: "2024-01-14T10:00:00Z",
+    updatedAt: "2024-01-14T10:00:00Z",
+    createdBy: "Michael Torres",
   },
   {
     id: 3,
@@ -520,6 +596,7 @@ const expensesData = [
     date: "2024-01-01",
     vendor: "WeWork",
     status: "paid",
+    entityStatus: "active" as const,
     recurring: true,
     recurringFrequency: "monthly",
     approvalStatus: "approved",
@@ -530,6 +607,9 @@ const expensesData = [
     notes: "Monthly office rent including utilities",
     department: "Operations",
     project: null,
+    createdAt: "2024-01-01T09:00:00Z",
+    updatedAt: "2024-01-01T09:00:00Z",
+    createdBy: "Sarah Chen",
   },
   {
     id: 4,
@@ -539,6 +619,7 @@ const expensesData = [
     date: "2024-01-12",
     vendor: "Sarah Miller Design",
     status: "pending",
+    entityStatus: "active" as const,
     recurring: false,
     recurringFrequency: null,
     approvalStatus: "approved",
@@ -549,6 +630,9 @@ const expensesData = [
     notes: "40 hours @ $80/hr - TechCorp project",
     department: "Creative",
     project: "PRJ-001",
+    createdAt: "2024-01-12T11:00:00Z",
+    updatedAt: "2024-01-12T11:00:00Z",
+    createdBy: "Sarah Chen",
   },
   {
     id: 5,
@@ -558,6 +642,7 @@ const expensesData = [
     date: "2024-01-10",
     vendor: "HubSpot Inc",
     status: "paid",
+    entityStatus: "active" as const,
     recurring: true,
     recurringFrequency: "monthly",
     approvalStatus: "approved",
@@ -568,6 +653,9 @@ const expensesData = [
     notes: "CRM and marketing automation",
     department: "Sales",
     project: null,
+    createdAt: "2024-01-10T09:30:00Z",
+    updatedAt: "2024-01-10T09:30:00Z",
+    createdBy: "Michael Torres",
   },
   {
     id: 6,
@@ -577,6 +665,7 @@ const expensesData = [
     date: "2024-01-18",
     vendor: "Various Vendors",
     status: "paid",
+    entityStatus: "active" as const,
     recurring: false,
     recurringFrequency: null,
     approvalStatus: "approved",
@@ -587,6 +676,9 @@ const expensesData = [
     notes: "Dinner and activities for 12 team members",
     department: "HR",
     project: null,
+    createdAt: "2024-01-18T16:00:00Z",
+    updatedAt: "2024-01-18T16:00:00Z",
+    createdBy: "Sarah Chen",
   },
   {
     id: 7,
@@ -596,6 +688,7 @@ const expensesData = [
     date: "2024-01-08",
     vendor: "Shutterstock",
     status: "paid",
+    entityStatus: "active" as const,
     recurring: true,
     recurringFrequency: "monthly",
     approvalStatus: "approved",
@@ -606,6 +699,9 @@ const expensesData = [
     notes: "Team subscription - 750 images/month",
     department: "Creative",
     project: null,
+    createdAt: "2024-01-08T10:00:00Z",
+    updatedAt: "2024-01-08T10:00:00Z",
+    createdBy: "Sarah Chen",
   },
   {
     id: 8,
@@ -615,6 +711,7 @@ const expensesData = [
     date: "2024-01-20",
     vendor: "Premium Gift Co",
     status: "pending_approval",
+    entityStatus: "active" as const,
     recurring: false,
     recurringFrequency: null,
     approvalStatus: "pending",
@@ -625,6 +722,9 @@ const expensesData = [
     notes: "Gift baskets for top 5 clients",
     department: "Business Development",
     project: null,
+    createdAt: "2024-01-20T14:00:00Z",
+    updatedAt: "2024-01-20T14:00:00Z",
+    createdBy: "Michael Torres",
   },
   {
     id: 9,
@@ -634,6 +734,7 @@ const expensesData = [
     date: "2024-01-05",
     vendor: "Amazon Web Services",
     status: "paid",
+    entityStatus: "active" as const,
     recurring: true,
     recurringFrequency: "monthly",
     approvalStatus: "approved",
@@ -644,6 +745,9 @@ const expensesData = [
     notes: "Client project hosting costs",
     department: "Development",
     project: "PRJ-006",
+    createdAt: "2024-01-05T08:30:00Z",
+    updatedAt: "2024-01-05T08:30:00Z",
+    createdBy: "Sarah Chen",
   },
   {
     id: 10,
@@ -653,6 +757,7 @@ const expensesData = [
     date: "2024-01-22",
     vendor: "Marketing Summit 2024",
     status: "pending_approval",
+    entityStatus: "active" as const,
     recurring: false,
     recurringFrequency: null,
     approvalStatus: "pending",
@@ -663,6 +768,9 @@ const expensesData = [
     notes: "Conference ticket for Michael Torres",
     department: "Marketing",
     project: null,
+    createdAt: "2024-01-22T09:00:00Z",
+    updatedAt: "2024-01-22T09:00:00Z",
+    createdBy: "Michael Torres",
   },
 ]
 
@@ -758,6 +866,60 @@ const statusConfig: Record<string, { label: string; color: string; icon: any }> 
   overdue: { label: "Overdue", color: "bg-red-500/10 text-red-500", icon: XCircle },
 }
 
+// Sample Activity Log Data
+type ActivityLogEntryType = {
+  id: string
+  entityType: "expense" | "income" | "invoice"
+  entityId: string | number
+  entityDescription: string
+  action: "created" | "updated" | "deleted" | "neutralized" | "restored" | "status_changed" | "payment_recorded"
+  changes?: { field: string; oldValue: any; newValue: any }[]
+  performedBy: string
+  performedAt: string
+  notes?: string
+}
+
+const initialActivityLog: ActivityLogEntryType[] = [
+  {
+    id: "log-1",
+    entityType: "expense",
+    entityId: 1,
+    entityDescription: "Adobe Creative Cloud - Team Plan",
+    action: "created",
+    performedBy: "Sarah Chen",
+    performedAt: "2024-01-15T08:00:00Z",
+  },
+  {
+    id: "log-2",
+    entityType: "income",
+    entityId: 1,
+    entityDescription: "Monthly Retainer - TechCorp Inc",
+    action: "created",
+    performedBy: "Sarah Chen",
+    performedAt: "2024-01-15T10:00:00Z",
+  },
+  {
+    id: "log-3",
+    entityType: "invoice",
+    entityId: "INV-2024-001",
+    entityDescription: "Invoice #INV-2024-001 - TechCorp Inc",
+    action: "status_changed",
+    changes: [{ field: "status", oldValue: "sent", newValue: "paid" }],
+    performedBy: "Michael Torres",
+    performedAt: "2024-01-14T15:30:00Z",
+  },
+  {
+    id: "log-4",
+    entityType: "expense",
+    entityId: 2,
+    entityDescription: "Google Ads - Client Campaign Budget",
+    action: "updated",
+    changes: [{ field: "amount", oldValue: 2000, newValue: 2500 }],
+    performedBy: "Michael Torres",
+    performedAt: "2024-01-14T11:00:00Z",
+  },
+]
+
 export default function FinancesPage() {
   const [activeTab, setActiveTab] = useState("overview")
   const [viewMode, setViewMode] = useState<"kanban" | "list" | "grid">("kanban")
@@ -773,15 +935,31 @@ export default function FinancesPage() {
   const [showAddExpenseDialog, setShowAddExpenseDialog] = useState(false)
   const [showAddIncomeDialog, setShowAddIncomeDialog] = useState(false)
 
+  // Activity Log and Edit States
+  const [activityLog, setActivityLog] = useState(initialActivityLog)
+  const [showActivityLogDialog, setShowActivityLogDialog] = useState(false)
+  const [showEditExpenseDialog, setShowEditExpenseDialog] = useState(false)
+  const [showEditIncomeDialog, setShowEditIncomeDialog] = useState(false)
+  const [showEditInvoiceDialog, setShowEditInvoiceDialog] = useState(false)
+  const [showNeutralizeDialog, setShowNeutralizeDialog] = useState(false)
+  const [showDeleteInvoiceDialog, setShowDeleteInvoiceDialog] = useState(false)
+  const [neutralizeTarget, setNeutralizeTarget] = useState<{ type: "expense" | "income"; id: number } | null>(null)
+  const [deleteInvoiceTarget, setDeleteInvoiceTarget] = useState<string | null>(null)
+  const [selectedIncome, setSelectedIncome] = useState<(typeof incomeData)[0] | null>(null)
+
   const [expenseFormData, setExpenseFormData] = useState({
     vendor: "",
-    category: "office-supplies",
+    sourceType: "office" as "client_project" | "office" | "personal",
+    category: "office_operations",
+    subCategory: "",
     amount: "",
     date: new Date().toISOString().split("T")[0],
     description: "",
     paymentMethod: "bank-transfer",
     status: "pending",
     department: "general",
+    clientId: "",
+    clientName: "",
     project: "",
     taxDeductible: true,
     receipt: null as File | null,
@@ -791,17 +969,20 @@ export default function FinancesPage() {
   })
 
   const [incomeFormData, setIncomeFormData] = useState({
-    source: "",
-    type: "project",
+    sourceType: "client_payment" as "client_payment" | "office_income" | "personal" | "other",
+    category: "project_payment",
+    subCategory: "",
     amount: "",
     date: new Date().toISOString().split("T")[0],
     description: "",
     paymentMethod: "bank-transfer",
-    status: "completed",
-    client: "",
+    status: "received",
+    clientId: "",
+    clientName: "",
     project: "",
     taxRate: 15,
-    invoiceNumber: "",
+    linkedInvoiceId: "",
+    linkedInvoiceNumber: "",
     recurring: false,
     recurringFrequency: "monthly",
     notes: "",
@@ -902,6 +1083,254 @@ export default function FinancesPage() {
     setDropTarget(null)
   }
 
+  // ==================== Activity Log & Edit Handlers ====================
+
+  const logActivity = (entry: Omit<typeof activityLog[0], "id">) => {
+    const newEntry = {
+      ...entry,
+      id: `log-${Date.now()}`,
+    }
+    setActivityLog(prev => [newEntry, ...prev])
+  }
+
+  // Handle Edit Expense
+  const handleSaveExpenseEdit = (updatedExpense: typeof expenses[0]) => {
+    const originalExpense = expenses.find(e => e.id === updatedExpense.id)
+    if (!originalExpense) return
+
+    // Find changes
+    const changes: { field: string; oldValue: any; newValue: any }[] = []
+    Object.keys(updatedExpense).forEach(key => {
+      const k = key as keyof typeof updatedExpense
+      if (originalExpense[k] !== updatedExpense[k] && k !== 'updatedAt') {
+        changes.push({
+          field: key,
+          oldValue: originalExpense[k],
+          newValue: updatedExpense[k],
+        })
+      }
+    })
+
+    // Update expense
+    setExpenses(prev =>
+      prev.map(exp =>
+        exp.id === updatedExpense.id
+          ? { ...updatedExpense, updatedAt: new Date().toISOString() }
+          : exp
+      )
+    )
+
+    // Log activity
+    if (changes.length > 0) {
+      logActivity({
+        entityType: "expense",
+        entityId: updatedExpense.id,
+        entityDescription: updatedExpense.description,
+        action: "updated",
+        changes,
+        performedBy: "Current User",
+        performedAt: new Date().toISOString(),
+      })
+    }
+
+    setShowEditExpenseDialog(false)
+    setSelectedExpense(null)
+  }
+
+  // Handle Edit Income
+  const handleSaveIncomeEdit = (updatedIncome: typeof income[0]) => {
+    const originalIncome = income.find(i => i.id === updatedIncome.id)
+    if (!originalIncome) return
+
+    // Find changes
+    const changes: { field: string; oldValue: any; newValue: any }[] = []
+    Object.keys(updatedIncome).forEach(key => {
+      const k = key as keyof typeof updatedIncome
+      if (originalIncome[k] !== updatedIncome[k] && k !== 'updatedAt') {
+        changes.push({
+          field: key,
+          oldValue: originalIncome[k],
+          newValue: updatedIncome[k],
+        })
+      }
+    })
+
+    // Update income
+    setIncome(prev =>
+      prev.map(inc =>
+        inc.id === updatedIncome.id
+          ? { ...updatedIncome, updatedAt: new Date().toISOString() }
+          : inc
+      )
+    )
+
+    // Log activity
+    if (changes.length > 0) {
+      logActivity({
+        entityType: "income",
+        entityId: updatedIncome.id,
+        entityDescription: updatedIncome.description,
+        action: "updated",
+        changes,
+        performedBy: "Current User",
+        performedAt: new Date().toISOString(),
+      })
+    }
+
+    setShowEditIncomeDialog(false)
+    setSelectedIncome(null)
+  }
+
+  // Handle Neutralize Expense
+  const handleNeutralizeExpense = (expenseId: number) => {
+    const expense = expenses.find(e => e.id === expenseId)
+    if (!expense) return
+
+    setExpenses(prev =>
+      prev.map(exp =>
+        exp.id === expenseId
+          ? { ...exp, entityStatus: "neutralized" as const, updatedAt: new Date().toISOString() }
+          : exp
+      )
+    )
+
+    logActivity({
+      entityType: "expense",
+      entityId: expenseId,
+      entityDescription: expense.description,
+      action: "neutralized",
+      performedBy: "Current User",
+      performedAt: new Date().toISOString(),
+      notes: "Expense neutralized - excluded from calculations",
+    })
+
+    setShowNeutralizeDialog(false)
+    setNeutralizeTarget(null)
+    setSelectedExpense(null)
+  }
+
+  // Handle Neutralize Income
+  const handleNeutralizeIncome = (incomeId: number) => {
+    const inc = income.find(i => i.id === incomeId)
+    if (!inc) return
+
+    setIncome(prev =>
+      prev.map(i =>
+        i.id === incomeId
+          ? { ...i, entityStatus: "neutralized" as const, updatedAt: new Date().toISOString() }
+          : i
+      )
+    )
+
+    logActivity({
+      entityType: "income",
+      entityId: incomeId,
+      entityDescription: inc.description,
+      action: "neutralized",
+      performedBy: "Current User",
+      performedAt: new Date().toISOString(),
+      notes: "Income neutralized - excluded from calculations",
+    })
+
+    setShowNeutralizeDialog(false)
+    setNeutralizeTarget(null)
+    setSelectedIncome(null)
+  }
+
+  // Handle Restore Expense
+  const handleRestoreExpense = (expenseId: number) => {
+    const expense = expenses.find(e => e.id === expenseId)
+    if (!expense) return
+
+    setExpenses(prev =>
+      prev.map(exp =>
+        exp.id === expenseId
+          ? { ...exp, entityStatus: "active" as const, updatedAt: new Date().toISOString() }
+          : exp
+      )
+    )
+
+    logActivity({
+      entityType: "expense",
+      entityId: expenseId,
+      entityDescription: expense.description,
+      action: "restored",
+      performedBy: "Current User",
+      performedAt: new Date().toISOString(),
+    })
+  }
+
+  // Handle Restore Income
+  const handleRestoreIncome = (incomeId: number) => {
+    const inc = income.find(i => i.id === incomeId)
+    if (!inc) return
+
+    setIncome(prev =>
+      prev.map(i =>
+        i.id === incomeId
+          ? { ...i, entityStatus: "active" as const, updatedAt: new Date().toISOString() }
+          : i
+      )
+    )
+
+    logActivity({
+      entityType: "income",
+      entityId: incomeId,
+      entityDescription: inc.description,
+      action: "restored",
+      performedBy: "Current User",
+      performedAt: new Date().toISOString(),
+    })
+  }
+
+  // Handle Delete Invoice
+  const handleDeleteInvoice = (invoiceId: string) => {
+    const invoice = invoices.find(inv => inv.id === invoiceId)
+    if (!invoice) return
+
+    setInvoices(prev => prev.filter(inv => inv.id !== invoiceId))
+
+    logActivity({
+      entityType: "invoice",
+      entityId: invoiceId,
+      entityDescription: `Invoice #${invoice.invoiceNumber} - ${invoice.client}`,
+      action: "deleted",
+      performedBy: "Current User",
+      performedAt: new Date().toISOString(),
+    })
+
+    setShowDeleteInvoiceDialog(false)
+    setDeleteInvoiceTarget(null)
+    setSelectedInvoice(null)
+  }
+
+  // Confirm Neutralize
+  const confirmNeutralize = () => {
+    if (!neutralizeTarget) return
+
+    if (neutralizeTarget.type === "expense") {
+      handleNeutralizeExpense(neutralizeTarget.id)
+    } else {
+      handleNeutralizeIncome(neutralizeTarget.id)
+    }
+  }
+
+  // Format activity log date
+  const formatActivityDate = (dateStr: string) => {
+    const date = new Date(dateStr)
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMs / 3600000)
+    const diffDays = Math.floor(diffMs / 86400000)
+
+    if (diffMins < 1) return "Just now"
+    if (diffMins < 60) return `${diffMins}m ago`
+    if (diffHours < 24) return `${diffHours}h ago`
+    if (diffDays < 7) return `${diffDays}d ago`
+    return date.toLocaleDateString()
+  }
+
   const handleAddExpense = () => {
     if (!expenseFormData.vendor || !expenseFormData.amount) {
       alert("Please fill in all required fields")
@@ -912,35 +1341,43 @@ export default function FinancesPage() {
     const newExpense = {
       id: `EXP${Date.now()}`,
       vendor: expenseFormData.vendor,
+      sourceType: expenseFormData.sourceType,
       category: expenseFormData.category,
+      subCategory: expenseFormData.subCategory,
       amount: expenseAmount,
       date: expenseFormData.date,
       description: expenseFormData.description,
       paymentMethod: expenseFormData.paymentMethod,
       status: expenseFormData.status as "pending" | "approved" | "paid",
       department: expenseFormData.department,
-      project: expenseFormData.project || "Unassigned",
+      clientId: expenseFormData.clientId || null,
+      clientName: expenseFormData.clientName || null,
+      project: expenseFormData.project || null,
       taxDeductible: expenseFormData.taxDeductible,
       recurring: expenseFormData.recurring,
       recurringFrequency: expenseFormData.recurring ? expenseFormData.recurringFrequency : null,
       notes: expenseFormData.notes,
-      attachments: [], // Assuming receipt is handled differently or not directly attached here
-      approvedBy: expenseFormData.status === "approved" ? "Finance Manager" : undefined,
-      receiptUrl: null, // Placeholder, actual receipt handling would be more complex
+      approvalStatus: expenseFormData.status === "approved" ? "approved" : "pending",
+      approvedBy: expenseFormData.status === "approved" ? "Finance Manager" : null,
+      receiptUrl: null,
       createdAt: new Date().toISOString(),
     }
 
-    setExpenses([newExpense, ...expenses])
+    setExpenses([newExpense, ...expenses] as typeof expenses)
     setShowAddExpenseDialog(false)
     setExpenseFormData({
       vendor: "",
-      category: "office-supplies",
+      sourceType: "office",
+      category: "office_operations",
+      subCategory: "",
       amount: "",
       date: new Date().toISOString().split("T")[0],
       description: "",
       paymentMethod: "bank-transfer",
       status: "pending",
       department: "general",
+      clientId: "",
+      clientName: "",
       project: "",
       taxDeductible: true,
       receipt: null,
@@ -951,50 +1388,52 @@ export default function FinancesPage() {
   }
 
   const handleAddIncome = () => {
-    if (!incomeFormData.source || !incomeFormData.amount) {
+    if (!incomeFormData.description || !incomeFormData.amount) {
       alert("Please fill in all required fields")
       return
     }
 
     const incomeAmount = Number.parseFloat(incomeFormData.amount)
     const taxAmount = Math.round(incomeAmount * (incomeFormData.taxRate / 100))
-    const netAmount = incomeAmount - taxAmount
 
     const newIncome = {
       id: `INC${Date.now()}`,
-      source: incomeFormData.source,
-      type: incomeFormData.type as "project" | "retainer" | "product" | "service",
+      sourceType: incomeFormData.sourceType,
+      category: incomeFormData.category,
+      subCategory: incomeFormData.subCategory,
       amount: incomeAmount,
       taxAmount: taxAmount,
-      netAmount: netAmount,
-      taxRate: incomeFormData.taxRate,
       date: incomeFormData.date,
       description: incomeFormData.description,
       paymentMethod: incomeFormData.paymentMethod,
-      status: incomeFormData.status as "pending" | "received" | "completed",
-      client: incomeFormData.client || "Direct",
-      project: incomeFormData.project || "General",
-      invoiceId: incomeFormData.invoiceNumber || null,
+      status: incomeFormData.status as "pending" | "received",
+      clientId: incomeFormData.clientId || null,
+      client: incomeFormData.clientName || "Direct",
+      project: incomeFormData.project || null,
+      invoiceId: incomeFormData.linkedInvoiceId || null,
       recurring: incomeFormData.recurring,
       recurringFrequency: incomeFormData.recurring ? incomeFormData.recurringFrequency : null,
       notes: incomeFormData.notes,
       createdAt: new Date().toISOString(),
     }
 
-    setIncome([newIncome, ...income])
+    setIncome([newIncome, ...income] as typeof income)
     setShowAddIncomeDialog(false)
     setIncomeFormData({
-      source: "",
-      type: "project",
+      sourceType: "client_payment",
+      category: "project_payment",
+      subCategory: "",
       amount: "",
       date: new Date().toISOString().split("T")[0],
       description: "",
       paymentMethod: "bank-transfer",
-      status: "completed",
-      client: "",
+      status: "received",
+      clientId: "",
+      clientName: "",
       project: "",
       taxRate: 15,
-      invoiceNumber: "",
+      linkedInvoiceId: "",
+      linkedInvoiceNumber: "",
       recurring: false,
       recurringFrequency: "monthly",
       notes: "",
@@ -1028,6 +1467,10 @@ export default function FinancesPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => setShowActivityLogDialog(true)}>
+              <History className="mr-2 h-4 w-4" />
+              Activity Log
+            </Button>
             <Button variant="outline" size="sm">
               <Download className="mr-2 h-4 w-4" />
               Export
@@ -1901,8 +2344,8 @@ export default function FinancesPage() {
                                                 <span className="font-medium">
                                                   {formatCurrency(
                                                     selectedInvoice.amount -
-                                                      selectedInvoice.tax +
-                                                      selectedInvoice.discount,
+                                                    selectedInvoice.tax +
+                                                    selectedInvoice.discount,
                                                   )}
                                                 </span>
                                               </div>
@@ -2580,8 +3023,8 @@ export default function FinancesPage() {
                                                 <span className="font-medium">
                                                   {formatCurrency(
                                                     selectedInvoice.amount -
-                                                      selectedInvoice.tax +
-                                                      selectedInvoice.discount,
+                                                    selectedInvoice.tax +
+                                                    selectedInvoice.discount,
                                                   )}
                                                 </span>
                                               </div>
@@ -2743,77 +3186,184 @@ export default function FinancesPage() {
                   <DialogHeader>
                     <DialogTitle>Record New Income</DialogTitle>
                   </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="incomeSource">Source *</Label>
-                        <Input
-                          id="incomeSource"
-                          placeholder="e.g., Client Name"
-                          value={incomeFormData.source}
-                          onChange={(e) => setIncomeFormData({ ...incomeFormData, source: e.target.value })}
-                        />
+                  <div className="space-y-6 py-4">
+                    {/* Step 1: Source Type Selection */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-semibold">Income Source Type *</Label>
+                      <div className="grid grid-cols-4 gap-3">
+                        {[
+                          { id: "client_payment", label: "Client Payment", icon: "👤", desc: "From a client", color: "border-green-500 bg-green-500/10" },
+                          { id: "office_income", label: "Office Income", icon: "🏢", desc: "Business ops", color: "border-blue-500 bg-blue-500/10" },
+                          { id: "personal", label: "Personal", icon: "💰", desc: "Owner invest", color: "border-purple-500 bg-purple-500/10" },
+                          { id: "other", label: "Other", icon: "📦", desc: "Misc income", color: "border-gray-500 bg-gray-500/10" },
+                        ].map((type) => (
+                          <button
+                            key={type.id}
+                            type="button"
+                            onClick={() => setIncomeFormData({ ...incomeFormData, sourceType: type.id as any })}
+                            className={cn(
+                              "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all hover:scale-105",
+                              incomeFormData.sourceType === type.id
+                                ? type.color + " border-2"
+                                : "border-border hover:border-muted-foreground/50"
+                            )}
+                          >
+                            <span className="text-2xl">{type.icon}</span>
+                            <span className="font-medium text-sm">{type.label}</span>
+                            <span className="text-xs text-muted-foreground">{type.desc}</span>
+                          </button>
+                        ))}
                       </div>
+                    </div>
+
+                    {/* Step 2: Category & Sub-category */}
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="incomeType">Type *</Label>
+                        <Label htmlFor="incomeCategory">Category *</Label>
                         <Select
-                          value={incomeFormData.type}
-                          onValueChange={(value) => setIncomeFormData({ ...incomeFormData, type: value })}
+                          value={incomeFormData.category}
+                          onValueChange={(value) => setIncomeFormData({ ...incomeFormData, category: value, subCategory: "" })}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Select type" />
+                            <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="project">Project</SelectItem>
-                            <SelectItem value="retainer">Retainer</SelectItem>
-                            <SelectItem value="product">Product Sale</SelectItem>
-                            <SelectItem value="service">Service</SelectItem>
+                            <SelectItem value="project_payment">📋 Project Payment</SelectItem>
+                            <SelectItem value="retainer">🔄 Retainer</SelectItem>
+                            <SelectItem value="consulting">💼 Consulting</SelectItem>
+                            <SelectItem value="other_income">📦 Other Income</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="incomeAmount">Amount *</Label>
-                        <Input
-                          id="incomeAmount"
-                          type="number"
-                          placeholder="0.00"
-                          value={incomeFormData.amount}
-                          onChange={(e) => setIncomeFormData({ ...incomeFormData, amount: e.target.value })}
-                        />
+                        <Label htmlFor="incomeSubCategory">Sub-category</Label>
+                        <Select
+                          value={incomeFormData.subCategory}
+                          onValueChange={(value) => setIncomeFormData({ ...incomeFormData, subCategory: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select sub-category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {incomeFormData.category === "project_payment" && (
+                              <>
+                                <SelectItem value="milestone">Milestone Payment</SelectItem>
+                                <SelectItem value="final_delivery">Final Delivery</SelectItem>
+                                <SelectItem value="advance">Advance Payment</SelectItem>
+                                <SelectItem value="partial">Partial Payment</SelectItem>
+                              </>
+                            )}
+                            {incomeFormData.category === "retainer" && (
+                              <>
+                                <SelectItem value="monthly">Monthly Retainer</SelectItem>
+                                <SelectItem value="quarterly">Quarterly Retainer</SelectItem>
+                                <SelectItem value="annual">Annual Retainer</SelectItem>
+                              </>
+                            )}
+                            {incomeFormData.category === "consulting" && (
+                              <>
+                                <SelectItem value="hourly">Hourly Consulting</SelectItem>
+                                <SelectItem value="advisory">Advisory Services</SelectItem>
+                                <SelectItem value="strategy">Strategy Session</SelectItem>
+                              </>
+                            )}
+                            {incomeFormData.category === "other_income" && (
+                              <>
+                                <SelectItem value="interest">Interest Income</SelectItem>
+                                <SelectItem value="refund">Refund</SelectItem>
+                                <SelectItem value="asset_sale">Asset Sale</SelectItem>
+                                <SelectItem value="commission">Commission</SelectItem>
+                              </>
+                            )}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
 
+                    {/* Step 3: Client Selection (only for client_payment) */}
+                    {incomeFormData.sourceType === "client_payment" && (
+                      <div className="p-4 rounded-xl bg-green-500/5 border border-green-500/20 space-y-4">
+                        <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+                          <span className="text-lg">👤</span>
+                          <span className="font-medium">Client Payment Details</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Client *</Label>
+                            <Select
+                              value={incomeFormData.clientName}
+                              onValueChange={(value) => setIncomeFormData({ ...incomeFormData, clientName: value, clientId: value })}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select client" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {invoices.map(inv => inv.client).filter((v, i, a) => a.indexOf(v) === i).map(client => (
+                                  <SelectItem key={client} value={client}>{client}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Link to Invoice</Label>
+                            <Select
+                              value={incomeFormData.linkedInvoiceId}
+                              onValueChange={(value) => {
+                                const invoice = invoices.find(inv => inv.id === value)
+                                if (invoice) {
+                                  setIncomeFormData({
+                                    ...incomeFormData,
+                                    linkedInvoiceId: value,
+                                    linkedInvoiceNumber: invoice.invoiceNumber,
+                                    amount: String(invoice.amount - invoice.paid),
+                                    clientName: invoice.client,
+                                    clientId: invoice.client,
+                                    project: invoice.project,
+                                    description: `Payment for ${invoice.invoiceNumber} - ${invoice.project}`
+                                  })
+                                }
+                              }}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Link to invoice (optional)" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {invoices.filter(inv => inv.status !== "paid" && (!incomeFormData.clientName || inv.client === incomeFormData.clientName)).map(inv => (
+                                  <SelectItem key={inv.id} value={inv.id}>
+                                    {inv.invoiceNumber} - ${inv.amount - inv.paid} due
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Project</Label>
+                          <Input
+                            placeholder="Project name"
+                            value={incomeFormData.project}
+                            onChange={(e) => setIncomeFormData({ ...incomeFormData, project: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 4: Amount & Date */}
                     <div className="grid grid-cols-3 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="incomeClient">Client</Label>
-                        <Input
-                          id="incomeClient"
-                          placeholder="Client name (optional)"
-                          value={incomeFormData.client}
-                          onChange={(e) => setIncomeFormData({ ...incomeFormData, client: e.target.value })}
-                        />
+                        <Label htmlFor="incomeAmount">Amount *</Label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                          <Input
+                            id="incomeAmount"
+                            type="number"
+                            className="pl-7"
+                            placeholder="0.00"
+                            value={incomeFormData.amount}
+                            onChange={(e) => setIncomeFormData({ ...incomeFormData, amount: e.target.value })}
+                          />
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="incomeProject">Project</Label>
-                        <Input
-                          id="incomeProject"
-                          placeholder="Project name (optional)"
-                          value={incomeFormData.project}
-                          onChange={(e) => setIncomeFormData({ ...incomeFormData, project: e.target.value })}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="incomeInvoice">Invoice #</Label>
-                        <Input
-                          id="incomeInvoice"
-                          placeholder="INV-001"
-                          value={incomeFormData.invoiceNumber}
-                          onChange={(e) => setIncomeFormData({ ...incomeFormData, invoiceNumber: e.target.value })}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="incomeDate">Date *</Label>
                         <Input
@@ -2824,19 +3374,6 @@ export default function FinancesPage() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="incomeTaxRate">Tax Rate (%)</Label>
-                        <Input
-                          id="incomeTaxRate"
-                          type="number"
-                          placeholder="15"
-                          value={incomeFormData.taxRate}
-                          onChange={(e) => setIncomeFormData({ ...incomeFormData, taxRate: Number(e.target.value) })}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
                         <Label htmlFor="incomePaymentMethod">Payment Method</Label>
                         <Select
                           value={incomeFormData.paymentMethod}
@@ -2846,34 +3383,19 @@ export default function FinancesPage() {
                             <SelectValue placeholder="Select method" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="bank-transfer">Bank Transfer</SelectItem>
-                            <SelectItem value="credit-card">Credit Card</SelectItem>
-                            <SelectItem value="ach">ACH</SelectItem>
-                            <SelectItem value="paypal">PayPal</SelectItem>
-                            <SelectItem value="check">Check</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="incomeStatus">Status</Label>
-                        <Select
-                          value={incomeFormData.status}
-                          onValueChange={(value) => setIncomeFormData({ ...incomeFormData, status: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="received">Received</SelectItem>
-                            <SelectItem value="completed">Completed</SelectItem>
+                            <SelectItem value="bank-transfer">🏦 Bank Transfer</SelectItem>
+                            <SelectItem value="credit-card">💳 Credit Card</SelectItem>
+                            <SelectItem value="cash">💵 Cash</SelectItem>
+                            <SelectItem value="check">📝 Check</SelectItem>
+                            <SelectItem value="paypal">💰 PayPal</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
 
+                    {/* Step 5: Description */}
                     <div className="space-y-2">
-                      <Label htmlFor="incomeDescription">Description</Label>
+                      <Label htmlFor="incomeDescription">Description *</Label>
                       <Textarea
                         id="incomeDescription"
                         value={incomeFormData.description}
@@ -2883,6 +3405,7 @@ export default function FinancesPage() {
                       />
                     </div>
 
+                    {/* Step 6: Notes & Recurring */}
                     <div className="space-y-2">
                       <Label htmlFor="incomeNotes">Internal Notes</Label>
                       <Textarea
@@ -3072,9 +3595,144 @@ export default function FinancesPage() {
                           </td>
                           <td className="p-3">
                             <div className="flex items-center justify-end gap-1">
-                              <Button variant="ghost" size="icon" className="h-7 w-7">
-                                <Eye className="h-3 w-3" />
-                              </Button>
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7"
+                                    onClick={() => setSelectedIncome(item)}
+                                  >
+                                    <Eye className="h-3 w-3" />
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-2xl">
+                                  <DialogHeader>
+                                    <DialogTitle>Income Details</DialogTitle>
+                                  </DialogHeader>
+                                  {selectedIncome && selectedIncome.id === item.id && (
+                                    <div className="space-y-4 py-4">
+                                      <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                          <p className="text-sm font-medium text-muted-foreground mb-1">Description</p>
+                                          <p className="font-medium">{selectedIncome.description}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-sm font-medium text-muted-foreground mb-1">Amount</p>
+                                          <p className="font-bold text-2xl text-emerald-500">
+                                            {formatCurrency(selectedIncome.amount)}
+                                          </p>
+                                        </div>
+                                      </div>
+
+                                      <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                          <p className="text-sm font-medium text-muted-foreground mb-1">Client</p>
+                                          <p className="font-medium">{selectedIncome.client}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-sm font-medium text-muted-foreground mb-1">Project</p>
+                                          <Badge variant="secondary">{selectedIncome.project}</Badge>
+                                        </div>
+                                      </div>
+
+                                      <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                          <p className="text-sm font-medium text-muted-foreground mb-1">Date</p>
+                                          <p className="font-medium">{formatDate(selectedIncome.date)}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-sm font-medium text-muted-foreground mb-1">Category</p>
+                                          <Badge>{selectedIncome.category}</Badge>
+                                        </div>
+                                      </div>
+
+                                      <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                          <p className="text-sm font-medium text-muted-foreground mb-1">Payment Method</p>
+                                          <Badge variant="outline">{selectedIncome.paymentMethod}</Badge>
+                                        </div>
+                                        <div>
+                                          <p className="text-sm font-medium text-muted-foreground mb-1">Status</p>
+                                          <Badge
+                                            className={
+                                              selectedIncome.status === "received"
+                                                ? "bg-emerald-500/10 text-emerald-500"
+                                                : "bg-amber-500/10 text-amber-500"
+                                            }
+                                          >
+                                            {selectedIncome.status === "received" ? "Received" : "Pending"}
+                                          </Badge>
+                                        </div>
+                                      </div>
+
+                                      {selectedIncome.invoiceId && (
+                                        <div>
+                                          <p className="text-sm font-medium text-muted-foreground mb-1">Linked Invoice</p>
+                                          <Badge variant="outline">{selectedIncome.invoiceId}</Badge>
+                                        </div>
+                                      )}
+
+                                      <div className="flex items-center gap-2">
+                                        <Checkbox checked={selectedIncome.recurring} disabled />
+                                        <Label className="text-sm">Recurring income</Label>
+                                      </div>
+
+                                      {/* Activity History Section */}
+                                      <div className="pt-4 border-t">
+                                        <div className="flex items-center gap-2 mb-3">
+                                          <History className="h-4 w-4 text-muted-foreground" />
+                                          <p className="font-medium text-sm">Activity History</p>
+                                        </div>
+                                        <div className="space-y-2 max-h-40 overflow-y-auto">
+                                          {activityLog
+                                            .filter(
+                                              (log) =>
+                                                log.entityType === "income" &&
+                                                log.entityId === selectedIncome.id
+                                            )
+                                            .map((log) => (
+                                              <div
+                                                key={log.id}
+                                                className="flex items-start gap-3 p-2 rounded-lg bg-muted/30 text-xs"
+                                              >
+                                                <span>
+                                                  {log.action === "created" && "➕"}
+                                                  {log.action === "updated" && "✏️"}
+                                                  {log.action === "neutralized" && "⚪"}
+                                                  {log.action === "restored" && "♻️"}
+                                                </span>
+                                                <div className="flex-1">
+                                                  <p className="font-medium capitalize">
+                                                    {log.action.replace("_", " ")}
+                                                  </p>
+                                                  {log.changes &&
+                                                    log.changes.map((c, i) => (
+                                                      <p key={i} className="text-muted-foreground">
+                                                        {c.field}: {String(c.oldValue)} → {String(c.newValue)}
+                                                      </p>
+                                                    ))}
+                                                  <p className="text-muted-foreground mt-1">
+                                                    {formatActivityDate(log.performedAt)} • {log.performedBy}
+                                                  </p>
+                                                </div>
+                                              </div>
+                                            ))}
+                                          {activityLog.filter(
+                                            (log) =>
+                                              log.entityType === "income" &&
+                                              log.entityId === selectedIncome.id
+                                          ).length === 0 && (
+                                              <p className="text-xs text-muted-foreground text-center py-2">
+                                                No activity recorded yet.
+                                              </p>
+                                            )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </DialogContent>
+                              </Dialog>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button variant="ghost" size="icon" className="h-7 w-7">
@@ -3127,7 +3785,174 @@ export default function FinancesPage() {
                   <DialogHeader>
                     <DialogTitle>Add New Expense</DialogTitle>
                   </DialogHeader>
-                  <div className="space-y-4 py-4">
+                  <div className="space-y-6 py-4">
+                    {/* Step 1: Expense Type Selection */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-semibold">Expense Type *</Label>
+                      <div className="grid grid-cols-3 gap-3">
+                        {[
+                          { id: "client_project", label: "Client Project", icon: "👤", desc: "Billable expense", color: "border-green-500 bg-green-500/10" },
+                          { id: "office", label: "Office / Company", icon: "🏢", desc: "Business operations", color: "border-blue-500 bg-blue-500/10" },
+                          { id: "personal", label: "Personal", icon: "💰", desc: "Owner withdrawal", color: "border-purple-500 bg-purple-500/10" },
+                        ].map((type) => (
+                          <button
+                            key={type.id}
+                            type="button"
+                            onClick={() => setExpenseFormData({ ...expenseFormData, sourceType: type.id as any })}
+                            className={cn(
+                              "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all hover:scale-105",
+                              expenseFormData.sourceType === type.id
+                                ? type.color + " border-2"
+                                : "border-border hover:border-muted-foreground/50"
+                            )}
+                          >
+                            <span className="text-2xl">{type.icon}</span>
+                            <span className="font-medium text-sm">{type.label}</span>
+                            <span className="text-xs text-muted-foreground">{type.desc}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Step 2: Category & Sub-category */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="expenseCategory">Category *</Label>
+                        <Select
+                          value={expenseFormData.category}
+                          onValueChange={(value) => setExpenseFormData({ ...expenseFormData, category: value, subCategory: "" })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="office_operations">🏢 Office Operations</SelectItem>
+                            <SelectItem value="software_tools">💻 Software & Tools</SelectItem>
+                            <SelectItem value="marketing">📢 Marketing & Advertising</SelectItem>
+                            <SelectItem value="contractors">👥 Contractors & Freelancers</SelectItem>
+                            <SelectItem value="infrastructure">🔧 Infrastructure</SelectItem>
+                            <SelectItem value="team">👨‍💼 Team & HR</SelectItem>
+                            <SelectItem value="travel">✈️ Travel & Transportation</SelectItem>
+                            <SelectItem value="client_expense">📁 Client Project Expense</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="expenseSubCategory">Sub-category</Label>
+                        <Select
+                          value={expenseFormData.subCategory}
+                          onValueChange={(value) => setExpenseFormData({ ...expenseFormData, subCategory: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select sub-category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {expenseFormData.category === "office_operations" && (
+                              <>
+                                <SelectItem value="rent">Rent & Lease</SelectItem>
+                                <SelectItem value="utilities">Utilities</SelectItem>
+                                <SelectItem value="supplies">Office Supplies</SelectItem>
+                                <SelectItem value="maintenance">Maintenance</SelectItem>
+                                <SelectItem value="furniture">Furniture</SelectItem>
+                              </>
+                            )}
+                            {expenseFormData.category === "software_tools" && (
+                              <>
+                                <SelectItem value="subscription">Subscriptions</SelectItem>
+                                <SelectItem value="license">Licenses</SelectItem>
+                                <SelectItem value="cloud">Cloud Services</SelectItem>
+                                <SelectItem value="saas">SaaS Products</SelectItem>
+                              </>
+                            )}
+                            {expenseFormData.category === "marketing" && (
+                              <>
+                                <SelectItem value="ads">Paid Advertising</SelectItem>
+                                <SelectItem value="events">Events & Sponsorship</SelectItem>
+                                <SelectItem value="promotions">Promotions</SelectItem>
+                                <SelectItem value="content">Content Creation</SelectItem>
+                              </>
+                            )}
+                            {expenseFormData.category === "contractors" && (
+                              <>
+                                <SelectItem value="freelancer">Freelancer Payment</SelectItem>
+                                <SelectItem value="agency">Agency Fee</SelectItem>
+                                <SelectItem value="consultant">Consultant</SelectItem>
+                              </>
+                            )}
+                            {expenseFormData.category === "infrastructure" && (
+                              <>
+                                <SelectItem value="hosting">Web Hosting</SelectItem>
+                                <SelectItem value="domain">Domains</SelectItem>
+                                <SelectItem value="server">Server Costs</SelectItem>
+                                <SelectItem value="cdn">CDN Services</SelectItem>
+                              </>
+                            )}
+                            {expenseFormData.category === "team" && (
+                              <>
+                                <SelectItem value="salaries">Salaries</SelectItem>
+                                <SelectItem value="benefits">Benefits</SelectItem>
+                                <SelectItem value="training">Training & Development</SelectItem>
+                                <SelectItem value="team_building">Team Building</SelectItem>
+                              </>
+                            )}
+                            {expenseFormData.category === "travel" && (
+                              <>
+                                <SelectItem value="flight">Flights</SelectItem>
+                                <SelectItem value="hotel">Hotels</SelectItem>
+                                <SelectItem value="transport">Local Transport</SelectItem>
+                                <SelectItem value="meals">Meals & Entertainment</SelectItem>
+                              </>
+                            )}
+                            {expenseFormData.category === "client_expense" && (
+                              <>
+                                <SelectItem value="production">Production Costs</SelectItem>
+                                <SelectItem value="third_party">Third-party Services</SelectItem>
+                                <SelectItem value="assets">Asset Purchases</SelectItem>
+                                <SelectItem value="tools">Project Tools</SelectItem>
+                              </>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {/* Step 3: Client Selection (only for client_project) */}
+                    {expenseFormData.sourceType === "client_project" && (
+                      <div className="p-4 rounded-xl bg-green-500/5 border border-green-500/20 space-y-4">
+                        <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+                          <span className="text-lg">👤</span>
+                          <span className="font-medium">Client Project Details (Billable)</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Client *</Label>
+                            <Select
+                              value={expenseFormData.clientName}
+                              onValueChange={(value) => setExpenseFormData({ ...expenseFormData, clientName: value, clientId: value })}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select client" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {invoices.map(inv => inv.client).filter((v, i, a) => a.indexOf(v) === i).map(client => (
+                                  <SelectItem key={client} value={client}>{client}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Project</Label>
+                            <Input
+                              placeholder="Project name"
+                              value={expenseFormData.project}
+                              onChange={(e) => setExpenseFormData({ ...expenseFormData, project: e.target.value })}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 4: Vendor, Amount & Date */}
                     <div className="grid grid-cols-3 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="expenseVendor">Vendor *</Label>
@@ -3139,66 +3964,18 @@ export default function FinancesPage() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="expenseCategory">Category *</Label>
-                        <Select
-                          value={expenseFormData.category}
-                          onValueChange={(value) => setExpenseFormData({ ...expenseFormData, category: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="office-supplies">Office Supplies</SelectItem>
-                            <SelectItem value="software">Software</SelectItem>
-                            <SelectItem value="advertising">Advertising</SelectItem>
-                            <SelectItem value="travel">Travel</SelectItem>
-                            <SelectItem value="utilities">Utilities</SelectItem>
-                            <SelectItem value="rent">Rent</SelectItem>
-                            <SelectItem value="salaries">Salaries</SelectItem>
-                            <SelectItem value="equipment">Equipment</SelectItem>
-                            <SelectItem value="maintenance">Maintenance</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
                         <Label htmlFor="expenseAmount">Amount *</Label>
-                        <Input
-                          id="expenseAmount"
-                          type="number"
-                          placeholder="0.00"
-                          value={expenseFormData.amount}
-                          onChange={(e) => setExpenseFormData({ ...expenseFormData, amount: e.target.value })}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="expenseDepartment">Department</Label>
-                        <Select
-                          value={expenseFormData.department}
-                          onValueChange={(value) => setExpenseFormData({ ...expenseFormData, department: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="general">General</SelectItem>
-                            <SelectItem value="marketing">Marketing</SelectItem>
-                            <SelectItem value="operations">Operations</SelectItem>
-                            <SelectItem value="it">IT</SelectItem>
-                            <SelectItem value="hr">HR</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="expenseProject">Project</Label>
-                        <Input
-                          id="expenseProject"
-                          placeholder="Project name (optional)"
-                          value={expenseFormData.project}
-                          onChange={(e) => setExpenseFormData({ ...expenseFormData, project: e.target.value })}
-                        />
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                          <Input
+                            id="expenseAmount"
+                            type="number"
+                            className="pl-7"
+                            placeholder="0.00"
+                            value={expenseFormData.amount}
+                            onChange={(e) => setExpenseFormData({ ...expenseFormData, amount: e.target.value })}
+                          />
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="expenseDate">Date *</Label>
@@ -3211,6 +3988,7 @@ export default function FinancesPage() {
                       </div>
                     </div>
 
+                    {/* Step 5: Payment & Status */}
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="expensePaymentMethod">Payment Method</Label>
@@ -3222,11 +4000,11 @@ export default function FinancesPage() {
                             <SelectValue placeholder="Select method" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="bank-transfer">Bank Transfer</SelectItem>
-                            <SelectItem value="credit-card">Credit Card</SelectItem>
-                            <SelectItem value="ach">ACH</SelectItem>
-                            <SelectItem value="company-card">Company Card</SelectItem>
-                            <SelectItem value="cash">Cash</SelectItem>
+                            <SelectItem value="bank-transfer">🏦 Bank Transfer</SelectItem>
+                            <SelectItem value="credit-card">💳 Credit Card</SelectItem>
+                            <SelectItem value="company-card">💼 Company Card</SelectItem>
+                            <SelectItem value="cash">💵 Cash</SelectItem>
+                            <SelectItem value="ach">📋 ACH</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -3240,14 +4018,15 @@ export default function FinancesPage() {
                             <SelectValue placeholder="Select status" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="approved">Approved</SelectItem>
-                            <SelectItem value="paid">Paid</SelectItem>
+                            <SelectItem value="pending">⏳ Pending</SelectItem>
+                            <SelectItem value="approved">✅ Approved</SelectItem>
+                            <SelectItem value="paid">💸 Paid</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
 
+                    {/* Step 6: Description */}
                     <div className="space-y-2">
                       <Label htmlFor="expenseDescription">Description</Label>
                       <Textarea
@@ -3270,6 +4049,7 @@ export default function FinancesPage() {
                       />
                     </div>
 
+                    {/* Step 7: Options */}
                     <div className="flex items-center gap-4 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
                       <div className="flex items-center gap-2">
                         <input
@@ -3630,6 +4410,58 @@ export default function FinancesPage() {
                                           </Button>
                                         </div>
                                       )}
+
+                                      {/* Activity History Section */}
+                                      <div className="pt-4 border-t">
+                                        <div className="flex items-center gap-2 mb-3">
+                                          <History className="h-4 w-4 text-muted-foreground" />
+                                          <p className="font-medium text-sm">Activity History</p>
+                                        </div>
+                                        <div className="space-y-2 max-h-40 overflow-y-auto">
+                                          {activityLog
+                                            .filter(
+                                              (log) =>
+                                                log.entityType === "expense" &&
+                                                log.entityId === selectedExpense.id
+                                            )
+                                            .map((log) => (
+                                              <div
+                                                key={log.id}
+                                                className="flex items-start gap-3 p-2 rounded-lg bg-muted/30 text-xs"
+                                              >
+                                                <span>
+                                                  {log.action === "created" && "➕"}
+                                                  {log.action === "updated" && "✏️"}
+                                                  {log.action === "neutralized" && "⚪"}
+                                                  {log.action === "restored" && "♻️"}
+                                                </span>
+                                                <div className="flex-1">
+                                                  <p className="font-medium capitalize">
+                                                    {log.action.replace("_", " ")}
+                                                  </p>
+                                                  {log.changes &&
+                                                    log.changes.map((c, i) => (
+                                                      <p key={i} className="text-muted-foreground">
+                                                        {c.field}: {String(c.oldValue)} → {String(c.newValue)}
+                                                      </p>
+                                                    ))}
+                                                  <p className="text-muted-foreground mt-1">
+                                                    {formatActivityDate(log.performedAt)} • {log.performedBy}
+                                                  </p>
+                                                </div>
+                                              </div>
+                                            ))}
+                                          {activityLog.filter(
+                                            (log) =>
+                                              log.entityType === "expense" &&
+                                              log.entityId === selectedExpense.id
+                                          ).length === 0 && (
+                                              <p className="text-xs text-muted-foreground text-center py-2">
+                                                No activity recorded yet.
+                                              </p>
+                                            )}
+                                        </div>
+                                      </div>
                                     </div>
                                   )}
                                 </DialogContent>
@@ -3825,6 +4657,131 @@ export default function FinancesPage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Activity Log Dialog */}
+      <Dialog open={showActivityLogDialog} onOpenChange={setShowActivityLogDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="h-5 w-5" />
+              Activity Log
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {activityLog.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">No activity recorded yet.</p>
+            ) : (
+              activityLog.map((log) => (
+                <div
+                  key={log.id}
+                  className="flex items-start gap-4 p-4 rounded-lg border bg-card"
+                >
+                  <div
+                    className={cn(
+                      "flex h-10 w-10 items-center justify-center rounded-full text-lg",
+                      log.action === "created" && "bg-green-500/10",
+                      log.action === "updated" && "bg-blue-500/10",
+                      log.action === "deleted" && "bg-red-500/10",
+                      log.action === "neutralized" && "bg-gray-500/10",
+                      log.action === "restored" && "bg-emerald-500/10",
+                      log.action === "status_changed" && "bg-amber-500/10"
+                    )}
+                  >
+                    {log.action === "created" && "➕"}
+                    {log.action === "updated" && "✏️"}
+                    {log.action === "deleted" && "🗑️"}
+                    {log.action === "neutralized" && "⚪"}
+                    {log.action === "restored" && "♻️"}
+                    {log.action === "status_changed" && "🔄"}
+                    {log.action === "payment_recorded" && "💰"}
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <p className="font-medium">
+                        <span className="capitalize">{log.entityType}</span>{" "}
+                        <span className="text-muted-foreground">{log.action.replace("_", " ")}</span>
+                      </p>
+                      <span className="text-xs text-muted-foreground">
+                        {formatActivityDate(log.performedAt)}
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{log.entityDescription}</p>
+                    {log.changes && log.changes.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        {log.changes.map((change, idx) => (
+                          <p key={idx} className="text-xs text-muted-foreground">
+                            <span className="font-medium">{change.field}:</span>{" "}
+                            <span className="line-through text-red-500/70">{String(change.oldValue)}</span>{" "}
+                            → <span className="text-green-500">{String(change.newValue)}</span>
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                    <p className="text-xs text-muted-foreground">by {log.performedBy}</p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Neutralize Confirmation Dialog */}
+      <Dialog open={showNeutralizeDialog} onOpenChange={setShowNeutralizeDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Ban className="h-5 w-5 text-amber-500" />
+              Confirm Neutralization
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-muted-foreground">
+              Are you sure you want to neutralize this {neutralizeTarget?.type}?
+              It will remain in records but will be excluded from all calculations.
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              You can restore it later if needed.
+            </p>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowNeutralizeDialog(false)}>
+              Cancel
+            </Button>
+            <Button variant="default" className="bg-amber-600 hover:bg-amber-700" onClick={confirmNeutralize}>
+              Neutralize
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Invoice Confirmation Dialog */}
+      <Dialog open={showDeleteInvoiceDialog} onOpenChange={setShowDeleteInvoiceDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-500">
+              <Trash2 className="h-5 w-5" />
+              Delete Invoice
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-muted-foreground">
+              Are you sure you want to delete this invoice? This action cannot be undone.
+            </p>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowDeleteInvoiceDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteInvoiceTarget && handleDeleteInvoice(deleteInvoiceTarget)}
+            >
+              Delete Invoice
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   )
 }
