@@ -14,6 +14,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   User,
   Building2,
@@ -33,8 +35,64 @@ import {
   Moon,
   Sun,
   Monitor,
+  Receipt,
+  FileText,
+  Settings2,
+  Target,
+  DollarSign,
+  FolderKanban,
+  Link2,
+  Database,
+  ChevronRight,
+  Plus,
+  GripVertical,
+  Pencil,
+  X,
+  Save,
+  Eye,
+  Zap,
+  Clock,
+  Calendar,
+  BarChart3,
+  Workflow,
+  ShieldCheck,
+  Download,
+  AlertTriangle,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+
+// ==================== Types ====================
+interface PipelineStage {
+  id: string
+  name: string
+  color: string
+  probability: number
+  order: number
+}
+
+interface LeadCategory {
+  id: string
+  name: string
+  color: string
+}
+
+interface InvoiceTemplate {
+  id: string
+  name: string
+  isDefault: boolean
+  logoPosition: "left" | "center" | "right"
+  accentColor: string
+  showPaymentTerms: boolean
+  defaultNotes: string
+  defaultTerms: string
+}
+
+interface TaxConfig {
+  id: string
+  name: string
+  rate: number
+  isDefault: boolean
+}
 
 interface NotificationSetting {
   id: string
@@ -45,72 +103,81 @@ interface NotificationSetting {
   sms: boolean
 }
 
+// ==================== Initial Data ====================
+const initialPipelineStages: PipelineStage[] = [
+  { id: "1", name: "New", color: "#64748b", probability: 10, order: 0 },
+  { id: "2", name: "Contacted", color: "#3b82f6", probability: 25, order: 1 },
+  { id: "3", name: "Qualified", color: "#06b6d4", probability: 40, order: 2 },
+  { id: "4", name: "Proposal", color: "#8b5cf6", probability: 60, order: 3 },
+  { id: "5", name: "Negotiation", color: "#f59e0b", probability: 80, order: 4 },
+  { id: "6", name: "Won", color: "#22c55e", probability: 100, order: 5 },
+  { id: "7", name: "Lost", color: "#ef4444", probability: 0, order: 6 },
+]
+
+const initialLeadCategories: LeadCategory[] = [
+  { id: "1", name: "Digital Marketing", color: "#8b5cf6" },
+  { id: "2", name: "SEO", color: "#22c55e" },
+  { id: "3", name: "Social Media", color: "#ec4899" },
+  { id: "4", name: "Content", color: "#06b6d4" },
+  { id: "5", name: "Branding", color: "#f97316" },
+  { id: "6", name: "Web Development", color: "#6366f1" },
+  { id: "7", name: "PPC", color: "#f43f5e" },
+]
+
+const initialTaxConfigs: TaxConfig[] = [
+  { id: "1", name: "Standard VAT", rate: 15, isDefault: true },
+  { id: "2", name: "Reduced VAT", rate: 5, isDefault: false },
+  { id: "3", name: "Zero Rate", rate: 0, isDefault: false },
+]
+
 const initialNotifications: NotificationSetting[] = [
-  {
-    id: "1",
-    title: "New Lead Assigned",
-    description: "Get notified when a new lead is assigned to you",
-    email: true,
-    push: true,
-    sms: false,
-  },
-  {
-    id: "2",
-    title: "Task Reminders",
-    description: "Receive reminders for upcoming task deadlines",
-    email: true,
-    push: true,
-    sms: true,
-  },
-  {
-    id: "3",
-    title: "Project Updates",
-    description: "Get updates when project status changes",
-    email: true,
-    push: false,
-    sms: false,
-  },
-  {
-    id: "4",
-    title: "Client Messages",
-    description: "Notifications for new client communications",
-    email: true,
-    push: true,
-    sms: true,
-  },
-  {
-    id: "5",
-    title: "Team Mentions",
-    description: "Get notified when someone mentions you",
-    email: false,
-    push: true,
-    sms: false,
-  },
-  {
-    id: "6",
-    title: "Weekly Reports",
-    description: "Receive weekly summary reports",
-    email: true,
-    push: false,
-    sms: false,
-  },
+  { id: "1", title: "New Lead Assigned", description: "Get notified when a new lead is assigned to you", email: true, push: true, sms: false },
+  { id: "2", title: "Task Reminders", description: "Receive reminders for upcoming task deadlines", email: true, push: true, sms: true },
+  { id: "3", title: "Invoice Paid", description: "Notification when an invoice is paid", email: true, push: true, sms: false },
+  { id: "4", title: "Client Messages", description: "Notifications for new client communications", email: true, push: true, sms: true },
+  { id: "5", title: "Overdue Payments", description: "Alerts for overdue invoice payments", email: true, push: true, sms: true },
+  { id: "6", title: "Weekly Reports", description: "Receive weekly summary reports", email: true, push: false, sms: false },
 ]
 
 const teamMembers = [
-  { id: "1", name: "John Doe", email: "john@agencyflow.com", role: "Admin", avatar: "JD" },
-  { id: "2", name: "Sarah Mitchell", email: "sarah@agencyflow.com", role: "Manager", avatar: "SM" },
-  { id: "3", name: "Emily Chen", email: "emily@agencyflow.com", role: "Member", avatar: "EC" },
-  { id: "4", name: "James Wilson", email: "james@agencyflow.com", role: "Member", avatar: "JW" },
+  { id: "1", name: "John Doe", email: "john@company.com", role: "Admin", avatar: "JD" },
+  { id: "2", name: "Sarah Mitchell", email: "sarah@company.com", role: "Manager", avatar: "SM" },
+  { id: "3", name: "Emily Chen", email: "emily@company.com", role: "Member", avatar: "EC" },
+  { id: "4", name: "James Wilson", email: "james@company.com", role: "Member", avatar: "JW" },
 ]
 
+// ==================== Settings Sections Config ====================
+const settingsSections = [
+  { id: "organization", label: "Organization", icon: Building2, group: "General" },
+  { id: "templates", label: "Templates", icon: FileText, group: "General" },
+  { id: "pipeline", label: "Sales Pipeline", icon: Target, group: "Sales" },
+  { id: "clients", label: "Client Settings", icon: Users, group: "Sales" },
+  { id: "finance", label: "Finance", icon: DollarSign, group: "Finance" },
+  { id: "tasks", label: "Tasks & Projects", icon: FolderKanban, group: "Operations" },
+  { id: "team", label: "Team & Roles", icon: Users, group: "Team" },
+  { id: "notifications", label: "Notifications", icon: Bell, group: "System" },
+  { id: "integrations", label: "Integrations", icon: Link2, group: "System" },
+  { id: "data", label: "Data Management", icon: Database, group: "System" },
+  { id: "security", label: "Security", icon: Shield, group: "System" },
+  { id: "appearance", label: "Appearance", icon: Palette, group: "System" },
+]
+
+const groupOrder = ["General", "Sales", "Finance", "Operations", "Team", "System"]
+
 export default function SettingsPage() {
-  const [notifications, setNotifications] = useState<NotificationSetting[]>(initialNotifications)
-  const [activeTab, setActiveTab] = useState("profile")
+  const [activeTab, setActiveTab] = useState("organization")
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle")
-  const { theme, setTheme, resolvedTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
-  // Prevent hydration mismatch
+  // Settings State
+  const [pipelineStages, setPipelineStages] = useState<PipelineStage[]>(initialPipelineStages)
+  const [leadCategories, setLeadCategories] = useState<LeadCategory[]>(initialLeadCategories)
+  const [taxConfigs, setTaxConfigs] = useState<TaxConfig[]>(initialTaxConfigs)
+  const [notifications, setNotifications] = useState<NotificationSetting[]>(initialNotifications)
+  const [invoicePrefix, setInvoicePrefix] = useState("INV")
+  const [invoiceStartNumber, setInvoiceStartNumber] = useState(1001)
+
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -125,26 +192,14 @@ export default function SettingsPage() {
 
   const toggleNotification = (id: string, type: "email" | "push" | "sms") => {
     setNotifications((prev) =>
-      prev.map((n) =>
-        n.id === id
-          ? {
-            ...n,
-            [type]: !n[type],
-          }
-          : n,
-      ),
+      prev.map((n) => n.id === id ? { ...n, [type]: !n[type] } : n)
     )
   }
 
-  const settingsSections = [
-    { id: "profile", label: "Profile", icon: User },
-    { id: "company", label: "Company", icon: Building2 },
-    { id: "notifications", label: "Notifications", icon: Bell },
-    { id: "security", label: "Security", icon: Shield },
-    { id: "appearance", label: "Appearance", icon: Palette },
-    { id: "team", label: "Team Access", icon: Users },
-    { id: "billing", label: "Billing", icon: CreditCard },
-  ]
+  const groupedSections = groupOrder.map(group => ({
+    group,
+    sections: settingsSections.filter(s => s.group === group)
+  }))
 
   return (
     <DashboardLayout>
@@ -153,7 +208,7 @@ export default function SettingsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Settings</h1>
-            <p className="text-muted-foreground mt-1">Manage your account and application preferences</p>
+            <p className="text-muted-foreground mt-1">Configure your CRM, templates, and business preferences</p>
           </div>
           <Button onClick={handleSave} disabled={saveStatus === "saving"} className="gap-2">
             {saveStatus === "saving" ? (
@@ -167,91 +222,118 @@ export default function SettingsPage() {
                 Saved
               </>
             ) : (
-              "Save Changes"
+              <>
+                <Save className="w-4 h-4" />
+                Save Changes
+              </>
             )}
           </Button>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar Navigation */}
-          <AnimatedCard delay={100} className="lg:w-64 shrink-0 h-fit" hover={false}>
-            <CardContent className="p-2">
-              <nav className="space-y-1">
-                {settingsSections.map((section, i) => (
-                  <button
-                    key={section.id}
-                    onClick={() => setActiveTab(section.id)}
-                    className={cn(
-                      "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 animate-in fade-in slide-in-from-left-2",
-                      activeTab === section.id
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:bg-secondary hover:text-foreground",
-                    )}
-                    style={{ animationDelay: `${i * 50}ms` }}
-                  >
-                    <section.icon className="w-4 h-4" />
-                    {section.label}
-                  </button>
-                ))}
-              </nav>
+          <AnimatedCard delay={100} className="lg:w-72 shrink-0 h-fit" hover={false}>
+            <CardContent className="p-3">
+              <ScrollArea className="h-[calc(100vh-220px)]">
+                <nav className="space-y-4">
+                  {groupedSections.map((group) => (
+                    <div key={group.group}>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 mb-2">
+                        {group.group}
+                      </p>
+                      <div className="space-y-1">
+                        {group.sections.map((section) => (
+                          <button
+                            key={section.id}
+                            onClick={() => setActiveTab(section.id)}
+                            className={cn(
+                              "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
+                              activeTab === section.id
+                                ? "bg-primary/10 text-primary"
+                                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                            )}
+                          >
+                            <section.icon className="w-4 h-4" />
+                            {section.label}
+                            <ChevronRight className={cn(
+                              "w-4 h-4 ml-auto transition-transform",
+                              activeTab === section.id && "rotate-90"
+                            )} />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </nav>
+              </ScrollArea>
             </CardContent>
           </AnimatedCard>
 
           {/* Content Area */}
           <div className="flex-1 space-y-6">
-            {activeTab === "profile" && (
+            {/* Organization Settings */}
+            {activeTab === "organization" && (
               <>
                 <AnimatedCard delay={200}>
                   <CardHeader>
-                    <CardTitle className="text-lg">Profile Information</CardTitle>
-                    <CardDescription>Update your personal details and profile picture</CardDescription>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Building2 className="w-5 h-5 text-primary" />
+                      Organization Profile
+                    </CardTitle>
+                    <CardDescription>Manage your company branding and business information</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="flex items-center gap-6">
-                      <Avatar className="w-20 h-20">
-                        <AvatarImage src="/placeholder.svg?height=80&width=80" />
-                        <AvatarFallback className="bg-primary/20 text-primary text-xl">JD</AvatarFallback>
-                      </Avatar>
+                      <div className="w-24 h-24 rounded-xl bg-primary/20 flex items-center justify-center border-2 border-dashed border-primary/50">
+                        <Building2 className="w-10 h-10 text-primary" />
+                      </div>
                       <div className="space-y-2">
                         <Button variant="outline" size="sm" className="gap-2 bg-transparent">
                           <Upload className="w-4 h-4" />
-                          Upload Photo
+                          Upload Logo
                         </Button>
-                        <p className="text-xs text-muted-foreground">JPG, PNG or GIF. Max 2MB.</p>
+                        <p className="text-xs text-muted-foreground">PNG, JPG up to 2MB. Recommended: 256x256px</p>
                       </div>
                     </div>
 
                     <Separator />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="firstName">First Name</Label>
-                        <Input id="firstName" defaultValue="John" className="bg-secondary border-0" />
+                      <div className="space-y-2 md:col-span-2">
+                        <Label htmlFor="companyName">Company Name</Label>
+                        <Input id="companyName" defaultValue="Your Company" className="bg-secondary border-0" />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="lastName">Last Name</Label>
-                        <Input id="lastName" defaultValue="Doe" className="bg-secondary border-0" />
+                        <Label htmlFor="website">Website</Label>
+                        <div className="relative">
+                          <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                          <Input id="website" defaultValue="yourcompany.com" className="bg-secondary border-0 pl-10" />
+                        </div>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="email">Email Address</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          defaultValue="john@agencyflow.com"
-                          className="bg-secondary border-0"
-                        />
+                        <Label htmlFor="email">Business Email</Label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                          <Input id="email" defaultValue="contact@yourcompany.com" className="bg-secondary border-0 pl-10" />
+                        </div>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <Input id="phone" defaultValue="+1 (555) 123-4567" className="bg-secondary border-0" />
+                        <Label htmlFor="phone">Phone</Label>
+                        <div className="relative">
+                          <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                          <Input id="phone" defaultValue="+1 (555) 123-4567" className="bg-secondary border-0 pl-10" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="taxId">Tax ID / VAT Number</Label>
+                        <Input id="taxId" placeholder="Enter tax ID" className="bg-secondary border-0" />
                       </div>
                       <div className="space-y-2 md:col-span-2">
-                        <Label htmlFor="bio">Bio</Label>
+                        <Label htmlFor="address">Business Address</Label>
                         <Textarea
-                          id="bio"
-                          placeholder="Tell us about yourself..."
-                          className="bg-secondary border-0 min-h-[100px]"
-                          defaultValue="Lead Developer at AgencyFlow with 5+ years of experience in web development."
+                          id="address"
+                          className="bg-secondary border-0"
+                          defaultValue="123 Business Street, Suite 100&#10;City, State 12345"
                         />
                       </div>
                     </div>
@@ -260,43 +342,46 @@ export default function SettingsPage() {
 
                 <AnimatedCard delay={300}>
                   <CardHeader>
-                    <CardTitle className="text-lg">Regional Settings</CardTitle>
-                    <CardDescription>Configure your timezone and language preferences</CardDescription>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Globe className="w-5 h-5 text-primary" />
+                      Regional Settings
+                    </CardTitle>
+                    <CardDescription>Configure timezone, currency, and date formats</CardDescription>
                   </CardHeader>
                   <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Timezone</Label>
-                      <Select defaultValue="pst">
+                      <Select defaultValue="utc+6">
                         <SelectTrigger className="bg-secondary border-0">
                           <SelectValue placeholder="Select timezone" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="pst">Pacific Time (PST)</SelectItem>
-                          <SelectItem value="est">Eastern Time (EST)</SelectItem>
-                          <SelectItem value="cst">Central Time (CST)</SelectItem>
+                          <SelectItem value="utc-8">Pacific Time (UTC-8)</SelectItem>
+                          <SelectItem value="utc-5">Eastern Time (UTC-5)</SelectItem>
                           <SelectItem value="utc">UTC</SelectItem>
+                          <SelectItem value="utc+6">Bangladesh (UTC+6)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Language</Label>
-                      <Select defaultValue="en">
+                      <Label>Default Currency</Label>
+                      <Select defaultValue="bdt">
                         <SelectTrigger className="bg-secondary border-0">
-                          <SelectValue placeholder="Select language" />
+                          <SelectValue placeholder="Select currency" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="en">English</SelectItem>
-                          <SelectItem value="es">Spanish</SelectItem>
-                          <SelectItem value="fr">French</SelectItem>
-                          <SelectItem value="de">German</SelectItem>
+                          <SelectItem value="usd">USD ($)</SelectItem>
+                          <SelectItem value="eur">EUR (€)</SelectItem>
+                          <SelectItem value="gbp">GBP (£)</SelectItem>
+                          <SelectItem value="bdt">BDT (৳)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
                       <Label>Date Format</Label>
-                      <Select defaultValue="mdy">
+                      <Select defaultValue="dmy">
                         <SelectTrigger className="bg-secondary border-0">
-                          <SelectValue placeholder="Select date format" />
+                          <SelectValue placeholder="Select format" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="mdy">MM/DD/YYYY</SelectItem>
@@ -306,15 +391,16 @@ export default function SettingsPage() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Currency</Label>
-                      <Select defaultValue="usd">
+                      <Label>Fiscal Year Start</Label>
+                      <Select defaultValue="jan">
                         <SelectTrigger className="bg-secondary border-0">
-                          <SelectValue placeholder="Select currency" />
+                          <SelectValue placeholder="Select month" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="usd">USD ($)</SelectItem>
-                          <SelectItem value="eur">EUR (€)</SelectItem>
-                          <SelectItem value="gbp">GBP (£)</SelectItem>
+                          <SelectItem value="jan">January</SelectItem>
+                          <SelectItem value="apr">April</SelectItem>
+                          <SelectItem value="jul">July</SelectItem>
+                          <SelectItem value="oct">October</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -323,356 +409,485 @@ export default function SettingsPage() {
               </>
             )}
 
-            {activeTab === "company" && (
-              <AnimatedCard delay={200}>
-                <CardHeader>
-                  <CardTitle className="text-lg">Company Information</CardTitle>
-                  <CardDescription>Manage your agency's details and branding</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="flex items-center gap-6">
-                    <div className="w-20 h-20 rounded-xl bg-primary/20 flex items-center justify-center">
-                      <Building2 className="w-10 h-10 text-primary" />
-                    </div>
-                    <div className="space-y-2">
-                      <Button variant="outline" size="sm" className="gap-2 bg-transparent">
-                        <Upload className="w-4 h-4" />
-                        Upload Logo
-                      </Button>
-                      <p className="text-xs text-muted-foreground">Recommended: 256x256px</p>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2 md:col-span-2">
-                      <Label htmlFor="companyName">Company Name</Label>
-                      <Input id="companyName" defaultValue="AgencyFlow Digital" className="bg-secondary border-0" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="website">Website</Label>
-                      <div className="relative">
-                        <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                        <Input id="website" defaultValue="agencyflow.com" className="bg-secondary border-0 pl-10" />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="industry">Industry</Label>
-                      <Select defaultValue="marketing">
-                        <SelectTrigger className="bg-secondary border-0">
-                          <SelectValue placeholder="Select industry" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="marketing">Digital Marketing</SelectItem>
-                          <SelectItem value="design">Design Agency</SelectItem>
-                          <SelectItem value="development">Development Agency</SelectItem>
-                          <SelectItem value="consulting">Consulting</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2 md:col-span-2">
-                      <Label htmlFor="address">Address</Label>
-                      <Textarea
-                        id="address"
-                        className="bg-secondary border-0"
-                        defaultValue="123 Marketing Street, Suite 500&#10;San Francisco, CA 94105"
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </AnimatedCard>
-            )}
-
-            {activeTab === "notifications" && (
-              <AnimatedCard delay={200}>
-                <CardHeader>
-                  <CardTitle className="text-lg">Notification Preferences</CardTitle>
-                  <CardDescription>Choose how and when you want to be notified</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-4 gap-4 text-xs font-medium text-muted-foreground pb-2 border-b border-border">
-                      <div className="col-span-1">Notification</div>
-                      <div className="flex items-center justify-center gap-1">
-                        <Mail className="w-3.5 h-3.5" />
-                        Email
-                      </div>
-                      <div className="flex items-center justify-center gap-1">
-                        <Bell className="w-3.5 h-3.5" />
-                        Push
-                      </div>
-                      <div className="flex items-center justify-center gap-1">
-                        <Smartphone className="w-3.5 h-3.5" />
-                        SMS
-                      </div>
-                    </div>
-
-                    {notifications.map((notification, i) => (
-                      <div
-                        key={notification.id}
-                        className="grid grid-cols-4 gap-4 py-3 items-center animate-in fade-in slide-in-from-bottom-2 duration-300"
-                        style={{ animationDelay: `${i * 50}ms` }}
-                      >
-                        <div>
-                          <p className="font-medium text-sm">{notification.title}</p>
-                          <p className="text-xs text-muted-foreground">{notification.description}</p>
-                        </div>
-                        <div className="flex justify-center">
-                          <Switch
-                            checked={notification.email}
-                            onCheckedChange={() => toggleNotification(notification.id, "email")}
-                          />
-                        </div>
-                        <div className="flex justify-center">
-                          <Switch
-                            checked={notification.push}
-                            onCheckedChange={() => toggleNotification(notification.id, "push")}
-                          />
-                        </div>
-                        <div className="flex justify-center">
-                          <Switch
-                            checked={notification.sms}
-                            onCheckedChange={() => toggleNotification(notification.id, "sms")}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </AnimatedCard>
-            )}
-
-            {activeTab === "security" && (
+            {/* Templates Settings */}
+            {activeTab === "templates" && (
               <>
                 <AnimatedCard delay={200}>
                   <CardHeader>
-                    <CardTitle className="text-lg">Password & Authentication</CardTitle>
-                    <CardDescription>Manage your password and security settings</CardDescription>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Receipt className="w-5 h-5 text-primary" />
+                      Invoice Template
+                    </CardTitle>
+                    <CardDescription>Customize how your invoices look</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="currentPassword">Current Password</Label>
-                        <div className="relative">
-                          <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label>Invoice Number Prefix</Label>
                           <Input
-                            id="currentPassword"
-                            type="password"
-                            className="bg-secondary border-0 pl-10"
-                            placeholder="••••••••"
+                            value={invoicePrefix}
+                            onChange={(e) => setInvoicePrefix(e.target.value)}
+                            className="bg-secondary border-0"
+                            placeholder="INV"
                           />
                         </div>
+                        <div className="space-y-2">
+                          <Label>Starting Number</Label>
+                          <Input
+                            type="number"
+                            value={invoiceStartNumber}
+                            onChange={(e) => setInvoiceStartNumber(parseInt(e.target.value))}
+                            className="bg-secondary border-0"
+                          />
+                        </div>
+                        <div className="p-3 rounded-lg bg-secondary/50">
+                          <p className="text-sm text-muted-foreground">Preview:</p>
+                          <p className="font-mono font-medium">{invoicePrefix}-{new Date().getFullYear()}-{String(invoiceStartNumber).padStart(4, '0')}</p>
+                        </div>
                       </div>
-                      <div />
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label>Logo Position</Label>
+                          <Select defaultValue="left">
+                            <SelectTrigger className="bg-secondary border-0">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="left">Left</SelectItem>
+                              <SelectItem value="center">Center</SelectItem>
+                              <SelectItem value="right">Right</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Accent Color</Label>
+                          <div className="flex gap-2">
+                            {["#3b82f6", "#8b5cf6", "#22c55e", "#f59e0b", "#ef4444"].map((color) => (
+                              <button
+                                key={color}
+                                className="w-8 h-8 rounded-lg border-2 border-transparent hover:border-foreground/50 transition-all"
+                                style={{ backgroundColor: color }}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="newPassword">New Password</Label>
-                        <Input
-                          id="newPassword"
-                          type="password"
+                        <Label>Default Payment Terms</Label>
+                        <Textarea
                           className="bg-secondary border-0"
-                          placeholder="••••••••"
+                          defaultValue="Payment is due within 30 days. Late payments may incur a fee of 1.5% per month."
+                          rows={3}
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                        <Input
-                          id="confirmPassword"
-                          type="password"
+                        <Label>Default Notes</Label>
+                        <Textarea
                           className="bg-secondary border-0"
-                          placeholder="••••••••"
+                          defaultValue="Thank you for your business!"
+                          rows={2}
                         />
                       </div>
                     </div>
-                    <Button variant="outline" className="bg-transparent">
-                      Update Password
-                    </Button>
                   </CardContent>
                 </AnimatedCard>
 
                 <AnimatedCard delay={300}>
                   <CardHeader>
-                    <CardTitle className="text-lg">Two-Factor Authentication</CardTitle>
-                    <CardDescription>Add an extra layer of security to your account</CardDescription>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Mail className="w-5 h-5 text-primary" />
+                      Email Templates
+                    </CardTitle>
+                    <CardDescription>Customize automated email communications</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-between p-4 rounded-lg bg-secondary/50">
-                      <div className="flex items-center gap-4">
-                        <div className="p-3 rounded-lg bg-success/20">
-                          <Shield className="w-5 h-5 text-success" />
+                    <div className="space-y-3">
+                      {[
+                        { name: "Invoice Sent", description: "Sent when invoice is issued to client" },
+                        { name: "Payment Reminder", description: "Reminder for upcoming/overdue payments" },
+                        { name: "Payment Received", description: "Confirmation when payment is received" },
+                        { name: "Welcome Email", description: "Sent to new clients" },
+                      ].map((template, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center justify-between p-4 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
+                        >
+                          <div>
+                            <p className="font-medium">{template.name}</p>
+                            <p className="text-sm text-muted-foreground">{template.description}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" size="sm">
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium">Two-Factor Authentication</p>
-                          <p className="text-sm text-muted-foreground">Currently enabled via authenticator app</p>
-                        </div>
-                      </div>
-                      <Badge className="bg-success/20 text-success border-0">Enabled</Badge>
-                    </div>
-                  </CardContent>
-                </AnimatedCard>
-
-                <AnimatedCard delay={400}>
-                  <CardHeader>
-                    <CardTitle className="text-lg text-destructive">Danger Zone</CardTitle>
-                    <CardDescription>Irreversible account actions</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between p-4 rounded-lg border border-destructive/30 bg-destructive/5">
-                      <div className="flex items-center gap-4">
-                        <LogOut className="w-5 h-5 text-destructive" />
-                        <div>
-                          <p className="font-medium">Sign Out All Devices</p>
-                          <p className="text-sm text-muted-foreground">Sign out from all active sessions</p>
-                        </div>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-destructive/50 text-destructive hover:bg-destructive/10 bg-transparent"
-                      >
-                        Sign Out All
-                      </Button>
-                    </div>
-                    <div className="flex items-center justify-between p-4 rounded-lg border border-destructive/30 bg-destructive/5">
-                      <div className="flex items-center gap-4">
-                        <Trash2 className="w-5 h-5 text-destructive" />
-                        <div>
-                          <p className="font-medium">Delete Account</p>
-                          <p className="text-sm text-muted-foreground">Permanently delete your account and all data</p>
-                        </div>
-                      </div>
-                      <Button variant="destructive" size="sm">
-                        Delete Account
-                      </Button>
+                      ))}
                     </div>
                   </CardContent>
                 </AnimatedCard>
               </>
             )}
 
-            {activeTab === "appearance" && (
+            {/* Sales Pipeline Settings */}
+            {activeTab === "pipeline" && (
+              <>
+                <AnimatedCard delay={200}>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Workflow className="w-5 h-5 text-primary" />
+                        Pipeline Stages
+                      </CardTitle>
+                      <CardDescription>Configure your sales pipeline stages</CardDescription>
+                    </div>
+                    <Button size="sm" className="gap-2">
+                      <Plus className="w-4 h-4" />
+                      Add Stage
+                    </Button>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {pipelineStages.map((stage, i) => (
+                        <div
+                          key={stage.id}
+                          className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50 group"
+                        >
+                          <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab" />
+                          <div
+                            className="w-4 h-4 rounded-full"
+                            style={{ backgroundColor: stage.color }}
+                          />
+                          <Input
+                            value={stage.name}
+                            className="flex-1 bg-transparent border-0 h-8"
+                            onChange={(e) => {
+                              const updated = [...pipelineStages]
+                              updated[i].name = e.target.value
+                              setPipelineStages(updated)
+                            }}
+                          />
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground">Probability:</span>
+                            <Input
+                              type="number"
+                              value={stage.probability}
+                              className="w-16 bg-secondary border-0 h-8 text-center"
+                              onChange={(e) => {
+                                const updated = [...pipelineStages]
+                                updated[i].probability = parseInt(e.target.value) || 0
+                                setPipelineStages(updated)
+                              }}
+                            />
+                            <span className="text-sm text-muted-foreground">%</span>
+                          </div>
+                          <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100">
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </AnimatedCard>
+
+                <AnimatedCard delay={300}>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Target className="w-5 h-5 text-primary" />
+                        Lead Categories
+                      </CardTitle>
+                      <CardDescription>Categorize your leads by service type</CardDescription>
+                    </div>
+                    <Button size="sm" className="gap-2">
+                      <Plus className="w-4 h-4" />
+                      Add Category
+                    </Button>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {leadCategories.map((cat) => (
+                        <div
+                          key={cat.id}
+                          className="flex items-center gap-2 p-3 rounded-lg bg-secondary/50 group"
+                        >
+                          <div
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: cat.color }}
+                          />
+                          <span className="flex-1 text-sm font-medium">{cat.name}</span>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100">
+                            <Pencil className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </AnimatedCard>
+              </>
+            )}
+
+            {/* Finance Settings */}
+            {activeTab === "finance" && (
+              <>
+                <AnimatedCard delay={200}>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <DollarSign className="w-5 h-5 text-primary" />
+                        Tax Configuration
+                      </CardTitle>
+                      <CardDescription>Manage tax rates for invoices</CardDescription>
+                    </div>
+                    <Button size="sm" className="gap-2">
+                      <Plus className="w-4 h-4" />
+                      Add Tax Rate
+                    </Button>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {taxConfigs.map((tax) => (
+                        <div
+                          key={tax.id}
+                          className="flex items-center justify-between p-4 rounded-lg bg-secondary/50"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div>
+                              <p className="font-medium">{tax.name}</p>
+                              <p className="text-sm text-muted-foreground">{tax.rate}%</p>
+                            </div>
+                            {tax.isDefault && (
+                              <Badge className="bg-primary/20 text-primary border-0">Default</Badge>
+                            )}
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" size="sm">
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </AnimatedCard>
+
+                <AnimatedCard delay={300}>
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <CreditCard className="w-5 h-5 text-primary" />
+                      Payment Settings
+                    </CardTitle>
+                    <CardDescription>Configure payment methods and terms</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Default Payment Terms</Label>
+                        <Select defaultValue="net30">
+                          <SelectTrigger className="bg-secondary border-0">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="due_on_receipt">Due on Receipt</SelectItem>
+                            <SelectItem value="net15">Net 15</SelectItem>
+                            <SelectItem value="net30">Net 30</SelectItem>
+                            <SelectItem value="net60">Net 60</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Late Payment Fee (%)</Label>
+                        <Input type="number" defaultValue="1.5" className="bg-secondary border-0" />
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div>
+                      <Label className="mb-3 block">Accepted Payment Methods</Label>
+                      <div className="grid grid-cols-2 gap-3">
+                        {[
+                          { name: "Bank Transfer", enabled: true },
+                          { name: "Credit Card", enabled: true },
+                          { name: "Cash", enabled: true },
+                          { name: "Check", enabled: false },
+                          { name: "Mobile Payment", enabled: true },
+                          { name: "PayPal", enabled: false },
+                        ].map((method) => (
+                          <div key={method.name} className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
+                            <span className="text-sm">{method.name}</span>
+                            <Switch defaultChecked={method.enabled} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </AnimatedCard>
+              </>
+            )}
+
+            {/* Client Settings */}
+            {activeTab === "clients" && (
               <AnimatedCard delay={200}>
                 <CardHeader>
-                  <CardTitle className="text-lg">Appearance Settings</CardTitle>
-                  <CardDescription>Customize the look and feel of your dashboard</CardDescription>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Users className="w-5 h-5 text-primary" />
+                    Client Configuration
+                  </CardTitle>
+                  <CardDescription>Manage client tiers and health scoring</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="space-y-4">
-                    <Label>Theme</Label>
-                    <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label className="mb-3 block">Client Tiers</Label>
+                    <div className="space-y-3">
                       {[
-                        { name: "Light", value: "light", icon: Sun },
-                        { name: "Dark", value: "dark", icon: Moon },
-                        { name: "System", value: "system", icon: Monitor },
-                      ].map((themeOption, i) => {
-                        const isActive = mounted && theme === themeOption.value
-                        const ThemeIcon = themeOption.icon
-                        return (
-                          <button
-                            key={themeOption.value}
-                            onClick={() => setTheme(themeOption.value)}
-                            className={cn(
-                              "p-4 rounded-lg border-2 transition-all text-center animate-in fade-in zoom-in duration-300",
-                              isActive ? "border-primary bg-primary/10" : "border-border hover:border-primary/50",
-                            )}
-                            style={{ animationDelay: `${i * 100}ms` }}
-                          >
-                            <div
-                              className={cn(
-                                "w-full h-16 rounded-lg mb-2 flex items-center justify-center",
-                                themeOption.value === "light"
-                                  ? "bg-white border text-zinc-900"
-                                  : themeOption.value === "dark"
-                                    ? "bg-zinc-900 border border-zinc-700 text-white"
-                                    : "bg-gradient-to-r from-white to-zinc-900 border",
-                              )}
-                            >
-                              <ThemeIcon className="w-8 h-8" />
-                            </div>
-                            <span className="text-sm font-medium">{themeOption.name}</span>
-                            {isActive && (
-                              <Badge className="ml-2 bg-primary/20 text-primary border-0">Active</Badge>
-                            )}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-4">
-                    <Label>Accent Color</Label>
-                    <div className="flex gap-3">
-                      {[
-                        { name: "Blue", color: "bg-blue-500" },
-                        { name: "Purple", color: "bg-purple-500" },
-                        { name: "Green", color: "bg-green-500" },
-                        { name: "Orange", color: "bg-orange-500" },
-                        { name: "Pink", color: "bg-pink-500" },
-                      ].map((accent, i) => (
-                        <button
-                          key={accent.name}
-                          className={cn(
-                            "w-10 h-10 rounded-full transition-all animate-in zoom-in duration-200",
-                            accent.color,
-                            accent.name === "Blue" && "ring-2 ring-offset-2 ring-offset-background ring-primary",
-                          )}
-                          style={{ animationDelay: `${i * 50}ms` }}
-                          title={accent.name}
-                        />
+                        { name: "Enterprise", minValue: 100000, color: "#f59e0b" },
+                        { name: "Professional", minValue: 25000, color: "#3b82f6" },
+                        { name: "Starter", minValue: 0, color: "#64748b" },
+                      ].map((tier) => (
+                        <div
+                          key={tier.name}
+                          className="flex items-center justify-between p-4 rounded-lg bg-secondary/50"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: tier.color }} />
+                            <span className="font-medium">{tier.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground">Min Value: $</span>
+                            <Input
+                              type="number"
+                              defaultValue={tier.minValue}
+                              className="w-28 bg-secondary border-0 h-8"
+                            />
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>
 
                   <Separator />
 
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Compact Mode</p>
-                        <p className="text-sm text-muted-foreground">Reduce spacing in the interface</p>
-                      </div>
-                      <Switch />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Animations</p>
-                        <p className="text-sm text-muted-foreground">Enable smooth animations</p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Sidebar Collapsed by Default</p>
-                        <p className="text-sm text-muted-foreground">Start with collapsed sidebar</p>
-                      </div>
-                      <Switch />
+                  <div>
+                    <Label className="mb-3 block">Health Score Weights</Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      {[
+                        { factor: "Payment History", weight: 30 },
+                        { factor: "Engagement", weight: 25 },
+                        { factor: "Project Activity", weight: 25 },
+                        { factor: "NPS Score", weight: 20 },
+                      ].map((item) => (
+                        <div key={item.factor} className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
+                          <span className="text-sm">{item.factor}</span>
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="number"
+                              defaultValue={item.weight}
+                              className="w-16 bg-secondary border-0 h-8 text-center"
+                            />
+                            <span className="text-sm text-muted-foreground">%</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </CardContent>
               </AnimatedCard>
             )}
 
+            {/* Tasks & Projects Settings */}
+            {activeTab === "tasks" && (
+              <AnimatedCard delay={200}>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <FolderKanban className="w-5 h-5 text-primary" />
+                    Task & Project Configuration
+                  </CardTitle>
+                  <CardDescription>Customize task statuses and project settings</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <Label className="mb-3 block">Task Statuses</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {["Backlog", "To Do", "In Progress", "In Review", "Done", "Blocked"].map((status) => (
+                        <Badge key={status} variant="secondary" className="gap-2 py-2 px-3">
+                          {status}
+                          <X className="w-3 h-3 cursor-pointer hover:text-destructive" />
+                        </Badge>
+                      ))}
+                      <Button variant="outline" size="sm" className="gap-1">
+                        <Plus className="w-3 h-3" />
+                        Add Status
+                      </Button>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div>
+                    <Label className="mb-3 block">Priority Levels</Label>
+                    <div className="grid grid-cols-4 gap-3">
+                      {[
+                        { name: "Critical", color: "#ef4444" },
+                        { name: "High", color: "#f97316" },
+                        { name: "Medium", color: "#eab308" },
+                        { name: "Low", color: "#22c55e" },
+                      ].map((priority) => (
+                        <div key={priority.name} className="p-3 rounded-lg bg-secondary/50 text-center">
+                          <div className="w-4 h-4 rounded-full mx-auto mb-2" style={{ backgroundColor: priority.color }} />
+                          <span className="text-sm font-medium">{priority.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Enable Task Automation</p>
+                      <p className="text-sm text-muted-foreground">Automatically move tasks based on rules</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                </CardContent>
+              </AnimatedCard>
+            )}
+
+            {/* Team & Roles */}
             {activeTab === "team" && (
               <AnimatedCard delay={200}>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
-                    <CardTitle className="text-lg">Team Access</CardTitle>
-                    <CardDescription>Manage team members and their permissions</CardDescription>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Users className="w-5 h-5 text-primary" />
+                      Team Members
+                    </CardTitle>
+                    <CardDescription>Manage team access and permissions</CardDescription>
                   </div>
                   <Button size="sm" className="gap-2">
-                    <Users className="w-4 h-4" />
+                    <Plus className="w-4 h-4" />
                     Invite Member
                   </Button>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {teamMembers.map((member, i) => (
+                    {teamMembers.map((member) => (
                       <div
                         key={member.id}
-                        className="flex items-center justify-between p-4 rounded-lg bg-secondary/50 animate-in fade-in slide-in-from-bottom-2 duration-300"
-                        style={{ animationDelay: `${i * 50}ms` }}
+                        className="flex items-center justify-between p-4 rounded-lg bg-secondary/50"
                       >
                         <div className="flex items-center gap-3">
                           <Avatar className="w-10 h-10">
@@ -706,110 +921,293 @@ export default function SettingsPage() {
               </AnimatedCard>
             )}
 
-            {activeTab === "billing" && (
+            {/* Notifications */}
+            {activeTab === "notifications" && (
+              <AnimatedCard delay={200}>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Bell className="w-5 h-5 text-primary" />
+                    Notification Preferences
+                  </CardTitle>
+                  <CardDescription>Choose how and when you want to be notified</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-4 gap-4 text-xs font-medium text-muted-foreground pb-2 border-b border-border">
+                      <div className="col-span-1">Notification Type</div>
+                      <div className="flex items-center justify-center gap-1">
+                        <Mail className="w-3.5 h-3.5" />
+                        Email
+                      </div>
+                      <div className="flex items-center justify-center gap-1">
+                        <Bell className="w-3.5 h-3.5" />
+                        Push
+                      </div>
+                      <div className="flex items-center justify-center gap-1">
+                        <Smartphone className="w-3.5 h-3.5" />
+                        SMS
+                      </div>
+                    </div>
+
+                    {notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        className="grid grid-cols-4 gap-4 py-3 items-center"
+                      >
+                        <div>
+                          <p className="font-medium text-sm">{notification.title}</p>
+                          <p className="text-xs text-muted-foreground">{notification.description}</p>
+                        </div>
+                        <div className="flex justify-center">
+                          <Switch
+                            checked={notification.email}
+                            onCheckedChange={() => toggleNotification(notification.id, "email")}
+                          />
+                        </div>
+                        <div className="flex justify-center">
+                          <Switch
+                            checked={notification.push}
+                            onCheckedChange={() => toggleNotification(notification.id, "push")}
+                          />
+                        </div>
+                        <div className="flex justify-center">
+                          <Switch
+                            checked={notification.sms}
+                            onCheckedChange={() => toggleNotification(notification.id, "sms")}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </AnimatedCard>
+            )}
+
+            {/* Integrations */}
+            {activeTab === "integrations" && (
+              <AnimatedCard delay={200}>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Link2 className="w-5 h-5 text-primary" />
+                    Integrations
+                  </CardTitle>
+                  <CardDescription>Connect with third-party services</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                      { name: "Google Calendar", description: "Sync events and meetings", connected: true, icon: Calendar },
+                      { name: "Stripe", description: "Accept online payments", connected: true, icon: CreditCard },
+                      { name: "Slack", description: "Team notifications", connected: false, icon: Zap },
+                      { name: "QuickBooks", description: "Accounting sync", connected: false, icon: BarChart3 },
+                    ].map((integration) => (
+                      <div
+                        key={integration.name}
+                        className="flex items-center justify-between p-4 rounded-lg bg-secondary/50"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-lg bg-primary/10">
+                            <integration.icon className="w-5 h-5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-medium">{integration.name}</p>
+                            <p className="text-sm text-muted-foreground">{integration.description}</p>
+                          </div>
+                        </div>
+                        <Button
+                          variant={integration.connected ? "outline" : "default"}
+                          size="sm"
+                          className={integration.connected ? "bg-transparent" : ""}
+                        >
+                          {integration.connected ? "Disconnect" : "Connect"}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </AnimatedCard>
+            )}
+
+            {/* Data Management */}
+            {activeTab === "data" && (
+              <AnimatedCard delay={200}>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Database className="w-5 h-5 text-primary" />
+                    Data Management
+                  </CardTitle>
+                  <CardDescription>Export, import, and manage your data</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 rounded-lg bg-secondary/50 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Download className="w-5 h-5 text-primary" />
+                        <span className="font-medium">Export Data</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">Download all your data as CSV or JSON</p>
+                      <Button variant="outline" className="w-full bg-transparent">Export All Data</Button>
+                    </div>
+                    <div className="p-4 rounded-lg bg-secondary/50 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Upload className="w-5 h-5 text-primary" />
+                        <span className="font-medium">Import Data</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">Import leads, clients, or projects from CSV</p>
+                      <Button variant="outline" className="w-full bg-transparent">Import Data</Button>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="p-4 rounded-lg border border-destructive/30 bg-destructive/5 space-y-3">
+                    <div className="flex items-center gap-2 text-destructive">
+                      <AlertTriangle className="w-5 h-5" />
+                      <span className="font-medium">Danger Zone</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Permanently delete all data. This action cannot be undone.
+                    </p>
+                    <Button variant="destructive" size="sm">Delete All Data</Button>
+                  </div>
+                </CardContent>
+              </AnimatedCard>
+            )}
+
+            {/* Security */}
+            {activeTab === "security" && (
               <>
                 <AnimatedCard delay={200}>
                   <CardHeader>
-                    <CardTitle className="text-lg">Current Plan</CardTitle>
-                    <CardDescription>Manage your subscription and billing</CardDescription>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Key className="w-5 h-5 text-primary" />
+                      Password & Authentication
+                    </CardTitle>
+                    <CardDescription>Manage your security settings</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between p-6 rounded-lg bg-gradient-to-r from-primary/20 to-chart-3/20 border border-primary/30">
-                      <div>
-                        <Badge className="bg-primary text-primary-foreground mb-2">Pro Plan</Badge>
-                        <h3 className="text-2xl font-bold">$49/month</h3>
-                        <p className="text-sm text-muted-foreground mt-1">Billed monthly • Renews Jan 1, 2025</p>
+                  <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="currentPassword">Current Password</Label>
+                        <Input id="currentPassword" type="password" className="bg-secondary border-0" placeholder="••••••••" />
                       </div>
-                      <Button variant="outline" className="bg-transparent">
-                        Upgrade Plan
-                      </Button>
+                      <div />
+                      <div className="space-y-2">
+                        <Label htmlFor="newPassword">New Password</Label>
+                        <Input id="newPassword" type="password" className="bg-secondary border-0" placeholder="••••••••" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                        <Input id="confirmPassword" type="password" className="bg-secondary border-0" placeholder="••••••••" />
+                      </div>
                     </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                      {[
-                        { label: "Team Members", value: "8/10", used: 80 },
-                        { label: "Projects", value: "28/50", used: 56 },
-                        { label: "Storage", value: "4.2/10 GB", used: 42 },
-                        { label: "API Calls", value: "8.5K/20K", used: 42 },
-                      ].map((item, i) => (
-                        <div
-                          key={item.label}
-                          className="p-4 rounded-lg bg-secondary/50 animate-in fade-in zoom-in duration-300"
-                          style={{ animationDelay: `${i * 50}ms` }}
-                        >
-                          <p className="text-xs text-muted-foreground">{item.label}</p>
-                          <p className="font-bold mt-1">{item.value}</p>
-                          <div className="w-full h-1.5 rounded-full bg-secondary mt-2">
-                            <div className="h-full rounded-full bg-primary" style={{ width: `${item.used}%` }} />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    <Button variant="outline" className="bg-transparent">Update Password</Button>
                   </CardContent>
                 </AnimatedCard>
 
                 <AnimatedCard delay={300}>
                   <CardHeader>
-                    <CardTitle className="text-lg">Payment Method</CardTitle>
-                    <CardDescription>Manage your payment methods</CardDescription>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <ShieldCheck className="w-5 h-5 text-primary" />
+                      Two-Factor Authentication
+                    </CardTitle>
+                    <CardDescription>Add an extra layer of security</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center justify-between p-4 rounded-lg bg-secondary/50">
                       <div className="flex items-center gap-4">
-                        <div className="p-3 rounded-lg bg-background">
-                          <CreditCard className="w-5 h-5" />
+                        <div className="p-3 rounded-lg bg-green-500/20">
+                          <Shield className="w-5 h-5 text-green-500" />
                         </div>
                         <div>
-                          <p className="font-medium">Visa ending in 4242</p>
-                          <p className="text-sm text-muted-foreground">Expires 12/2026</p>
+                          <p className="font-medium">Two-Factor Authentication</p>
+                          <p className="text-sm text-muted-foreground">Currently enabled via authenticator app</p>
                         </div>
                       </div>
-                      <Badge variant="outline">Default</Badge>
-                    </div>
-                    <Button variant="outline" className="mt-4 bg-transparent">
-                      Add Payment Method
-                    </Button>
-                  </CardContent>
-                </AnimatedCard>
-
-                <AnimatedCard delay={400}>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Billing History</CardTitle>
-                    <CardDescription>Download past invoices</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {[
-                        { date: "Dec 1, 2024", amount: "$49.00", status: "Paid" },
-                        { date: "Nov 1, 2024", amount: "$49.00", status: "Paid" },
-                        { date: "Oct 1, 2024", amount: "$49.00", status: "Paid" },
-                      ].map((invoice, i) => (
-                        <div
-                          key={i}
-                          className="flex items-center justify-between p-3 rounded-lg hover:bg-secondary/50 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
-                          style={{ animationDelay: `${i * 50}ms` }}
-                        >
-                          <div className="flex items-center gap-4">
-                            <div className="p-2 rounded-lg bg-secondary">
-                              <CreditCard className="w-4 h-4 text-muted-foreground" />
-                            </div>
-                            <div>
-                              <p className="font-medium text-sm">{invoice.date}</p>
-                              <p className="text-xs text-muted-foreground">{invoice.amount}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <Badge className="bg-success/20 text-success border-0">{invoice.status}</Badge>
-                            <Button variant="ghost" size="sm" className="text-xs">
-                              Download
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
+                      <Badge className="bg-green-500/20 text-green-500 border-0">Enabled</Badge>
                     </div>
                   </CardContent>
                 </AnimatedCard>
               </>
+            )}
+
+            {/* Appearance */}
+            {activeTab === "appearance" && (
+              <AnimatedCard delay={200}>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Palette className="w-5 h-5 text-primary" />
+                    Appearance Settings
+                  </CardTitle>
+                  <CardDescription>Customize the look and feel</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <Label>Theme</Label>
+                    <div className="grid grid-cols-3 gap-4">
+                      {[
+                        { name: "Light", value: "light", icon: Sun },
+                        { name: "Dark", value: "dark", icon: Moon },
+                        { name: "System", value: "system", icon: Monitor },
+                      ].map((themeOption) => {
+                        const isActive = mounted && theme === themeOption.value
+                        const ThemeIcon = themeOption.icon
+                        return (
+                          <button
+                            key={themeOption.value}
+                            onClick={() => setTheme(themeOption.value)}
+                            className={cn(
+                              "p-4 rounded-lg border-2 transition-all text-center",
+                              isActive ? "border-primary bg-primary/10" : "border-border hover:border-primary/50"
+                            )}
+                          >
+                            <div
+                              className={cn(
+                                "w-full h-16 rounded-lg mb-2 flex items-center justify-center",
+                                themeOption.value === "light" ? "bg-white border text-zinc-900"
+                                  : themeOption.value === "dark" ? "bg-zinc-900 border border-zinc-700 text-white"
+                                    : "bg-gradient-to-r from-white to-zinc-900 border"
+                              )}
+                            >
+                              <ThemeIcon className="w-8 h-8" />
+                            </div>
+                            <span className="text-sm font-medium">{themeOption.name}</span>
+                            {isActive && (
+                              <Badge className="ml-2 bg-primary/20 text-primary border-0">Active</Badge>
+                            )}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Compact Mode</p>
+                        <p className="text-sm text-muted-foreground">Reduce spacing in the interface</p>
+                      </div>
+                      <Switch />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Animations</p>
+                        <p className="text-sm text-muted-foreground">Enable smooth animations</p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Sidebar Collapsed by Default</p>
+                        <p className="text-sm text-muted-foreground">Start with collapsed sidebar</p>
+                      </div>
+                      <Switch />
+                    </div>
+                  </div>
+                </CardContent>
+              </AnimatedCard>
             )}
           </div>
         </div>

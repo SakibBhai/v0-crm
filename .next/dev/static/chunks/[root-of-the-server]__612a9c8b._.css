@@ -1198,6 +1198,10 @@
     height: calc(var(--spacing) * 20);
   }
 
+  .h-24 {
+    height: calc(var(--spacing) * 24);
+  }
+
   .h-32 {
     height: calc(var(--spacing) * 32);
   }
@@ -1240,6 +1244,10 @@
 
   .h-\[calc\(100\%-1px\)\] {
     height: calc(100% - 1px);
+  }
+
+  .h-\[calc\(100vh-220px\)\] {
+    height: calc(100vh - 220px);
   }
 
   .h-\[calc\(100vh-400px\)\] {
@@ -1633,6 +1641,10 @@
     --tw-scale-y: 95%;
     --tw-scale-z: 95%;
     scale: var(--tw-scale-x) var(--tw-scale-y);
+  }
+
+  .rotate-90 {
+    rotate: 90deg;
   }
 
   .rotate-180 {
@@ -2172,16 +2184,6 @@
   @supports (color: color-mix(in lab, red, red)) {
     .border-destructive\/30 {
       border-color: color-mix(in oklab, var(--destructive) 30%, transparent);
-    }
-  }
-
-  .border-destructive\/50 {
-    border-color: var(--destructive);
-  }
-
-  @supports (color: color-mix(in lab, red, red)) {
-    .border-destructive\/50 {
-      border-color: color-mix(in oklab, var(--destructive) 50%, transparent);
     }
   }
 
@@ -4637,6 +4639,18 @@
   }
 
   @media (hover: hover) {
+    .hover\:border-foreground\/50:hover {
+      border-color: var(--foreground);
+    }
+
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:border-foreground\/50:hover {
+        border-color: color-mix(in oklab, var(--foreground) 50%, transparent);
+      }
+    }
+  }
+
+  @media (hover: hover) {
     .hover\:border-muted-foreground\/50:hover {
       border-color: var(--muted-foreground);
     }
@@ -4699,18 +4713,6 @@
   @media (hover: hover) {
     .hover\:bg-amber-700:hover {
       background-color: var(--color-amber-700);
-    }
-  }
-
-  @media (hover: hover) {
-    .hover\:bg-destructive\/10:hover {
-      background-color: var(--destructive);
-    }
-
-    @supports (color: color-mix(in lab, red, red)) {
-      .hover\:bg-destructive\/10:hover {
-        background-color: color-mix(in oklab, var(--destructive) 10%, transparent);
-      }
     }
   }
 
@@ -5729,8 +5731,8 @@
   }
 
   @media (min-width: 64rem) {
-    .lg\:w-64 {
-      width: calc(var(--spacing) * 64);
+    .lg\:w-72 {
+      width: calc(var(--spacing) * 72);
     }
   }
 
