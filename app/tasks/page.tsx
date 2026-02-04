@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import type { Task, TaskStatus, TaskPriority, SwimlaneType, TaskTemplate, AutomationRule } from "@/lib/types/task"
-import { DEFAULT_COLUMNS, PRIORITY_CONFIG, STATUS_CONFIG } from "@/lib/types/task"
+import type { Task, TaskStatus, TaskPriority, TaskType, SwimlaneType, TaskTemplate, AutomationRule } from "@/lib/types/task"
+import { DEFAULT_COLUMNS, PRIORITY_CONFIG, STATUS_CONFIG, TASK_TYPE_CONFIG } from "@/lib/types/task"
 import { sampleTasks, teamMembers, projects, taskTemplates, automationRules } from "@/lib/data/tasks"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { KanbanBoard } from "@/components/tasks/kanban-board"
@@ -183,13 +183,16 @@ export default function TasksPage() {
       description: formData.get("description") as string || "",
       status: formData.get("status") as TaskStatus || initialStatus,
       priority: formData.get("priority") as TaskPriority || "medium",
+      taskType: formData.get("taskType") as TaskType || "general",
       projectId: formData.get("project") as string || "1",
       projectName: projects.find((p) => p.id === formData.get("project"))?.name || projects[0].name,
       assignees: [teamMembers.find((m) => m.id === formData.get("assignee")) || teamMembers[0]],
+      assignedById: "2",
+      assignedByName: "Ali Hasan",
       reporterId: "2",
       reporterName: "Ali Hasan",
       dueDate: formData.get("dueDate") as string || new Date().toISOString().split("T")[0],
-      startDate: formData.get("startDate") as string,
+      startDate: formData.get("startDate") as string || new Date().toISOString().split("T")[0],
       tags: (formData.get("tags") as string || "").split(",").map((t) => t.trim()).filter(Boolean),
       subtasks: [],
       comments: [],
@@ -220,12 +223,16 @@ export default function TasksPage() {
       description: template.description,
       status: "todo",
       priority: template.priority,
+      taskType: "general",
       projectId: "1",
       projectName: projects[0].name,
       assignees: [teamMembers[0]],
+      assignedById: "2",
+      assignedByName: "Ali Hasan",
       reporterId: "2",
       reporterName: "Ali Hasan",
       dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+      startDate: new Date().toISOString().split("T")[0],
       tags: template.tags,
       subtasks: template.subtasks.map((s, i) => ({ id: `sub-${i}`, title: s.title, completed: false })),
       comments: [],
@@ -349,6 +356,24 @@ export default function TasksPage() {
                       </Select>
                     </div>
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="taskType" className="text-sm">Task Type</Label>
+                    <Select name="taskType" defaultValue="general">
+                      <SelectTrigger className="bg-secondary/50 border-border">
+                        <SelectValue placeholder="Select task type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(TASK_TYPE_CONFIG).map(([k, v]) => (
+                          <SelectItem key={k} value={k}>
+                            <span className="flex items-center gap-2">
+                              <span>{v.icon}</span>
+                              {v.label}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 {/* Assignment & Schedule Section */}
@@ -403,6 +428,7 @@ export default function TasksPage() {
                       <DatePicker
                         name="startDate"
                         placeholder="Select start date"
+                        defaultValue={new Date()}
                       />
                     </div>
                     <div className="space-y-2">

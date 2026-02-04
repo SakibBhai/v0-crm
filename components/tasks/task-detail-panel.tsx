@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import type { Task, TaskStatus, TaskPriority, SubTask, Comment, TimeEntry, ReferenceLink } from "@/lib/types/task"
-import { PRIORITY_CONFIG, STATUS_CONFIG } from "@/lib/types/task"
+import { PRIORITY_CONFIG, STATUS_CONFIG, TASK_TYPE_CONFIG } from "@/lib/types/task"
 import { teamMembers, projects } from "@/lib/data/tasks"
 import { TimeTracker } from "./time-tracker"
 import { SubtaskList } from "./subtask-list"
@@ -499,10 +499,43 @@ export function TaskDetailPanel({ task, isOpen, onClose, onUpdate, onDelete }: T
                                     </Select>
                                 </div>
 
-                                {/* Assignees */}
+                                {/* Task Type */}
+                                {task.taskType && (
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-medium text-muted-foreground">Task Type</label>
+                                        <div className={cn(
+                                            "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium",
+                                            TASK_TYPE_CONFIG[task.taskType]?.color.replace("bg-", "bg-") + "/20"
+                                        )}>
+                                            <span className="text-base">{TASK_TYPE_CONFIG[task.taskType]?.icon}</span>
+                                            <span>{TASK_TYPE_CONFIG[task.taskType]?.label}</span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Assigned By */}
+                                {task.assignedByName && (
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                                            <Users className="w-3 h-3" /> Assigned By
+                                        </label>
+                                        <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                                            <Avatar className="w-6 h-6">
+                                                <AvatarFallback className="bg-amber-500/20 text-amber-600 text-[10px]">
+                                                    {task.assignedByName.split(" ").map(n => n[0]).join("").toUpperCase()}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium truncate">{task.assignedByName}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Assignees (Assigned To) */}
                                 <div className="space-y-2">
                                     <label className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                                        <Users className="w-3 h-3" /> Assignees
+                                        <Users className="w-3 h-3" /> Assigned To
                                     </label>
                                     <div className="space-y-2">
                                         {task.assignees.map((assignee) => (

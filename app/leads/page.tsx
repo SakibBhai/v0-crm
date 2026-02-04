@@ -69,6 +69,8 @@ import {
   History,
   FolderOpen,
   Tag,
+  Video,
+  MapPin,
 } from "lucide-react"
 
 type Stage = "new" | "contacted" | "qualified" | "proposal" | "negotiation" | "won" | "lost"
@@ -116,11 +118,14 @@ interface Lead {
   starred: boolean
   activityHistory: Array<{
     id: string
-    type: "created" | "updated" | "note_added" | "status_changed" | "stage_changed" | "category_changed"
+    type: "created" | "updated" | "note_added" | "status_changed" | "stage_changed" | "category_changed" | "meeting_scheduled"
     description: string
     timestamp: string
     changedBy: string
     changes?: Record<string, { old: string | number; new: string | number }>
+    meetingType?: "online" | "offline"
+    meetingDetails?: string
+    meetingDate?: string
   }>
 }
 
@@ -425,6 +430,10 @@ export default function LeadsPage() {
   const [draggedLead, setDraggedLead] = useState<Lead | null>(null)
   const [dragOverStage, setDragOverStage] = useState<Stage | null>(null)
   const [newNoteText, setNewNoteText] = useState("")
+  const [isAddMeetingOpen, setIsAddMeetingOpen] = useState(false)
+  const [meetingType, setMeetingType] = useState<"online" | "offline">("online")
+  const [meetingDetails, setMeetingDetails] = useState("")
+  const [meetingDate, setMeetingDate] = useState("")
 
   const filteredLeads = leads.filter((lead) => {
     const matchesSearch =
@@ -725,6 +734,67 @@ export default function LeadsPage() {
     })
 
     setNewNoteText("")
+  }
+
+  // Add meeting to lead
+  const handleAddMeeting = (leadId: string) => {
+    if (!meetingDetails.trim()) return
+
+    const meetingLabel = meetingType === "online" ? "💻 Online Meeting" : "🏢 Offline Meeting"
+
+    setLeads(
+      leads.map((lead) => {
+        if (lead.id === leadId) {
+          return {
+            ...lead,
+            activityHistory: [
+              {
+                id: Date.now().toString(),
+                type: "meeting_scheduled" as const,
+                description: `${meetingLabel} scheduled`,
+                timestamp: new Date().toISOString(),
+                changedBy: "Current User",
+                meetingType,
+                meetingDetails: meetingDetails.trim(),
+                meetingDate: meetingDate || new Date().toISOString(),
+              },
+              ...lead.activityHistory,
+            ],
+            lastContact: new Date().toISOString(),
+            activities: lead.activities + 1,
+          }
+        }
+        return lead
+      }),
+    )
+
+    // Update selectedLead if it's the same lead
+    if (selectedLead && selectedLead.id === leadId) {
+      setSelectedLead({
+        ...selectedLead,
+        activityHistory: [
+          {
+            id: Date.now().toString(),
+            type: "meeting_scheduled" as const,
+            description: `${meetingLabel} scheduled`,
+            timestamp: new Date().toISOString(),
+            changedBy: "Current User",
+            meetingType,
+            meetingDetails: meetingDetails.trim(),
+            meetingDate: meetingDate || new Date().toISOString(),
+          },
+          ...selectedLead.activityHistory,
+        ],
+        lastContact: new Date().toISOString(),
+        activities: selectedLead.activities + 1,
+      })
+    }
+
+    // Reset form
+    setMeetingType("online")
+    setMeetingDetails("")
+    setMeetingDate("")
+    setIsAddMeetingOpen(false)
   }
 
   return (

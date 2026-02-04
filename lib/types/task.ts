@@ -2,6 +2,7 @@
 
 export type TaskStatus = "backlog" | "todo" | "in-progress" | "in-review" | "done"
 export type TaskPriority = "low" | "medium" | "high" | "critical"
+export type TaskType = "general" | "bug" | "feature" | "improvement" | "research" | "design" | "documentation"
 export type SwimlaneType = "none" | "project" | "assignee" | "priority"
 
 export interface TeamMember {
@@ -19,6 +20,9 @@ export interface SubTask {
     title: string
     completed: boolean
     assigneeId?: string
+    assigneeName?: string
+    assignedById?: string
+    assignedByName?: string
     dueDate?: string
 }
 
@@ -82,9 +86,12 @@ export interface Task {
     description: string
     status: TaskStatus
     priority: TaskPriority
+    taskType: TaskType
     projectId: string
     projectName: string
     assignees: TeamMember[]
+    assignedById: string
+    assignedByName: string
     reporterId: string
     reporterName: string
     dueDate: string
@@ -151,6 +158,16 @@ export const STATUS_CONFIG: Record<TaskStatus, { label: string; color: string }>
     "in-progress": { label: "In Progress", color: "bg-blue-500" },
     "in-review": { label: "In Review", color: "bg-purple-500" },
     done: { label: "Done", color: "bg-green-500" },
+}
+
+export const TASK_TYPE_CONFIG: Record<TaskType, { label: string; color: string; icon: string }> = {
+    general: { label: "General", color: "bg-slate-500", icon: "📋" },
+    bug: { label: "Bug", color: "bg-red-500", icon: "🐛" },
+    feature: { label: "Feature", color: "bg-green-500", icon: "✨" },
+    improvement: { label: "Improvement", color: "bg-blue-500", icon: "📈" },
+    research: { label: "Research", color: "bg-purple-500", icon: "🔍" },
+    design: { label: "Design", color: "bg-pink-500", icon: "🎨" },
+    documentation: { label: "Documentation", color: "bg-orange-500", icon: "📝" },
 }
 
 export const DEFAULT_COLUMNS: KanbanColumn[] = [

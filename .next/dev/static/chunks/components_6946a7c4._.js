@@ -12464,9 +12464,9 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-function DatePicker({ date, onDateChange, placeholder = "Pick a date", className, name, required, disabled }) {
+function DatePicker({ date, defaultValue, onDateChange, placeholder = "Pick a date", className, name, required, disabled }) {
     _s();
-    const [selectedDate, setSelectedDate] = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"](date);
+    const [selectedDate, setSelectedDate] = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"](date ?? defaultValue);
     const [open, setOpen] = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"](false);
     const handleSelect = (newDate)=>{
         setSelectedDate(newDate);
@@ -12482,7 +12482,7 @@ function DatePicker({ date, onDateChange, placeholder = "Pick a date", className
                 required: required
             }, void 0, false, {
                 fileName: "[project]/components/ui/date-picker.tsx",
-                lineNumber: 46,
+                lineNumber: 48,
                 columnNumber: 17
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$popover$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Popover"], {
@@ -12500,25 +12500,25 @@ function DatePicker({ date, onDateChange, placeholder = "Pick a date", className
                                     className: "mr-2 h-4 w-4"
                                 }, void 0, false, {
                                     fileName: "[project]/components/ui/date-picker.tsx",
-                                    lineNumber: 64,
+                                    lineNumber: 66,
                                     columnNumber: 25
                                 }, this),
                                 selectedDate ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$date$2d$fns$2f$format$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["format"])(selectedDate, "PPP") : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     children: placeholder
                                 }, void 0, false, {
                                     fileName: "[project]/components/ui/date-picker.tsx",
-                                    lineNumber: 65,
+                                    lineNumber: 67,
                                     columnNumber: 71
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/ui/date-picker.tsx",
-                            lineNumber: 55,
+                            lineNumber: 57,
                             columnNumber: 21
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/ui/date-picker.tsx",
-                        lineNumber: 54,
+                        lineNumber: 56,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$popover$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PopoverContent"], {
@@ -12531,24 +12531,24 @@ function DatePicker({ date, onDateChange, placeholder = "Pick a date", className
                             initialFocus: true
                         }, void 0, false, {
                             fileName: "[project]/components/ui/date-picker.tsx",
-                            lineNumber: 69,
+                            lineNumber: 71,
                             columnNumber: 21
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/ui/date-picker.tsx",
-                        lineNumber: 68,
+                        lineNumber: 70,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/ui/date-picker.tsx",
-                lineNumber: 53,
+                lineNumber: 55,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true);
 }
-_s(DatePicker, "Etybx0KNskv85th1awcMJ4Cy7pQ=");
+_s(DatePicker, "B3lIweYGLvvbD0yJrq9VK2F9w9c=");
 _c = DatePicker;
 var _c;
 __turbopack_context__.k.register(_c, "DatePicker");

@@ -1398,6 +1398,10 @@
     max-width: var(--container-5xl);
   }
 
+  .max-w-\[60px\] {
+    max-width: 60px;
+  }
+
   .max-w-\[calc\(100\%-2rem\)\] {
     max-width: calc(100% - 2rem);
   }
@@ -1967,6 +1971,16 @@
   .border-none {
     --tw-border-style: none;
     border-style: none;
+  }
+
+  .border-amber-500\/20 {
+    border-color: #f99c0033;
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .border-amber-500\/20 {
+      border-color: color-mix(in oklab, var(--color-amber-500) 20%, transparent);
+    }
   }
 
   .border-amber-500\/30 {

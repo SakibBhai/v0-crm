@@ -115,13 +115,20 @@ export function SubtaskList({ subtasks, onUpdate }: SubtaskListProps) {
                             </span>
                         )}
 
-                        {/* Assignee Avatar (if assigned) */}
-                        {subtask.assigneeId && (
-                            <Avatar className="w-5 h-5">
-                                <AvatarFallback className="bg-primary/20 text-primary text-[8px]">
-                                    {subtask.assigneeId.slice(0, 2).toUpperCase()}
-                                </AvatarFallback>
-                            </Avatar>
+                        {/* Assignee (if assigned) */}
+                        {(subtask.assigneeName || subtask.assigneeId) && (
+                            <div className="flex items-center gap-1" title={subtask.assignedByName ? `Assigned by ${subtask.assignedByName}` : undefined}>
+                                <Avatar className="w-5 h-5">
+                                    <AvatarFallback className="bg-primary/20 text-primary text-[8px]">
+                                        {subtask.assigneeName
+                                            ? subtask.assigneeName.split(" ").map(n => n[0]).join("").toUpperCase()
+                                            : subtask.assigneeId?.slice(0, 2).toUpperCase()}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <span className="text-[10px] text-muted-foreground max-w-[60px] truncate">
+                                    {subtask.assigneeName || subtask.assigneeId}
+                                </span>
+                            </div>
                         )}
 
                         {/* Due Date (if set) */}

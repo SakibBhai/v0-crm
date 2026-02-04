@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import type { Task } from "@/lib/types/task"
-import { PRIORITY_CONFIG, STATUS_CONFIG } from "@/lib/types/task"
+import { PRIORITY_CONFIG, STATUS_CONFIG, TASK_TYPE_CONFIG } from "@/lib/types/task"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -95,11 +95,17 @@ export function TaskCard({ task, onClick, onDelete, onClone, onMoveToTop }: Task
                 </DropdownMenu>
             </div>
 
-            {/* Project & Priority */}
+            {/* Project, Task Type & Priority */}
             <div className="flex items-center gap-2 mb-2 flex-wrap">
                 <Badge variant="outline" className="text-[10px] font-normal">
                     {task.projectName}
                 </Badge>
+                {task.taskType && TASK_TYPE_CONFIG[task.taskType] && (
+                    <Badge variant="outline" className="text-[10px] font-normal gap-1">
+                        <span>{TASK_TYPE_CONFIG[task.taskType].icon}</span>
+                        {TASK_TYPE_CONFIG[task.taskType].label}
+                    </Badge>
+                )}
                 <Badge className={cn("text-[10px] text-white border-0", priorityConfig.color)}>
                     {priorityConfig.label}
                 </Badge>

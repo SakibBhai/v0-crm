@@ -14,6 +14,7 @@ import {
 
 interface DatePickerProps {
     date?: Date
+    defaultValue?: Date
     onDateChange?: (date: Date | undefined) => void
     placeholder?: string
     className?: string
@@ -24,6 +25,7 @@ interface DatePickerProps {
 
 export function DatePicker({
     date,
+    defaultValue,
     onDateChange,
     placeholder = "Pick a date",
     className,
@@ -31,7 +33,7 @@ export function DatePicker({
     required,
     disabled,
 }: DatePickerProps) {
-    const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(date)
+    const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(date ?? defaultValue)
     const [open, setOpen] = React.useState(false)
 
     const handleSelect = (newDate: Date | undefined) => {
