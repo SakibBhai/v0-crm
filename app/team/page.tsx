@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import type { Employee, Candidate, LeaveRequest, OKR, AttendanceRecord } from "@/lib/types/hr"
+import type { Employee, Candidate, LeaveRequest, OKR, AttendanceRecord, PerformanceReview } from "@/lib/types/hr"
 import { employees as initialEmployees, candidates as initialCandidates, leaveRequests as initialLeaveRequests, okrs as initialOkrs, skillDefinitions, trainingCourses, courseEnrollments as initialEnrollments, hrMetrics, attendanceRecords as initialAttendanceRecords } from "@/lib/data/hr"
 import { DEPARTMENT_CONFIG } from "@/lib/types/hr"
 import { DashboardLayout } from "@/components/dashboard-layout"
@@ -63,6 +63,47 @@ export default function TeamPage() {
   const [okrs, setOkrs] = useState<OKR[]>(initialOkrs)
   const [enrollments, setEnrollments] = useState(initialEnrollments)
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>(initialAttendanceRecords)
+  const [reviews] = useState<PerformanceReview[]>([
+    {
+      id: "PR001",
+      employeeId: "EMP001",
+      employeeName: "Alex Johnson",
+      reviewerId: "EMP003",
+      reviewerName: "Sarah Williams",
+      period: "H2 2025",
+      scheduledDate: "2026-01-15",
+      status: "completed",
+      overallRating: 4.5,
+      competencyRatings: [
+        { competency: "Technical Skills", rating: 5, comments: "Exceptional coding ability" },
+        { competency: "Communication", rating: 4, comments: "Clear and concise" },
+        { competency: "Leadership", rating: 4.5, comments: "Great team mentoring" },
+      ],
+      strengths: ["Problem solving", "Code quality", "Team collaboration", "Initiative"],
+      areasForImprovement: ["Documentation", "Delegation"],
+      goals: ["Lead a major project", "Mentor 2 juniors"],
+      promotionRecommended: true,
+      pipRequired: false,
+      completedAt: "2026-01-20",
+    },
+    {
+      id: "PR002",
+      employeeId: "EMP002",
+      employeeName: "Emma Davis",
+      reviewerId: "EMP001",
+      reviewerName: "Alex Johnson",
+      period: "H2 2025",
+      scheduledDate: "2026-02-01",
+      status: "scheduled",
+      overallRating: 0,
+      competencyRatings: [],
+      strengths: [],
+      areasForImprovement: [],
+      goals: [],
+      promotionRecommended: false,
+      pipRequired: false,
+    },
+  ])
 
   // UI state
   const [activeTab, setActiveTab] = useState<TabMode>("directory")
@@ -238,6 +279,14 @@ export default function TeamPage() {
     setAttendanceRecords(prev => prev.map(r =>
       r.id === id ? { ...r, ...updates, markedAt: new Date().toISOString() } : r
     ))
+  }
+
+  const handleAddOkr = (okr: Omit<OKR, "id">) => {
+    const newOkr: OKR = {
+      ...okr,
+      id: `OKR_${Date.now()}`,
+    }
+    setOkrs(prev => [newOkr, ...prev])
   }
 
   const tabs = [
@@ -509,9 +558,10 @@ export default function TeamPage() {
         {activeTab === "performance" && (
           <PerformanceDashboard
             okrs={okrs}
-            reviews={[]}
+            reviews={reviews}
             employees={employees}
             currentUserId={currentUserId}
+            onAddOkr={handleAddOkr}
           />
         )}
 

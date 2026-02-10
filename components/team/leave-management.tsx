@@ -62,6 +62,8 @@ export function LeaveManagement({
     const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false)
     const [rejectingId, setRejectingId] = useState<string | null>(null)
     const [rejectReason, setRejectReason] = useState("")
+    const [calMonth, setCalMonth] = useState(new Date().getMonth())
+    const [calYear, setCalYear] = useState(new Date().getFullYear())
 
     const currentEmployee = employees.find(e => e.id === currentUserId)
     const myRequests = requests.filter(r => r.employeeId === currentUserId)
@@ -270,17 +272,102 @@ export function LeaveManagement({
                 </div>
             )}
 
-            {activeTab === "calendar" && (
-                <Card>
-                    <CardContent className="pt-4">
-                        <div className="text-center py-12 text-muted-foreground">
-                            <CalendarDays className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                            <p>Calendar view showing approved leaves</p>
-                            <p className="text-sm mt-2">Integrates with Google/Outlook coming soon</p>
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
+            {activeTab === "calendar" && (() => {
+                const today = new Date()
+                const firstDay = new Date(calYear, calMonth, 1).getDay()
+                const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate()
+                const monthName = new Date(calYear, calMonth).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+
+                const approvedOrPending = requests.filter(r => r.status === "approved" || r.status === "pending")
+
+                const getLeavesForDay = (day: number) => {
+                    const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+                    const dateObj = new Date(dateStr)
+                    return approvedOrPending.filter(r => {
+                        const start = new Date(r.startDate)
+                        const end = new Date(r.endDate)
+                        start.setHours(0, 0, 0, 0)
+                        end.setHours(23, 59, 59, 999)
+                        return dateObj >= start && dateObj <= end
+                    })
+                }
+
+                const prevMonth = () => {
+                    if (calMonth === 0) { setCalMonth(11); setCalYear(calYear - 1) }
+                    else setCalMonth(calMonth - 1)
+                }
+                const nextMonth = () => {
+                    if (calMonth === 11) { setCalMonth(0); setCalYear(calYear + 1) }
+                    else setCalMonth(calMonth + 1)
+                }
+
+                return (
+                    <Card>
+                        <CardHeader className="pb-3">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-base">{monthName}</CardTitle>
+                                <div className="flex gap-1">
+                                    <Button variant="ghost" size="icon" onClick={prevMonth} className="h-8 w-8">
+                                        <Calendar className="w-4 h-4" />
+                                    </Button>
+                                    <Button variant="ghost" size="sm" onClick={() => { setCalMonth(today.getMonth()); setCalYear(today.getFullYear()) }}>
+                                        Today
+                                    </Button>
+                                    <Button variant="ghost" size="icon" onClick={nextMonth} className="h-8 w-8">
+                                        <Calendar className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="flex gap-4 text-xs text-muted-foreground mt-2">
+                                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" /> Approved</span>
+                                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500" /> Pending</span>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-7 gap-px">
+                                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(d => (
+                                    <div key={d} className="text-center text-xs font-medium text-muted-foreground py-2">{d}</div>
+                                ))}
+                                {Array.from({ length: firstDay }).map((_, i) => (
+                                    <div key={`empty-${i}`} className="min-h-[80px]" />
+                                ))}
+                                {Array.from({ length: daysInMonth }).map((_, i) => {
+                                    const day = i + 1
+                                    const leaves = getLeavesForDay(day)
+                                    const isToday = day === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear()
+                                    return (
+                                        <div key={day} className={cn(
+                                            "min-h-[80px] p-1 border border-border/30 rounded-md",
+                                            isToday && "bg-primary/5 border-primary/50"
+                                        )}>
+                                            <span className={cn(
+                                                "text-xs font-medium",
+                                                isToday && "text-primary font-bold"
+                                            )}>{day}</span>
+                                            <div className="mt-1 space-y-0.5">
+                                                {leaves.slice(0, 2).map(l => {
+                                                    const typeConfig = LEAVE_TYPE_CONFIG[l.leaveType]
+                                                    return (
+                                                        <div key={l.id} className={cn(
+                                                            "text-[9px] px-1 py-0.5 rounded truncate",
+                                                            l.status === "approved" ? "bg-green-500/20 text-green-700 dark:text-green-400" : "bg-yellow-500/20 text-yellow-700 dark:text-yellow-400"
+                                                        )} title={`${l.employeeName} - ${typeConfig.label}`}>
+                                                            {l.employeeName.split(" ")[0]}
+                                                        </div>
+                                                    )
+                                                })}
+                                                {leaves.length > 2 && (
+                                                    <div className="text-[9px] text-muted-foreground px-1">+{leaves.length - 2} more</div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )
+            })()}
 
             {/* Request Dialog */}
             <Dialog open={isRequestDialogOpen} onOpenChange={setIsRequestDialogOpen}>

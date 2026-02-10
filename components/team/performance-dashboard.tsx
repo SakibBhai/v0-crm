@@ -7,7 +7,18 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "@/components/ui/dialog"
 import {
     Target,
     TrendingUp,
@@ -27,6 +38,7 @@ interface PerformanceDashboardProps {
     reviews: PerformanceReview[]
     employees: Employee[]
     currentUserId: string
+    onAddOkr?: (okr: Omit<OKR, "id">) => void
 }
 
 const OKR_STATUS_CONFIG = {
@@ -36,8 +48,10 @@ const OKR_STATUS_CONFIG = {
     "completed": { label: "Completed", color: "text-blue-500", bg: "bg-blue-500/20" },
 }
 
-export function PerformanceDashboard({ okrs, reviews, employees, currentUserId }: PerformanceDashboardProps) {
+export function PerformanceDashboard({ okrs, reviews, employees, currentUserId, onAddOkr }: PerformanceDashboardProps) {
     const [activeTab, setActiveTab] = useState("my-okrs")
+    const [isAddOkrOpen, setIsAddOkrOpen] = useState(false)
+    const [krCount, setKrCount] = useState(1)
 
     const myOkrs = okrs.filter(o => o.employeeId === currentUserId)
     const pendingReviews = reviews.filter(r => r.status === "scheduled")
@@ -124,7 +138,7 @@ export function PerformanceDashboard({ okrs, reviews, employees, currentUserId }
                 <TabsContent value="my-okrs" className="space-y-4 mt-4">
                     <div className="flex items-center justify-between">
                         <h3 className="text-lg font-medium">My Objectives & Key Results</h3>
-                        <Button className="gap-2"><Plus className="w-4 h-4" /> Add OKR</Button>
+                        <Button className="gap-2" onClick={() => setIsAddOkrOpen(true)}><Plus className="w-4 h-4" /> Add OKR</Button>
                     </div>
 
                     {myOkrs.length === 0 ? (
@@ -132,7 +146,7 @@ export function PerformanceDashboard({ okrs, reviews, employees, currentUserId }
                             <CardContent className="flex flex-col items-center justify-center py-12">
                                 <Target className="w-12 h-12 text-muted-foreground mb-4" />
                                 <p className="text-muted-foreground">No OKRs set for this quarter</p>
-                                <Button className="mt-4">Set Your First OKR</Button>
+                                <Button className="mt-4" onClick={() => setIsAddOkrOpen(true)}>Set Your First OKR</Button>
                             </CardContent>
                         </Card>
                     ) : (
@@ -321,6 +335,92 @@ export function PerformanceDashboard({ okrs, reviews, employees, currentUserId }
                     </Card>
                 </TabsContent>
             </Tabs>
+
+            {/* Add OKR Dialog */}
+            <Dialog open={isAddOkrOpen} onOpenChange={setIsAddOkrOpen}>
+                <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Target className="w-5 h-5 text-primary" />
+                            Add New OKR
+                        </DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={(e) => {
+                        e.preventDefault()
+                        const fd = new FormData(e.currentTarget)
+                        const keyResults = Array.from({ length: krCount }).map((_, i) => ({
+                            id: `kr_${Date.now()}_${i}`,
+                            title: fd.get(`kr_title_${i}`) as string || `Key Result ${i + 1}`,
+                            targetValue: Number(fd.get(`kr_target_${i}`)) || 100,
+                            currentValue: 0,
+                            unit: fd.get(`kr_unit_${i}`) as string || "%",
+                            progress: 0,
+                        }))
+                        const newOkr = {
+                            title: fd.get("title") as string,
+                            description: fd.get("description") as string || "",
+                            employeeId: currentUserId,
+                            quarter: fd.get("quarter") as string || "Q1 2026",
+                            status: "on-track" as const,
+                            overallProgress: 0,
+                            keyResults,
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString(),
+                        }
+                        if (onAddOkr) onAddOkr(newOkr)
+                        setIsAddOkrOpen(false)
+                        setKrCount(1)
+                    }} className="space-y-4">
+                        <div className="space-y-2">
+                            <Label>Objective Title <span className="text-destructive">*</span></Label>
+                            <Input name="title" placeholder="e.g., Increase customer satisfaction" required className="bg-secondary/50" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Description</Label>
+                            <Textarea name="description" placeholder="Describe the objective..." className="bg-secondary/50" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Quarter</Label>
+                            <Select name="quarter" defaultValue="Q1 2026">
+                                <SelectTrigger className="bg-secondary/50"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Q1 2026">Q1 2026</SelectItem>
+                                    <SelectItem value="Q2 2026">Q2 2026</SelectItem>
+                                    <SelectItem value="Q3 2026">Q3 2026</SelectItem>
+                                    <SelectItem value="Q4 2026">Q4 2026</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-3 pt-2 border-t">
+                            <div className="flex items-center justify-between">
+                                <Label className="text-primary">Key Results</Label>
+                                <Button type="button" variant="ghost" size="sm" onClick={() => setKrCount(c => c + 1)} className="gap-1 text-xs">
+                                    <Plus className="w-3 h-3" /> Add
+                                </Button>
+                            </div>
+                            {Array.from({ length: krCount }).map((_, i) => (
+                                <div key={i} className="p-3 rounded-lg bg-secondary/30 space-y-2">
+                                    <Input name={`kr_title_${i}`} placeholder={`Key Result ${i + 1}`} className="bg-background text-sm" />
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <Label className="text-xs">Target</Label>
+                                            <Input name={`kr_target_${i}`} type="number" defaultValue={100} className="bg-background text-sm mt-1" />
+                                        </div>
+                                        <div>
+                                            <Label className="text-xs">Unit</Label>
+                                            <Input name={`kr_unit_${i}`} defaultValue="%" placeholder="%, users, etc." className="bg-background text-sm mt-1" />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="ghost" onClick={() => setIsAddOkrOpen(false)}>Cancel</Button>
+                            <Button type="submit">Create OKR</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

@@ -3,6 +3,7 @@
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { StatCard } from "@/components/stat-card"
 import { AnimatedCard } from "@/components/animated-card"
+import { UpcomingWidget } from "@/components/dashboard/upcoming-widget"
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -152,13 +153,7 @@ const recentActivities = [
   },
 ]
 
-const calendarEvents = [
-  { date: 24, events: ["Client Call", "Team Review"], count: 2 },
-  { date: 25, events: ["Project Kickoff"], count: 1 },
-  { date: 26, events: [], count: 0 },
-  { date: 27, events: ["Proposal Deadline"], count: 1 },
-  { date: 28, events: ["Performance Review"], count: 1 },
-]
+
 
 const quickActions = [
   { label: "New Lead", icon: Users, color: "bg-blue-500/20 text-blue-400" },
@@ -177,7 +172,6 @@ const kpis = [
 ]
 
 export default function DashboardPage() {
-  const [selectedDate, setSelectedDate] = useState(24)
 
   // Calculate totals for hero section
   const todayStats = {
@@ -505,53 +499,7 @@ export default function DashboardPage() {
         {/* Bottom Row */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           {/* Calendar Widget */}
-          <AnimatedCard delay={1200}>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base font-medium">Upcoming</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="grid grid-cols-7 gap-1 text-center text-xs mb-3">
-                  {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
-                    <div key={index} className="font-semibold text-muted-foreground">
-                      {day}
-                    </div>
-                  ))}
-                  {Array.from({ length: 28 }).map((_, i) => {
-                    const date = i + 1
-                    const hasEvent = calendarEvents.some((e) => e.date === date)
-                    return (
-                      <button
-                        key={date}
-                        onClick={() => setSelectedDate(date)}
-                        className={`py-1.5 rounded text-xs font-medium transition-colors ${selectedDate === date
-                          ? "bg-primary text-primary-foreground"
-                          : hasEvent
-                            ? "bg-secondary text-foreground border border-primary/50"
-                            : "text-muted-foreground hover:bg-secondary/50"
-                          }`}
-                      >
-                        {date}
-                      </button>
-                    )
-                  })}
-                </div>
-                <div className="border-t border-secondary pt-3 space-y-2">
-                  {calendarEvents.find((e) => e.date === selectedDate)?.events.length > 0 ? (
-                    calendarEvents
-                      .find((e) => e.date === selectedDate)
-                      ?.events.map((event, i) => (
-                        <div key={i} className="text-xs p-2 bg-secondary/50 rounded border-l-2 border-primary">
-                          {event}
-                        </div>
-                      ))
-                  ) : (
-                    <p className="text-xs text-muted-foreground text-center py-2">No events</p>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </AnimatedCard>
+          <UpcomingWidget delay={1200} />
 
           {/* Recent Activities */}
           <AnimatedCard delay={1300} className="lg:col-span-3">
@@ -565,7 +513,7 @@ export default function DashboardPage() {
               <div className="space-y-3 max-h-[400px] overflow-y-auto">
                 {recentActivities.map((activity, i) => {
                   const Icon = activity.icon
-                  const typeColors = {
+                  const typeColors: Record<string, string> = {
                     lead: "bg-blue-500/20 text-blue-400",
                     project: "bg-green-500/20 text-green-400",
                     task: "bg-purple-500/20 text-purple-400",

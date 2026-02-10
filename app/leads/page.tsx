@@ -4,6 +4,7 @@ import type React from "react"
 import { useState } from "react"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { AnimatedCard } from "@/components/animated-card"
+import { employees } from "@/lib/data/hr"
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -126,6 +127,10 @@ interface Lead {
     meetingType?: "online" | "offline"
     meetingDetails?: string
     meetingDate?: string
+    meetingTime?: string
+    meetingLocation?: string
+    meetingLink?: string
+    meetingAttendees?: Array<{ id: string; name: string; initials: string }>
   }>
 }
 
@@ -434,6 +439,18 @@ export default function LeadsPage() {
   const [meetingType, setMeetingType] = useState<"online" | "offline">("online")
   const [meetingDetails, setMeetingDetails] = useState("")
   const [meetingDate, setMeetingDate] = useState("")
+  const [meetingTime, setMeetingTime] = useState("")
+  const [meetingLocation, setMeetingLocation] = useState("")
+  const [meetingLink, setMeetingLink] = useState("")
+  const [meetingAttendees, setMeetingAttendees] = useState<string[]>([])
+
+  // Team members from employees data
+  const teamMembers = employees.map(emp => ({
+    id: emp.id,
+    name: `${emp.firstName} ${emp.lastName}`,
+    initials: `${emp.firstName[0]}${emp.lastName[0]}`,
+    jobTitle: emp.jobTitle,
+  }))
 
   const filteredLeads = leads.filter((lead) => {
     const matchesSearch =
@@ -564,6 +581,14 @@ export default function LeadsPage() {
     if (oldLead.stage !== updatedData.stage) changes["stage"] = { old: oldLead.stage, new: updatedData.stage! }
     if (oldLead.priority !== updatedData.priority)
       changes["priority"] = { old: oldLead.priority, new: updatedData.priority! }
+    if (updatedData.value !== undefined && oldLead.value !== updatedData.value)
+      changes["value"] = { old: oldLead.value, new: updatedData.value }
+    if (updatedData.probability !== undefined && oldLead.probability !== updatedData.probability)
+      changes["probability"] = { old: oldLead.probability, new: updatedData.probability }
+    if (updatedData.source !== undefined && oldLead.source !== updatedData.source)
+      changes["source"] = { old: oldLead.source, new: updatedData.source }
+    if (updatedData.nextFollowUp !== undefined && oldLead.nextFollowUp !== updatedData.nextFollowUp)
+      changes["nextFollowUp"] = { old: oldLead.nextFollowUp || "none", new: updatedData.nextFollowUp || "none" }
     if (oldLead.notes !== updatedData.notes)
       changes["notes"] = { old: oldLead.notes || "", new: updatedData.notes || "" }
 
@@ -622,6 +647,37 @@ export default function LeadsPage() {
     setLeads(leads.map((l) => (l.id === id ? { ...l, stage: newStage, lastContact: new Date().toISOString() } : l)))
     addActivityHistory(id, "stage_changed", `Stage changed to ${newStage}`, {
       stage: { old: oldLead.stage, new: newStage },
+    })
+  }
+
+  // Handle Next Follow-Up date change
+  const handleFollowUpChange = (id: string, newDate: string) => {
+    const oldLead = leads.find((l) => l.id === id)
+    if (!oldLead) return
+
+    const oldDate = oldLead.nextFollowUp || "Not set"
+
+    setLeads(
+      leads.map((l) =>
+        l.id === id
+          ? { ...l, nextFollowUp: newDate }
+          : l,
+      ),
+    )
+
+    // Update selectedLead if it's the same lead
+    if (selectedLead && selectedLead.id === id) {
+      setSelectedLead({
+        ...selectedLead,
+        nextFollowUp: newDate,
+      })
+    }
+
+    addActivityHistory(id, "updated", `Next follow-up date changed`, {
+      "next follow-up": {
+        old: oldDate ? new Date(oldDate).toLocaleDateString() : "Not set",
+        new: newDate ? new Date(newDate).toLocaleDateString() : "Not set",
+      },
     })
   }
 
@@ -687,6 +743,76 @@ export default function LeadsPage() {
 
   const kanbanStages: Stage[] = ["new", "contacted", "qualified", "proposal", "negotiation", "won", "lost"]
 
+  // Export leads as CSV
+  const handleExportLeads = () => {
+    const headers = ["Name", "Company", "Email", "Phone", "Status", "Stage", "Priority", "Category", "Source", "Assigned To", "Value", "Probability", "Tags", "Next Follow-Up", "Notes", "Created At"]
+    const rows = filteredLeads.map(l => [
+      l.name, l.company, l.email, l.phone, l.status, l.stage, l.priority, l.category,
+      l.source, l.assignedTo, l.value, l.probability, l.tags.join("; "), l.nextFollowUp, l.notes.replace(/,/g, " "), l.createdAt,
+    ])
+    const csv = [headers.join(","), ...rows.map(r => r.map(v => `"${v}"`).join(","))].join("\n")
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `leads_export_${new Date().toISOString().split("T")[0]}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  // Import leads from CSV
+  const handleImportLeads = () => {
+    const input = document.createElement("input")
+    input.type = "file"
+    input.accept = ".csv"
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (!file) return
+      const reader = new FileReader()
+      reader.onload = (ev) => {
+        const text = ev.target?.result as string
+        const lines = text.split("\n").filter(l => l.trim())
+        if (lines.length < 2) return
+        const newLeads: Lead[] = lines.slice(1).map((line, i) => {
+          const cols = line.split(",").map(c => c.replace(/^"|"$/g, "").trim())
+          return {
+            id: `IMP_${Date.now()}_${i}`,
+            name: cols[0] || "Unknown",
+            company: cols[1] || "",
+            email: cols[2] || "",
+            phone: cols[3] || "",
+            status: (cols[4] as "hot" | "warm" | "cold") || "warm",
+            stage: (cols[5] as Stage) || "new",
+            priority: (cols[6] as "high" | "medium" | "low") || "medium",
+            category: (cols[7] as LeadCategory) || "other",
+            source: cols[8] || "Website",
+            assignedTo: cols[9] || "Unassigned",
+            value: Number(cols[10]) || 0,
+            probability: Number(cols[11]) || 50,
+            tags: cols[12] ? cols[12].split(";").map(t => t.trim()).filter(Boolean) : [],
+            nextFollowUp: cols[13] || "",
+            notes: cols[14] || "",
+            createdAt: cols[15] || new Date().toISOString().split("T")[0],
+            lastContact: new Date().toISOString().split("T")[0],
+            starred: false,
+            activities: 0,
+            noteHistory: [],
+            activityHistory: [{
+              id: Date.now().toString(),
+              type: "created",
+              description: "Lead imported from CSV",
+              timestamp: new Date().toISOString(),
+              changedBy: "Current User",
+            }],
+          }
+        })
+        setLeads(prev => [...newLeads, ...prev])
+      }
+      reader.readAsText(file)
+    }
+    input.click()
+  }
+
   // Bulk delete function (added to fix the lint error)
   const handleBulkDelete = () => {
     setLeads(leads.filter((lead) => !selectedLeads.includes(lead.id)))
@@ -741,25 +867,31 @@ export default function LeadsPage() {
     if (!meetingDetails.trim()) return
 
     const meetingLabel = meetingType === "online" ? "💻 Online Meeting" : "🏢 Offline Meeting"
+    const selectedAttendees = teamMembers
+      .filter(tm => meetingAttendees.includes(tm.id))
+      .map(tm => ({ id: tm.id, name: tm.name, initials: tm.initials }))
+
+    const meetingEntry = {
+      id: Date.now().toString(),
+      type: "meeting_scheduled" as const,
+      description: `${meetingLabel} scheduled`,
+      timestamp: new Date().toISOString(),
+      changedBy: "Current User",
+      meetingType,
+      meetingDetails: meetingDetails.trim(),
+      meetingDate: meetingDate || new Date().toISOString().split("T")[0],
+      meetingTime: meetingTime || "",
+      meetingLocation: meetingType === "offline" ? meetingLocation : "",
+      meetingLink: meetingType === "online" ? meetingLink : "",
+      meetingAttendees: selectedAttendees,
+    }
 
     setLeads(
       leads.map((lead) => {
         if (lead.id === leadId) {
           return {
             ...lead,
-            activityHistory: [
-              {
-                id: Date.now().toString(),
-                type: "meeting_scheduled" as const,
-                description: `${meetingLabel} scheduled`,
-                timestamp: new Date().toISOString(),
-                changedBy: "Current User",
-                meetingType,
-                meetingDetails: meetingDetails.trim(),
-                meetingDate: meetingDate || new Date().toISOString(),
-              },
-              ...lead.activityHistory,
-            ],
+            activityHistory: [meetingEntry, ...lead.activityHistory],
             lastContact: new Date().toISOString(),
             activities: lead.activities + 1,
           }
@@ -772,19 +904,7 @@ export default function LeadsPage() {
     if (selectedLead && selectedLead.id === leadId) {
       setSelectedLead({
         ...selectedLead,
-        activityHistory: [
-          {
-            id: Date.now().toString(),
-            type: "meeting_scheduled" as const,
-            description: `${meetingLabel} scheduled`,
-            timestamp: new Date().toISOString(),
-            changedBy: "Current User",
-            meetingType,
-            meetingDetails: meetingDetails.trim(),
-            meetingDate: meetingDate || new Date().toISOString(),
-          },
-          ...selectedLead.activityHistory,
-        ],
+        activityHistory: [meetingEntry, ...selectedLead.activityHistory],
         lastContact: new Date().toISOString(),
         activities: selectedLead.activities + 1,
       })
@@ -794,6 +914,10 @@ export default function LeadsPage() {
     setMeetingType("online")
     setMeetingDetails("")
     setMeetingDate("")
+    setMeetingTime("")
+    setMeetingLocation("")
+    setMeetingLink("")
+    setMeetingAttendees([])
     setIsAddMeetingOpen(false)
   }
 
@@ -807,11 +931,11 @@ export default function LeadsPage() {
             <p className="text-muted-foreground mt-1">Track, manage, and convert your leads into clients</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+            <Button variant="outline" size="sm" className="gap-2 bg-transparent" onClick={handleImportLeads}>
               <Upload className="w-4 h-4" />
               Import
             </Button>
-            <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+            <Button variant="outline" size="sm" className="gap-2 bg-transparent" onClick={handleExportLeads}>
               <Download className="w-4 h-4" />
               Export
             </Button>
@@ -1779,7 +1903,15 @@ export default function LeadsPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
+                      <Button
+                        size="sm"
+                        onClick={() => setIsAddMeetingOpen(true)}
+                        className="gap-2 bg-primary/90 hover:bg-primary"
+                      >
+                        <CalendarPlus className="w-4 h-4" />
+                        Schedule Meeting
+                      </Button>
                       <Button
                         size="sm"
                         variant="outline"
@@ -1898,13 +2030,16 @@ export default function LeadsPage() {
                               <span className="text-sm text-muted-foreground">Last Contact</span>
                               <span className="text-sm">{new Date(selectedLead.lastContact).toLocaleDateString()}</span>
                             </div>
-                            <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50">
+                            <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50 group">
                               <span className="text-sm text-muted-foreground">Next Follow-up</span>
-                              <span className="text-sm font-medium text-primary">
-                                {selectedLead.nextFollowUp
-                                  ? new Date(selectedLead.nextFollowUp).toLocaleDateString()
-                                  : "Not set"}
-                              </span>
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="date"
+                                  value={selectedLead.nextFollowUp || ""}
+                                  onChange={(e) => handleFollowUpChange(selectedLead.id, e.target.value)}
+                                  className="text-sm font-medium text-primary bg-transparent border border-transparent hover:border-border focus:border-primary rounded px-2 py-0.5 outline-none cursor-pointer transition-colors"
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -1953,15 +2088,15 @@ export default function LeadsPage() {
                       )}
 
                       <div className="flex gap-2">
-                        <Button className="flex-1 gap-2">
+                        <Button className="flex-1 gap-2" onClick={() => window.location.href = `mailto:${selectedLead.email}`}>
                           <Mail className="w-4 h-4" />
                           Send Email
                         </Button>
-                        <Button variant="outline" className="flex-1 gap-2 bg-transparent">
+                        <Button variant="outline" className="flex-1 gap-2 bg-transparent" onClick={() => window.location.href = `tel:${selectedLead.phone}`}>
                           <Phone className="w-4 h-4" />
                           Call
                         </Button>
-                        <Button variant="outline" className="flex-1 gap-2 bg-transparent">
+                        <Button variant="outline" className="flex-1 gap-2 bg-transparent" onClick={() => setIsAddMeetingOpen(true)}>
                           <CalendarPlus className="w-4 h-4" />
                           Schedule
                         </Button>
@@ -2036,7 +2171,10 @@ export default function LeadsPage() {
                       ) : (
                         <div className="space-y-3">
                           {selectedLead.activityHistory.map((activity) => (
-                            <div key={activity.id} className="p-4 rounded-lg bg-secondary/50 border border-border">
+                            <div key={activity.id} className={`p-4 rounded-lg border ${activity.type === "meeting_scheduled"
+                              ? "bg-primary/5 border-primary/30"
+                              : "bg-secondary/50 border-border"
+                              }`}>
                               <div className="flex items-start justify-between mb-2">
                                 <div>
                                   <p className="font-medium text-sm">{activity.description}</p>
@@ -2044,10 +2182,77 @@ export default function LeadsPage() {
                                     {activity.changedBy} • {new Date(activity.timestamp).toLocaleString()}
                                   </p>
                                 </div>
-                                <Badge variant="outline" className="text-xs">
-                                  {activity.type}
+                                <Badge variant="outline" className={`text-xs ${activity.type === "meeting_scheduled" ? "border-primary/50 text-primary" : ""
+                                  }`}>
+                                  {activity.type.replace(/_/g, " ")}
                                 </Badge>
                               </div>
+
+                              {/* Meeting Details */}
+                              {activity.type === "meeting_scheduled" && (
+                                <div className="mt-3 space-y-3 pt-3 border-t border-border/50">
+                                  {/* Meeting Agenda */}
+                                  {activity.meetingDetails && (
+                                    <div className="text-sm text-foreground bg-secondary/50 p-2 rounded">
+                                      {activity.meetingDetails}
+                                    </div>
+                                  )}
+
+                                  {/* Date, Time, Location/Link */}
+                                  <div className="flex flex-wrap gap-3 text-xs">
+                                    {activity.meetingDate && (
+                                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                                        <Calendar className="w-3.5 h-3.5" />
+                                        {new Date(activity.meetingDate).toLocaleDateString()}
+                                        {activity.meetingTime && ` at ${activity.meetingTime}`}
+                                      </div>
+                                    )}
+                                    {activity.meetingType === "online" && activity.meetingLink && (
+                                      <a
+                                        href={activity.meetingLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-1.5 text-primary hover:underline"
+                                      >
+                                        <Video className="w-3.5 h-3.5" />
+                                        Join Meeting
+                                      </a>
+                                    )}
+                                    {activity.meetingType === "offline" && activity.meetingLocation && (
+                                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                                        <MapPin className="w-3.5 h-3.5" />
+                                        {activity.meetingLocation}
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Attendees */}
+                                  {activity.meetingAttendees && activity.meetingAttendees.length > 0 && (
+                                    <div className="flex items-center gap-2">
+                                      <Users className="w-3.5 h-3.5 text-muted-foreground" />
+                                      <div className="flex -space-x-2">
+                                        {activity.meetingAttendees.slice(0, 4).map((attendee) => (
+                                          <Avatar key={attendee.id} className="w-6 h-6 border-2 border-background">
+                                            <AvatarFallback className="text-[10px] bg-primary/20 text-primary">
+                                              {attendee.initials}
+                                            </AvatarFallback>
+                                          </Avatar>
+                                        ))}
+                                        {activity.meetingAttendees.length > 4 && (
+                                          <div className="w-6 h-6 rounded-full bg-secondary border-2 border-background flex items-center justify-center text-[10px] text-muted-foreground">
+                                            +{activity.meetingAttendees.length - 4}
+                                          </div>
+                                        )}
+                                      </div>
+                                      <span className="text-xs text-muted-foreground">
+                                        {activity.meetingAttendees.length} attendee{activity.meetingAttendees.length > 1 ? "s" : ""}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Regular Changes */}
                               {activity.changes && Object.keys(activity.changes).length > 0 && (
                                 <div className="mt-3 space-y-1 text-xs">
                                   {Object.entries(activity.changes).map(([key, value]) => (
@@ -2086,6 +2291,181 @@ export default function LeadsPage() {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Schedule Meeting Dialog */}
+        <Dialog open={isAddMeetingOpen} onOpenChange={setIsAddMeetingOpen}>
+          <DialogContent className="sm:max-w-[550px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <CalendarPlus className="w-5 h-5 text-primary" />
+                Schedule Meeting
+              </DialogTitle>
+              <DialogDescription>
+                {selectedLead ? `Schedule a meeting with ${selectedLead.name}` : "Schedule a new meeting"}
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-5 mt-4">
+              {/* Meeting Type Toggle */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Meeting Type</Label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant={meetingType === "online" ? "default" : "outline"}
+                    onClick={() => setMeetingType("online")}
+                    className="flex-1 gap-2"
+                  >
+                    <Video className="w-4 h-4" />
+                    Online
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={meetingType === "offline" ? "default" : "outline"}
+                    onClick={() => setMeetingType("offline")}
+                    className="flex-1 gap-2"
+                  >
+                    <MapPin className="w-4 h-4" />
+                    Offline
+                  </Button>
+                </div>
+              </div>
+
+              {/* Meeting Details */}
+              <div className="space-y-2">
+                <Label htmlFor="meeting-details">Meeting Title / Agenda *</Label>
+                <Textarea
+                  id="meeting-details"
+                  placeholder="Enter meeting title or agenda..."
+                  value={meetingDetails}
+                  onChange={(e) => setMeetingDetails(e.target.value)}
+                  rows={2}
+                />
+              </div>
+
+              {/* Date and Time */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="meeting-date">Date *</Label>
+                  <Input
+                    id="meeting-date"
+                    type="date"
+                    value={meetingDate}
+                    onChange={(e) => setMeetingDate(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="meeting-time">Time</Label>
+                  <Input
+                    id="meeting-time"
+                    type="time"
+                    value={meetingTime}
+                    onChange={(e) => setMeetingTime(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Location (for offline) or Link (for online) */}
+              {meetingType === "offline" ? (
+                <div className="space-y-2">
+                  <Label htmlFor="meeting-location">Location</Label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="meeting-location"
+                      placeholder="Enter meeting location..."
+                      className="pl-10"
+                      value={meetingLocation}
+                      onChange={(e) => setMeetingLocation(e.target.value)}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Label htmlFor="meeting-link">Meeting Link</Label>
+                  <div className="relative">
+                    <Video className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="meeting-link"
+                      placeholder="https://meet.google.com/... or Zoom link"
+                      className="pl-10"
+                      value={meetingLink}
+                      onChange={(e) => setMeetingLink(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Team Members Selection */}
+              <div className="space-y-2">
+                <Label>Assign Team Members</Label>
+                <div className="grid grid-cols-2 gap-2 max-h-[150px] overflow-y-auto p-2 rounded-lg bg-secondary/30 border border-border">
+                  {teamMembers.map((member) => (
+                    <div
+                      key={member.id}
+                      onClick={() => {
+                        setMeetingAttendees(prev =>
+                          prev.includes(member.id)
+                            ? prev.filter(id => id !== member.id)
+                            : [...prev, member.id]
+                        )
+                      }}
+                      className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all ${meetingAttendees.includes(member.id)
+                        ? "bg-primary/20 border border-primary/50"
+                        : "hover:bg-secondary/80"
+                        }`}
+                    >
+                      <Checkbox
+                        checked={meetingAttendees.includes(member.id)}
+                        className="pointer-events-none"
+                      />
+                      <Avatar className="w-7 h-7">
+                        <AvatarFallback className="text-xs bg-primary/20 text-primary">
+                          {member.initials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{member.name}</p>
+                        <p className="text-[10px] text-muted-foreground truncate">{member.jobTitle}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {meetingAttendees.length > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    {meetingAttendees.length} team member{meetingAttendees.length > 1 ? "s" : ""} selected
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <DialogFooter className="mt-6">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsAddMeetingOpen(false)
+                  setMeetingType("online")
+                  setMeetingDetails("")
+                  setMeetingDate("")
+                  setMeetingTime("")
+                  setMeetingLocation("")
+                  setMeetingLink("")
+                  setMeetingAttendees([])
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => selectedLead && handleAddMeeting(selectedLead.id)}
+                disabled={!meetingDetails.trim() || !meetingDate}
+                className="gap-2"
+              >
+                <CalendarPlus className="w-4 h-4" />
+                Schedule Meeting
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   )
@@ -2111,6 +2491,11 @@ function EditLeadForm({
     category: lead.category,
     assignedTo: lead.assignedTo,
     notes: lead.notes,
+    value: lead.value,
+    probability: lead.probability,
+    source: lead.source,
+    tags: lead.tags.join(", "),
+    nextFollowUp: lead.nextFollowUp,
   })
 
   const handleChange = (field: string, value: string) => {
@@ -2119,7 +2504,12 @@ function EditLeadForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSave(formData)
+    onSave({
+      ...formData,
+      value: Number(formData.value) || 0,
+      probability: Number(formData.probability) || 0,
+      tags: formData.tags.split(",").map(t => t.trim()).filter(Boolean),
+    })
   }
 
   return (
@@ -2220,6 +2610,53 @@ function EditLeadForm({
             ))}
           </select>
         </div>
+        <div className="space-y-2">
+          <Label htmlFor="value">Deal Value ($)</Label>
+          <Input
+            id="value"
+            type="number"
+            value={formData.value}
+            onChange={(e) => handleChange("value", e.target.value)}
+            placeholder="10000"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="probability">Win Probability (%)</Label>
+          <Input
+            id="probability"
+            type="number"
+            value={formData.probability}
+            onChange={(e) => handleChange("probability", e.target.value)}
+            placeholder="50"
+            min={0}
+            max={100}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="source">Source</Label>
+          <select
+            id="source"
+            value={formData.source}
+            onChange={(e) => handleChange("source", e.target.value)}
+            className="w-full px-3 py-2 bg-secondary text-foreground rounded-md border border-input"
+          >
+            <option value="Website">Website</option>
+            <option value="Referral">Referral</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="Cold Email">Cold Email</option>
+            <option value="Conference">Conference</option>
+            <option value="Webinar">Webinar</option>
+          </select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="nextFollowUp">Next Follow-Up</Label>
+          <Input
+            id="nextFollowUp"
+            type="date"
+            value={formData.nextFollowUp}
+            onChange={(e) => handleChange("nextFollowUp", e.target.value)}
+          />
+        </div>
       </div>
       <div className="space-y-2">
         <Label htmlFor="assignedTo">Assigned To</Label>
@@ -2228,6 +2665,15 @@ function EditLeadForm({
           value={formData.assignedTo}
           onChange={(e) => handleChange("assignedTo", e.target.value)}
           placeholder="Team member name"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="tags">Tags (comma separated)</Label>
+        <Input
+          id="tags"
+          value={formData.tags}
+          onChange={(e) => handleChange("tags", e.target.value)}
+          placeholder="SEO, Enterprise, Priority"
         />
       </div>
       <div className="space-y-2">
