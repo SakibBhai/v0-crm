@@ -1,362 +1,309 @@
-[00:00:02.261] Server  LOG      ✓ Ready in 1875ms
-[36:12:32.037] Server  LOG      ○ Compiling / ...
-[36:12:32.819] Server  WARN     ⚠ Cross origin request detected from 192.168.0.6 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
-Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
-[36:12:32.865] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[36:12:33.499] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[36:12:33.499] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[36:12:33.499] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://192.168.0.6:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://192.168.0.6:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770478842982}
-[36:13:38.953] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://192.168.0.6:3000/tasks color: rgb(120, 120, 120) color: inherit {"dp":"/tasks","o":"http://192.168.0.6:3000/tasks","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770478908441}
-[36:13:41.857] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
-[36:13:41.857] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://192.168.0.6:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://192.168.0.6:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770478911272}
-[36:19:09.736] Server  LOG      ✓ Compiled in 159ms
-[36:19:16.807] Server  LOG      ✓ Compiled in 60ms
-[36:19:34.312] Server  LOG      ✓ Compiled in 145ms
-[36:20:00.985] Server  LOG      ✓ Compiled in 61ms
-[59:39:15.670] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[59:39:16.532] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[59:39:16.532] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[59:39:16.532] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770563246018}
-[59:40:06.481] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770563295960}
-[59:40:08.151] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[59:40:08.151] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[59:40:18.811] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[59:40:18.811] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[59:40:27.357] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3000/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770563316835}
-[59:40:29.921] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770563319405}
-[59:40:31.922] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/tasks color: rgb(120, 120, 120) color: inherit {"dp":"/tasks","o":"http://localhost:3000/tasks","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770563321406}
-[59:40:37.681] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
-[59:40:37.681] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770563327109}
-[59:40:46.237] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770563335718}
-[59:40:48.773] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770563338232}
-[71:00:16.009] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[71:00:16.320] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[71:00:16.320] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/projects","route":"/projects"}
-[71:00:16.320] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770604105809}
-[72:57:58.604] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770611168087}
-[73:03:03.650] Server  LOG      ✓ Compiled in 1476ms
-[73:03:04.395] Browser ERROR   ./app/leads/page.tsx:10:10
-Ecmascript file had an error
-   8 | import { useState } from "react"
-   9 | import { DashboardLayout } from "@/components/dashboard-layout"
-> 10 | import { AnimatedCard } from "@/components/animated-card"
-     |          ^^^^^^^^^^^^
-  11 | import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-  12 | import { Badge } from "@/components/ui/badge"
-  13 | import { Button } from "@/components/ui/button"
-
-the name `AnimatedCard` is defined multiple times
-
-Import traces:
-  Client Component Browser:
-    ./app/leads/page.tsx [Client Component Browser]
-    ./app/leads/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/leads/page.tsx [Client Component SSR]
-    ./app/leads/page.tsx [Server Component]
-[73:03:04.395] Browser ERROR   ./app/leads/page.tsx:9:10
-Ecmascript file had an error
-   7 | import { employees } from "@/lib/data/hr"
-   8 | import { useState } from "react"
->  9 | import { DashboardLayout } from "@/components/dashboard-layout"
-     |          ^^^^^^^^^^^^^^^
-  10 | import { AnimatedCard } from "@/components/animated-card"
-  11 | import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-  12 | import { Badge } from "@/components/ui/badge"
-
-the name `DashboardLayout` is defined multiple times
-
-Import traces:
-  Client Component Browser:
-    ./app/leads/page.tsx [Client Component Browser]
-    ./app/leads/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/leads/page.tsx [Client Component SSR]
-    ./app/leads/page.tsx [Server Component]
-[73:03:04.395] Browser ERROR   ./app/leads/page.tsx:8:10
-Ecmascript file had an error
-   6 | import { AnimatedCard } from "@/components/animated-card"
-   7 | import { employees } from "@/lib/data/hr"
->  8 | import { useState } from "react"
-     |          ^^^^^^^^
-   9 | import { DashboardLayout } from "@/components/dashboard-layout"
-  10 | import { AnimatedCard } from "@/components/animated-card"
-  11 | import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
-the name `useState` is defined multiple times
-
-Import traces:
-  Client Component Browser:
-    ./app/leads/page.tsx [Client Component Browser]
-    ./app/leads/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./app/leads/page.tsx [Client Component SSR]
-    ./app/leads/page.tsx [Server Component]
-[73:03:20.390] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
-[73:03:47.740] Server  LOG      ✓ Compiled in 78ms
-[73:04:41.226] Server  LOG      ✓ Compiled in 282ms
-[73:05:21.640] Server  LOG      ✓ Compiled in 136ms
-[73:09:15.362] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[73:09:15.876] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[73:09:15.876] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[73:09:15.876] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770611845338}
-[73:09:16.932] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770611846422}
-[73:09:18.245] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[73:09:18.245] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[73:09:36.479] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[73:09:36.480] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[77:56:09.246] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[77:56:09.800] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[77:56:09.800] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[77:56:09.800] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770629059258}
-[77:56:11.499] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770629060987}
-[77:56:13.742] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[77:56:13.742] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[85:34:42.675] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[85:34:43.088] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[85:34:43.088] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[85:34:43.088] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://192.168.0.6:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://192.168.0.6:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770656572548}
-[86:59:38.944] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[86:59:39.250] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[86:59:39.250] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/leads","route":"/leads"}
-[86:59:39.250] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770661668732}
-[96:19:03.927] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[96:19:04.249] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[96:19:04.249] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/leads","route":"/leads"}
-[96:19:04.249] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770695233734}
-[96:19:06.599] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[96:19:06.599] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[96:21:29.845] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
-[96:21:29.845] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/calendar color: rgb(120, 120, 120) color: inherit {"dp":"/calendar","o":"http://localhost:3000/calendar","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770695379317}
-[96:23:19.796] Server  LOG      ✓ Compiled in 161ms
-[96:23:55.820] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770695525283}
-[96:23:57.005] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[96:23:57.005] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[96:24:24.098] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770695553585}
-[96:25:38.565] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/finances color: rgb(120, 120, 120) color: inherit {"dp":"/finances","o":"http://localhost:3000/finances","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770695628017}
-[96:25:43.028] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770695632516}
-[96:25:45.396] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/projects/2 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3000/projects/2","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770695634879}
-[96:26:10.672] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770695660127}
-[96:26:11.842] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[96:26:11.842] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[96:28:52.446] Server  LOG      ✓ Compiled in 125ms
-[96:29:35.008] Server  LOG      ✓ Compiled in 60ms
-[96:30:22.162] Server  LOG      ✓ Compiled in 173ms
-[96:32:25.370] Server  LOG      ✓ Compiled in 75ms
-[96:33:02.637] Server  LOG      ✓ Compiled in 78ms
-[96:33:02.749] Browser ERROR   ./components/team/employee-profile.tsx:59:80
+[00:00:01.094] Server  LOG      ✓ Ready in 674ms
+[00:00:06.474] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:06.889] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:06.889] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:00:06.889] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772307633534} /_vercel/insights/view
+[00:00:11.692] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772307638355} /_vercel/insights/view
+[00:00:23.171] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3000/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772307649833} /_vercel/insights/view
+[00:00:28.740] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:00:28.740] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:00:30.973] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:00:30.973] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:00:34.362] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:00:34.363] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:03:39.879] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:03:40.365] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:03:40.365] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/clients","route":"/clients"}
+[00:03:40.365] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3000/clients","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772307847033} /_vercel/insights/view
+[00:03:54.502] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:03:54.502] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:04:51.516] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:04:51.516] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:05:33.637] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:05:33.637] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:06:32.114] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:06:32.114] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:07:54.948] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:07:54.948] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:10:17.295] Server  LOG      ✓ Compiled in 96ms
+[00:10:55.496] Server  LOG      ✓ Compiled in 94ms
+[00:11:38.177] Server  LOG      ✓ Compiled in 110ms
+[00:12:25.301] Server  LOG      ✓ Compiled in 207ms
+[00:12:46.390] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:12:46.390] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:12:47.978] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:12:47.979] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:13:21.573] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772308428234} /_vercel/insights/view
+[00:13:36.536] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:13:36.536] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:17:00.532] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:17:00.959] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:17:00.959] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/leads","route":"/leads"}
+[00:17:00.959] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772308647627} /_vercel/insights/view
+[00:17:48.071] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3000/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772308694728} /_vercel/insights/view
+[00:17:50.543] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:17:50.543] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:17:52.855] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:17:52.855] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:17:56.072] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:17:56.072] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:18:15.201] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:18:15.201] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:18:20.731] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:18:20.731] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:18:27.630] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772308734291} /_vercel/insights/view
+[00:21:03.294] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:21:03.966] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:21:03.966] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/projects","route":"/projects"}
+[00:21:03.966] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772308890635} /_vercel/insights/view
+[00:21:14.058] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:21:14.058] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:22:26.738] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects/PJ-0007 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3000/projects/PJ-0007","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772308973267} /_vercel/insights/view
+[00:22:26.738] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:23:26.498] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772309033090} /_vercel/insights/view
+[00:24:59.820] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects/PJ-0002 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3000/projects/PJ-0002","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772309126477} /_vercel/insights/view
+[00:25:06.543] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772309133129} /_vercel/insights/view
+[00:25:37.824] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects/PJ-0001 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3000/projects/PJ-0001","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772309164487} /_vercel/insights/view
+[00:27:50.832] Server  LOG      ✓ Compiled in 88ms
+[00:28:31.107] Server  LOG      ✓ Compiled in 153ms
+[00:29:08.165] Server  LOG      ✓ Compiled in 171ms
+[00:29:08.279] Browser ERROR   ./app/projects/page.tsx:1173:23
 Parsing ecmascript source code failed
-  57 |     const [isUploadOpen, setIsUploadOpen] = useState(false)
-  58 |     const [localEmployee, setLocalEmployee] = useState(employee)
-> 59 |     const [downloadingId, setDownloadingId] = useState<string | null>(null)    const initials = `${employee.firstName[0]}${employee.lastName[0]}`
-     |                                                                                ^^^^^
-  60 |     const deptConfig = DEPARTMENT_CONFIG[employee.department]
-  61 |
-  62 |     const formatCurrency = (amount: number) => {
-
-Expected a semicolon
-
-Import traces:
-  Client Component Browser:
-    ./components/team/employee-profile.tsx [Client Component Browser]
-    ./app/team/page.tsx [Client Component Browser]
-    ./app/team/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./components/team/employee-profile.tsx [Client Component SSR]
-    ./app/team/page.tsx [Client Component SSR]
-    ./app/team/page.tsx [Server Component]
-[96:33:03.400] Browser ERROR   ./components/team/employee-profile.tsx:59:80
-Parsing ecmascript source code failed
-  57 |     const [isUploadOpen, setIsUploadOpen] = useState(false)
-  58 |     const [localEmployee, setLocalEmployee] = useState(employee)
-> 59 |     const [downloadingId, setDownloadingId] = useState<string | null>(null)    const initials = `${employee.firstName[0]}${employee.lastName[0]}`
-     |                                                                                ^^^^^
-  60 |     const deptConfig = DEPARTMENT_CONFIG[employee.department]
-  61 |
-  62 |     const formatCurrency = (amount: number) => {
-
-Expected a semicolon
-
-Import traces:
-  Client Component Browser:
-    ./components/team/employee-profile.tsx [Client Component Browser]
-    ./app/team/page.tsx [Client Component Browser]
-    ./app/team/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./components/team/employee-profile.tsx [Client Component SSR]
-    ./app/team/page.tsx [Client Component SSR]
-    ./app/team/page.tsx [Server Component]
-[96:33:03.400] Browser ERROR   ./components/team/employee-profile.tsx:59:80
-Parsing ecmascript source code failed
-  57 |     const [isUploadOpen, setIsUploadOpen] = useState(false)
-  58 |     const [localEmployee, setLocalEmployee] = useState(employee)
-> 59 |     const [downloadingId, setDownloadingId] = useState<string | null>(null)    const initials = `${employee.firstName[0]}${employee.lastName[0]}`
-     |                                                                                ^^^^^
-  60 |     const deptConfig = DEPARTMENT_CONFIG[employee.department]
-  61 |
-  62 |     const formatCurrency = (amount: number) => {
-
-Expected a semicolon
-
-Import traces:
-  Client Component Browser:
-    ./components/team/employee-profile.tsx [Client Component Browser]
-    ./app/team/page.tsx [Client Component Browser]
-    ./app/team/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./components/team/employee-profile.tsx [Client Component SSR]
-    ./app/team/page.tsx [Client Component SSR]
-    ./app/team/page.tsx [Server Component]
-[96:33:43.930] Server  LOG      ✓ Compiled in 126ms
-[96:33:44.391] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
-[96:34:05.399] Server  LOG      ✓ Compiled in 65ms
-[96:34:05.515] Browser ERROR   ./components/team/employee-profile.tsx:428:13
-Parsing ecmascript source code failed
-  426 |         </div>
-  427 |
-> 428 |             {/* Upload Document Dialog */ }
-      |             ^
-  429 |     <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
-  430 |         <DialogContent>
-  431 |             <DialogHeader>
-
-Expected ',', got '{'
-
-Import traces:
-  Client Component Browser:
-    ./components/team/employee-profile.tsx [Client Component Browser]
-    ./app/team/page.tsx [Client Component Browser]
-    ./app/team/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./components/team/employee-profile.tsx [Client Component SSR]
-    ./app/team/page.tsx [Client Component SSR]
-    ./app/team/page.tsx [Server Component]
-[96:34:06.404] Browser ERROR   ./components/team/employee-profile.tsx:428:13
-Parsing ecmascript source code failed
-  426 |         </div>
-  427 |
-> 428 |             {/* Upload Document Dialog */ }
-      |             ^
-  429 |     <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
-  430 |         <DialogContent>
-  431 |             <DialogHeader>
-
-Expected ',', got '{'
-
-Import traces:
-  Client Component Browser:
-    ./components/team/employee-profile.tsx [Client Component Browser]
-    ./app/team/page.tsx [Client Component Browser]
-    ./app/team/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./components/team/employee-profile.tsx [Client Component SSR]
-    ./app/team/page.tsx [Client Component SSR]
-    ./app/team/page.tsx [Server Component]
-[96:34:06.412] Browser ERROR   ./components/team/employee-profile.tsx:428:13
-Parsing ecmascript source code failed
-  426 |         </div>
-  427 |
-> 428 |             {/* Upload Document Dialog */ }
-      |             ^
-  429 |     <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
-  430 |         <DialogContent>
-  431 |             <DialogHeader>
-
-Expected ',', got '{'
-
-Import traces:
-  Client Component Browser:
-    ./components/team/employee-profile.tsx [Client Component Browser]
-    ./app/team/page.tsx [Client Component Browser]
-    ./app/team/page.tsx [Server Component]
-
-  Client Component SSR:
-    ./components/team/employee-profile.tsx [Client Component SSR]
-    ./app/team/page.tsx [Client Component SSR]
-    ./app/team/page.tsx [Server Component]
-[96:34:24.835] Server  LOG      ✓ Compiled in 66ms
-[96:34:24.945] Browser ERROR   ./components/team/employee-profile.tsx:470:1
-Parsing ecmascript source code failed
-  468 |             </Dialog>
-  469 |             )
-> 470 | }
-      | ^
-  471 |
+  1171 |                       </div>
+  1172 |                     </div>
+> 1173 |                     ))}
+       |                       ^
+  1174 |                   </CardContent>
+  1175 |                 </AnimatedCard>
+  1176 |               )
 
 Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
 
 Import traces:
   Client Component Browser:
-    ./components/team/employee-profile.tsx [Client Component Browser]
-    ./app/team/page.tsx [Client Component Browser]
-    ./app/team/page.tsx [Server Component]
+    ./app/projects/page.tsx [Client Component Browser]
+    ./app/projects/page.tsx [Server Component]
 
   Client Component SSR:
-    ./components/team/employee-profile.tsx [Client Component SSR]
-    ./app/team/page.tsx [Client Component SSR]
-    ./app/team/page.tsx [Server Component]
-[96:34:25.387] Browser ERROR   ./components/team/employee-profile.tsx:470:1
+    ./app/projects/page.tsx [Client Component SSR]
+    ./app/projects/page.tsx [Server Component]
+[00:29:08.282] Browser ERROR   ./app/projects/page.tsx:1173:23
 Parsing ecmascript source code failed
-  468 |             </Dialog>
-  469 |             )
-> 470 | }
-      | ^
-  471 |
+  1171 |                       </div>
+  1172 |                     </div>
+> 1173 |                     ))}
+       |                       ^
+  1174 |                   </CardContent>
+  1175 |                 </AnimatedCard>
+  1176 |               )
 
 Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
 
 Import traces:
   Client Component Browser:
-    ./components/team/employee-profile.tsx [Client Component Browser]
-    ./app/team/page.tsx [Client Component Browser]
-    ./app/team/page.tsx [Server Component]
+    ./app/projects/page.tsx [Client Component Browser]
+    ./app/projects/page.tsx [Server Component]
 
   Client Component SSR:
-    ./components/team/employee-profile.tsx [Client Component SSR]
-    ./app/team/page.tsx [Client Component SSR]
-    ./app/team/page.tsx [Server Component]
-[96:34:25.387] Browser ERROR   ./components/team/employee-profile.tsx:470:1
+    ./app/projects/page.tsx [Client Component SSR]
+    ./app/projects/page.tsx [Server Component]
+[00:29:08.302] Browser ERROR   ./app/projects/page.tsx:1173:23
 Parsing ecmascript source code failed
-  468 |             </Dialog>
-  469 |             )
-> 470 | }
-      | ^
-  471 |
+  1171 |                       </div>
+  1172 |                     </div>
+> 1173 |                     ))}
+       |                       ^
+  1174 |                   </CardContent>
+  1175 |                 </AnimatedCard>
+  1176 |               )
 
 Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
 
 Import traces:
   Client Component Browser:
-    ./components/team/employee-profile.tsx [Client Component Browser]
-    ./app/team/page.tsx [Client Component Browser]
-    ./app/team/page.tsx [Server Component]
+    ./app/projects/page.tsx [Client Component Browser]
+    ./app/projects/page.tsx [Server Component]
 
   Client Component SSR:
-    ./components/team/employee-profile.tsx [Client Component SSR]
-    ./app/team/page.tsx [Client Component SSR]
-    ./app/team/page.tsx [Server Component]
-[96:34:41.503] Server  LOG      ✓ Compiled in 180ms
-[96:34:47.284] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770696176770}
-[96:35:45.628] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[96:35:45.628] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[96:36:13.573] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[96:36:13.573] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[96:36:34.078] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[96:36:34.078] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[96:44:31.381] Server  LOG      ✓ Compiled in 108ms
-[96:45:07.963] Server  LOG      ✓ Compiled in 103ms
-[96:45:26.839] Server  LOG      ✓ Compiled in 110ms
-[96:45:56.429] Server  LOG      ✓ Compiled in 64ms
-[96:49:37.272] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1770697066748}
-[96:49:38.908] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[96:49:38.908] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[96:50:17.896] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[96:50:17.896] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+    ./app/projects/page.tsx [Client Component SSR]
+    ./app/projects/page.tsx [Server Component]
+[00:29:09.217] Browser ERROR   ./app/projects/page.tsx:1173:23
+Parsing ecmascript source code failed
+  1171 |                       </div>
+  1172 |                     </div>
+> 1173 |                     ))}
+       |                       ^
+  1174 |                   </CardContent>
+  1175 |                 </AnimatedCard>
+  1176 |               )
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./app/projects/page.tsx [Client Component Browser]
+    ./app/projects/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/projects/page.tsx [Client Component SSR]
+    ./app/projects/page.tsx [Server Component]
+[00:35:11.112] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772309737737} /_vercel/insights/view
+[00:35:11.815] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects/PJ-0002 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3000/projects/PJ-0002","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772309738480} /_vercel/insights/view
+[00:35:12.399] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772309739024} /_vercel/insights/view
+[00:36:07.983] Browser ERROR   ./app/projects/page.tsx:1173:23
+Parsing ecmascript source code failed
+  1171 |                       </div>
+  1172 |                     </div>
+> 1173 |                     ))}
+       |                       ^
+  1174 |                   </CardContent>
+  1175 |                 </AnimatedCard>
+  1176 |               )
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./app/projects/page.tsx [Client Component Browser]
+    ./app/projects/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/projects/page.tsx [Client Component SSR]
+    ./app/projects/page.tsx [Server Component]
+[00:36:07.983] Browser ERROR   ./app/projects/page.tsx:1173:23
+Parsing ecmascript source code failed
+  1171 |                       </div>
+  1172 |                     </div>
+> 1173 |                     ))}
+       |                       ^
+  1174 |                   </CardContent>
+  1175 |                 </AnimatedCard>
+  1176 |               )
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./app/projects/page.tsx [Client Component Browser]
+    ./app/projects/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/projects/page.tsx [Client Component SSR]
+    ./app/projects/page.tsx [Server Component]
+[00:36:07.983] Browser ERROR   ./app/projects/page.tsx:1173:23
+Parsing ecmascript source code failed
+  1171 |                       </div>
+  1172 |                     </div>
+> 1173 |                     ))}
+       |                       ^
+  1174 |                   </CardContent>
+  1175 |                 </AnimatedCard>
+  1176 |               )
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./app/projects/page.tsx [Client Component Browser]
+    ./app/projects/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/projects/page.tsx [Client Component SSR]
+    ./app/projects/page.tsx [Server Component]
+[00:36:08.208] Browser ERROR   ./app/projects/page.tsx:1173:23
+Parsing ecmascript source code failed
+  1171 |                       </div>
+  1172 |                     </div>
+> 1173 |                     ))}
+       |                       ^
+  1174 |                   </CardContent>
+  1175 |                 </AnimatedCard>
+  1176 |               )
+
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+
+Import traces:
+  Client Component Browser:
+    ./app/projects/page.tsx [Client Component Browser]
+    ./app/projects/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/projects/page.tsx [Client Component SSR]
+    ./app/projects/page.tsx [Server Component]
+[00:36:17.276] Server  LOG      ✓ Compiled in 87ms
+[00:36:17.929] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:36:18.216] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:37:15.785] Server  LOG      ✓ Compiled in 101ms
+[00:38:02.314] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772309908973} /_vercel/insights/view
+[00:40:37.926] Server  LOG      ✓ Compiled in 87ms
+[00:41:20.143] Server  LOG      ✓ Compiled in 75ms
+[00:53:57.477] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:53:58.035] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:53:58.035] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/projects","route":"/projects"}
+[00:53:58.035] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772310864703} /_vercel/insights/view
+[00:54:22.452] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects/PJ-0001 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3000/projects/PJ-0001","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772310889117} /_vercel/insights/view
+[00:54:22.777] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:54:30.486] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:54:31.153] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:54:31.153] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/projects","route":"/projects"}
+[00:54:31.153] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772310897815} /_vercel/insights/view
+[00:54:50.894] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:54:50.894] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:54:59.500] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:55:00.019] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:55:00.019] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/projects/PJ-0002","route":"/projects/[id]"}
+[00:55:00.019] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects/PJ-0002 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3000/projects/PJ-0002","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772310926683} /_vercel/insights/view
+[00:55:07.853] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:55:08.255] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:55:08.255] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/projects/PJ-0005","route":"/projects/[id]"}
+[00:55:08.255] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects/PJ-0005 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3000/projects/PJ-0005","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772310934918} /_vercel/insights/view
+[00:55:50.473] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772310977142} /_vercel/insights/view
+[00:55:54.736] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:55:54.736] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects/PJ-0001 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3000/projects/PJ-0001","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772310981397} /_vercel/insights/view
+[00:56:08.095] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/tasks color: rgb(120, 120, 120) color: inherit {"dp":"/tasks","o":"http://localhost:3000/tasks","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772310994752} /_vercel/insights/view
+[08:34:36.713] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338503278} /_vercel/insights/view
+[08:34:38.541] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects/PJ-0001 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3000/projects/PJ-0001","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338505202} /_vercel/insights/view
+[08:34:52.565] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338519133} /_vercel/insights/view
+[08:34:54.567] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects/PJ-0002 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3000/projects/PJ-0002","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338521225} /_vercel/insights/view
+[08:35:05.136] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3000/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338531802} /_vercel/insights/view
+[08:35:06.811] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338533382} /_vercel/insights/view
+[08:35:09.626] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[08:35:09.626] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[08:35:38.377] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects/PJ-0001 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3000/projects/PJ-0001","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338565039} /_vercel/insights/view
+[08:36:01.266] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338587841} /_vercel/insights/view
+[08:36:02.901] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3000/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338589546} /_vercel/insights/view
+[08:36:04.986] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338591651} /_vercel/insights/view
+[08:36:08.374] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[08:36:08.374] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[08:39:24.105] Server  LOG      ✓ Compiled in 151ms
+[08:40:02.953] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[08:40:03.409] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[08:40:03.409] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/leads","route":"/leads"}
+[08:40:03.409] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338830075} /_vercel/insights/view
+[08:40:09.664] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[08:40:09.664] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[08:40:14.884] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3000/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338841546} /_vercel/insights/view
+[08:40:19.282] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[08:40:20.223] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[08:40:20.223] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/leads","route":"/leads"}
+[08:40:20.223] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338846294} /_vercel/insights/view
+[08:40:57.828] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[08:40:57.828] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338884471} /_vercel/insights/view
+[08:40:59.716] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[08:40:59.716] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[08:41:08.410] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3000/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338895065} /_vercel/insights/view
+[08:41:10.104] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338896770} /_vercel/insights/view
+[08:41:13.130] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/tasks color: rgb(120, 120, 120) color: inherit {"dp":"/tasks","o":"http://localhost:3000/tasks","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338899801} /_vercel/insights/view
+[08:41:17.883] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338904540} /_vercel/insights/view
+[08:41:30.773] Server  LOG      ✓ Compiled in 158ms
+[08:42:06.900] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3000/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772338953559} /_vercel/insights/view
+[08:43:17.888] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772339024554} /_vercel/insights/view
+[08:43:20.373] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects/PJ-0001 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3000/projects/PJ-0001","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772339027031} /_vercel/insights/view
+[08:43:58.159] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/tasks color: rgb(120, 120, 120) color: inherit {"dp":"/tasks","o":"http://localhost:3000/tasks","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772339064789} /_vercel/insights/view
+[08:43:59.343] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[08:43:59.343] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[08:48:35.030] Server  LOG      ✓ Compiled in 72ms
+[08:52:25.832] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772339572495} /_vercel/insights/view
+[08:52:27.716] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects/PJ-0001 color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3000/projects/PJ-0001","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772339574376} /_vercel/insights/view
+[08:52:28.033] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[08:52:32.358] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1772339578895} /_vercel/insights/view

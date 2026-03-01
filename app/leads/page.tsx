@@ -1,7 +1,8 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useRef } from "react"
+import { generateId, generateBulkIds } from "@/lib/id-generator"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { AnimatedCard } from "@/components/animated-card"
 import { employees } from "@/lib/data/hr"
@@ -136,7 +137,7 @@ interface Lead {
 
 const initialLeads: Lead[] = [
   {
-    id: "1",
+    id: "LD-0001",
     name: "Sarah Mitchell",
     email: "sarah@techstart.com",
     phone: "+1 (555) 123-4567",
@@ -163,7 +164,7 @@ const initialLeads: Lead[] = [
     activityHistory: [],
   },
   {
-    id: "2",
+    id: "LD-0002",
     name: "James Wilson",
     email: "james@growthco.io",
     phone: "+1 (555) 234-5678",
@@ -189,7 +190,7 @@ const initialLeads: Lead[] = [
     activityHistory: [],
   },
   {
-    id: "3",
+    id: "LD-0003",
     name: "Emily Chen",
     email: "emily@innovatelab.com",
     phone: "+1 (555) 345-6789",
@@ -217,7 +218,7 @@ const initialLeads: Lead[] = [
     activityHistory: [],
   },
   {
-    id: "4",
+    id: "LD-0004",
     name: "Michael Brown",
     email: "michael@scaleup.ltd",
     phone: "+1 (555) 456-7890",
@@ -243,7 +244,7 @@ const initialLeads: Lead[] = [
     activityHistory: [],
   },
   {
-    id: "5",
+    id: "LD-0005",
     name: "Amanda Torres",
     email: "amanda@brightideas.co",
     phone: "+1 (555) 567-8901",
@@ -270,7 +271,7 @@ const initialLeads: Lead[] = [
     activityHistory: [],
   },
   {
-    id: "6",
+    id: "LD-0006",
     name: "David Park",
     email: "david@nexgen.tech",
     phone: "+1 (555) 678-9012",
@@ -296,7 +297,7 @@ const initialLeads: Lead[] = [
     activityHistory: [],
   },
   {
-    id: "7",
+    id: "LD-0007",
     name: "Lisa Wang",
     email: "lisa@cloudnine.io",
     phone: "+1 (555) 789-0123",
@@ -322,7 +323,7 @@ const initialLeads: Lead[] = [
     activityHistory: [],
   },
   {
-    id: "8",
+    id: "LD-0008",
     name: "Robert Kim",
     email: "robert@fintech.pro",
     phone: "+1 (555) 890-1234",
@@ -434,6 +435,7 @@ export default function LeadsPage() {
   const [selectedLeads, setSelectedLeads] = useState<string[]>([])
   const [draggedLead, setDraggedLead] = useState<Lead | null>(null)
   const [dragOverStage, setDragOverStage] = useState<Stage | null>(null)
+  const wasDragging = useRef(false)
   const [newNoteText, setNewNoteText] = useState("")
   const [isAddMeetingOpen, setIsAddMeetingOpen] = useState(false)
   const [meetingType, setMeetingType] = useState<"online" | "offline">("online")
@@ -484,7 +486,7 @@ export default function LeadsPage() {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const newLead: Lead = {
-      id: Date.now().toString(),
+      id: generateId("LD", leads),
       name: formData.get("name") as string,
       email: formData.get("email") as string,
       phone: formData.get("phone") as string,
@@ -536,8 +538,8 @@ export default function LeadsPage() {
     description: string,
     changes?: Record<string, { old: string | number; new: string | number }>,
   ) => {
-    setLeads(
-      leads.map((lead) => {
+    setLeads((prev) =>
+      prev.map((lead) => {
         if (lead.id === leadId) {
           return {
             ...lead,
@@ -560,8 +562,8 @@ export default function LeadsPage() {
   }
 
   const handleDeleteLead = (id: string) => {
-    setLeads(leads.filter((l) => l.id !== id))
-    setSelectedLeads(selectedLeads.filter((sid) => sid !== id))
+    setLeads((prev) => prev.filter((l) => l.id !== id))
+    setSelectedLeads((prev) => prev.filter((sid) => sid !== id))
     setIsViewDialogOpen(false) // Close the view dialog if the lead being viewed is deleted
   }
 
@@ -592,8 +594,8 @@ export default function LeadsPage() {
     if (oldLead.notes !== updatedData.notes)
       changes["notes"] = { old: oldLead.notes || "", new: updatedData.notes || "" }
 
-    setLeads(
-      leads.map((lead) =>
+    setLeads((prev) =>
+      prev.map((lead) =>
         lead.id === selectedLead.id
           ? {
             ...lead,
@@ -624,8 +626,8 @@ export default function LeadsPage() {
     const oldLead = leads.find((l) => l.id === id)
     if (!oldLead) return
 
-    setLeads(
-      leads.map((l) =>
+    setLeads((prev) =>
+      prev.map((l) =>
         l.id === id
           ? {
             ...l,
@@ -644,7 +646,7 @@ export default function LeadsPage() {
     const oldLead = leads.find((l) => l.id === id)
     if (!oldLead) return
 
-    setLeads(leads.map((l) => (l.id === id ? { ...l, stage: newStage, lastContact: new Date().toISOString() } : l)))
+    setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, stage: newStage, lastContact: new Date().toISOString() } : l)))
     addActivityHistory(id, "stage_changed", `Stage changed to ${newStage}`, {
       stage: { old: oldLead.stage, new: newStage },
     })
@@ -657,8 +659,8 @@ export default function LeadsPage() {
 
     const oldDate = oldLead.nextFollowUp || "Not set"
 
-    setLeads(
-      leads.map((l) =>
+    setLeads((prev) =>
+      prev.map((l) =>
         l.id === id
           ? { ...l, nextFollowUp: newDate }
           : l,
@@ -699,6 +701,7 @@ export default function LeadsPage() {
 
   // Drag and Drop handlers
   const handleDragStart = (e: React.DragEvent, lead: Lead) => {
+    wasDragging.current = true
     setDraggedLead(lead)
     e.dataTransfer.effectAllowed = "move"
     e.dataTransfer.setData("text/plain", lead.id)
@@ -710,8 +713,12 @@ export default function LeadsPage() {
     setDragOverStage(stage)
   }
 
-  const handleDragLeave = () => {
-    setDragOverStage(null)
+  const handleDragLeave = (e: React.DragEvent) => {
+    // Only reset if actually leaving the column (not just moving to a child element)
+    const relatedTarget = e.relatedTarget as Node | null
+    if (!relatedTarget || !e.currentTarget.contains(relatedTarget)) {
+      setDragOverStage(null)
+    }
   }
 
   const handleDrop = (e: React.DragEvent, targetStage: Stage) => {
@@ -726,6 +733,8 @@ export default function LeadsPage() {
   const handleDragEnd = () => {
     setDraggedLead(null)
     setDragOverStage(null)
+    // Reset wasDragging after a tick so the click handler can check it
+    setTimeout(() => { wasDragging.current = false }, 0)
   }
 
   const clearFilters = () => {
@@ -775,8 +784,9 @@ export default function LeadsPage() {
         if (lines.length < 2) return
         const newLeads: Lead[] = lines.slice(1).map((line, i) => {
           const cols = line.split(",").map(c => c.replace(/^"|"$/g, "").trim())
+          const importIds = generateBulkIds("LD", leads, lines.length - 1)
           return {
-            id: `IMP_${Date.now()}_${i}`,
+            id: importIds[i],
             name: cols[0] || "Unknown",
             company: cols[1] || "",
             email: cols[2] || "",
@@ -1313,7 +1323,7 @@ export default function LeadsPage() {
                     className={`w-[300px] flex flex-col rounded-xl transition-all duration-200 ${isDropTarget ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
                       }`}
                     onDragOver={(e) => handleDragOver(e, stage)}
-                    onDragLeave={handleDragLeave}
+                    onDragLeave={(e) => handleDragLeave(e)}
                     onDrop={(e) => handleDrop(e, stage)}
                     style={{ animationDelay: `${stageIndex * 50}ms` }}
                   >
@@ -1344,10 +1354,12 @@ export default function LeadsPage() {
                             onClick={(e) => {
                               // Prevent opening dialog when clicking on interactive elements
                               if ((e.target as HTMLElement).closest('button, [role="menuitem"], [data-radix-collection-item]')) return;
+                              // Suppress click after drag
+                              if (wasDragging.current) return;
                               setSelectedLead(lead);
                               setIsViewDialogOpen(true);
                             }}
-                            className={`group bg-card rounded-lg border border-border p-3 cursor-pointer active:cursor-grabbing transition-all duration-200 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 animate-in fade-in slide-in-from-bottom-2 ${draggedLead?.id === lead.id ? "opacity-50 scale-95" : ""
+                            className={`group bg-card rounded-lg border border-border p-3 cursor-grab active:cursor-grabbing transition-all duration-200 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 animate-in fade-in slide-in-from-bottom-2 ${draggedLead?.id === lead.id ? "opacity-50 scale-95" : ""
                               }`}
                             style={{ animationDelay: `${i * 30}ms` }}
                           >
@@ -1372,7 +1384,10 @@ export default function LeadsPage() {
                                   </AvatarFallback>
                                 </Avatar>
                                 <div className="min-w-0">
-                                  <p className="font-medium text-sm truncate">{lead.name}</p>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded shrink-0">{lead.id}</span>
+                                    <p className="font-medium text-sm truncate">{lead.name}</p>
+                                  </div>
                                   <p className="text-xs text-muted-foreground truncate">{lead.company}</p>
                                 </div>
                               </div>
@@ -1452,20 +1467,25 @@ export default function LeadsPage() {
                                     Edit Lead
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
-                                  <DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => window.location.href = `mailto:${lead.email}`}>
                                     <Mail className="w-4 h-4 mr-2" />
                                     Send Email
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => window.location.href = `tel:${lead.phone}`}>
                                     <Phone className="w-4 h-4 mr-2" />
                                     Call
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setSelectedLead(lead)
+                                      setIsAddMeetingOpen(true)
+                                    }}
+                                  >
                                     <CalendarPlus className="w-4 h-4 mr-2" />
                                     Schedule Meeting
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
-                                  <DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => alert(`Convert "${lead.name}" to client — this feature is coming soon!`)}>
                                     <ArrowUpRight className="w-4 h-4 mr-2" />
                                     Convert to Client
                                   </DropdownMenuItem>
@@ -1570,7 +1590,10 @@ export default function LeadsPage() {
                                 </AvatarFallback>
                               </Avatar>
                               <div>
-                                <p className="font-medium text-sm">{lead.name}</p>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">{lead.id}</span>
+                                  <p className="font-medium text-sm">{lead.name}</p>
+                                </div>
                                 <p className="text-xs text-muted-foreground">{lead.email}</p>
                               </div>
                             </div>
@@ -1664,11 +1687,11 @@ export default function LeadsPage() {
                                   </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => window.location.href = `mailto:${lead.email}`}>
                                     <Mail className="w-4 h-4 mr-2" />
                                     Send Email
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => window.location.href = `tel:${lead.phone}`}>
                                     <Phone className="w-4 h-4 mr-2" />
                                     Call
                                   </DropdownMenuItem>
@@ -1681,7 +1704,7 @@ export default function LeadsPage() {
                                     <Edit className="w-4 h-4 mr-2" />
                                     Edit
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => alert(`Convert "${lead.name}" to client — this feature is coming soon!`)}>
                                     <ArrowUpRight className="w-4 h-4 mr-2" />
                                     Convert to Client
                                   </DropdownMenuItem>
@@ -1745,6 +1768,7 @@ export default function LeadsPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div>
+                        <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded mb-1 inline-block">{lead.id}</span>
                         <div className="flex items-center gap-2">
                           <p className="font-semibold">{lead.name}</p>
                           <button onClick={() => handleToggleStar(lead.id)}>
@@ -1845,11 +1869,11 @@ export default function LeadsPage() {
                   )}
 
                   <div className="mt-4 flex gap-2">
-                    <Button variant="outline" size="sm" className="flex-1 text-xs bg-transparent">
+                    <Button variant="outline" size="sm" className="flex-1 text-xs bg-transparent" onClick={() => window.location.href = `mailto:${lead.email}`}>
                       <Mail className="w-3 h-3 mr-1" />
                       Email
                     </Button>
-                    <Button variant="outline" size="sm" className="flex-1 text-xs bg-transparent">
+                    <Button variant="outline" size="sm" className="flex-1 text-xs bg-transparent" onClick={() => window.location.href = `tel:${lead.phone}`}>
                       <Phone className="w-3 h-3 mr-1" />
                       Call
                     </Button>
@@ -1885,7 +1909,10 @@ export default function LeadsPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <DialogTitle className="text-xl">{selectedLead.name}</DialogTitle>
+                        <div className="flex items-center gap-2">
+                          <DialogTitle className="text-xl">{selectedLead.name}</DialogTitle>
+                          <span className="text-xs font-mono text-muted-foreground bg-secondary px-2 py-1 rounded">{selectedLead.id}</span>
+                        </div>
                         <p className="text-muted-foreground">{selectedLead.company}</p>
                         <div className="flex items-center gap-2 mt-2 flex-wrap">
                           <Badge className={`${statusConfig[selectedLead.status].color} border`}>

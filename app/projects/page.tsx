@@ -1,8 +1,9 @@
-"use client"
+﻿"use client"
 
 import type React from "react"
 
 import { useState } from "react"
+import { generateId, generateBulkIds } from "@/lib/id-generator"
 import { useRouter } from "next/navigation"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { AnimatedCard } from "@/components/animated-card"
@@ -38,6 +39,11 @@ import {
   User,
   Repeat,
   CreditCard,
+  Trash2,
+  Download,
+  Upload,
+  X,
+  Edit,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -71,7 +77,7 @@ interface Project {
 
 const initialProjects: Project[] = [
   {
-    id: "1",
+    id: "PJ-0001",
     name: "E-commerce Redesign",
     description: "Complete website redesign with new branding and improved UX",
     client: "TechMart Solutions",
@@ -94,7 +100,7 @@ const initialProjects: Project[] = [
     paymentStatus: "partial",
   },
   {
-    id: "2",
+    id: "PJ-0002",
     name: "SEO Campaign Q4",
     description: "Comprehensive SEO optimization and content strategy",
     client: "GreenLife Organics",
@@ -116,7 +122,7 @@ const initialProjects: Project[] = [
     paymentStatus: "paid",
   },
   {
-    id: "3",
+    id: "PJ-0003",
     name: "Social Media Strategy",
     description: "Full social media management and content calendar",
     client: "FoodieHub",
@@ -138,7 +144,7 @@ const initialProjects: Project[] = [
     paymentStatus: "paid",
   },
   {
-    id: "4",
+    id: "PJ-0004",
     name: "PPC Management",
     description: "Google Ads and Meta advertising campaigns",
     client: "AutoDeal Motors",
@@ -160,7 +166,7 @@ const initialProjects: Project[] = [
     paymentStatus: "pending",
   },
   {
-    id: "5",
+    id: "PJ-0005",
     name: "Brand Identity Overhaul",
     description: "Complete rebranding including logo, colors, and guidelines",
     client: "LuxStay Hotels",
@@ -180,7 +186,7 @@ const initialProjects: Project[] = [
     paymentStatus: "partial",
   },
   {
-    id: "6",
+    id: "PJ-0006",
     name: "Email Marketing Automation",
     description: "Set up automated email sequences and newsletters",
     client: "TechMart Solutions",
@@ -229,6 +235,12 @@ export default function ProjectsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list" | "kanban">("grid")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [editingProject, setEditingProject] = useState<Project | null>(null)
+
+  // Drag and drop state
+  const [draggedProject, setDraggedProject] = useState<Project | null>(null)
+  const [dragOverStatus, setDragOverStatus] = useState<string | null>(null)
 
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
@@ -265,7 +277,7 @@ export default function ProjectsPage() {
     }
 
     const newProject: Project = {
-      id: Date.now().toString(),
+      id: generateId("PJ", projects),
       name: formData.get("name") as string,
       description: formData.get("description") as string,
       client: formData.get("client") as string,
@@ -291,11 +303,135 @@ export default function ProjectsPage() {
       totalBilled: 0,
       paymentStatus: "pending",
     }
-    setProjects([newProject, ...projects])
+    setProjects((prev) => [newProject, ...prev])
     setIsAddDialogOpen(false)
   }
 
-  const kanbanStatuses = ["planning", "in-progress", "review", "completed"] as const
+  // Drag handlers for Kanban
+  const handleDragStart = (e: React.DragEvent, project: Project) => {
+    setDraggedProject(project)
+    e.dataTransfer.effectAllowed = "move"
+  }
+
+  const handleDragOver = (e: React.DragEvent, status: string) => {
+    e.preventDefault()
+    setDragOverStatus(status)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    const relatedTarget = e.relatedTarget as Node | null
+    if (!relatedTarget || !e.currentTarget.contains(relatedTarget)) {
+      setDragOverStatus(null)
+    }
+  }
+
+  const handleDrop = (e: React.DragEvent, newStatus: string) => {
+    e.preventDefault()
+    if (draggedProject && draggedProject.status !== newStatus) {
+      setProjects((prev) => prev.map((p) => (p.id === draggedProject.id ? { ...p, status: newStatus as Project["status"] } : p)))
+    }
+    setDraggedProject(null)
+    setDragOverStatus(null)
+  }
+
+  const handleDeleteProject = (projectId: string) => {
+    if (!window.confirm("Are you sure you want to delete this project? This action cannot be undone.")) return
+    setProjects((prev) => prev.filter((p) => p.id !== projectId))
+    if (selectedProject?.id === projectId) {
+      setSelectedProject(null)
+    }
+  }
+
+  const handleExportProjects = () => {
+    const headers = ["Name", "Client", "Category", "Status", "Priority", "Progress", "Budget", "Spent", "Start Date", "Due Date", "Billing Type", "Project Manager", "Payment Status"]
+    const rows = filteredProjects.map(p => [
+      p.name, p.client, p.category, p.status, p.priority, p.progress, p.budget, p.spent,
+      p.startDate, p.dueDate, p.billingType, p.projectManager, p.paymentStatus,
+    ])
+    const csv = [headers.join(","), ...rows.map(r => r.map(v => `"${v}"`).join(","))].join("\n")
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `projects_export_${new Date().toISOString().split("T")[0]}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleImportProjects = () => {
+    const input = document.createElement("input")
+    input.type = "file"
+    input.accept = ".csv"
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (!file) return
+      const reader = new FileReader()
+      reader.onload = (ev) => {
+        const text = ev.target?.result as string
+        const lines = text.split("\n").filter(l => l.trim())
+        if (lines.length < 2) return
+        const importIds = generateBulkIds("PJ", projects, lines.length - 1)
+        const newProjects: Project[] = lines.slice(1).map((line, i) => {
+          const cols = line.split(",").map(c => c.replace(/^"|"$/g, "").trim())
+          return {
+            id: importIds[i],
+            name: cols[0] || "Untitled",
+            client: cols[1] || "",
+            category: cols[2] || "Web Design",
+            status: (cols[3] as Project["status"]) || "planning",
+            priority: (cols[4] as Project["priority"]) || "medium",
+            progress: Number(cols[5]) || 0,
+            budget: Number(cols[6]) || 0,
+            spent: Number(cols[7]) || 0,
+            startDate: cols[8] || new Date().toISOString().split("T")[0],
+            dueDate: cols[9] || "",
+            billingType: (cols[10] as "one-time" | "recurring") || "one-time",
+            projectManager: cols[11] || "John Smith",
+            paymentStatus: (cols[12] as Project["paymentStatus"]) || "pending",
+            description: "",
+            team: [],
+            tasks: { total: 0, completed: 0 },
+            totalBilled: 0,
+          }
+        })
+        setProjects(prev => [...newProjects, ...prev])
+      }
+      reader.readAsText(file)
+    }
+    input.click()
+  }
+
+  const openEditDialog = (project: Project) => {
+    setEditingProject(project)
+    setIsEditDialogOpen(true)
+  }
+
+  const handleEditProject = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!editingProject) return
+    const formData = new FormData(e.currentTarget)
+    const updatedProject: Project = {
+      ...editingProject,
+      name: formData.get("name") as string || editingProject.name,
+      description: formData.get("description") as string || editingProject.description,
+      client: formData.get("client") as string || editingProject.client,
+      category: formData.get("category") as string || editingProject.category,
+      projectManager: formData.get("projectManager") as string || editingProject.projectManager,
+      priority: formData.get("priority") as Project["priority"] || editingProject.priority,
+      status: formData.get("status") as Project["status"] || editingProject.status,
+      budget: Number(formData.get("budget")) || editingProject.budget,
+      billingType: formData.get("billingType") as "one-time" | "recurring" || editingProject.billingType,
+      recurringInterval: formData.get("recurringInterval") as Project["recurringInterval"] || editingProject.recurringInterval,
+      briefLink: formData.get("briefLink") as string || editingProject.briefLink,
+      driveLink: formData.get("driveLink") as string || editingProject.driveLink,
+      researchLink: formData.get("researchLink") as string || editingProject.researchLink,
+    }
+    setProjects((prev) => prev.map((p) => (p.id === editingProject.id ? updatedProject : p)))
+    setIsEditDialogOpen(false)
+    setEditingProject(null)
+  }
+
+  const kanbanStatuses = ["planning", "in-progress", "review", "completed", "on-hold"] as const
 
   return (
     <DashboardLayout>
@@ -306,334 +442,344 @@ export default function ProjectsPage() {
             <h1 className="text-2xl font-bold text-foreground">Projects</h1>
             <p className="text-muted-foreground mt-1">Track and manage all your client projects</p>
           </div>
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2">
-                <Plus className="w-4 h-4" />
-                New Project
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader className="pb-4 border-b border-border">
-                <DialogTitle className="flex items-center gap-3 text-xl">
-                  <div className="p-2 rounded-lg bg-primary/20">
-                    <FolderKanban className="w-5 h-5 text-primary" />
-                  </div>
-                  Create New Project
-                </DialogTitle>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Set up a new client project with all the essential details
-                </p>
-              </DialogHeader>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm" className="gap-2 bg-transparent" onClick={handleExportProjects}>
+              <Download className="w-4 h-4" />
+              Export
+            </Button>
+            <Button variant="outline" size="sm" className="gap-2 bg-transparent" onClick={handleImportProjects}>
+              <Upload className="w-4 h-4" />
+              Import
+            </Button>
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="gap-2">
+                  <Plus className="w-4 h-4" />
+                  New Project
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader className="pb-4 border-b border-border">
+                  <DialogTitle className="flex items-center gap-3 text-xl">
+                    <div className="p-2 rounded-lg bg-primary/20">
+                      <FolderKanban className="w-5 h-5 text-primary" />
+                    </div>
+                    Create New Project
+                  </DialogTitle>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Set up a new client project with all the essential details
+                  </p>
+                </DialogHeader>
 
-              <form onSubmit={handleAddProject} className="space-y-6 pt-4">
-                {/* Project Details Section */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-sm font-medium text-primary">
-                    <Target className="w-4 h-4" />
-                    Project Details
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-sm">
-                      Project Name <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      placeholder="e.g., E-commerce Website Redesign"
-                      required
-                      className="bg-secondary/50 border-border"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="description" className="text-sm">Description</Label>
-                    <Textarea
-                      id="description"
-                      name="description"
-                      placeholder="Describe the project scope, goals, and deliverables..."
-                      rows={3}
-                      className="bg-secondary/50 border-border resize-none"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="client" className="text-sm">
-                        Client <span className="text-destructive">*</span>
-                      </Label>
-                      <Select name="client" defaultValue="TechMart Solutions">
-                        <SelectTrigger className="bg-secondary/50 border-border">
-                          <SelectValue placeholder="Select client" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="TechMart Solutions">TechMart Solutions</SelectItem>
-                          <SelectItem value="GreenLife Organics">GreenLife Organics</SelectItem>
-                          <SelectItem value="FoodieHub">FoodieHub</SelectItem>
-                          <SelectItem value="LuxStay Hotels">LuxStay Hotels</SelectItem>
-                          <SelectItem value="StartupX">StartupX</SelectItem>
-                        </SelectContent>
-                      </Select>
+                <form onSubmit={handleAddProject} className="space-y-6 pt-4">
+                  {/* Project Details Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                      <Target className="w-4 h-4" />
+                      Project Details
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="category" className="text-sm">
-                        Category <span className="text-destructive">*</span>
+                      <Label htmlFor="name" className="text-sm">
+                        Project Name <span className="text-destructive">*</span>
                       </Label>
-                      <Select name="category" defaultValue="Web Design">
-                        <SelectTrigger className="bg-secondary/50 border-border">
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Web Design">🎨 Web Design</SelectItem>
-                          <SelectItem value="SEO">📈 SEO</SelectItem>
-                          <SelectItem value="Social Media">📱 Social Media</SelectItem>
-                          <SelectItem value="PPC">💰 PPC</SelectItem>
-                          <SelectItem value="Branding">✨ Branding</SelectItem>
-                          <SelectItem value="Email Marketing">📧 Email Marketing</SelectItem>
-                          <SelectItem value="Content">📝 Content</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Input
+                        id="name"
+                        name="name"
+                        placeholder="e.g., E-commerce Website Redesign"
+                        required
+                        className="bg-secondary/50 border-border"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="description" className="text-sm">Description</Label>
+                      <Textarea
+                        id="description"
+                        name="description"
+                        placeholder="Describe the project scope, goals, and deliverables..."
+                        rows={3}
+                        className="bg-secondary/50 border-border resize-none"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="client" className="text-sm">
+                          Client <span className="text-destructive">*</span>
+                        </Label>
+                        <Select name="client" defaultValue="TechMart Solutions">
+                          <SelectTrigger className="bg-secondary/50 border-border">
+                            <SelectValue placeholder="Select client" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="TechMart Solutions">TechMart Solutions</SelectItem>
+                            <SelectItem value="GreenLife Organics">GreenLife Organics</SelectItem>
+                            <SelectItem value="FoodieHub">FoodieHub</SelectItem>
+                            <SelectItem value="LuxStay Hotels">LuxStay Hotels</SelectItem>
+                            <SelectItem value="StartupX">StartupX</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="category" className="text-sm">
+                          Category <span className="text-destructive">*</span>
+                        </Label>
+                        <Select name="category" defaultValue="Web Design">
+                          <SelectTrigger className="bg-secondary/50 border-border">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Web Design">ðŸŽ¨ Web Design</SelectItem>
+                            <SelectItem value="SEO">ðŸ“ˆ SEO</SelectItem>
+                            <SelectItem value="Social Media">ðŸ“± Social Media</SelectItem>
+                            <SelectItem value="PPC">ðŸ’° PPC</SelectItem>
+                            <SelectItem value="Branding">âœ¨ Branding</SelectItem>
+                            <SelectItem value="Email Marketing">ðŸ“§ Email Marketing</SelectItem>
+                            <SelectItem value="Content">ðŸ“ Content</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Team & Budget Section */}
-                <div className="space-y-4 pt-4 border-t border-border">
-                  <div className="flex items-center gap-2 text-sm font-medium text-primary">
-                    <User className="w-4 h-4" />
-                    Team & Budget
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="projectManager" className="text-sm">Project Manager</Label>
-                      <Select name="projectManager" defaultValue="John Smith">
-                        <SelectTrigger className="bg-secondary/50 border-border">
-                          <SelectValue placeholder="Select manager" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {uniqueManagers.map((manager) => (
-                            <SelectItem key={manager} value={manager}>
-                              <span className="flex items-center gap-2">
-                                <span className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-medium">
-                                  {manager.split(" ").map(n => n[0]).join("")}
+                  {/* Team & Budget Section */}
+                  <div className="space-y-4 pt-4 border-t border-border">
+                    <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                      <User className="w-4 h-4" />
+                      Team & Budget
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="projectManager" className="text-sm">Project Manager</Label>
+                        <Select name="projectManager" defaultValue="John Smith">
+                          <SelectTrigger className="bg-secondary/50 border-border">
+                            <SelectValue placeholder="Select manager" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {uniqueManagers.map((manager) => (
+                              <SelectItem key={manager} value={manager}>
+                                <span className="flex items-center gap-2">
+                                  <span className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-medium">
+                                    {manager.split(" ").map(n => n[0]).join("")}
+                                  </span>
+                                  {manager}
                                 </span>
-                                {manager}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="priority" className="text-sm">Priority</Label>
+                        <Select name="priority" defaultValue="medium">
+                          <SelectTrigger className="bg-secondary/50 border-border">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="low">
+                              <span className="flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-blue-500" />
+                                Low
                               </span>
                             </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                            <SelectItem value="medium">
+                              <span className="flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-yellow-500" />
+                                Medium
+                              </span>
+                            </SelectItem>
+                            <SelectItem value="high">
+                              <span className="flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-red-500" />
+                                High
+                              </span>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="priority" className="text-sm">Priority</Label>
-                      <Select name="priority" defaultValue="medium">
-                        <SelectTrigger className="bg-secondary/50 border-border">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="low">
-                            <span className="flex items-center gap-2">
-                              <span className="w-2 h-2 rounded-full bg-blue-500" />
-                              Low
-                            </span>
-                          </SelectItem>
-                          <SelectItem value="medium">
-                            <span className="flex items-center gap-2">
-                              <span className="w-2 h-2 rounded-full bg-yellow-500" />
-                              Medium
-                            </span>
-                          </SelectItem>
-                          <SelectItem value="high">
-                            <span className="flex items-center gap-2">
-                              <span className="w-2 h-2 rounded-full bg-red-500" />
-                              High
-                            </span>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="budget" className="text-sm">
-                      <span className="flex items-center gap-1">
-                        <DollarSign className="w-3 h-3" />
-                        Project Budget <span className="text-destructive">*</span>
-                      </span>
-                    </Label>
-                    <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input
-                        id="budget"
-                        name="budget"
-                        type="number"
-                        placeholder="25000"
-                        required
-                        className="pl-9 bg-secondary/50 border-border"
-                      />
-                    </div>
-                    <p className="text-[10px] text-muted-foreground">Enter the total project budget in USD</p>
-                  </div>
-                </div>
-
-                {/* Billing Type Section */}
-                <div className="space-y-4 pt-4 border-t border-border">
-                  <div className="flex items-center gap-2 text-sm font-medium text-primary">
-                    <CreditCard className="w-4 h-4" />
-                    Billing Type
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="billingType" className="text-sm">
-                        Payment Model <span className="text-destructive">*</span>
+                      <Label htmlFor="budget" className="text-sm">
+                        <span className="flex items-center gap-1">
+                          <DollarSign className="w-3 h-3" />
+                          Project Budget <span className="text-destructive">*</span>
+                        </span>
                       </Label>
-                      <Select name="billingType" defaultValue="one-time">
-                        <SelectTrigger className="bg-secondary/50 border-border">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="one-time">
-                            <span className="flex items-center gap-2">
-                              <DollarSign className="w-3.5 h-3.5 text-green-500" />
-                              One-time Payment
-                            </span>
-                          </SelectItem>
-                          <SelectItem value="recurring">
-                            <span className="flex items-center gap-2">
-                              <Repeat className="w-3.5 h-3.5 text-blue-500" />
-                              Recurring
-                            </span>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="recurringInterval" className="text-sm">
-                        Billing Interval
-                      </Label>
-                      <Select name="recurringInterval" defaultValue="30-days">
-                        <SelectTrigger className="bg-secondary/50 border-border">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="7-days">
-                            <span className="flex items-center gap-2">
-                              <Clock className="w-3.5 h-3.5" />
-                              Every 7 Days (Weekly)
-                            </span>
-                          </SelectItem>
-                          <SelectItem value="15-days">
-                            <span className="flex items-center gap-2">
-                              <Clock className="w-3.5 h-3.5" />
-                              Every 15 Days (Bi-weekly)
-                            </span>
-                          </SelectItem>
-                          <SelectItem value="30-days">
-                            <span className="flex items-center gap-2">
-                              <Clock className="w-3.5 h-3.5" />
-                              Every 30 Days (Monthly)
-                            </span>
-                          </SelectItem>
-                          <SelectItem value="monthly">
-                            <span className="flex items-center gap-2">
-                              <Calendar className="w-3.5 h-3.5" />
-                              Monthly (Calendar)
-                            </span>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <p className="text-[10px] text-muted-foreground">Only applicable for recurring projects</p>
+                      <div className="relative">
+                        <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          id="budget"
+                          name="budget"
+                          type="number"
+                          placeholder="25000"
+                          required
+                          className="pl-9 bg-secondary/50 border-border"
+                        />
+                      </div>
+                      <p className="text-[10px] text-muted-foreground">Enter the total project budget in USD</p>
                     </div>
                   </div>
-                </div>
 
-                {/* Timeline Section */}
-                <div className="space-y-4 pt-4 border-t border-border">
-                  <div className="flex items-center gap-2 text-sm font-medium text-primary">
-                    <Calendar className="w-4 h-4" />
-                    Timeline
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="startDate" className="text-sm">
-                        Start Date <span className="text-destructive">*</span>
-                      </Label>
-                      <DatePicker
-                        name="startDate"
-                        placeholder="Select start date"
-                        date={new Date()}
-                        required
-                      />
+                  {/* Billing Type Section */}
+                  <div className="space-y-4 pt-4 border-t border-border">
+                    <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                      <CreditCard className="w-4 h-4" />
+                      Billing Type
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="dueDate" className="text-sm">
-                        Due Date <span className="text-destructive">*</span>
-                      </Label>
-                      <DatePicker
-                        name="dueDate"
-                        placeholder="Select due date"
-                        required
-                      />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="billingType" className="text-sm">
+                          Payment Model <span className="text-destructive">*</span>
+                        </Label>
+                        <Select name="billingType" defaultValue="one-time">
+                          <SelectTrigger className="bg-secondary/50 border-border">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="one-time">
+                              <span className="flex items-center gap-2">
+                                <DollarSign className="w-3.5 h-3.5 text-green-500" />
+                                One-time Payment
+                              </span>
+                            </SelectItem>
+                            <SelectItem value="recurring">
+                              <span className="flex items-center gap-2">
+                                <Repeat className="w-3.5 h-3.5 text-blue-500" />
+                                Recurring
+                              </span>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="recurringInterval" className="text-sm">
+                          Billing Interval
+                        </Label>
+                        <Select name="recurringInterval" defaultValue="30-days">
+                          <SelectTrigger className="bg-secondary/50 border-border">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="7-days">
+                              <span className="flex items-center gap-2">
+                                <Clock className="w-3.5 h-3.5" />
+                                Every 7 Days (Weekly)
+                              </span>
+                            </SelectItem>
+                            <SelectItem value="15-days">
+                              <span className="flex items-center gap-2">
+                                <Clock className="w-3.5 h-3.5" />
+                                Every 15 Days (Bi-weekly)
+                              </span>
+                            </SelectItem>
+                            <SelectItem value="30-days">
+                              <span className="flex items-center gap-2">
+                                <Clock className="w-3.5 h-3.5" />
+                                Every 30 Days (Monthly)
+                              </span>
+                            </SelectItem>
+                            <SelectItem value="monthly">
+                              <span className="flex items-center gap-2">
+                                <Calendar className="w-3.5 h-3.5" />
+                                Monthly (Calendar)
+                              </span>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-[10px] text-muted-foreground">Only applicable for recurring projects</p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Resources Section */}
-                <div className="space-y-4 pt-4 border-t border-border">
-                  <div className="flex items-center gap-2 text-sm font-medium text-primary">
-                    <ArrowRight className="w-4 h-4" />
-                    Key Resources
-                    <Badge variant="secondary" className="text-[10px] ml-auto">Optional</Badge>
-                  </div>
-                  <div className="grid grid-cols-1 gap-3">
-                    <div className="space-y-2">
-                      <Label htmlFor="briefLink" className="text-sm">Project Brief URL</Label>
-                      <Input
-                        id="briefLink"
-                        name="briefLink"
-                        type="url"
-                        placeholder="https://docs.google.com/document/d/..."
-                        className="bg-secondary/50 border-border"
-                      />
+                  {/* Timeline Section */}
+                  <div className="space-y-4 pt-4 border-t border-border">
+                    <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                      <Calendar className="w-4 h-4" />
+                      Timeline
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="driveLink" className="text-sm">Google Drive Folder</Label>
-                      <Input
-                        id="driveLink"
-                        name="driveLink"
-                        type="url"
-                        placeholder="https://drive.google.com/drive/folders/..."
-                        className="bg-secondary/50 border-border"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="researchLink" className="text-sm">Research Documents</Label>
-                      <Input
-                        id="researchLink"
-                        name="researchLink"
-                        type="url"
-                        placeholder="https://notion.so/..."
-                        className="bg-secondary/50 border-border"
-                      />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="startDate" className="text-sm">
+                          Start Date <span className="text-destructive">*</span>
+                        </Label>
+                        <DatePicker
+                          name="startDate"
+                          placeholder="Select start date"
+                          date={new Date()}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="dueDate" className="text-sm">
+                          Due Date <span className="text-destructive">*</span>
+                        </Label>
+                        <DatePicker
+                          name="dueDate"
+                          placeholder="Select due date"
+                          required
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Footer Actions */}
-                <DialogFooter className="pt-4 border-t border-border gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsAddDialogOpen(false)}
-                    className="gap-2"
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit" className="gap-2 min-w-[140px]">
-                    <Plus className="w-4 h-4" />
-                    Create Project
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+                  {/* Resources Section */}
+                  <div className="space-y-4 pt-4 border-t border-border">
+                    <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                      <ArrowRight className="w-4 h-4" />
+                      Key Resources
+                      <Badge variant="secondary" className="text-[10px] ml-auto">Optional</Badge>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="briefLink" className="text-sm">Project Brief URL</Label>
+                        <Input
+                          id="briefLink"
+                          name="briefLink"
+                          type="url"
+                          placeholder="https://docs.google.com/document/d/..."
+                          className="bg-secondary/50 border-border"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="driveLink" className="text-sm">Google Drive Folder</Label>
+                        <Input
+                          id="driveLink"
+                          name="driveLink"
+                          type="url"
+                          placeholder="https://drive.google.com/drive/folders/..."
+                          className="bg-secondary/50 border-border"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="researchLink" className="text-sm">Research Documents</Label>
+                        <Input
+                          id="researchLink"
+                          name="researchLink"
+                          type="url"
+                          placeholder="https://notion.so/..."
+                          className="bg-secondary/50 border-border"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Footer Actions */}
+                  <DialogFooter className="pt-4 border-t border-border gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsAddDialogOpen(false)}
+                      className="gap-2"
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="submit" className="gap-2 min-w-[140px]">
+                      <Plus className="w-4 h-4" />
+                      Create Project
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         {/* Stats */}
@@ -789,8 +935,8 @@ export default function ProjectsPage() {
                             </Badge>
                             <Badge
                               className={`text-xs border-0 ${project.billingType === "recurring"
-                                  ? "bg-blue-500/20 text-blue-400"
-                                  : "bg-green-500/20 text-green-400"
+                                ? "bg-blue-500/20 text-blue-400"
+                                : "bg-green-500/20 text-green-400"
                                 }`}
                             >
                               {project.billingType === "recurring" ? (
@@ -816,9 +962,9 @@ export default function ProjectsPage() {
                             </button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem>View Details</DropdownMenuItem>
-                            <DropdownMenuItem>Edit Project</DropdownMenuItem>
-                            <DropdownMenuItem>View Tasks</DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); router.push(`/projects/${project.id}`); }}>View Details</DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); openEditDialog(project); }}>Edit Project</DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-400" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeleteProject(project.id); }}>Delete</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
@@ -953,70 +1099,81 @@ export default function ProjectsPage() {
         )}
 
         {viewMode === "kanban" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto pb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 overflow-x-auto pb-4">
             {kanbanStatuses.map((status, colIndex) => {
               const statusProjects = filteredProjects.filter((p) => p.status === status)
               const StatusIcon = statusConfig[status].icon
               return (
-                <AnimatedCard key={status} delay={300 + colIndex * 100} hover={false} className="min-w-[280px]">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <StatusIcon className="w-4 h-4" />
-                        {statusConfig[status].label}
-                      </div>
-                      <Badge variant="secondary" className="text-xs">
-                        {statusProjects.length}
-                      </Badge>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3 max-h-[500px] overflow-y-auto">
-                    {statusProjects.map((project, i) => (
-                      <div
-                        key={project.id}
-                        className="p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors cursor-pointer animate-in fade-in slide-in-from-bottom-2 duration-300"
-                        style={{ animationDelay: `${i * 50}ms` }}
-                        onClick={() => router.push(`/projects/${project.id}`)}
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <Badge variant="outline" className="text-[10px] font-normal mb-1">
-                              {project.category}
-                            </Badge>
-                            <h4 className="font-medium text-sm truncate">{project.name}</h4>
-                            <p className="text-xs text-muted-foreground truncate">{project.client}</p>
-                          </div>
-                          <Badge className={`${priorityConfig[project.priority].color} border-0 text-[10px] shrink-0`}>
-                            {project.priority[0].toUpperCase()}
-                          </Badge>
+                <div
+                  key={status}
+                  className={`rounded-xl transition-all duration-200 ${dragOverStatus === status ? "ring-2 ring-primary/50 bg-primary/5" : ""}`}
+                  onDragOver={(e) => handleDragOver(e, status)}
+                  onDragLeave={(e) => handleDragLeave(e)}
+                  onDrop={(e) => handleDrop(e, status)}
+                >
+                  <AnimatedCard delay={300 + colIndex * 100} hover={false} className="min-w-[250px]">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <StatusIcon className="w-4 h-4" />
+                          {statusConfig[status].label}
                         </div>
-                        <div className="mt-3 space-y-2">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-muted-foreground">{project.progress}%</span>
-                            <span className="text-muted-foreground">
-                              {project.tasks.completed}/{project.tasks.total} tasks
+                        <Badge variant="secondary" className="text-xs">
+                          {statusProjects.length}
+                        </Badge>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3 max-h-[500px] overflow-y-auto">
+                      {statusProjects.map((project, i) => (
+                        <div
+                          key={project.id}
+                          className={`p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors cursor-grab active:cursor-grabbing animate-in fade-in slide-in-from-bottom-2 duration-300 ${draggedProject?.id === project.id ? 'opacity-50' : ''}`}
+                          style={{ animationDelay: `${i * 50}ms` }}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, project)}
+                          onDragEnd={() => { setDraggedProject(null); setDragOverStatus(null); }}
+                          onClick={() => router.push(`/projects/${project.id}`)}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <Badge variant="outline" className="text-[10px] font-normal mb-1">
+                                {project.category}
+                              </Badge>
+                              <h4 className="font-medium text-sm truncate">{project.name}</h4>
+                              <p className="text-xs text-muted-foreground truncate">{project.client}</p>
+                            </div>
+                            <Badge className={`${priorityConfig[project.priority].color} border-0 text-[10px] shrink-0`}>
+                              {project.priority[0].toUpperCase()}
+                            </Badge>
+                          </div>
+                          <div className="mt-3 space-y-2">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground">{project.progress}%</span>
+                              <span className="text-muted-foreground">
+                                {project.tasks.completed}/{project.tasks.total} tasks
+                              </span>
+                            </div>
+                            <Progress value={project.progress} className="h-1" />
+                          </div>
+                          <div className="mt-3 flex items-center justify-between">
+                            <div className="flex -space-x-1.5">
+                              {project.team.slice(0, 2).map((member, idx) => (
+                                <Avatar key={idx} className="w-5 h-5 border border-card">
+                                  <AvatarFallback className="bg-primary/20 text-primary text-[8px]">
+                                    {member}
+                                  </AvatarFallback>
+                                </Avatar>
+                              ))}
+                            </div>
+                            <span className="text-[10px] text-muted-foreground">
+                              {new Date(project.dueDate).toLocaleDateString()}
                             </span>
                           </div>
-                          <Progress value={project.progress} className="h-1" />
                         </div>
-                        <div className="mt-3 flex items-center justify-between">
-                          <div className="flex -space-x-1.5">
-                            {project.team.slice(0, 2).map((member, idx) => (
-                              <Avatar key={idx} className="w-5 h-5 border border-card">
-                                <AvatarFallback className="bg-primary/20 text-primary text-[8px]">
-                                  {member}
-                                </AvatarFallback>
-                              </Avatar>
-                            ))}
-                          </div>
-                          <span className="text-[10px] text-muted-foreground">
-                            {new Date(project.dueDate).toLocaleDateString()}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                </AnimatedCard>
+                      ))}
+                    </CardContent>
+                  </AnimatedCard>
+                </div>
               )
             })}
           </div>
@@ -1122,6 +1279,140 @@ export default function ProjectsPage() {
                   </Button>
                 </DialogFooter>
               </>
+            )}
+          </DialogContent>
+        </Dialog>
+        {/* Edit Project Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={(open) => { if (!open) { setIsEditDialogOpen(false); setEditingProject(null); } }}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader className="pb-4 border-b border-border">
+              <DialogTitle className="flex items-center gap-3 text-xl">
+                <div className="p-2 rounded-lg bg-primary/20">
+                  <Edit className="w-5 h-5 text-primary" />
+                </div>
+                Edit Project
+              </DialogTitle>
+            </DialogHeader>
+            {editingProject && (
+              <form onSubmit={handleEditProject} className="space-y-4 pt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-name" className="text-sm">Project Name</Label>
+                    <Input id="edit-name" name="name" defaultValue={editingProject.name} className="bg-secondary/50 border-border" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-client" className="text-sm">Client</Label>
+                    <Select name="client" defaultValue={editingProject.client}>
+                      <SelectTrigger className="bg-secondary/50 border-border"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {uniqueClients.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-description" className="text-sm">Description</Label>
+                  <Textarea id="edit-description" name="description" defaultValue={editingProject.description} className="bg-secondary/50 border-border resize-none" rows={2} />
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm">Category</Label>
+                    <Select name="category" defaultValue={editingProject.category}>
+                      <SelectTrigger className="bg-secondary/50 border-border"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Web Design">🎨 Web Design</SelectItem>
+                        <SelectItem value="SEO">📈 SEO</SelectItem>
+                        <SelectItem value="Social Media">📱 Social Media</SelectItem>
+                        <SelectItem value="PPC">💰 PPC</SelectItem>
+                        <SelectItem value="Branding">✨ Branding</SelectItem>
+                        <SelectItem value="Email Marketing">📧 Email Marketing</SelectItem>
+                        <SelectItem value="Content">📝 Content</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Priority</Label>
+                    <Select name="priority" defaultValue={editingProject.priority}>
+                      <SelectTrigger className="bg-secondary/50 border-border"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Status</Label>
+                    <Select name="status" defaultValue={editingProject.status}>
+                      <SelectTrigger className="bg-secondary/50 border-border"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="planning">Planning</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="review">Review</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="on-hold">On Hold</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm">Budget ($)</Label>
+                    <Input name="budget" type="number" defaultValue={editingProject.budget} className="bg-secondary/50 border-border" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Billing Type</Label>
+                    <Select name="billingType" defaultValue={editingProject.billingType}>
+                      <SelectTrigger className="bg-secondary/50 border-border"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="one-time">One-time</SelectItem>
+                        <SelectItem value="recurring">Recurring</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Interval</Label>
+                    <Select name="recurringInterval" defaultValue={editingProject.recurringInterval || "30-days"}>
+                      <SelectTrigger className="bg-secondary/50 border-border"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="7-days">7 Days</SelectItem>
+                        <SelectItem value="15-days">15 Days</SelectItem>
+                        <SelectItem value="30-days">30 Days</SelectItem>
+                        <SelectItem value="monthly">Monthly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm">Project Brief URL</Label>
+                    <Input name="briefLink" type="url" defaultValue={editingProject.briefLink || ""} placeholder="https://..." className="bg-secondary/50 border-border" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Drive Folder</Label>
+                    <Input name="driveLink" type="url" defaultValue={editingProject.driveLink || ""} placeholder="https://..." className="bg-secondary/50 border-border" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Research</Label>
+                    <Input name="researchLink" type="url" defaultValue={editingProject.researchLink || ""} placeholder="https://..." className="bg-secondary/50 border-border" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm">Project Manager</Label>
+                    <Select name="projectManager" defaultValue={editingProject.projectManager}>
+                      <SelectTrigger className="bg-secondary/50 border-border"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {uniqueManagers.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <DialogFooter className="pt-4 border-t border-border gap-2">
+                  <Button type="button" variant="outline" onClick={() => { setIsEditDialogOpen(false); setEditingProject(null); }}>Cancel</Button>
+                  <Button type="submit" className="gap-2"><CheckCircle className="w-4 h-4" /> Save Changes</Button>
+                </DialogFooter>
+              </form>
             )}
           </DialogContent>
         </Dialog>

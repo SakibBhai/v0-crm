@@ -4,7 +4,9 @@ import { TabsContent } from "@/components/ui/tabs"
 
 import type React from "react"
 import { useState } from "react"
+import { generateId, generateBulkIds } from "@/lib/id-generator"
 import { DashboardLayout } from "@/components/dashboard-layout"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { AnimatedCard } from "@/components/animated-card"
 import { CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -102,7 +104,7 @@ interface Client {
 
 const initialClients: Client[] = [
   {
-    id: "1",
+    id: "CL-0001",
     name: "Sarah Mitchell",
     email: "sarah@techmart.com",
     phone: "+1 (555) 123-4567",
@@ -135,7 +137,7 @@ const initialClients: Client[] = [
     activeCampaigns: 5,
   },
   {
-    id: "2",
+    id: "CL-0002",
     name: "Michael Chen",
     email: "michael@greenlife.co",
     phone: "+1 (555) 234-5678",
@@ -168,7 +170,7 @@ const initialClients: Client[] = [
     activeCampaigns: 3,
   },
   {
-    id: "3",
+    id: "CL-0003",
     name: "Emily Rodriguez",
     email: "emily@foodiehub.io",
     phone: "+1 (555) 345-6789",
@@ -201,7 +203,7 @@ const initialClients: Client[] = [
     activeCampaigns: 2,
   },
   {
-    id: "4",
+    id: "CL-0004",
     name: "David Park",
     email: "david@autodeal.com",
     phone: "+1 (555) 456-7890",
@@ -234,7 +236,7 @@ const initialClients: Client[] = [
     activeCampaigns: 0,
   },
   {
-    id: "5",
+    id: "CL-0005",
     name: "Lisa Thompson",
     email: "lisa@luxstay.com",
     phone: "+1 (555) 567-8901",
@@ -267,7 +269,7 @@ const initialClients: Client[] = [
     activeCampaigns: 8,
   },
   {
-    id: "6",
+    id: "CL-0006",
     name: "James Wilson",
     email: "james@fitpro.app",
     phone: "+1 (555) 678-9012",
@@ -300,7 +302,7 @@ const initialClients: Client[] = [
     activeCampaigns: 0,
   },
   {
-    id: "7",
+    id: "CL-0007",
     name: "Amanda Foster",
     email: "amanda@brightsmile.dental",
     phone: "+1 (555) 789-0123",
@@ -333,7 +335,7 @@ const initialClients: Client[] = [
     activeCampaigns: 0,
   },
   {
-    id: "8",
+    id: "CL-0008",
     name: "Robert Kim",
     email: "robert@urbanstyle.fashion",
     phone: "+1 (555) 890-1234",
@@ -366,7 +368,7 @@ const initialClients: Client[] = [
     activeCampaigns: 4,
   },
   {
-    id: "9",
+    id: "CL-0009",
     name: "Jennifer Adams",
     email: "jennifer@skytech.io",
     phone: "+1 (555) 901-2345",
@@ -399,7 +401,7 @@ const initialClients: Client[] = [
     activeCampaigns: 2,
   },
   {
-    id: "10",
+    id: "CL-0010",
     name: "Marcus Brown",
     email: "marcus@elitetravel.com",
     phone: "+1 (555) 012-3456",
@@ -487,6 +489,15 @@ export default function ClientsPage() {
   const [newClientTags, setNewClientTags] = useState<string[]>([])
   const [tagInput, setTagInput] = useState("")
 
+  // Edit dialog state
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [editingClient, setEditingClient] = useState<Client | null>(null)
+  const [editClientTags, setEditClientTags] = useState<string[]>([])
+  const [editTagInput, setEditTagInput] = useState("")
+
+  // Note input state
+  const [noteInput, setNoteInput] = useState("")
+
   // Filters
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [industryFilter, setIndustryFilter] = useState<string>("All Industries")
@@ -567,7 +578,7 @@ export default function ClientsPage() {
   }
 
   const toggleStarred = (clientId: string) => {
-    setClients(clients.map((c) => (c.id === clientId ? { ...c, starred: !c.starred } : c)))
+    setClients((prev) => prev.map((c) => (c.id === clientId ? { ...c, starred: !c.starred } : c)))
   }
 
   const toggleSelectClient = (clientId: string) => {
@@ -593,14 +604,17 @@ export default function ClientsPage() {
     setDragOverStatus(status)
   }
 
-  const handleDragLeave = () => {
-    setDragOverStatus(null)
+  const handleDragLeave = (e: React.DragEvent) => {
+    const relatedTarget = e.relatedTarget as Node | null
+    if (!relatedTarget || !e.currentTarget.contains(relatedTarget)) {
+      setDragOverStatus(null)
+    }
   }
 
   const handleDrop = (e: React.DragEvent, newStatus: string) => {
     e.preventDefault()
     if (draggedClient && draggedClient.status !== newStatus) {
-      setClients(clients.map((c) => (c.id === draggedClient.id ? { ...c, status: newStatus as Client["status"] } : c)))
+      setClients((prev) => prev.map((c) => (c.id === draggedClient.id ? { ...c, status: newStatus as Client["status"] } : c)))
     }
     setDraggedClient(null)
     setDragOverStatus(null)
@@ -610,7 +624,7 @@ export default function ClientsPage() {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const newClient: Client = {
-      id: Date.now().toString(),
+      id: generateId("CL", clients),
       name: formData.get("name") as string,
       email: formData.get("email") as string,
       phone: (formData.get("phone") as string) || "",
@@ -654,6 +668,163 @@ export default function ClientsPage() {
     return "text-red-400"
   }
 
+  const openEditDialog = (client: Client) => {
+    setEditingClient(client)
+    setEditClientTags([...client.tags])
+    setEditTagInput("")
+    setIsEditDialogOpen(true)
+  }
+
+  const handleEditClient = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!editingClient) return
+    const formData = new FormData(e.currentTarget)
+    const updatedClient: Client = {
+      ...editingClient,
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      phone: (formData.get("phone") as string) || "",
+      company: formData.get("company") as string,
+      website: (formData.get("website") as string) || "",
+      address: (formData.get("address") as string) || "",
+      status: (formData.get("status") as Client["status"]) || editingClient.status,
+      industry: (formData.get("industry") as string) || editingClient.industry,
+      tier: (formData.get("tier") as Client["tier"]) || editingClient.tier,
+      accountManager: (formData.get("accountManager") as string) || editingClient.accountManager,
+      monthlyRevenue: Number(formData.get("monthlyRevenue")) || 0,
+      contractValue: Number(formData.get("contractValue")) || 0,
+      contractEnd: (formData.get("contractEnd") as string) || editingClient.contractEnd,
+      notes: (formData.get("notes") as string) || editingClient.notes,
+      tags: editClientTags,
+      totalRevenue: Number(formData.get("totalRevenue")) || 0,
+      healthScore: Math.min(100, Math.max(0, Number(formData.get("healthScore")) || 0)),
+      engagementScore: Math.min(100, Math.max(0, Number(formData.get("engagementScore")) || 0)),
+      satisfaction: Math.min(100, Math.max(0, Number(formData.get("satisfaction")) || 0)),
+      npsScore: Math.min(10, Math.max(0, Number(formData.get("npsScore")) || 0)),
+      revenueGrowth: Number(formData.get("revenueGrowth")) || 0,
+      lifetimeValue: Number(formData.get("lifetimeValue")) || 0,
+      paymentStatus: (formData.get("paymentStatus") as Client["paymentStatus"]) || editingClient.paymentStatus,
+      joinedDate: (formData.get("joinedDate") as string) || editingClient.joinedDate,
+      activeProjects: Number(formData.get("activeProjects")) || 0,
+      completedProjects: Number(formData.get("completedProjects")) || 0,
+      activeCampaigns: Number(formData.get("activeCampaigns")) || 0,
+      openTickets: Number(formData.get("openTickets")) || 0,
+    }
+    setClients((prev) => prev.map((c) => (c.id === editingClient.id ? updatedClient : c)))
+    if (selectedClient?.id === editingClient.id) {
+      setSelectedClient(updatedClient)
+    }
+    setIsEditDialogOpen(false)
+    setEditingClient(null)
+    setEditClientTags([])
+    setEditTagInput("")
+  }
+
+  const handleDeleteClient = (clientId: string) => {
+    if (!window.confirm("Are you sure you want to delete this client? This action cannot be undone.")) return
+    setClients((prev) => prev.filter((c) => c.id !== clientId))
+    setSelectedClients((prev) => prev.filter((id) => id !== clientId))
+    if (selectedClient?.id === clientId) {
+      setSelectedClient(null)
+    }
+  }
+
+  const handleSaveNote = () => {
+    if (!selectedClient || !noteInput.trim()) return
+    const updatedNotes = selectedClient.notes
+      ? `${selectedClient.notes}\n\n---\n${new Date().toLocaleDateString()}: ${noteInput.trim()}`
+      : `${new Date().toLocaleDateString()}: ${noteInput.trim()}`
+    setClients((prev) => prev.map((c) => (c.id === selectedClient.id ? { ...c, notes: updatedNotes } : c)))
+    setSelectedClient({ ...selectedClient, notes: updatedNotes })
+    setNoteInput("")
+  }
+
+  const handleBulkDelete = () => {
+    if (selectedClients.length === 0) return
+    if (!window.confirm(`Are you sure you want to delete ${selectedClients.length} client(s)? This action cannot be undone.`)) return
+    setClients((prev) => prev.filter((c) => !selectedClients.includes(c.id)))
+    setSelectedClients([])
+  }
+
+  const handleBulkEmail = () => {
+    if (selectedClients.length === 0) return
+    const emails = clients.filter((c) => selectedClients.includes(c.id)).map((c) => c.email)
+    window.open(`mailto:${emails.join(",")}`)
+  }
+
+  const handleExportClients = () => {
+    const headers = ["Name", "Company", "Email", "Phone", "Status", "Industry", "Tier", "Account Manager", "Monthly Revenue", "Total Revenue", "Contract Value", "Contract End", "Health Score", "Tags", "Joined Date"]
+    const rows = filteredClients.map(c => [
+      c.name, c.company, c.email, c.phone, c.status, c.industry, c.tier, c.accountManager,
+      c.monthlyRevenue, c.totalRevenue, c.contractValue, c.contractEnd, c.healthScore,
+      c.tags.join("; "), c.joinedDate,
+    ])
+    const csv = [headers.join(","), ...rows.map(r => r.map(v => `"${v}"`).join(","))].join("\n")
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `clients_export_${new Date().toISOString().split("T")[0]}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleImportClients = () => {
+    const input = document.createElement("input")
+    input.type = "file"
+    input.accept = ".csv"
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (!file) return
+      const reader = new FileReader()
+      reader.onload = (ev) => {
+        const text = ev.target?.result as string
+        const lines = text.split("\n").filter(l => l.trim())
+        if (lines.length < 2) return
+        const importIds = generateBulkIds("CL", clients, lines.length - 1)
+        const newClients: Client[] = lines.slice(1).map((line, i) => {
+          const cols = line.split(",").map(c => c.replace(/^"|"$/g, "").trim())
+          return {
+            id: importIds[i],
+            name: cols[0] || "Unknown",
+            company: cols[1] || "",
+            email: cols[2] || "",
+            phone: cols[3] || "",
+            status: (cols[4] as Client["status"]) || "prospect",
+            industry: cols[5] || "Technology",
+            tier: (cols[6] as Client["tier"]) || "starter",
+            accountManager: cols[7] || "Alex Johnson",
+            monthlyRevenue: Number(cols[8]) || 0,
+            totalRevenue: Number(cols[9]) || 0,
+            contractValue: Number(cols[10]) || 0,
+            contractEnd: cols[11] || "",
+            healthScore: Number(cols[12]) || 50,
+            tags: cols[13] ? cols[13].split(";").map(t => t.trim()).filter(Boolean) : [],
+            joinedDate: cols[14] || new Date().toISOString().split("T")[0],
+            lastContact: new Date().toISOString().split("T")[0],
+            notes: "",
+            starred: false,
+            satisfaction: 50,
+            paymentStatus: "pending" as const,
+            engagementScore: 50,
+            lifetimeValue: 0,
+            openTickets: 0,
+            npsScore: 0,
+            revenueGrowth: 0,
+            activeCampaigns: 0,
+            activeProjects: 0,
+            completedProjects: 0,
+            address: "",
+            website: "",
+          }
+        })
+        setClients(prev => [...newClients, ...prev])
+      }
+      reader.readAsText(file)
+    }
+    input.click()
+  }
+
   const getHealthBg = (score: number) => {
     if (score >= 70) return "bg-emerald-400"
     if (score >= 40) return "bg-amber-400"
@@ -672,11 +843,11 @@ export default function ClientsPage() {
             <p className="text-muted-foreground mt-1">Manage relationships, track health scores, and monitor revenue</p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+            <Button variant="outline" size="sm" className="gap-2 bg-transparent" onClick={handleExportClients}>
               <Download className="w-4 h-4" />
               Export
             </Button>
-            <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+            <Button variant="outline" size="sm" className="gap-2 bg-transparent" onClick={handleImportClients}>
               <Upload className="w-4 h-4" />
               Import
             </Button>
@@ -1179,15 +1350,15 @@ export default function ClientsPage() {
               {selectedClients.length} client{selectedClients.length > 1 ? "s" : ""} selected
             </span>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+              <Button variant="outline" size="sm" className="gap-2 bg-transparent" onClick={handleBulkEmail}>
                 <Send className="w-4 h-4" />
                 Send Email
               </Button>
-              <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+              <Button variant="outline" size="sm" className="gap-2 bg-transparent" onClick={() => alert("Bulk edit coming soon! Select individual clients to edit for now.")}>
                 <Edit className="w-4 h-4" />
                 Bulk Edit
               </Button>
-              <Button variant="outline" size="sm" className="gap-2 text-red-400 hover:text-red-300 bg-transparent">
+              <Button variant="outline" size="sm" className="gap-2 text-red-400 hover:text-red-300 bg-transparent" onClick={handleBulkDelete}>
                 <Trash2 className="w-4 h-4" />
                 Delete
               </Button>
@@ -1211,7 +1382,7 @@ export default function ClientsPage() {
                   className={`flex-shrink-0 w-[320px] rounded-xl transition-all duration-200 ${dragOverStatus === status ? "bg-primary/10 ring-2 ring-primary/50" : "bg-card/30"
                     }`}
                   onDragOver={(e) => handleDragOver(e, status)}
-                  onDragLeave={handleDragLeave}
+                  onDragLeave={(e) => handleDragLeave(e)}
                   onDrop={(e) => handleDrop(e, status)}
                 >
                   {/* Column Header */}
@@ -1253,7 +1424,10 @@ export default function ClientsPage() {
                                 </AvatarFallback>
                               </Avatar>
                               <div className="min-w-0">
-                                <h4 className="font-medium text-sm truncate">{client.company}</h4>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded shrink-0">{client.id}</span>
+                                  <h4 className="font-medium text-sm truncate">{client.company}</h4>
+                                </div>
                                 <p className="text-xs text-muted-foreground truncate">{client.name}</p>
                               </div>
                             </div>
@@ -1398,6 +1572,7 @@ export default function ClientsPage() {
                           />
                         </div>
                         <div>
+                          <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded mb-1 inline-block">{client.id}</span>
                           <div className="flex items-center gap-2">
                             <h3 className="font-semibold">{client.company}</h3>
                             {client.starred && <Star className="w-4 h-4 text-amber-400 fill-amber-400" />}
@@ -1558,7 +1733,10 @@ export default function ClientsPage() {
                                 )}
                               </div>
                               <div>
-                                <p className="font-medium text-sm">{client.company}</p>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">{client.id}</span>
+                                  <p className="font-medium text-sm">{client.company}</p>
+                                </div>
                                 <p className="text-xs text-muted-foreground">{client.name}</p>
                               </div>
                             </div>
@@ -1643,9 +1821,37 @@ export default function ClientsPage() {
                               >
                                 <Eye className="w-4 h-4" />
                               </Button>
-                              <Button variant="ghost" size="sm" className="w-8 h-8 p-0">
-                                <MoreHorizontal className="w-4 h-4" />
-                              </Button>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="w-8 h-8 p-0">
+                                    <MoreHorizontal className="w-4 h-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => setSelectedClient(client)}>
+                                    <Eye className="w-4 h-4 mr-2" />
+                                    View Details
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => { openEditDialog(client) }}>
+                                    <Edit className="w-4 h-4 mr-2" />
+                                    Edit Client
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem onClick={() => window.open(`mailto:${client.email}`)}>
+                                    <Mail className="w-4 h-4 mr-2" />
+                                    Send Email
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => window.open(`tel:${client.phone}`)}>
+                                    <Phone className="w-4 h-4 mr-2" />
+                                    Call
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem className="text-red-400 focus:text-red-400" onClick={() => handleDeleteClient(client.id)}>
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                           </td>
                         </tr>
@@ -1657,6 +1863,414 @@ export default function ClientsPage() {
             </CardContent>
           </AnimatedCard>
         )}
+
+        {/* Edit Client Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-xl">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Edit className="w-5 h-5 text-primary" />
+                </div>
+                Edit Client
+              </DialogTitle>
+              <p className="text-sm text-muted-foreground">Update the client's information below</p>
+            </DialogHeader>
+            {editingClient && (
+              <form onSubmit={handleEditClient} className="space-y-6">
+                {/* Basic Info Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                    <Building2 className="w-4 h-4" />
+                    Basic Information
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-name">Contact Name *</Label>
+                      <div className="relative">
+                        <Input id="edit-name" name="name" defaultValue={editingClient.name} required className="pl-9" />
+                        <Users className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-company">Company Name *</Label>
+                      <div className="relative">
+                        <Input id="edit-company" name="company" defaultValue={editingClient.company} required className="pl-9" />
+                        <Building2 className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-email">Email *</Label>
+                      <div className="relative">
+                        <Input id="edit-email" name="email" type="email" defaultValue={editingClient.email} required className="pl-9" />
+                        <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-phone">Phone</Label>
+                      <div className="relative">
+                        <Input id="edit-phone" name="phone" defaultValue={editingClient.phone} className="pl-9" />
+                        <Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-website">Website</Label>
+                      <div className="relative">
+                        <Input id="edit-website" name="website" defaultValue={editingClient.website} className="pl-9" />
+                        <Globe className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-industry">Industry</Label>
+                      <Select name="industry" defaultValue={editingClient.industry}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select industry" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {industries.slice(1).map((ind) => (
+                            <SelectItem key={ind} value={ind}>{ind}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-status">Status</Label>
+                      <Select name="status" defaultValue={editingClient.status}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="prospect">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-violet-400" />
+                              Prospect
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="active">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                              Active
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="paused">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-amber-400" />
+                              Paused
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="inactive">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-zinc-400" />
+                              Inactive
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="churned">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-red-400" />
+                              Churned
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-address">Address</Label>
+                      <div className="relative">
+                        <Input id="edit-address" name="address" defaultValue={editingClient.address} className="pl-9" />
+                        <MapPin className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-joinedDate">Client Since</Label>
+                      <div className="relative">
+                        <Input id="edit-joinedDate" name="joinedDate" type="date" defaultValue={editingClient.joinedDate} className="pl-9" />
+                        <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Client Classification Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                    <Target className="w-4 h-4" />
+                    Client Classification
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-tier">Client Tier</Label>
+                      <Select name="tier" defaultValue={editingClient.tier}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select tier" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="enterprise">
+                            <div className="flex items-center gap-2">
+                              <Star className="w-4 h-4 text-amber-400" />
+                              Enterprise
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="professional">
+                            <div className="flex items-center gap-2">
+                              <Star className="w-4 h-4 text-blue-400" />
+                              Professional
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="starter">
+                            <div className="flex items-center gap-2">
+                              <Star className="w-4 h-4 text-zinc-400" />
+                              Starter
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-accountManager">Account Manager</Label>
+                      <Select name="accountManager" defaultValue={editingClient.accountManager}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select manager" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {accountManagers.slice(1).map((mgr) => (
+                            <SelectItem key={mgr} value={mgr}>{mgr}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  {/* Tags Input */}
+                  <div className="space-y-2">
+                    <Label>Tags</Label>
+                    <div className="flex flex-wrap gap-2 p-3 rounded-lg border bg-secondary/30 min-h-[44px]">
+                      {editClientTags.map((tag, index) => (
+                        <Badge key={index} variant="secondary" className="gap-1 pr-1">
+                          {tag}
+                          <button
+                            type="button"
+                            onClick={() => setEditClientTags(editClientTags.filter((_, i) => i !== index))}
+                            className="hover:bg-destructive/20 rounded p-0.5 ml-1"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                      <input
+                        type="text"
+                        value={editTagInput}
+                        onChange={(e) => setEditTagInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === ",") {
+                            e.preventDefault()
+                            const tag = editTagInput.trim()
+                            if (tag && !editClientTags.includes(tag)) {
+                              setEditClientTags([...editClientTags, tag])
+                              setEditTagInput("")
+                            }
+                          }
+                        }}
+                        placeholder={editClientTags.length === 0 ? "Type and press Enter to add tags..." : "Add more..."}
+                        className="flex-1 min-w-[120px] bg-transparent border-none outline-none text-sm placeholder:text-muted-foreground"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">Press Enter or comma to add a tag</p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Metrics & Scores Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                    <Heart className="w-4 h-4" />
+                    Metrics & Scores
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-healthScore">Health Score (0-100)</Label>
+                      <div className="relative">
+                        <Input id="edit-healthScore" name="healthScore" type="number" min="0" max="100" defaultValue={editingClient.healthScore} className="pl-9" />
+                        <Heart className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-engagementScore">Engagement (0-100)</Label>
+                      <div className="relative">
+                        <Input id="edit-engagementScore" name="engagementScore" type="number" min="0" max="100" defaultValue={editingClient.engagementScore} className="pl-9" />
+                        <Target className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-satisfaction">Satisfaction (0-100)</Label>
+                      <div className="relative">
+                        <Input id="edit-satisfaction" name="satisfaction" type="number" min="0" max="100" defaultValue={editingClient.satisfaction} className="pl-9" />
+                        <Sparkles className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-npsScore">NPS Score (0-10)</Label>
+                      <div className="relative">
+                        <Input id="edit-npsScore" name="npsScore" type="number" min="0" max="10" defaultValue={editingClient.npsScore} className="pl-9" />
+                        <Star className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-revenueGrowth">Revenue Growth (%)</Label>
+                      <div className="relative">
+                        <Input id="edit-revenueGrowth" name="revenueGrowth" type="number" defaultValue={editingClient.revenueGrowth} className="pl-9" />
+                        <TrendingUp className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-openTickets">Open Tickets</Label>
+                      <div className="relative">
+                        <Input id="edit-openTickets" name="openTickets" type="number" min="0" defaultValue={editingClient.openTickets} className="pl-9" />
+                        <AlertTriangle className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-activeProjects">Active Projects</Label>
+                      <div className="relative">
+                        <Input id="edit-activeProjects" name="activeProjects" type="number" min="0" defaultValue={editingClient.activeProjects} className="pl-9" />
+                        <Briefcase className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-completedProjects">Completed Projects</Label>
+                      <div className="relative">
+                        <Input id="edit-completedProjects" name="completedProjects" type="number" min="0" defaultValue={editingClient.completedProjects} className="pl-9" />
+                        <CheckCircle className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-activeCampaigns">Active Campaigns</Label>
+                      <div className="relative">
+                        <Input id="edit-activeCampaigns" name="activeCampaigns" type="number" min="0" defaultValue={editingClient.activeCampaigns} className="pl-9" />
+                        <Target className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Contract & Financial Details Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                    <DollarSign className="w-4 h-4" />
+                    Contract & Financial Details
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-totalRevenue">Total Revenue ($)</Label>
+                      <div className="relative">
+                        <Input id="edit-totalRevenue" name="totalRevenue" type="number" defaultValue={editingClient.totalRevenue} className="pl-9" />
+                        <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-contractValue">Contract Value ($)</Label>
+                      <div className="relative">
+                        <Input id="edit-contractValue" name="contractValue" type="number" defaultValue={editingClient.contractValue} className="pl-9" />
+                        <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-monthlyRevenue">Monthly Revenue ($)</Label>
+                      <div className="relative">
+                        <Input id="edit-monthlyRevenue" name="monthlyRevenue" type="number" defaultValue={editingClient.monthlyRevenue} className="pl-9" />
+                        <TrendingUp className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-lifetimeValue">Lifetime Value ($)</Label>
+                      <div className="relative">
+                        <Input id="edit-lifetimeValue" name="lifetimeValue" type="number" defaultValue={editingClient.lifetimeValue} className="pl-9" />
+                        <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-contractEnd">Contract End Date</Label>
+                      <div className="relative">
+                        <Input id="edit-contractEnd" name="contractEnd" type="date" defaultValue={editingClient.contractEnd} className="pl-9" />
+                        <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-paymentStatus">Payment Status</Label>
+                      <Select name="paymentStatus" defaultValue={editingClient.paymentStatus}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="paid">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                              Paid
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="pending">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-amber-400" />
+                              Pending
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="overdue">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-red-400" />
+                              Overdue
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Notes Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                    <FileText className="w-4 h-4" />
+                    Additional Notes
+                  </div>
+                  <Textarea
+                    id="edit-notes"
+                    name="notes"
+                    defaultValue={editingClient.notes}
+                    placeholder="Enter any additional notes about the client..."
+                    className="min-h-[100px] resize-none"
+                  />
+                </div>
+
+                <DialogFooter className="gap-2 pt-4 border-t">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setIsEditDialogOpen(false)
+                      setEditingClient(null)
+                      setEditClientTags([])
+                      setEditTagInput("")
+                    }}
+                    className="bg-transparent"
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" className="gap-2">
+                    <CheckCircle className="w-4 h-4" />
+                    Save Changes
+                  </Button>
+                </DialogFooter>
+              </form>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Client Detail Modal */}
         <Dialog open={!!selectedClient} onOpenChange={() => setSelectedClient(null)}>
@@ -1682,6 +2296,7 @@ export default function ClientsPage() {
                       <div>
                         <div className="flex items-center gap-2">
                           <DialogTitle className="text-xl">{selectedClient.company}</DialogTitle>
+                          <span className="text-xs font-mono text-muted-foreground bg-secondary px-2 py-1 rounded">{selectedClient.id}</span>
                           <Badge className={tierConfig[selectedClient.tier].color}>
                             {tierConfig[selectedClient.tier].label}
                           </Badge>
@@ -1692,13 +2307,21 @@ export default function ClientsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+                      <Button variant="outline" size="sm" className="gap-2 bg-transparent" onClick={() => window.open(`mailto:${selectedClient.email}`)}>
                         <Mail className="w-4 h-4" />
                         Email
                       </Button>
-                      <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+                      <Button variant="outline" size="sm" className="gap-2 bg-transparent" onClick={() => window.open(`tel:${selectedClient.phone}`)}>
                         <Phone className="w-4 h-4" />
                         Call
+                      </Button>
+                      <Button variant="outline" size="sm" className="gap-2 bg-transparent" onClick={() => { setSelectedClient(null); openEditDialog(selectedClient); }}>
+                        <Edit className="w-4 h-4" />
+                        Edit
+                      </Button>
+                      <Button variant="outline" size="sm" className="gap-2 text-red-400 hover:text-red-300 bg-transparent" onClick={() => handleDeleteClient(selectedClient.id)}>
+                        <Trash2 className="w-4 h-4" />
+                        Delete
                       </Button>
                     </div>
                   </div>
@@ -1872,9 +2495,37 @@ export default function ClientsPage() {
                           <p className="text-xs text-muted-foreground">Active Campaigns</p>
                         </div>
                       </div>
-                      <div className="text-center text-muted-foreground py-8">
-                        <Briefcase className="w-12 h-12 mx-auto mb-2 opacity-20" />
-                        <p>Project details would be displayed here</p>
+                      <div className="space-y-3">
+                        {selectedClient.activeProjects > 0 && Array.from({ length: selectedClient.activeProjects }, (_, i) => (
+                          <div key={`active-${i}`} className="flex items-center justify-between p-3 bg-secondary/20 rounded-lg border border-border/50">
+                            <div className="flex items-center gap-3">
+                              <div className="w-2 h-2 rounded-full bg-blue-400" />
+                              <div>
+                                <p className="text-sm font-medium">{["Website Redesign", "SEO Campaign", "Social Media Strategy", "Content Marketing", "PPC Management"][i % 5]}</p>
+                                <p className="text-xs text-muted-foreground">Started {new Date(Date.now() - (i + 1) * 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
+                              </div>
+                            </div>
+                            <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">In Progress</Badge>
+                          </div>
+                        ))}
+                        {selectedClient.completedProjects > 0 && Array.from({ length: Math.min(selectedClient.completedProjects, 3) }, (_, i) => (
+                          <div key={`completed-${i}`} className="flex items-center justify-between p-3 bg-secondary/20 rounded-lg border border-border/50 opacity-70">
+                            <div className="flex items-center gap-3">
+                              <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                              <div>
+                                <p className="text-sm font-medium">{["Brand Identity", "Email Automation", "Analytics Setup", "Landing Pages"][i % 4]}</p>
+                                <p className="text-xs text-muted-foreground">Completed {new Date(Date.now() - (i + 3) * 60 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
+                              </div>
+                            </div>
+                            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">Completed</Badge>
+                          </div>
+                        ))}
+                        {selectedClient.activeProjects === 0 && selectedClient.completedProjects === 0 && (
+                          <div className="text-center text-muted-foreground py-8">
+                            <Briefcase className="w-12 h-12 mx-auto mb-2 opacity-20" />
+                            <p>No projects yet</p>
+                          </div>
+                        )}
                       </div>
                     </TabsContent>
 
@@ -1885,18 +2536,44 @@ export default function ClientsPage() {
                           Last contact: {new Date(selectedClient.lastContact).toLocaleDateString()}
                         </span>
                       </div>
-                      <div className="text-center text-muted-foreground py-8">
-                        <History className="w-12 h-12 mx-auto mb-2 opacity-20" />
-                        <p>Activity timeline would be displayed here</p>
+                      <div className="relative space-y-0">
+                        <div className="absolute left-[15px] top-2 bottom-2 w-px bg-border" />
+                        {[
+                          { icon: Mail, label: "Email follow-up sent", time: "2 days ago", color: "bg-blue-400" },
+                          { icon: Phone, label: "Monthly review call completed", time: "1 week ago", color: "bg-emerald-400" },
+                          { icon: FileText, label: "Contract renewed", time: "2 weeks ago", color: "bg-violet-400" },
+                          { icon: DollarSign, label: `Invoice paid — $${(selectedClient.monthlyRevenue).toLocaleString()}`, time: "3 weeks ago", color: "bg-amber-400" },
+                          { icon: Users, label: `Account manager assigned: ${selectedClient.accountManager}`, time: "1 month ago", color: "bg-cyan-400" },
+                          { icon: CheckCircle, label: "Onboarding completed", time: "2 months ago", color: "bg-emerald-400" },
+                          { icon: Star, label: "Client account created", time: new Date(selectedClient.joinedDate).toLocaleDateString(), color: "bg-primary" },
+                        ].map((activity, i) => {
+                          const ActivityIcon = activity.icon
+                          return (
+                            <div key={i} className={`relative flex items-start gap-4 py-3 ${i === 0 ? 'text-foreground' : 'text-muted-foreground'}`}>
+                              <div className={`relative z-10 w-[31px] h-[31px] rounded-full ${activity.color} flex items-center justify-center flex-shrink-0`}>
+                                <ActivityIcon className="w-3.5 h-3.5 text-white" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm">{activity.label}</p>
+                                <p className="text-xs opacity-60">{activity.time}</p>
+                              </div>
+                            </div>
+                          )
+                        })}
                       </div>
                     </TabsContent>
 
                     <TabsContent value="notes" className="space-y-4">
                       <div className="p-4 bg-secondary/20 rounded-lg">
-                        <p className="text-sm">{selectedClient.notes}</p>
+                        <p className="text-sm whitespace-pre-line">{selectedClient.notes || "No notes yet."}</p>
                       </div>
-                      <Textarea placeholder="Add a note..." className="min-h-[100px]" />
-                      <Button className="w-full">Save Note</Button>
+                      <Textarea
+                        placeholder="Add a note..."
+                        className="min-h-[100px]"
+                        value={noteInput}
+                        onChange={(e) => setNoteInput(e.target.value)}
+                      />
+                      <Button className="w-full" onClick={handleSaveNote} disabled={!noteInput.trim()}>Save Note</Button>
                     </TabsContent>
                   </Tabs>
                 </ScrollArea>

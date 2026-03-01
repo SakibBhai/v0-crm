@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import type React from "react"
 import { useState, use } from "react"
@@ -114,53 +114,151 @@ interface Project {
 }
 
 // Sample project data
-const sampleProject: Project = {
-    id: "1",
-    name: "E-commerce Redesign",
-    description: "Complete website redesign with new branding, improved UX/UI, and modern technology stack. The project includes full responsive design, payment integration, and inventory management system.",
-    client: "TechMart Solutions",
-    projectManager: "John Smith",
-    status: "in-progress",
-    progress: 75,
-    budget: 25000,
-    spent: 18500,
-    startDate: "2024-10-15",
-    deadline: "2024-12-28",
-    briefLink: "https://docs.google.com/document/d/project-brief",
-    driveLink: "https://drive.google.com/drive/folders/project-files",
-    researchLink: "https://notion.so/research-documents",
-    tasks: [
-        { id: "1", title: "Design System Setup", status: "done", priority: "high", assignee: "SM", dueDate: "2024-10-20" },
-        { id: "2", title: "Homepage Wireframes", status: "done", priority: "high", assignee: "SM", dueDate: "2024-10-25" },
-        { id: "3", title: "Product Page Design", status: "done", priority: "medium", assignee: "SM", dueDate: "2024-11-01" },
-        { id: "4", title: "Cart & Checkout Flow", status: "done", priority: "high", assignee: "EC", dueDate: "2024-11-05" },
-        { id: "5", title: "Frontend Development", status: "in-progress", priority: "high", assignee: "JD", dueDate: "2024-11-20" },
-        { id: "6", title: "Backend API Integration", status: "in-progress", priority: "high", assignee: "JD", dueDate: "2024-11-25" },
-        { id: "7", title: "Payment Gateway Setup", status: "todo", priority: "high", assignee: "JD", dueDate: "2024-12-01" },
-        { id: "8", title: "User Testing", status: "todo", priority: "medium", assignee: "EC", dueDate: "2024-12-10" },
-        { id: "9", title: "Performance Optimization", status: "todo", priority: "medium", assignee: "JD", dueDate: "2024-12-15" },
-        { id: "10", title: "Launch Preparation", status: "todo", priority: "high", assignee: "JS", dueDate: "2024-12-25" },
-    ],
-    team: [
-        { id: "1", name: "John Smith", role: "Project Manager", workload: 60, tasksAssigned: 1 },
-        { id: "2", name: "Sarah Mitchell", role: "UI/UX Designer", workload: 85, tasksAssigned: 3 },
-        { id: "3", name: "John Doe", role: "Lead Developer", workload: 90, tasksAssigned: 4 },
-        { id: "4", name: "Emily Chen", role: "QA Engineer", workload: 40, tasksAssigned: 2 },
-    ],
-    files: [
-        { id: "1", name: "Project Brief.pdf", type: "document", size: "2.4 MB", uploadedBy: "John Smith", uploadedAt: "2024-10-15", version: 3 },
-        { id: "2", name: "Design System.fig", type: "presentation", size: "15.2 MB", uploadedBy: "Sarah Mitchell", uploadedAt: "2024-10-20", version: 5 },
-        { id: "3", name: "Homepage Mockup.png", type: "image", size: "4.8 MB", uploadedBy: "Sarah Mitchell", uploadedAt: "2024-10-25", version: 2 },
-        { id: "4", name: "API Documentation.docx", type: "document", size: "1.2 MB", uploadedBy: "John Doe", uploadedAt: "2024-11-01", version: 4 },
-        { id: "5", name: "Budget Tracker.xlsx", type: "spreadsheet", size: "856 KB", uploadedBy: "John Smith", uploadedAt: "2024-11-10", version: 8 },
-    ],
-    discussions: [
-        { id: "1", author: "John Smith", content: "Team, let's make sure we're on track for the December deadline. Please update your task statuses daily.", timestamp: "2024-11-15T09:00:00", mentions: [] },
-        { id: "2", author: "Sarah Mitchell", content: "Design system is finalized! @John Doe you can start implementing the components now.", timestamp: "2024-11-15T10:30:00", mentions: ["John Doe"] },
-        { id: "3", author: "John Doe", content: "Great work @Sarah Mitchell! I'll start with the homepage first. Should have initial version ready by end of week.", timestamp: "2024-11-15T11:00:00", mentions: ["Sarah Mitchell"] },
-        { id: "4", author: "Emily Chen", content: "I've prepared the test cases for the checkout flow. Will start testing once development is complete.", timestamp: "2024-11-16T14:00:00", mentions: [] },
-    ],
+const projectsMap: Record<string, Project> = {
+    "PJ-0001": {
+        id: "PJ-0001",
+        name: "E-commerce Redesign",
+        description: "Complete website redesign with new branding, improved UX/UI, and modern technology stack. The project includes full responsive design, payment integration, and inventory management system.",
+        client: "TechMart Solutions",
+        projectManager: "John Smith",
+        status: "in-progress",
+        progress: 75,
+        budget: 25000,
+        spent: 18500,
+        startDate: "2024-10-15",
+        deadline: "2024-12-28",
+        briefLink: "https://docs.google.com/document/d/project-brief",
+        driveLink: "https://drive.google.com/drive/folders/project-files",
+        researchLink: "https://notion.so/research-documents",
+        tasks: [
+            { id: "1", title: "Design System Setup", status: "done", priority: "high", assignee: "SM", dueDate: "2024-10-20" },
+            { id: "2", title: "Homepage Wireframes", status: "done", priority: "high", assignee: "SM", dueDate: "2024-10-25" },
+            { id: "3", title: "Product Page Design", status: "done", priority: "medium", assignee: "SM", dueDate: "2024-11-01" },
+            { id: "4", title: "Cart & Checkout Flow", status: "done", priority: "high", assignee: "EC", dueDate: "2024-11-05" },
+            { id: "5", title: "Frontend Development", status: "in-progress", priority: "high", assignee: "JD", dueDate: "2024-11-20" },
+            { id: "6", title: "Backend API Integration", status: "in-progress", priority: "high", assignee: "JD", dueDate: "2024-11-25" },
+            { id: "7", title: "Payment Gateway Setup", status: "todo", priority: "high", assignee: "JD", dueDate: "2024-12-01" },
+            { id: "8", title: "User Testing", status: "todo", priority: "medium", assignee: "EC", dueDate: "2024-12-10" },
+            { id: "9", title: "Performance Optimization", status: "todo", priority: "medium", assignee: "JD", dueDate: "2024-12-15" },
+            { id: "10", title: "Launch Preparation", status: "todo", priority: "high", assignee: "JS", dueDate: "2024-12-25" },
+        ],
+        team: [
+            { id: "1", name: "John Smith", role: "Project Manager", workload: 60, tasksAssigned: 1 },
+            { id: "2", name: "Sarah Mitchell", role: "UI/UX Designer", workload: 85, tasksAssigned: 3 },
+            { id: "3", name: "John Doe", role: "Lead Developer", workload: 90, tasksAssigned: 4 },
+            { id: "4", name: "Emily Chen", role: "QA Engineer", workload: 40, tasksAssigned: 2 },
+        ],
+        files: [
+            { id: "1", name: "Project Brief.pdf", type: "document", size: "2.4 MB", uploadedBy: "John Smith", uploadedAt: "2024-10-15", version: 3 },
+            { id: "2", name: "Design System.fig", type: "presentation", size: "15.2 MB", uploadedBy: "Sarah Mitchell", uploadedAt: "2024-10-20", version: 5 },
+            { id: "3", name: "Homepage Mockup.png", type: "image", size: "4.8 MB", uploadedBy: "Sarah Mitchell", uploadedAt: "2024-10-25", version: 2 },
+            { id: "4", name: "API Documentation.docx", type: "document", size: "1.2 MB", uploadedBy: "John Doe", uploadedAt: "2024-11-01", version: 4 },
+            { id: "5", name: "Budget Tracker.xlsx", type: "spreadsheet", size: "856 KB", uploadedBy: "John Smith", uploadedAt: "2024-11-10", version: 8 },
+        ],
+        discussions: [
+            { id: "1", author: "John Smith", content: "Team, let's make sure we're on track for the December deadline. Please update your task statuses daily.", timestamp: "2024-11-15T09:00:00", mentions: [] },
+            { id: "2", author: "Sarah Mitchell", content: "Design system is finalized! @John Doe you can start implementing the components now.", timestamp: "2024-11-15T10:30:00", mentions: ["John Doe"] },
+            { id: "3", author: "John Doe", content: "Great work @Sarah Mitchell! I'll start with the homepage first. Should have initial version ready by end of week.", timestamp: "2024-11-15T11:00:00", mentions: ["Sarah Mitchell"] },
+            { id: "4", author: "Emily Chen", content: "I've prepared the test cases for the checkout flow. Will start testing once development is complete.", timestamp: "2024-11-16T14:00:00", mentions: [] },
+        ],
+    },
+    "PJ-0002": {
+        id: "PJ-0002", name: "SEO Campaign Q4",
+        description: "Comprehensive SEO optimization and content strategy for Q4.",
+        client: "GreenLife Organics", projectManager: "Emily Chen",
+        status: "in-progress", progress: 45, budget: 12000, spent: 5400,
+        startDate: "2024-11-01", deadline: "2025-01-05",
+        briefLink: "https://docs.google.com/document/d/seo-brief",
+        driveLink: "https://drive.google.com/drive/folders/seo-files",
+        tasks: [
+            { id: "1", title: "Technical SEO Audit", status: "done", priority: "high", assignee: "JW", dueDate: "2024-11-10" },
+            { id: "2", title: "Keyword Research", status: "done", priority: "high", assignee: "AT", dueDate: "2024-11-15" },
+            { id: "3", title: "On-Page Optimization", status: "in-progress", priority: "high", assignee: "JW", dueDate: "2024-11-30" },
+            { id: "4", title: "Content Calendar Creation", status: "in-progress", priority: "medium", assignee: "AT", dueDate: "2024-12-05" },
+            { id: "5", title: "Blog Posts (8x)", status: "todo", priority: "medium", assignee: "AT", dueDate: "2024-12-20" },
+        ],
+        team: [
+            { id: "1", name: "Emily Chen", role: "SEO Manager", workload: 70, tasksAssigned: 0 },
+            { id: "2", name: "Jake Wilson", role: "SEO Specialist", workload: 80, tasksAssigned: 3 },
+            { id: "3", name: "Amy Thompson", role: "Content Writer", workload: 65, tasksAssigned: 3 },
+        ],
+        files: [{ id: "1", name: "SEO Audit Report.pdf", type: "document", size: "3.1 MB", uploadedBy: "Jake Wilson", uploadedAt: "2024-11-10", version: 2 }],
+        discussions: [{ id: "1", author: "Emily Chen", content: "Technical audit is complete. Moving to on-page optimizations.", timestamp: "2024-11-12T09:00:00", mentions: [] }],
+    },
+    "PJ-0003": {
+        id: "PJ-0003", name: "Social Media Strategy",
+        description: "Full social media management and content calendar for FoodieHub.",
+        client: "FoodieHub", projectManager: "Sarah Mitchell",
+        status: "review", progress: 90, budget: 8000, spent: 7200,
+        startDate: "2024-09-20", deadline: "2024-12-22",
+        tasks: [
+            { id: "1", title: "Social Media Audit", status: "done", priority: "high", assignee: "EC", dueDate: "2024-09-25" },
+            { id: "2", title: "Strategy Document", status: "done", priority: "high", assignee: "MB", dueDate: "2024-10-01" },
+            { id: "3", title: "Content Calendar Q4", status: "done", priority: "medium", assignee: "EC", dueDate: "2024-10-10" },
+            { id: "4", title: "Final Review", status: "review", priority: "high", assignee: "MB", dueDate: "2024-12-22" },
+        ],
+        team: [
+            { id: "1", name: "Sarah Mitchell", role: "Social Media Manager", workload: 50, tasksAssigned: 0 },
+            { id: "2", name: "Emily Chen", role: "Content Creator", workload: 60, tasksAssigned: 2 },
+            { id: "3", name: "Mike Brown", role: "Community Manager", workload: 75, tasksAssigned: 2 },
+        ],
+        files: [{ id: "1", name: "Social Strategy.pdf", type: "document", size: "2.8 MB", uploadedBy: "Sarah Mitchell", uploadedAt: "2024-10-01", version: 4 }],
+        discussions: [{ id: "1", author: "Sarah Mitchell", content: "We are on track for the final review.", timestamp: "2024-12-18T09:00:00", mentions: [] }],
+    },
+    "PJ-0004": {
+        id: "PJ-0004", name: "PPC Management",
+        description: "Google Ads and Meta advertising campaigns. Currently on hold.",
+        client: "AutoDeal Motors", projectManager: "David Park",
+        status: "on-hold", progress: 30, budget: 15000, spent: 4500,
+        startDate: "2024-10-01", deadline: "2025-01-15",
+        tasks: [
+            { id: "1", title: "Campaign Audit", status: "done", priority: "high", assignee: "DP", dueDate: "2024-10-10" },
+            { id: "2", title: "Google Ads Setup", status: "in-progress", priority: "high", assignee: "JW", dueDate: "2024-10-25" },
+        ],
+        team: [{ id: "1", name: "David Park", role: "PPC Manager", workload: 30, tasksAssigned: 1 }, { id: "2", name: "Jake Wilson", role: "PPC Specialist", workload: 35, tasksAssigned: 2 }],
+        files: [], discussions: [{ id: "1", author: "David Park", content: "On hold pending client budget approval.", timestamp: "2024-12-01T09:00:00", mentions: [] }],
+    },
+    "PJ-0005": {
+        id: "PJ-0005", name: "Brand Identity Overhaul",
+        description: "Complete rebranding including logo, colors, and guidelines.",
+        client: "LuxStay Hotels", projectManager: "John Smith",
+        status: "planning", progress: 15, budget: 35000, spent: 5250,
+        startDate: "2024-12-01", deadline: "2025-03-15",
+        tasks: [
+            { id: "1", title: "Brand Discovery Workshop", status: "done", priority: "high", assignee: "SM", dueDate: "2024-12-05" },
+            { id: "2", title: "Competitor Analysis", status: "in-progress", priority: "medium", assignee: "JD", dueDate: "2024-12-15" },
+            { id: "3", title: "Logo Concepts", status: "todo", priority: "high", assignee: "SM", dueDate: "2025-01-05" },
+        ],
+        team: [
+            { id: "1", name: "John Smith", role: "Project Manager", workload: 40, tasksAssigned: 0 },
+            { id: "2", name: "Sarah Mitchell", role: "Lead Designer", workload: 55, tasksAssigned: 3 },
+            { id: "3", name: "John Doe", role: "Developer", workload: 30, tasksAssigned: 1 },
+        ],
+        files: [{ id: "1", name: "Brand Brief.pdf", type: "document", size: "1.8 MB", uploadedBy: "John Smith", uploadedAt: "2024-12-01", version: 1 }],
+        discussions: [{ id: "1", author: "John Smith", content: "Kickoff meeting went great. Sarah will start on mood boards.", timestamp: "2024-12-05T14:00:00", mentions: [] }],
+    },
+    "PJ-0006": {
+        id: "PJ-0006", name: "Email Marketing Automation",
+        description: "Automated email sequences and newsletters. Project completed.",
+        client: "TechMart Solutions", projectManager: "Emily Chen",
+        status: "completed", progress: 100, budget: 6000, spent: 5800,
+        startDate: "2024-08-15", deadline: "2024-11-30",
+        tasks: [
+            { id: "1", title: "Email Strategy", status: "done", priority: "high", assignee: "AT", dueDate: "2024-08-25" },
+            { id: "2", title: "Template Design", status: "done", priority: "high", assignee: "MB", dueDate: "2024-09-10" },
+            { id: "3", title: "Automation Setup", status: "done", priority: "high", assignee: "AT", dueDate: "2024-10-15" },
+            { id: "4", title: "Testing & Launch", status: "done", priority: "medium", assignee: "AT", dueDate: "2024-11-30" },
+        ],
+        team: [
+            { id: "1", name: "Emily Chen", role: "Project Manager", workload: 0, tasksAssigned: 0 },
+            { id: "2", name: "Amy Thompson", role: "Email Specialist", workload: 0, tasksAssigned: 3 },
+        ],
+        files: [{ id: "1", name: "Email Templates.zip", type: "other", size: "5.2 MB", uploadedBy: "Mike Brown", uploadedAt: "2024-09-10", version: 6 }],
+        discussions: [{ id: "1", author: "Emily Chen", content: "Project completed! All automations live.", timestamp: "2024-11-30T16:00:00", mentions: [] }],
+    },
 }
+
+const getProjectById = (id: string): Project => projectsMap[id] || projectsMap["PJ-0001"]
 
 // Gantt chart data
 const ganttData = [
@@ -204,7 +302,7 @@ const fileIcons = {
 
 export default function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params)
-    const [project, setProject] = useState<Project>(sampleProject)
+    const [project, setProject] = useState<Project>(getProjectById(resolvedParams.id))
     const [activeTab, setActiveTab] = useState("overview")
     const [isAddTaskOpen, setIsAddTaskOpen] = useState(false)
     const [isEditOpen, setIsEditOpen] = useState(false)
@@ -331,7 +429,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                                     <StatusIcon className="w-3 h-3 mr-1" />
                                     {statusConfig[project.status].label}
                                 </Badge>
-                                <span className="text-muted-foreground text-sm">•</span>
+                                <span className="text-muted-foreground text-sm">â€¢</span>
                                 <span className="text-sm text-muted-foreground">{project.client}</span>
                             </div>
                             <h1 className="text-2xl sm:text-3xl font-bold">{project.name}</h1>
@@ -956,7 +1054,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                                         </div>
                                         <div>
                                             <p className="font-medium text-sm">$10,000.00 received</p>
-                                            <p className="text-xs text-muted-foreground">INV-2024-001 • Bank Transfer</p>
+                                            <p className="text-xs text-muted-foreground">INV-2024-001 â€¢ Bank Transfer</p>
                                         </div>
                                     </div>
                                     <span className="text-xs text-muted-foreground">Dec 10, 2024</span>
@@ -1151,11 +1249,11 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="bank_transfer">🏦 Bank Transfer</SelectItem>
-                                        <SelectItem value="credit_card">💳 Credit Card</SelectItem>
-                                        <SelectItem value="cash">💵 Cash</SelectItem>
-                                        <SelectItem value="check">📝 Check</SelectItem>
-                                        <SelectItem value="other">📋 Other</SelectItem>
+                                        <SelectItem value="bank_transfer">ðŸ¦ Bank Transfer</SelectItem>
+                                        <SelectItem value="credit_card">ðŸ’³ Credit Card</SelectItem>
+                                        <SelectItem value="cash">ðŸ’µ Cash</SelectItem>
+                                        <SelectItem value="check">ðŸ“ Check</SelectItem>
+                                        <SelectItem value="other">ðŸ“‹ Other</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>

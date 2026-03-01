@@ -3337,6 +3337,7 @@ function LeadsPage() {
     const [selectedLeads, setSelectedLeads] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
     const [draggedLead, setDraggedLead] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const [dragOverStage, setDragOverStage] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const wasDragging = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(false);
     const [newNoteText, setNewNoteText] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
     const [isAddMeetingOpen, setIsAddMeetingOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [meetingType, setMeetingType] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("online");
@@ -3602,6 +3603,7 @@ function LeadsPage() {
     };
     // Drag and Drop handlers
     const handleDragStart = (e, lead)=>{
+        wasDragging.current = true;
         setDraggedLead(lead);
         e.dataTransfer.effectAllowed = "move";
         e.dataTransfer.setData("text/plain", lead.id);
@@ -3625,6 +3627,10 @@ function LeadsPage() {
     const handleDragEnd = ()=>{
         setDraggedLead(null);
         setDragOverStage(null);
+        // Reset wasDragging after a tick so the click handler can check it
+        setTimeout(()=>{
+            wasDragging.current = false;
+        }, 0);
     };
     const clearFilters = ()=>{
         setStatusFilter("all");
@@ -3883,7 +3889,7 @@ function LeadsPage() {
                                     children: "Lead Management"
                                 }, void 0, false, {
                                     fileName: "[project]/app/leads/page.tsx",
-                                    lineNumber: 930,
+                                    lineNumber: 934,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3891,13 +3897,13 @@ function LeadsPage() {
                                     children: "Track, manage, and convert your leads into clients"
                                 }, void 0, false, {
                                     fileName: "[project]/app/leads/page.tsx",
-                                    lineNumber: 931,
+                                    lineNumber: 935,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/leads/page.tsx",
-                            lineNumber: 929,
+                            lineNumber: 933,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3913,14 +3919,14 @@ function LeadsPage() {
                                             className: "w-4 h-4"
                                         }, void 0, false, {
                                             fileName: "[project]/app/leads/page.tsx",
-                                            lineNumber: 935,
+                                            lineNumber: 939,
                                             columnNumber: 15
                                         }, this),
                                         "Import"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/leads/page.tsx",
-                                    lineNumber: 934,
+                                    lineNumber: 938,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -3933,14 +3939,14 @@ function LeadsPage() {
                                             className: "w-4 h-4"
                                         }, void 0, false, {
                                             fileName: "[project]/app/leads/page.tsx",
-                                            lineNumber: 939,
+                                            lineNumber: 943,
                                             columnNumber: 15
                                         }, this),
                                         "Export"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/leads/page.tsx",
-                                    lineNumber: 938,
+                                    lineNumber: 942,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Dialog"], {
@@ -3956,19 +3962,19 @@ function LeadsPage() {
                                                         className: "w-4 h-4"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 945,
+                                                        lineNumber: 949,
                                                         columnNumber: 19
                                                     }, this),
                                                     "Add Lead"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 944,
+                                                lineNumber: 948,
                                                 columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/leads/page.tsx",
-                                            lineNumber: 943,
+                                            lineNumber: 947,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogContent"], {
@@ -3980,20 +3986,20 @@ function LeadsPage() {
                                                             children: "Add New Lead"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 951,
+                                                            lineNumber: 955,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogDescription"], {
                                                             children: "Fill in the details to create a new lead."
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 952,
+                                                            lineNumber: 956,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 950,
+                                                    lineNumber: 954,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -4011,40 +4017,13 @@ function LeadsPage() {
                                                                             children: "Full Name *"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 957,
+                                                                            lineNumber: 961,
                                                                             columnNumber: 23
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
                                                                             id: "name",
                                                                             name: "name",
                                                                             placeholder: "John Doe",
-                                                                            required: true
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 958,
-                                                                            columnNumber: 23
-                                                                        }, this)
-                                                                    ]
-                                                                }, void 0, true, {
-                                                                    fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 956,
-                                                                    columnNumber: 21
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "space-y-2",
-                                                                    children: [
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Label"], {
-                                                                            htmlFor: "company",
-                                                                            children: "Company *"
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 961,
-                                                                            columnNumber: 23
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
-                                                                            id: "company",
-                                                                            name: "company",
-                                                                            placeholder: "Acme Inc",
                                                                             required: true
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
@@ -4056,11 +4035,38 @@ function LeadsPage() {
                                                                     fileName: "[project]/app/leads/page.tsx",
                                                                     lineNumber: 960,
                                                                     columnNumber: 21
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "space-y-2",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Label"], {
+                                                                            htmlFor: "company",
+                                                                            children: "Company *"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/leads/page.tsx",
+                                                                            lineNumber: 965,
+                                                                            columnNumber: 23
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
+                                                                            id: "company",
+                                                                            name: "company",
+                                                                            placeholder: "Acme Inc",
+                                                                            required: true
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/leads/page.tsx",
+                                                                            lineNumber: 966,
+                                                                            columnNumber: 23
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/app/leads/page.tsx",
+                                                                    lineNumber: 964,
+                                                                    columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 955,
+                                                            lineNumber: 959,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4074,7 +4080,7 @@ function LeadsPage() {
                                                                             children: "Email *"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 967,
+                                                                            lineNumber: 971,
                                                                             columnNumber: 23
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -4085,13 +4091,13 @@ function LeadsPage() {
                                                                             required: true
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 968,
+                                                                            lineNumber: 972,
                                                                             columnNumber: 23
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 966,
+                                                                    lineNumber: 970,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4102,7 +4108,7 @@ function LeadsPage() {
                                                                             children: "Phone"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 971,
+                                                                            lineNumber: 975,
                                                                             columnNumber: 23
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -4111,19 +4117,19 @@ function LeadsPage() {
                                                                             placeholder: "+1 (555) 000-0000"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 972,
+                                                                            lineNumber: 976,
                                                                             columnNumber: 23
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 970,
+                                                                    lineNumber: 974,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 965,
+                                                            lineNumber: 969,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4137,7 +4143,7 @@ function LeadsPage() {
                                                                             children: "Temperature"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 977,
+                                                                            lineNumber: 981,
                                                                             columnNumber: 23
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Select"], {
@@ -4149,12 +4155,12 @@ function LeadsPage() {
                                                                                         placeholder: "Select status"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                                        lineNumber: 980,
+                                                                                        lineNumber: 984,
                                                                                         columnNumber: 27
                                                                                     }, this)
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 979,
+                                                                                    lineNumber: 983,
                                                                                     columnNumber: 25
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -4164,7 +4170,7 @@ function LeadsPage() {
                                                                                             children: "Hot"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 983,
+                                                                                            lineNumber: 987,
                                                                                             columnNumber: 27
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -4172,7 +4178,7 @@ function LeadsPage() {
                                                                                             children: "Warm"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 984,
+                                                                                            lineNumber: 988,
                                                                                             columnNumber: 27
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -4180,25 +4186,25 @@ function LeadsPage() {
                                                                                             children: "Cold"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 985,
+                                                                                            lineNumber: 989,
                                                                                             columnNumber: 27
                                                                                         }, this)
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 982,
+                                                                                    lineNumber: 986,
                                                                                     columnNumber: 25
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 978,
+                                                                            lineNumber: 982,
                                                                             columnNumber: 23
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 976,
+                                                                    lineNumber: 980,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4209,7 +4215,7 @@ function LeadsPage() {
                                                                             children: "Stage"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 990,
+                                                                            lineNumber: 994,
                                                                             columnNumber: 23
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Select"], {
@@ -4221,12 +4227,12 @@ function LeadsPage() {
                                                                                         placeholder: "Select stage"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                                        lineNumber: 993,
+                                                                                        lineNumber: 997,
                                                                                         columnNumber: 27
                                                                                     }, this)
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 992,
+                                                                                    lineNumber: 996,
                                                                                     columnNumber: 25
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -4235,24 +4241,24 @@ function LeadsPage() {
                                                                                             children: stageConfig[stage].label
                                                                                         }, stage, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 999,
+                                                                                            lineNumber: 1003,
                                                                                             columnNumber: 31
                                                                                         }, this))
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 995,
+                                                                                    lineNumber: 999,
                                                                                     columnNumber: 25
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 991,
+                                                                            lineNumber: 995,
                                                                             columnNumber: 23
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 989,
+                                                                    lineNumber: 993,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4263,7 +4269,7 @@ function LeadsPage() {
                                                                             children: "Priority"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1007,
+                                                                            lineNumber: 1011,
                                                                             columnNumber: 23
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Select"], {
@@ -4275,12 +4281,12 @@ function LeadsPage() {
                                                                                         placeholder: "Priority"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                                        lineNumber: 1010,
+                                                                                        lineNumber: 1014,
                                                                                         columnNumber: 27
                                                                                     }, this)
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1009,
+                                                                                    lineNumber: 1013,
                                                                                     columnNumber: 25
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -4290,7 +4296,7 @@ function LeadsPage() {
                                                                                             children: "High"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1013,
+                                                                                            lineNumber: 1017,
                                                                                             columnNumber: 27
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -4298,7 +4304,7 @@ function LeadsPage() {
                                                                                             children: "Medium"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1014,
+                                                                                            lineNumber: 1018,
                                                                                             columnNumber: 27
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -4306,31 +4312,31 @@ function LeadsPage() {
                                                                                             children: "Low"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1015,
+                                                                                            lineNumber: 1019,
                                                                                             columnNumber: 27
                                                                                         }, this)
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1012,
+                                                                                    lineNumber: 1016,
                                                                                     columnNumber: 25
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1008,
+                                                                            lineNumber: 1012,
                                                                             columnNumber: 23
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1006,
+                                                                    lineNumber: 1010,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 975,
+                                                            lineNumber: 979,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4344,7 +4350,7 @@ function LeadsPage() {
                                                                             children: "Source"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1022,
+                                                                            lineNumber: 1026,
                                                                             columnNumber: 23
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Select"], {
@@ -4356,12 +4362,12 @@ function LeadsPage() {
                                                                                         placeholder: "Select source"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                                        lineNumber: 1025,
+                                                                                        lineNumber: 1029,
                                                                                         columnNumber: 27
                                                                                     }, this)
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1024,
+                                                                                    lineNumber: 1028,
                                                                                     columnNumber: 25
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -4371,7 +4377,7 @@ function LeadsPage() {
                                                                                             children: "Website"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1028,
+                                                                                            lineNumber: 1032,
                                                                                             columnNumber: 27
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -4379,7 +4385,7 @@ function LeadsPage() {
                                                                                             children: "Referral"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1029,
+                                                                                            lineNumber: 1033,
                                                                                             columnNumber: 27
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -4387,7 +4393,7 @@ function LeadsPage() {
                                                                                             children: "LinkedIn"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1030,
+                                                                                            lineNumber: 1034,
                                                                                             columnNumber: 27
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -4395,7 +4401,7 @@ function LeadsPage() {
                                                                                             children: "Cold Email"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1031,
+                                                                                            lineNumber: 1035,
                                                                                             columnNumber: 27
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -4403,7 +4409,7 @@ function LeadsPage() {
                                                                                             children: "Conference"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1032,
+                                                                                            lineNumber: 1036,
                                                                                             columnNumber: 27
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -4411,25 +4417,25 @@ function LeadsPage() {
                                                                                             children: "Webinar"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1033,
+                                                                                            lineNumber: 1037,
                                                                                             columnNumber: 27
                                                                                         }, this)
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1027,
+                                                                                    lineNumber: 1031,
                                                                                     columnNumber: 25
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1023,
+                                                                            lineNumber: 1027,
                                                                             columnNumber: 23
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1021,
+                                                                    lineNumber: 1025,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4440,7 +4446,7 @@ function LeadsPage() {
                                                                             children: "Assigned To"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1038,
+                                                                            lineNumber: 1042,
                                                                             columnNumber: 23
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Select"], {
@@ -4452,12 +4458,12 @@ function LeadsPage() {
                                                                                         placeholder: "Select assignee"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                                        lineNumber: 1041,
+                                                                                        lineNumber: 1045,
                                                                                         columnNumber: 27
                                                                                     }, this)
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1040,
+                                                                                    lineNumber: 1044,
                                                                                     columnNumber: 25
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -4467,7 +4473,7 @@ function LeadsPage() {
                                                                                             children: "John Smith"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1044,
+                                                                                            lineNumber: 1048,
                                                                                             columnNumber: 27
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -4475,7 +4481,7 @@ function LeadsPage() {
                                                                                             children: "Emma Davis"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1045,
+                                                                                            lineNumber: 1049,
                                                                                             columnNumber: 27
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -4483,31 +4489,31 @@ function LeadsPage() {
                                                                                             children: "Alex Johnson"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1046,
+                                                                                            lineNumber: 1050,
                                                                                             columnNumber: 27
                                                                                         }, this)
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1043,
+                                                                                    lineNumber: 1047,
                                                                                     columnNumber: 25
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1039,
+                                                                            lineNumber: 1043,
                                                                             columnNumber: 23
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1037,
+                                                                    lineNumber: 1041,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1020,
+                                                            lineNumber: 1024,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4521,7 +4527,7 @@ function LeadsPage() {
                                                                             children: "Deal Value ($) *"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1053,
+                                                                            lineNumber: 1057,
                                                                             columnNumber: 23
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -4532,13 +4538,13 @@ function LeadsPage() {
                                                                             required: true
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1054,
+                                                                            lineNumber: 1058,
                                                                             columnNumber: 23
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1052,
+                                                                    lineNumber: 1056,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4549,7 +4555,7 @@ function LeadsPage() {
                                                                             children: "Win Probability (%)"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1057,
+                                                                            lineNumber: 1061,
                                                                             columnNumber: 23
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -4561,19 +4567,19 @@ function LeadsPage() {
                                                                             max: "100"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1058,
+                                                                            lineNumber: 1062,
                                                                             columnNumber: 23
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1056,
+                                                                    lineNumber: 1060,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1051,
+                                                            lineNumber: 1055,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4584,7 +4590,7 @@ function LeadsPage() {
                                                                     children: "Next Follow-up"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1062,
+                                                                    lineNumber: 1066,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -4593,13 +4599,13 @@ function LeadsPage() {
                                                                     type: "date"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1063,
+                                                                    lineNumber: 1067,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1061,
+                                                            lineNumber: 1065,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4613,7 +4619,7 @@ function LeadsPage() {
                                                                             children: "Category"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1067,
+                                                                            lineNumber: 1071,
                                                                             columnNumber: 23
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Select"], {
@@ -4625,12 +4631,12 @@ function LeadsPage() {
                                                                                         placeholder: "Select category"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                                        lineNumber: 1070,
+                                                                                        lineNumber: 1074,
                                                                                         columnNumber: 27
                                                                                     }, this)
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1069,
+                                                                                    lineNumber: 1073,
                                                                                     columnNumber: 25
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -4639,24 +4645,24 @@ function LeadsPage() {
                                                                                             children: config.label
                                                                                         }, key, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1074,
+                                                                                            lineNumber: 1078,
                                                                                             columnNumber: 29
                                                                                         }, this))
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1072,
+                                                                                    lineNumber: 1076,
                                                                                     columnNumber: 25
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1068,
+                                                                            lineNumber: 1072,
                                                                             columnNumber: 23
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1066,
+                                                                    lineNumber: 1070,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4667,7 +4673,7 @@ function LeadsPage() {
                                                                             children: "Tags (comma separated)"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1082,
+                                                                            lineNumber: 1086,
                                                                             columnNumber: 23
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -4676,19 +4682,19 @@ function LeadsPage() {
                                                                             placeholder: "SEO, Enterprise, Priority"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1083,
+                                                                            lineNumber: 1087,
                                                                             columnNumber: 23
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1081,
+                                                                    lineNumber: 1085,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1065,
+                                                            lineNumber: 1069,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4699,7 +4705,7 @@ function LeadsPage() {
                                                                     children: "Notes"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1087,
+                                                                    lineNumber: 1091,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$textarea$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Textarea"], {
@@ -4709,13 +4715,13 @@ function LeadsPage() {
                                                                     rows: 3
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1088,
+                                                                    lineNumber: 1092,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1086,
+                                                            lineNumber: 1090,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogFooter"], {
@@ -4727,7 +4733,7 @@ function LeadsPage() {
                                                                     children: "Cancel"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1091,
+                                                                    lineNumber: 1095,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -4735,43 +4741,43 @@ function LeadsPage() {
                                                                     children: "Add Lead"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1094,
+                                                                    lineNumber: 1098,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1090,
+                                                            lineNumber: 1094,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 954,
+                                                    lineNumber: 958,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/leads/page.tsx",
-                                            lineNumber: 949,
+                                            lineNumber: 953,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/leads/page.tsx",
-                                    lineNumber: 942,
+                                    lineNumber: 946,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/leads/page.tsx",
-                            lineNumber: 933,
+                            lineNumber: 937,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/leads/page.tsx",
-                    lineNumber: 928,
+                    lineNumber: 932,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4845,12 +4851,12 @@ function LeadsPage() {
                                             className: `w-3.5 h-3.5 ${stat.color}`
                                         }, void 0, false, {
                                             fileName: "[project]/app/leads/page.tsx",
-                                            lineNumber: 1135,
+                                            lineNumber: 1139,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1134,
+                                        lineNumber: 1138,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4860,7 +4866,7 @@ function LeadsPage() {
                                                 children: stat.label
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1138,
+                                                lineNumber: 1142,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4868,29 +4874,29 @@ function LeadsPage() {
                                                 children: stat.value
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1139,
+                                                lineNumber: 1143,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1137,
+                                        lineNumber: 1141,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 1133,
+                                lineNumber: 1137,
                                 columnNumber: 15
                             }, this)
                         }, stat.label, false, {
                             fileName: "[project]/app/leads/page.tsx",
-                            lineNumber: 1132,
+                            lineNumber: 1136,
                             columnNumber: 13
                         }, this))
                 }, void 0, false, {
                     fileName: "[project]/app/leads/page.tsx",
-                    lineNumber: 1103,
+                    lineNumber: 1107,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$animated$2d$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["AnimatedCard"], {
@@ -4910,7 +4916,7 @@ function LeadsPage() {
                                                     className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 1152,
+                                                    lineNumber: 1156,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -4920,7 +4926,7 @@ function LeadsPage() {
                                                     onChange: (e)=>setSearchQuery(e.target.value)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 1153,
+                                                    lineNumber: 1157,
                                                     columnNumber: 17
                                                 }, this),
                                                 searchQuery && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -4930,18 +4936,18 @@ function LeadsPage() {
                                                         className: "w-4 h-4"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1164,
+                                                        lineNumber: 1168,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 1160,
+                                                    lineNumber: 1164,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/leads/page.tsx",
-                                            lineNumber: 1151,
+                                            lineNumber: 1155,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -4954,7 +4960,7 @@ function LeadsPage() {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 1175,
+                                                    lineNumber: 1179,
                                                     columnNumber: 17
                                                 }, this),
                                                 activeFiltersCount > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4962,19 +4968,19 @@ function LeadsPage() {
                                                     children: activeFiltersCount
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 1177,
+                                                    lineNumber: 1181,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/leads/page.tsx",
-                                            lineNumber: 1169,
+                                            lineNumber: 1173,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/leads/page.tsx",
-                                    lineNumber: 1150,
+                                    lineNumber: 1154,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4991,7 +4997,7 @@ function LeadsPage() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 1188,
+                                                    lineNumber: 1192,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -5001,7 +5007,7 @@ function LeadsPage() {
                                                     children: "Clear"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 1189,
+                                                    lineNumber: 1193,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -5013,20 +5019,20 @@ function LeadsPage() {
                                                             className: "w-4 h-4 mr-1"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1193,
+                                                            lineNumber: 1197,
                                                             columnNumber: 21
                                                         }, this),
                                                         "Delete"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 1192,
+                                                    lineNumber: 1196,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/leads/page.tsx",
-                                            lineNumber: 1187,
+                                            lineNumber: 1191,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Tabs"], {
@@ -5043,37 +5049,12 @@ function LeadsPage() {
                                                                 className: "w-4 h-4"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1202,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "hidden sm:inline",
-                                                                children: "Kanban"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1203,
-                                                                columnNumber: 21
-                                                            }, this)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1201,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["TabsTrigger"], {
-                                                        value: "table",
-                                                        className: "gap-1.5",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$list$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__List$3e$__["List"], {
-                                                                className: "w-4 h-4"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/app/leads/page.tsx",
                                                                 lineNumber: 1206,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 className: "hidden sm:inline",
-                                                                children: "Table"
+                                                                children: "Kanban"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
                                                                 lineNumber: 1207,
@@ -5086,10 +5067,10 @@ function LeadsPage() {
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["TabsTrigger"], {
-                                                        value: "grid",
+                                                        value: "table",
                                                         className: "gap-1.5",
                                                         children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$layout$2d$grid$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__LayoutGrid$3e$__["LayoutGrid"], {
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$list$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__List$3e$__["List"], {
                                                                 className: "w-4 h-4"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
@@ -5098,7 +5079,7 @@ function LeadsPage() {
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 className: "hidden sm:inline",
-                                                                children: "Grid"
+                                                                children: "Table"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
                                                                 lineNumber: 1211,
@@ -5109,28 +5090,53 @@ function LeadsPage() {
                                                         fileName: "[project]/app/leads/page.tsx",
                                                         lineNumber: 1209,
                                                         columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["TabsTrigger"], {
+                                                        value: "grid",
+                                                        className: "gap-1.5",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$layout$2d$grid$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__LayoutGrid$3e$__["LayoutGrid"], {
+                                                                className: "w-4 h-4"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/leads/page.tsx",
+                                                                lineNumber: 1214,
+                                                                columnNumber: 21
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "hidden sm:inline",
+                                                                children: "Grid"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/leads/page.tsx",
+                                                                lineNumber: 1215,
+                                                                columnNumber: 21
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/leads/page.tsx",
+                                                        lineNumber: 1213,
+                                                        columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1200,
+                                                lineNumber: 1204,
                                                 columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/leads/page.tsx",
-                                            lineNumber: 1199,
+                                            lineNumber: 1203,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/leads/page.tsx",
-                                    lineNumber: 1185,
+                                    lineNumber: 1189,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/leads/page.tsx",
-                            lineNumber: 1148,
+                            lineNumber: 1152,
                             columnNumber: 11
                         }, this),
                         isFilterPanelOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5149,20 +5155,20 @@ function LeadsPage() {
                                                         className: "w-4 h-4 mr-2"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1224,
+                                                        lineNumber: 1228,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectValue"], {
                                                         placeholder: "Status"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1225,
+                                                        lineNumber: 1229,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1223,
+                                                lineNumber: 1227,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -5172,7 +5178,7 @@ function LeadsPage() {
                                                         children: "All Status"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1228,
+                                                        lineNumber: 1232,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -5180,7 +5186,7 @@ function LeadsPage() {
                                                         children: "Hot"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1229,
+                                                        lineNumber: 1233,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -5188,7 +5194,7 @@ function LeadsPage() {
                                                         children: "Warm"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1230,
+                                                        lineNumber: 1234,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -5196,19 +5202,19 @@ function LeadsPage() {
                                                         children: "Cold"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1231,
+                                                        lineNumber: 1235,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1227,
+                                                lineNumber: 1231,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1222,
+                                        lineNumber: 1226,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Select"], {
@@ -5221,12 +5227,12 @@ function LeadsPage() {
                                                     placeholder: "Source"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 1237,
+                                                    lineNumber: 1241,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1236,
+                                                lineNumber: 1240,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -5236,7 +5242,7 @@ function LeadsPage() {
                                                         children: "All Sources"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1240,
+                                                        lineNumber: 1244,
                                                         columnNumber: 21
                                                     }, this),
                                                     uniqueSources.map((source)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -5244,19 +5250,19 @@ function LeadsPage() {
                                                             children: source
                                                         }, source, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1242,
+                                                            lineNumber: 1246,
                                                             columnNumber: 23
                                                         }, this))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1239,
+                                                lineNumber: 1243,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1235,
+                                        lineNumber: 1239,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Select"], {
@@ -5269,12 +5275,12 @@ function LeadsPage() {
                                                     placeholder: "Priority"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 1251,
+                                                    lineNumber: 1255,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1250,
+                                                lineNumber: 1254,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -5284,7 +5290,7 @@ function LeadsPage() {
                                                         children: "All Priority"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1254,
+                                                        lineNumber: 1258,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -5292,7 +5298,7 @@ function LeadsPage() {
                                                         children: "High"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1255,
+                                                        lineNumber: 1259,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -5300,7 +5306,7 @@ function LeadsPage() {
                                                         children: "Medium"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1256,
+                                                        lineNumber: 1260,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -5308,19 +5314,19 @@ function LeadsPage() {
                                                         children: "Low"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1257,
+                                                        lineNumber: 1261,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1253,
+                                                lineNumber: 1257,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1249,
+                                        lineNumber: 1253,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Select"], {
@@ -5333,12 +5339,12 @@ function LeadsPage() {
                                                     placeholder: "Assignee"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 1263,
+                                                    lineNumber: 1267,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1262,
+                                                lineNumber: 1266,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -5348,7 +5354,7 @@ function LeadsPage() {
                                                         children: "All Assignees"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1266,
+                                                        lineNumber: 1270,
                                                         columnNumber: 21
                                                     }, this),
                                                     uniqueAssignees.map((assignee)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -5356,19 +5362,19 @@ function LeadsPage() {
                                                             children: assignee
                                                         }, assignee, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1268,
+                                                            lineNumber: 1272,
                                                             columnNumber: 23
                                                         }, this))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1265,
+                                                lineNumber: 1269,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1261,
+                                        lineNumber: 1265,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Select"], {
@@ -5382,20 +5388,20 @@ function LeadsPage() {
                                                         className: "w-4 h-4 mr-2"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1277,
+                                                        lineNumber: 1281,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectValue"], {
                                                         placeholder: "Category"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1278,
+                                                        lineNumber: 1282,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1276,
+                                                lineNumber: 1280,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -5405,7 +5411,7 @@ function LeadsPage() {
                                                         children: "All Categories"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1281,
+                                                        lineNumber: 1285,
                                                         columnNumber: 21
                                                     }, this),
                                                     Object.entries(categoryConfig).map(([key, config])=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -5413,19 +5419,19 @@ function LeadsPage() {
                                                             children: config.label
                                                         }, key, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1283,
+                                                            lineNumber: 1287,
                                                             columnNumber: 23
                                                         }, this))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1280,
+                                                lineNumber: 1284,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1275,
+                                        lineNumber: 1279,
                                         columnNumber: 17
                                     }, this),
                                     activeFiltersCount > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -5438,31 +5444,31 @@ function LeadsPage() {
                                                 className: "w-4 h-4 mr-1"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1292,
+                                                lineNumber: 1296,
                                                 columnNumber: 21
                                             }, this),
                                             "Clear filters"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1291,
+                                        lineNumber: 1295,
                                         columnNumber: 19
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 1221,
+                                lineNumber: 1225,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/leads/page.tsx",
-                            lineNumber: 1220,
+                            lineNumber: 1224,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/leads/page.tsx",
-                    lineNumber: 1147,
+                    lineNumber: 1151,
                     columnNumber: 9
                 }, this),
                 viewMode === "kanban" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5493,7 +5499,7 @@ function LeadsPage() {
                                                         children: stageConfig[stage].label
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1322,
+                                                        lineNumber: 1326,
                                                         columnNumber: 25
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5505,13 +5511,13 @@ function LeadsPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1323,
+                                                        lineNumber: 1327,
                                                         columnNumber: 25
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1321,
+                                                lineNumber: 1325,
                                                 columnNumber: 23
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5523,13 +5529,13 @@ function LeadsPage() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1325,
+                                                lineNumber: 1329,
                                                 columnNumber: 23
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1320,
+                                        lineNumber: 1324,
                                         columnNumber: 21
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5545,10 +5551,12 @@ function LeadsPage() {
                                                     onClick: (e)=>{
                                                         // Prevent opening dialog when clicking on interactive elements
                                                         if (e.target.closest('button, [role="menuitem"], [data-radix-collection-item]')) return;
+                                                        // Suppress click after drag
+                                                        if (wasDragging.current) return;
                                                         setSelectedLead(lead);
                                                         setIsViewDialogOpen(true);
                                                     },
-                                                    className: `group bg-card rounded-lg border border-border p-3 cursor-pointer active:cursor-grabbing transition-all duration-200 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 animate-in fade-in slide-in-from-bottom-2 ${draggedLead?.id === lead.id ? "opacity-50 scale-95" : ""}`,
+                                                    className: `group bg-card rounded-lg border border-border p-3 cursor-grab active:cursor-grabbing transition-all duration-200 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 animate-in fade-in slide-in-from-bottom-2 ${draggedLead?.id === lead.id ? "opacity-50 scale-95" : ""}`,
                                                     style: {
                                                         animationDelay: `${i * 30}ms`
                                                     },
@@ -5566,18 +5574,18 @@ function LeadsPage() {
                                                                                 className: "w-4 h-4 fill-yellow-400 text-yellow-400"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 1361,
+                                                                                lineNumber: 1367,
                                                                                 columnNumber: 37
                                                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$star$2d$off$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__StarOff$3e$__["StarOff"], {
                                                                                 className: "w-4 h-4"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 1363,
+                                                                                lineNumber: 1369,
                                                                                 columnNumber: 37
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1356,
+                                                                            lineNumber: 1362,
                                                                             columnNumber: 33
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$avatar$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Avatar"], {
@@ -5587,12 +5595,12 @@ function LeadsPage() {
                                                                                 children: lead.name.split(" ").map((n)=>n[0]).join("")
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 1367,
+                                                                                lineNumber: 1373,
                                                                                 columnNumber: 35
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1366,
+                                                                            lineNumber: 1372,
                                                                             columnNumber: 33
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5603,7 +5611,7 @@ function LeadsPage() {
                                                                                     children: lead.name
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1375,
+                                                                                    lineNumber: 1381,
                                                                                     columnNumber: 35
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5611,32 +5619,32 @@ function LeadsPage() {
                                                                                     children: lead.company
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1376,
+                                                                                    lineNumber: 1382,
                                                                                     columnNumber: 35
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1374,
+                                                                            lineNumber: 1380,
                                                                             columnNumber: 33
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1355,
+                                                                    lineNumber: 1361,
                                                                     columnNumber: 31
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$grip$2d$vertical$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__GripVertical$3e$__["GripVertical"], {
                                                                     className: "w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1379,
+                                                                    lineNumber: 1385,
                                                                     columnNumber: 31
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1354,
+                                                            lineNumber: 1360,
                                                             columnNumber: 29
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5652,14 +5660,14 @@ function LeadsPage() {
                                                                                     className: "w-2.5 h-2.5 mr-0.5"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1385,
+                                                                                    lineNumber: 1391,
                                                                                     columnNumber: 35
                                                                                 }, this),
                                                                                 statusConfig[lead.status].label
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1384,
+                                                                            lineNumber: 1390,
                                                                             columnNumber: 33
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Badge"], {
@@ -5667,13 +5675,13 @@ function LeadsPage() {
                                                                             children: categoryConfig[lead.category].label
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1388,
+                                                                            lineNumber: 1394,
                                                                             columnNumber: 33
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1383,
+                                                                    lineNumber: 1389,
                                                                     columnNumber: 31
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5681,13 +5689,13 @@ function LeadsPage() {
                                                                     children: priorityConfig[lead.priority].label
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1392,
+                                                                    lineNumber: 1398,
                                                                     columnNumber: 31
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1382,
+                                                            lineNumber: 1388,
                                                             columnNumber: 29
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5701,7 +5709,7 @@ function LeadsPage() {
                                                                             children: "Deal Value"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1399,
+                                                                            lineNumber: 1405,
                                                                             columnNumber: 33
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5712,13 +5720,13 @@ function LeadsPage() {
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1400,
+                                                                            lineNumber: 1406,
                                                                             columnNumber: 33
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1398,
+                                                                    lineNumber: 1404,
                                                                     columnNumber: 31
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5729,7 +5737,7 @@ function LeadsPage() {
                                                                             children: "Probability"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1403,
+                                                                            lineNumber: 1409,
                                                                             columnNumber: 33
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5740,13 +5748,13 @@ function LeadsPage() {
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1404,
+                                                                            lineNumber: 1410,
                                                                             columnNumber: 33
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1402,
+                                                                    lineNumber: 1408,
                                                                     columnNumber: 31
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$progress$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Progress"], {
@@ -5754,13 +5762,13 @@ function LeadsPage() {
                                                                     className: "h-1"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1406,
+                                                                    lineNumber: 1412,
                                                                     columnNumber: 31
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1397,
+                                                            lineNumber: 1403,
                                                             columnNumber: 29
                                                         }, this),
                                                         lead.tags.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5772,7 +5780,7 @@ function LeadsPage() {
                                                                         children: tag
                                                                     }, tag, false, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 1412,
+                                                                        lineNumber: 1418,
                                                                         columnNumber: 35
                                                                     }, this)),
                                                                 lead.tags.length > 2 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Badge"], {
@@ -5784,13 +5792,13 @@ function LeadsPage() {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1417,
+                                                                    lineNumber: 1423,
                                                                     columnNumber: 35
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1410,
+                                                            lineNumber: 1416,
                                                             columnNumber: 31
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5803,14 +5811,14 @@ function LeadsPage() {
                                                                             className: "w-3 h-3"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1426,
+                                                                            lineNumber: 1432,
                                                                             columnNumber: 33
                                                                         }, this),
                                                                         lead.source
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1425,
+                                                                    lineNumber: 1431,
                                                                     columnNumber: 31
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenu"], {
@@ -5823,17 +5831,17 @@ function LeadsPage() {
                                                                                     className: "w-4 h-4 text-muted-foreground"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1432,
+                                                                                    lineNumber: 1438,
                                                                                     columnNumber: 37
                                                                                 }, this)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 1431,
+                                                                                lineNumber: 1437,
                                                                                 columnNumber: 35
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1430,
+                                                                            lineNumber: 1436,
                                                                             columnNumber: 33
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuContent"], {
@@ -5850,14 +5858,14 @@ function LeadsPage() {
                                                                                             className: "w-4 h-4 mr-2"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1442,
+                                                                                            lineNumber: 1448,
                                                                                             columnNumber: 37
                                                                                         }, this),
                                                                                         "View Details"
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1436,
+                                                                                    lineNumber: 1442,
                                                                                     columnNumber: 35
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuItem"], {
@@ -5870,88 +5878,95 @@ function LeadsPage() {
                                                                                             className: "w-4 h-4 mr-2"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1451,
+                                                                                            lineNumber: 1457,
                                                                                             columnNumber: 37
                                                                                         }, this),
                                                                                         "Edit Lead"
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1445,
+                                                                                    lineNumber: 1451,
                                                                                     columnNumber: 35
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuSeparator"], {}, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1454,
+                                                                                    lineNumber: 1460,
                                                                                     columnNumber: 35
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuItem"], {
+                                                                                    onClick: ()=>window.location.href = `mailto:${lead.email}`,
                                                                                     children: [
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$mail$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Mail$3e$__["Mail"], {
                                                                                             className: "w-4 h-4 mr-2"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1456,
+                                                                                            lineNumber: 1462,
                                                                                             columnNumber: 37
                                                                                         }, this),
                                                                                         "Send Email"
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1455,
+                                                                                    lineNumber: 1461,
                                                                                     columnNumber: 35
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuItem"], {
+                                                                                    onClick: ()=>window.location.href = `tel:${lead.phone}`,
                                                                                     children: [
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$phone$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Phone$3e$__["Phone"], {
                                                                                             className: "w-4 h-4 mr-2"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1460,
+                                                                                            lineNumber: 1466,
                                                                                             columnNumber: 37
                                                                                         }, this),
                                                                                         "Call"
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1459,
+                                                                                    lineNumber: 1465,
                                                                                     columnNumber: 35
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuItem"], {
+                                                                                    onClick: ()=>{
+                                                                                        setSelectedLead(lead);
+                                                                                        setIsAddMeetingOpen(true);
+                                                                                    },
                                                                                     children: [
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$calendar$2d$plus$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__CalendarPlus$3e$__["CalendarPlus"], {
                                                                                             className: "w-4 h-4 mr-2"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1464,
+                                                                                            lineNumber: 1475,
                                                                                             columnNumber: 37
                                                                                         }, this),
                                                                                         "Schedule Meeting"
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1463,
+                                                                                    lineNumber: 1469,
                                                                                     columnNumber: 35
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuSeparator"], {}, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1467,
+                                                                                    lineNumber: 1478,
                                                                                     columnNumber: 35
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuItem"], {
+                                                                                    onClick: ()=>alert(`Convert "${lead.name}" to client — this feature is coming soon!`),
                                                                                     children: [
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$arrow$2d$up$2d$right$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowUpRight$3e$__["ArrowUpRight"], {
                                                                                             className: "w-4 h-4 mr-2"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1469,
+                                                                                            lineNumber: 1480,
                                                                                             columnNumber: 37
                                                                                         }, this),
                                                                                         "Convert to Client"
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1468,
+                                                                                    lineNumber: 1479,
                                                                                     columnNumber: 35
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuItem"], {
@@ -5962,38 +5977,38 @@ function LeadsPage() {
                                                                                             className: "w-4 h-4 mr-2"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1476,
+                                                                                            lineNumber: 1487,
                                                                                             columnNumber: 37
                                                                                         }, this),
                                                                                         "Delete"
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1472,
+                                                                                    lineNumber: 1483,
                                                                                     columnNumber: 35
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1435,
+                                                                            lineNumber: 1441,
                                                                             columnNumber: 33
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1429,
+                                                                    lineNumber: 1435,
                                                                     columnNumber: 31
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1424,
+                                                            lineNumber: 1430,
                                                             columnNumber: 29
                                                         }, this)
                                                     ]
                                                 }, lead.id, true, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 1339,
+                                                    lineNumber: 1343,
                                                     columnNumber: 27
                                                 }, this);
                                             }),
@@ -6004,7 +6019,7 @@ function LeadsPage() {
                                                         children: "No leads"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1488,
+                                                        lineNumber: 1499,
                                                         columnNumber: 27
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6012,36 +6027,36 @@ function LeadsPage() {
                                                         children: "Drag leads here"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1489,
+                                                        lineNumber: 1500,
                                                         columnNumber: 27
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1487,
+                                                lineNumber: 1498,
                                                 columnNumber: 25
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1330,
+                                        lineNumber: 1334,
                                         columnNumber: 21
                                     }, this)
                                 ]
                             }, stage, true, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 1311,
+                                lineNumber: 1315,
                                 columnNumber: 19
                             }, this);
                         })
                     }, void 0, false, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 1304,
+                        lineNumber: 1308,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/leads/page.tsx",
-                    lineNumber: 1303,
+                    lineNumber: 1307,
                     columnNumber: 11
                 }, this),
                 viewMode === "table" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$animated$2d$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["AnimatedCard"], {
@@ -6064,23 +6079,23 @@ function LeadsPage() {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/leads/page.tsx",
-                                            lineNumber: 1507,
+                                            lineNumber: 1518,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/leads/page.tsx",
-                                    lineNumber: 1505,
+                                    lineNumber: 1516,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 1504,
+                                lineNumber: 1515,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/leads/page.tsx",
-                            lineNumber: 1503,
+                            lineNumber: 1514,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -6101,57 +6116,9 @@ function LeadsPage() {
                                                                 onCheckedChange: handleSelectAll
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1517,
+                                                                lineNumber: 1528,
                                                                 columnNumber: 25
                                                             }, this)
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1516,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                            className: "text-left py-3 px-4 text-xs font-medium text-muted-foreground",
-                                                            children: "Lead"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1522,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                            className: "text-left py-3 px-4 text-xs font-medium text-muted-foreground",
-                                                            children: "Company"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1523,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                            className: "text-left py-3 px-4 text-xs font-medium text-muted-foreground",
-                                                            children: "Status"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1524,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                            className: "text-left py-3 px-4 text-xs font-medium text-muted-foreground",
-                                                            children: "Stage"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1525,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                            className: "text-left py-3 px-4 text-xs font-medium text-muted-foreground",
-                                                            children: "Value"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1526,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                            className: "text-left py-3 px-4 text-xs font-medium text-muted-foreground",
-                                                            children: "Probability"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
                                                             lineNumber: 1527,
@@ -6159,10 +6126,58 @@ function LeadsPage() {
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
                                                             className: "text-left py-3 px-4 text-xs font-medium text-muted-foreground",
+                                                            children: "Lead"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/leads/page.tsx",
+                                                            lineNumber: 1533,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                            className: "text-left py-3 px-4 text-xs font-medium text-muted-foreground",
+                                                            children: "Company"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/leads/page.tsx",
+                                                            lineNumber: 1534,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                            className: "text-left py-3 px-4 text-xs font-medium text-muted-foreground",
+                                                            children: "Status"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/leads/page.tsx",
+                                                            lineNumber: 1535,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                            className: "text-left py-3 px-4 text-xs font-medium text-muted-foreground",
+                                                            children: "Stage"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/leads/page.tsx",
+                                                            lineNumber: 1536,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                            className: "text-left py-3 px-4 text-xs font-medium text-muted-foreground",
+                                                            children: "Value"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/leads/page.tsx",
+                                                            lineNumber: 1537,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                            className: "text-left py-3 px-4 text-xs font-medium text-muted-foreground",
+                                                            children: "Probability"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/leads/page.tsx",
+                                                            lineNumber: 1538,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                            className: "text-left py-3 px-4 text-xs font-medium text-muted-foreground",
                                                             children: "Assigned"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1528,
+                                                            lineNumber: 1539,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -6170,7 +6185,7 @@ function LeadsPage() {
                                                             children: "Follow-up"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1529,
+                                                            lineNumber: 1540,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -6178,18 +6193,18 @@ function LeadsPage() {
                                                             children: "Actions"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1530,
+                                                            lineNumber: 1541,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 1515,
+                                                    lineNumber: 1526,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1514,
+                                                lineNumber: 1525,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
@@ -6214,12 +6229,12 @@ function LeadsPage() {
                                                                     onCheckedChange: ()=>handleSelectLead(lead.id)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1550,
+                                                                    lineNumber: 1561,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1549,
+                                                                lineNumber: 1560,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -6233,18 +6248,18 @@ function LeadsPage() {
                                                                                 className: "w-4 h-4 fill-yellow-400 text-yellow-400"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 1559,
+                                                                                lineNumber: 1570,
                                                                                 columnNumber: 35
                                                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$star$2d$off$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__StarOff$3e$__["StarOff"], {
                                                                                 className: "w-4 h-4 text-muted-foreground hover:text-yellow-400 transition-colors"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 1561,
+                                                                                lineNumber: 1572,
                                                                                 columnNumber: 35
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1557,
+                                                                            lineNumber: 1568,
                                                                             columnNumber: 31
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$avatar$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Avatar"], {
@@ -6254,12 +6269,12 @@ function LeadsPage() {
                                                                                 children: lead.name.split(" ").map((n)=>n[0]).join("")
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 1565,
+                                                                                lineNumber: 1576,
                                                                                 columnNumber: 33
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1564,
+                                                                            lineNumber: 1575,
                                                                             columnNumber: 31
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6269,7 +6284,7 @@ function LeadsPage() {
                                                                                     children: lead.name
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1573,
+                                                                                    lineNumber: 1584,
                                                                                     columnNumber: 33
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6277,24 +6292,24 @@ function LeadsPage() {
                                                                                     children: lead.email
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1574,
+                                                                                    lineNumber: 1585,
                                                                                     columnNumber: 33
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1572,
+                                                                            lineNumber: 1583,
                                                                             columnNumber: 31
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1556,
+                                                                    lineNumber: 1567,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1555,
+                                                                lineNumber: 1566,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -6306,7 +6321,7 @@ function LeadsPage() {
                                                                             className: "w-3.5 h-3.5 text-muted-foreground"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1580,
+                                                                            lineNumber: 1591,
                                                                             columnNumber: 31
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6314,18 +6329,18 @@ function LeadsPage() {
                                                                             children: lead.company
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1581,
+                                                                            lineNumber: 1592,
                                                                             columnNumber: 31
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1579,
+                                                                    lineNumber: 1590,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1578,
+                                                                lineNumber: 1589,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -6342,24 +6357,24 @@ function LeadsPage() {
                                                                                             className: "w-3 h-3 mr-1"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1589,
+                                                                                            lineNumber: 1600,
                                                                                             columnNumber: 37
                                                                                         }, this),
                                                                                         statusConfig[lead.status].label
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1588,
+                                                                                    lineNumber: 1599,
                                                                                     columnNumber: 35
                                                                                 }, this)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 1587,
+                                                                                lineNumber: 1598,
                                                                                 columnNumber: 33
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1586,
+                                                                            lineNumber: 1597,
                                                                             columnNumber: 31
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuContent"], {
@@ -6371,14 +6386,14 @@ function LeadsPage() {
                                                                                             className: "w-4 h-4 mr-2 text-red-400"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1596,
+                                                                                            lineNumber: 1607,
                                                                                             columnNumber: 35
                                                                                         }, this),
                                                                                         "Hot"
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1595,
+                                                                                    lineNumber: 1606,
                                                                                     columnNumber: 33
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuItem"], {
@@ -6388,14 +6403,14 @@ function LeadsPage() {
                                                                                             className: "w-4 h-4 mr-2 text-amber-400"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1600,
+                                                                                            lineNumber: 1611,
                                                                                             columnNumber: 35
                                                                                         }, this),
                                                                                         "Warm"
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1599,
+                                                                                    lineNumber: 1610,
                                                                                     columnNumber: 33
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuItem"], {
@@ -6405,31 +6420,31 @@ function LeadsPage() {
                                                                                             className: "w-4 h-4 mr-2 text-blue-400"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1604,
+                                                                                            lineNumber: 1615,
                                                                                             columnNumber: 35
                                                                                         }, this),
                                                                                         "Cold"
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1603,
+                                                                                    lineNumber: 1614,
                                                                                     columnNumber: 33
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1594,
+                                                                            lineNumber: 1605,
                                                                             columnNumber: 31
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1585,
+                                                                    lineNumber: 1596,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1584,
+                                                                lineNumber: 1595,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -6444,17 +6459,17 @@ function LeadsPage() {
                                                                                     children: stageConfig[lead.stage].label
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1614,
+                                                                                    lineNumber: 1625,
                                                                                     columnNumber: 35
                                                                                 }, this)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 1613,
+                                                                                lineNumber: 1624,
                                                                                 columnNumber: 33
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1612,
+                                                                            lineNumber: 1623,
                                                                             columnNumber: 31
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuContent"], {
@@ -6463,23 +6478,23 @@ function LeadsPage() {
                                                                                     children: stageConfig[stage].label
                                                                                 }, stage, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1621,
+                                                                                    lineNumber: 1632,
                                                                                     columnNumber: 35
                                                                                 }, this))
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1619,
+                                                                            lineNumber: 1630,
                                                                             columnNumber: 31
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1611,
+                                                                    lineNumber: 1622,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1610,
+                                                                lineNumber: 1621,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -6491,19 +6506,19 @@ function LeadsPage() {
                                                                             className: "w-3.5 h-3.5"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1630,
+                                                                            lineNumber: 1641,
                                                                             columnNumber: 31
                                                                         }, this),
                                                                         lead.value.toLocaleString()
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1629,
+                                                                    lineNumber: 1640,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1628,
+                                                                lineNumber: 1639,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -6516,7 +6531,7 @@ function LeadsPage() {
                                                                             className: "w-16 h-1.5"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1636,
+                                                                            lineNumber: 1647,
                                                                             columnNumber: 31
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6527,18 +6542,18 @@ function LeadsPage() {
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1637,
+                                                                            lineNumber: 1648,
                                                                             columnNumber: 31
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1635,
+                                                                    lineNumber: 1646,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1634,
+                                                                lineNumber: 1645,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -6548,12 +6563,12 @@ function LeadsPage() {
                                                                     children: lead.assignedTo
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1641,
+                                                                    lineNumber: 1652,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1640,
+                                                                lineNumber: 1651,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -6565,19 +6580,19 @@ function LeadsPage() {
                                                                             className: "w-3.5 h-3.5"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1645,
+                                                                            lineNumber: 1656,
                                                                             columnNumber: 31
                                                                         }, this),
                                                                         lead.nextFollowUp ? new Date(lead.nextFollowUp).toLocaleDateString() : "-"
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1644,
+                                                                    lineNumber: 1655,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1643,
+                                                                lineNumber: 1654,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -6595,12 +6610,12 @@ function LeadsPage() {
                                                                                 className: "w-4 h-4 text-muted-foreground"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 1658,
+                                                                                lineNumber: 1669,
                                                                                 columnNumber: 33
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1651,
+                                                                            lineNumber: 1662,
                                                                             columnNumber: 31
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenu"], {
@@ -6613,52 +6628,54 @@ function LeadsPage() {
                                                                                             className: "w-4 h-4 text-muted-foreground"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1663,
+                                                                                            lineNumber: 1674,
                                                                                             columnNumber: 37
                                                                                         }, this)
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                                        lineNumber: 1662,
+                                                                                        lineNumber: 1673,
                                                                                         columnNumber: 35
                                                                                     }, this)
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1661,
+                                                                                    lineNumber: 1672,
                                                                                     columnNumber: 33
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuContent"], {
                                                                                     align: "end",
                                                                                     children: [
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuItem"], {
+                                                                                            onClick: ()=>window.location.href = `mailto:${lead.email}`,
                                                                                             children: [
                                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$mail$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Mail$3e$__["Mail"], {
                                                                                                     className: "w-4 h-4 mr-2"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                                    lineNumber: 1668,
+                                                                                                    lineNumber: 1679,
                                                                                                     columnNumber: 37
                                                                                                 }, this),
                                                                                                 "Send Email"
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1667,
+                                                                                            lineNumber: 1678,
                                                                                             columnNumber: 35
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuItem"], {
+                                                                                            onClick: ()=>window.location.href = `tel:${lead.phone}`,
                                                                                             children: [
                                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$phone$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Phone$3e$__["Phone"], {
                                                                                                     className: "w-4 h-4 mr-2"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                                    lineNumber: 1672,
+                                                                                                    lineNumber: 1683,
                                                                                                     columnNumber: 37
                                                                                                 }, this),
                                                                                                 "Call"
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1671,
+                                                                                            lineNumber: 1682,
                                                                                             columnNumber: 35
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuItem"], {
@@ -6671,35 +6688,36 @@ function LeadsPage() {
                                                                                                     className: "w-4 h-4 mr-2"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                                    lineNumber: 1681,
+                                                                                                    lineNumber: 1692,
                                                                                                     columnNumber: 37
                                                                                                 }, this),
                                                                                                 "Edit"
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1675,
+                                                                                            lineNumber: 1686,
                                                                                             columnNumber: 35
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuItem"], {
+                                                                                            onClick: ()=>alert(`Convert "${lead.name}" to client — this feature is coming soon!`),
                                                                                             children: [
                                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$arrow$2d$up$2d$right$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowUpRight$3e$__["ArrowUpRight"], {
                                                                                                     className: "w-4 h-4 mr-2"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                                    lineNumber: 1685,
+                                                                                                    lineNumber: 1696,
                                                                                                     columnNumber: 37
                                                                                                 }, this),
                                                                                                 "Convert to Client"
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1684,
+                                                                                            lineNumber: 1695,
                                                                                             columnNumber: 35
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuSeparator"], {}, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1688,
+                                                                                            lineNumber: 1699,
                                                                                             columnNumber: 35
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuItem"], {
@@ -6710,55 +6728,55 @@ function LeadsPage() {
                                                                                                     className: "w-4 h-4 mr-2"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                                    lineNumber: 1693,
+                                                                                                    lineNumber: 1704,
                                                                                                     columnNumber: 37
                                                                                                 }, this),
                                                                                                 "Delete"
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 1689,
+                                                                                            lineNumber: 1700,
                                                                                             columnNumber: 35
                                                                                         }, this)
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1666,
+                                                                                    lineNumber: 1677,
                                                                                     columnNumber: 33
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1660,
+                                                                            lineNumber: 1671,
                                                                             columnNumber: 31
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1650,
+                                                                    lineNumber: 1661,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1649,
+                                                                lineNumber: 1660,
                                                                 columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, lead.id, true, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1537,
+                                                        lineNumber: 1548,
                                                         columnNumber: 25
                                                     }, this);
                                                 })
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1533,
+                                                lineNumber: 1544,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1513,
+                                        lineNumber: 1524,
                                         columnNumber: 17
                                     }, this),
                                     filteredLeads.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6768,14 +6786,14 @@ function LeadsPage() {
                                                 className: "w-12 h-12 mx-auto mb-3 opacity-20"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1708,
+                                                lineNumber: 1719,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                 children: "No leads found"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1709,
+                                                lineNumber: 1720,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6783,30 +6801,30 @@ function LeadsPage() {
                                                 children: "Try adjusting your filters"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1710,
+                                                lineNumber: 1721,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1707,
+                                        lineNumber: 1718,
                                         columnNumber: 19
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 1512,
+                                lineNumber: 1523,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/leads/page.tsx",
-                            lineNumber: 1511,
+                            lineNumber: 1522,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/leads/page.tsx",
-                    lineNumber: 1502,
+                    lineNumber: 1513,
                     columnNumber: 11
                 }, this),
                 viewMode === "grid" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6838,12 +6856,12 @@ function LeadsPage() {
                                                             children: lead.name.split(" ").map((n)=>n[0]).join("")
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1740,
+                                                            lineNumber: 1751,
                                                             columnNumber: 25
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1739,
+                                                        lineNumber: 1750,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6856,7 +6874,7 @@ function LeadsPage() {
                                                                         children: lead.name
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 1749,
+                                                                        lineNumber: 1760,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -6865,24 +6883,24 @@ function LeadsPage() {
                                                                             className: "w-4 h-4 fill-yellow-400 text-yellow-400"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1752,
+                                                                            lineNumber: 1763,
                                                                             columnNumber: 31
                                                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$star$2d$off$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__StarOff$3e$__["StarOff"], {
                                                                             className: "w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1754,
+                                                                            lineNumber: 1765,
                                                                             columnNumber: 31
                                                                         }, this)
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 1750,
+                                                                        lineNumber: 1761,
                                                                         columnNumber: 27
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1748,
+                                                                lineNumber: 1759,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6890,19 +6908,19 @@ function LeadsPage() {
                                                                 children: lead.company
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1758,
+                                                                lineNumber: 1769,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1747,
+                                                        lineNumber: 1758,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1738,
+                                                lineNumber: 1749,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenu"], {
@@ -6915,17 +6933,17 @@ function LeadsPage() {
                                                                 className: "w-4 h-4 text-muted-foreground"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1764,
+                                                                lineNumber: 1775,
                                                                 columnNumber: 27
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1763,
+                                                            lineNumber: 1774,
                                                             columnNumber: 25
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1762,
+                                                        lineNumber: 1773,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuContent"], {
@@ -6941,14 +6959,14 @@ function LeadsPage() {
                                                                         className: "w-4 h-4 mr-2"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 1774,
+                                                                        lineNumber: 1785,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     "View Details"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1768,
+                                                                lineNumber: 1779,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuItem"], {
@@ -6961,19 +6979,19 @@ function LeadsPage() {
                                                                         className: "w-4 h-4 mr-2"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 1783,
+                                                                        lineNumber: 1794,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     "Edit"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1777,
+                                                                lineNumber: 1788,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuSeparator"], {}, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1786,
+                                                                lineNumber: 1797,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dropdown$2d$menu$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DropdownMenuItem"], {
@@ -6984,32 +7002,32 @@ function LeadsPage() {
                                                                         className: "w-4 h-4 mr-2"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 1788,
+                                                                        lineNumber: 1799,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     "Delete"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1787,
+                                                                lineNumber: 1798,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1767,
+                                                        lineNumber: 1778,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1761,
+                                                lineNumber: 1772,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1737,
+                                        lineNumber: 1748,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7022,14 +7040,14 @@ function LeadsPage() {
                                                         className: "w-3 h-3 mr-1"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1797,
+                                                        lineNumber: 1808,
                                                         columnNumber: 23
                                                     }, this),
                                                     statusConfig[lead.status].label
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1796,
+                                                lineNumber: 1807,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Badge"], {
@@ -7037,7 +7055,7 @@ function LeadsPage() {
                                                 children: stageConfig[lead.stage].label
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1800,
+                                                lineNumber: 1811,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Badge"], {
@@ -7045,13 +7063,13 @@ function LeadsPage() {
                                                 children: categoryConfig[lead.category].label
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1803,
+                                                lineNumber: 1814,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1795,
+                                        lineNumber: 1806,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7065,7 +7083,7 @@ function LeadsPage() {
                                                         children: "Deal Value"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1810,
+                                                        lineNumber: 1821,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7076,13 +7094,13 @@ function LeadsPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1811,
+                                                        lineNumber: 1822,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1809,
+                                                lineNumber: 1820,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7093,7 +7111,7 @@ function LeadsPage() {
                                                         children: "Probability"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1814,
+                                                        lineNumber: 1825,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7104,13 +7122,13 @@ function LeadsPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1815,
+                                                        lineNumber: 1826,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1813,
+                                                lineNumber: 1824,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$progress$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Progress"], {
@@ -7118,13 +7136,13 @@ function LeadsPage() {
                                                 className: "h-1.5"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1817,
+                                                lineNumber: 1828,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1808,
+                                        lineNumber: 1819,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7137,7 +7155,7 @@ function LeadsPage() {
                                                         className: "w-3.5 h-3.5"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1822,
+                                                        lineNumber: 1833,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7145,13 +7163,13 @@ function LeadsPage() {
                                                         children: lead.email
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1823,
+                                                        lineNumber: 1834,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1821,
+                                                lineNumber: 1832,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7161,20 +7179,20 @@ function LeadsPage() {
                                                         className: "w-3.5 h-3.5"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1826,
+                                                        lineNumber: 1837,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: lead.source
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1827,
+                                                        lineNumber: 1838,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1825,
+                                                lineNumber: 1836,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7184,7 +7202,7 @@ function LeadsPage() {
                                                         className: "w-3.5 h-3.5"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1830,
+                                                        lineNumber: 1841,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7194,19 +7212,19 @@ function LeadsPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1831,
+                                                        lineNumber: 1842,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1829,
+                                                lineNumber: 1840,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1820,
+                                        lineNumber: 1831,
                                         columnNumber: 19
                                     }, this),
                                     lead.tags.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7217,12 +7235,12 @@ function LeadsPage() {
                                                 children: tag
                                             }, tag, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1840,
+                                                lineNumber: 1851,
                                                 columnNumber: 25
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1838,
+                                        lineNumber: 1849,
                                         columnNumber: 21
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7232,50 +7250,52 @@ function LeadsPage() {
                                                 variant: "outline",
                                                 size: "sm",
                                                 className: "flex-1 text-xs bg-transparent",
+                                                onClick: ()=>window.location.href = `mailto:${lead.email}`,
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$mail$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Mail$3e$__["Mail"], {
                                                         className: "w-3 h-3 mr-1"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1849,
+                                                        lineNumber: 1860,
                                                         columnNumber: 23
                                                     }, this),
                                                     "Email"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1848,
+                                                lineNumber: 1859,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
                                                 variant: "outline",
                                                 size: "sm",
                                                 className: "flex-1 text-xs bg-transparent",
+                                                onClick: ()=>window.location.href = `tel:${lead.phone}`,
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$phone$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Phone$3e$__["Phone"], {
                                                         className: "w-3 h-3 mr-1"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1853,
+                                                        lineNumber: 1864,
                                                         columnNumber: 23
                                                     }, this),
                                                     "Call"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1852,
+                                                lineNumber: 1863,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1847,
+                                        lineNumber: 1858,
                                         columnNumber: 19
                                     }, this)
                                 ]
                             }, lead.id, true, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 1726,
+                                lineNumber: 1737,
                                 columnNumber: 17
                             }, this);
                         }),
@@ -7286,14 +7306,14 @@ function LeadsPage() {
                                     className: "w-12 h-12 mx-auto mb-3 opacity-20"
                                 }, void 0, false, {
                                     fileName: "[project]/app/leads/page.tsx",
-                                    lineNumber: 1863,
+                                    lineNumber: 1874,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                     children: "No leads found"
                                 }, void 0, false, {
                                     fileName: "[project]/app/leads/page.tsx",
-                                    lineNumber: 1864,
+                                    lineNumber: 1875,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -7301,19 +7321,19 @@ function LeadsPage() {
                                     children: "Try adjusting your filters"
                                 }, void 0, false, {
                                     fileName: "[project]/app/leads/page.tsx",
-                                    lineNumber: 1865,
+                                    lineNumber: 1876,
                                     columnNumber: 17
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/leads/page.tsx",
-                            lineNumber: 1862,
+                            lineNumber: 1873,
                             columnNumber: 15
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/leads/page.tsx",
-                    lineNumber: 1720,
+                    lineNumber: 1731,
                     columnNumber: 11
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Dialog"], {
@@ -7337,12 +7357,12 @@ function LeadsPage() {
                                                             children: selectedLead.name.split(" ").map((n)=>n[0]).join("")
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1880,
+                                                            lineNumber: 1891,
                                                             columnNumber: 25
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1879,
+                                                        lineNumber: 1890,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7352,7 +7372,7 @@ function LeadsPage() {
                                                                 children: selectedLead.name
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1888,
+                                                                lineNumber: 1899,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -7360,7 +7380,7 @@ function LeadsPage() {
                                                                 children: selectedLead.company
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1889,
+                                                                lineNumber: 1900,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7371,7 +7391,7 @@ function LeadsPage() {
                                                                         children: statusConfig[selectedLead.status].label
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 1891,
+                                                                        lineNumber: 1902,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Badge"], {
@@ -7379,7 +7399,7 @@ function LeadsPage() {
                                                                         children: stageConfig[selectedLead.stage].label
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 1894,
+                                                                        lineNumber: 1905,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Badge"], {
@@ -7390,7 +7410,7 @@ function LeadsPage() {
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 1897,
+                                                                        lineNumber: 1908,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Badge"], {
@@ -7398,25 +7418,25 @@ function LeadsPage() {
                                                                         children: categoryConfig[selectedLead.category].label
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 1900,
+                                                                        lineNumber: 1911,
                                                                         columnNumber: 27
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1890,
+                                                                lineNumber: 1901,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1887,
+                                                        lineNumber: 1898,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1878,
+                                                lineNumber: 1889,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7431,14 +7451,14 @@ function LeadsPage() {
                                                                 className: "w-4 h-4"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1912,
+                                                                lineNumber: 1923,
                                                                 columnNumber: 25
                                                             }, this),
                                                             "Schedule Meeting"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1907,
+                                                        lineNumber: 1918,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -7451,14 +7471,14 @@ function LeadsPage() {
                                                                 className: "w-4 h-4"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1921,
+                                                                lineNumber: 1932,
                                                                 columnNumber: 25
                                                             }, this),
                                                             "Edit"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1915,
+                                                        lineNumber: 1926,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -7471,31 +7491,31 @@ function LeadsPage() {
                                                                 className: "w-4 h-4"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 1930,
+                                                                lineNumber: 1941,
                                                                 columnNumber: 25
                                                             }, this),
                                                             "Delete"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 1924,
+                                                        lineNumber: 1935,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 1906,
+                                                lineNumber: 1917,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 1877,
+                                        lineNumber: 1888,
                                         columnNumber: 19
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/leads/page.tsx",
-                                    lineNumber: 1876,
+                                    lineNumber: 1887,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7510,7 +7530,7 @@ function LeadsPage() {
                                                     children: "Overview"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 1939,
+                                                    lineNumber: 1950,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -7523,7 +7543,7 @@ function LeadsPage() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 1948,
+                                                    lineNumber: 1959,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -7532,13 +7552,13 @@ function LeadsPage() {
                                                     children: "Activity History"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 1957,
+                                                    lineNumber: 1968,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/leads/page.tsx",
-                                            lineNumber: 1938,
+                                            lineNumber: 1949,
                                             columnNumber: 19
                                         }, this),
                                         activeTab === "overview" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -7554,7 +7574,7 @@ function LeadsPage() {
                                                                     children: "Contact Info"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1972,
+                                                                    lineNumber: 1983,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7567,7 +7587,7 @@ function LeadsPage() {
                                                                                     className: "w-4 h-4 text-muted-foreground"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1977,
+                                                                                    lineNumber: 1988,
                                                                                     columnNumber: 31
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7575,13 +7595,13 @@ function LeadsPage() {
                                                                                     children: selectedLead.email
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1978,
+                                                                                    lineNumber: 1989,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1976,
+                                                                            lineNumber: 1987,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7591,7 +7611,7 @@ function LeadsPage() {
                                                                                     className: "w-4 h-4 text-muted-foreground"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1981,
+                                                                                    lineNumber: 1992,
                                                                                     columnNumber: 31
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7599,13 +7619,13 @@ function LeadsPage() {
                                                                                     children: selectedLead.phone
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1982,
+                                                                                    lineNumber: 1993,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1980,
+                                                                            lineNumber: 1991,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7615,7 +7635,7 @@ function LeadsPage() {
                                                                                     className: "w-4 h-4 text-muted-foreground"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1985,
+                                                                                    lineNumber: 1996,
                                                                                     columnNumber: 31
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7623,25 +7643,25 @@ function LeadsPage() {
                                                                                     children: selectedLead.company
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1986,
+                                                                                    lineNumber: 1997,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1984,
+                                                                            lineNumber: 1995,
                                                                             columnNumber: 29
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1975,
+                                                                    lineNumber: 1986,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1971,
+                                                            lineNumber: 1982,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7652,7 +7672,7 @@ function LeadsPage() {
                                                                     children: "Deal Info"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1992,
+                                                                    lineNumber: 2003,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7666,7 +7686,7 @@ function LeadsPage() {
                                                                                     children: "Deal Value"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1997,
+                                                                                    lineNumber: 2008,
                                                                                     columnNumber: 31
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7677,13 +7697,13 @@ function LeadsPage() {
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 1998,
+                                                                                    lineNumber: 2009,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 1996,
+                                                                            lineNumber: 2007,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7697,7 +7717,7 @@ function LeadsPage() {
                                                                                             children: "Win Probability"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 2004,
+                                                                                            lineNumber: 2015,
                                                                                             columnNumber: 33
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7708,13 +7728,13 @@ function LeadsPage() {
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 2005,
+                                                                                            lineNumber: 2016,
                                                                                             columnNumber: 33
                                                                                         }, this)
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2003,
+                                                                                    lineNumber: 2014,
                                                                                     columnNumber: 31
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$progress$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Progress"], {
@@ -7722,13 +7742,13 @@ function LeadsPage() {
                                                                                     className: "h-2"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2007,
+                                                                                    lineNumber: 2018,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 2002,
+                                                                            lineNumber: 2013,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7739,7 +7759,7 @@ function LeadsPage() {
                                                                                     children: "Weighted Value"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2010,
+                                                                                    lineNumber: 2021,
                                                                                     columnNumber: 31
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7750,31 +7770,31 @@ function LeadsPage() {
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2011,
+                                                                                    lineNumber: 2022,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 2009,
+                                                                            lineNumber: 2020,
                                                                             columnNumber: 29
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 1995,
+                                                                    lineNumber: 2006,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 1991,
+                                                            lineNumber: 2002,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 1970,
+                                                    lineNumber: 1981,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7788,7 +7808,7 @@ function LeadsPage() {
                                                                     children: "Timeline"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 2021,
+                                                                    lineNumber: 2032,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7802,7 +7822,7 @@ function LeadsPage() {
                                                                                     children: "Created"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2026,
+                                                                                    lineNumber: 2037,
                                                                                     columnNumber: 31
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7810,13 +7830,13 @@ function LeadsPage() {
                                                                                     children: new Date(selectedLead.createdAt).toLocaleDateString()
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2027,
+                                                                                    lineNumber: 2038,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 2025,
+                                                                            lineNumber: 2036,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7827,7 +7847,7 @@ function LeadsPage() {
                                                                                     children: "Last Contact"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2030,
+                                                                                    lineNumber: 2041,
                                                                                     columnNumber: 31
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7835,13 +7855,13 @@ function LeadsPage() {
                                                                                     children: new Date(selectedLead.lastContact).toLocaleDateString()
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2031,
+                                                                                    lineNumber: 2042,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 2029,
+                                                                            lineNumber: 2040,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7852,7 +7872,7 @@ function LeadsPage() {
                                                                                     children: "Next Follow-up"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2034,
+                                                                                    lineNumber: 2045,
                                                                                     columnNumber: 31
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7864,30 +7884,30 @@ function LeadsPage() {
                                                                                         className: "text-sm font-medium text-primary bg-transparent border border-transparent hover:border-border focus:border-primary rounded px-2 py-0.5 outline-none cursor-pointer transition-colors"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                                        lineNumber: 2036,
+                                                                                        lineNumber: 2047,
                                                                                         columnNumber: 33
                                                                                     }, this)
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2035,
+                                                                                    lineNumber: 2046,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 2033,
+                                                                            lineNumber: 2044,
                                                                             columnNumber: 29
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 2024,
+                                                                    lineNumber: 2035,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 2020,
+                                                            lineNumber: 2031,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7898,7 +7918,7 @@ function LeadsPage() {
                                                                     children: "Assignment"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 2048,
+                                                                    lineNumber: 2059,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7912,7 +7932,7 @@ function LeadsPage() {
                                                                                     children: "Assigned To"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2053,
+                                                                                    lineNumber: 2064,
                                                                                     columnNumber: 31
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7920,13 +7940,13 @@ function LeadsPage() {
                                                                                     children: selectedLead.assignedTo
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2054,
+                                                                                    lineNumber: 2065,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 2052,
+                                                                            lineNumber: 2063,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7937,7 +7957,7 @@ function LeadsPage() {
                                                                                     children: "Source"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2057,
+                                                                                    lineNumber: 2068,
                                                                                     columnNumber: 31
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7945,13 +7965,13 @@ function LeadsPage() {
                                                                                     children: selectedLead.source
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2058,
+                                                                                    lineNumber: 2069,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 2056,
+                                                                            lineNumber: 2067,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -7962,7 +7982,7 @@ function LeadsPage() {
                                                                                     children: "Activities"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2061,
+                                                                                    lineNumber: 2072,
                                                                                     columnNumber: 31
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -7973,31 +7993,31 @@ function LeadsPage() {
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2062,
+                                                                                    lineNumber: 2073,
                                                                                     columnNumber: 31
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 2060,
+                                                                            lineNumber: 2071,
                                                                             columnNumber: 29
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 2051,
+                                                                    lineNumber: 2062,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 2047,
+                                                            lineNumber: 2058,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 2019,
+                                                    lineNumber: 2030,
                                                     columnNumber: 23
                                                 }, this),
                                                 selectedLead.tags.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8008,7 +8028,7 @@ function LeadsPage() {
                                                             children: "Tags"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 2070,
+                                                            lineNumber: 2081,
                                                             columnNumber: 27
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8019,18 +8039,18 @@ function LeadsPage() {
                                                                     children: tag
                                                                 }, tag, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 2073,
+                                                                    lineNumber: 2084,
                                                                     columnNumber: 31
                                                                 }, this))
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 2071,
+                                                            lineNumber: 2082,
                                                             columnNumber: 27
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 2069,
+                                                    lineNumber: 2080,
                                                     columnNumber: 25
                                                 }, this),
                                                 selectedLead.notes && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8041,7 +8061,7 @@ function LeadsPage() {
                                                             children: "Notes"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 2083,
+                                                            lineNumber: 2094,
                                                             columnNumber: 27
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -8049,13 +8069,13 @@ function LeadsPage() {
                                                             children: selectedLead.notes
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 2086,
+                                                            lineNumber: 2097,
                                                             columnNumber: 27
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 2082,
+                                                    lineNumber: 2093,
                                                     columnNumber: 25
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8069,14 +8089,14 @@ function LeadsPage() {
                                                                     className: "w-4 h-4"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 2092,
+                                                                    lineNumber: 2103,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 "Send Email"
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 2091,
+                                                            lineNumber: 2102,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -8088,14 +8108,14 @@ function LeadsPage() {
                                                                     className: "w-4 h-4"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 2096,
+                                                                    lineNumber: 2107,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 "Call"
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 2095,
+                                                            lineNumber: 2106,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -8107,20 +8127,20 @@ function LeadsPage() {
                                                                     className: "w-4 h-4"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 2100,
+                                                                    lineNumber: 2111,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 "Schedule"
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 2099,
+                                                            lineNumber: 2110,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 2090,
+                                                    lineNumber: 2101,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
@@ -8136,7 +8156,7 @@ function LeadsPage() {
                                                             children: "Add New Note"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 2111,
+                                                            lineNumber: 2122,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8148,12 +8168,12 @@ function LeadsPage() {
                                                                 className: "flex-1 min-h-[80px] resize-none"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 2115,
+                                                                lineNumber: 2126,
                                                                 columnNumber: 27
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 2114,
+                                                            lineNumber: 2125,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -8165,20 +8185,20 @@ function LeadsPage() {
                                                                     className: "w-4 h-4"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 2127,
+                                                                    lineNumber: 2138,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 "Add Note"
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 2122,
+                                                            lineNumber: 2133,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 2110,
+                                                    lineNumber: 2121,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8193,7 +8213,7 @@ function LeadsPage() {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 2134,
+                                                            lineNumber: 2145,
                                                             columnNumber: 25
                                                         }, this),
                                                         selectedLead.noteHistory.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8203,14 +8223,14 @@ function LeadsPage() {
                                                                     className: "w-8 h-8 mx-auto mb-2 opacity-50"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 2139,
+                                                                    lineNumber: 2150,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                                     children: "No notes yet"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 2140,
+                                                                    lineNumber: 2151,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -8218,13 +8238,13 @@ function LeadsPage() {
                                                                     children: "Add your first note above"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 2141,
+                                                                    lineNumber: 2152,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 2138,
+                                                            lineNumber: 2149,
                                                             columnNumber: 27
                                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                             className: "space-y-3",
@@ -8236,7 +8256,7 @@ function LeadsPage() {
                                                                             children: note.content
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 2147,
+                                                                            lineNumber: 2158,
                                                                             columnNumber: 33
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8247,7 +8267,7 @@ function LeadsPage() {
                                                                                     children: note.createdBy
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2149,
+                                                                                    lineNumber: 2160,
                                                                                     columnNumber: 35
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8255,36 +8275,36 @@ function LeadsPage() {
                                                                                     children: getTimeAgo(note.createdAt)
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                                    lineNumber: 2152,
+                                                                                    lineNumber: 2163,
                                                                                     columnNumber: 35
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                            lineNumber: 2148,
+                                                                            lineNumber: 2159,
                                                                             columnNumber: 33
                                                                         }, this)
                                                                     ]
                                                                 }, note.id, true, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 2146,
+                                                                    lineNumber: 2157,
                                                                     columnNumber: 31
                                                                 }, this))
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/leads/page.tsx",
-                                                            lineNumber: 2144,
+                                                            lineNumber: 2155,
                                                             columnNumber: 27
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/leads/page.tsx",
-                                                    lineNumber: 2133,
+                                                    lineNumber: 2144,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/leads/page.tsx",
-                                            lineNumber: 2108,
+                                            lineNumber: 2119,
                                             columnNumber: 21
                                         }, this),
                                         activeTab === "history" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8296,20 +8316,20 @@ function LeadsPage() {
                                                         className: "w-8 h-8 mx-auto mb-2 opacity-50"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 2168,
+                                                        lineNumber: 2179,
                                                         columnNumber: 27
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                         children: "No activity history yet"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 2169,
+                                                        lineNumber: 2180,
                                                         columnNumber: 27
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 2167,
+                                                lineNumber: 2178,
                                                 columnNumber: 25
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "space-y-3",
@@ -8326,7 +8346,7 @@ function LeadsPage() {
                                                                                 children: activity.description
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 2180,
+                                                                                lineNumber: 2191,
                                                                                 columnNumber: 35
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -8338,13 +8358,13 @@ function LeadsPage() {
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 2181,
+                                                                                lineNumber: 2192,
                                                                                 columnNumber: 35
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 2179,
+                                                                        lineNumber: 2190,
                                                                         columnNumber: 33
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Badge"], {
@@ -8353,13 +8373,13 @@ function LeadsPage() {
                                                                         children: activity.type.replace(/_/g, " ")
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 2185,
+                                                                        lineNumber: 2196,
                                                                         columnNumber: 33
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 2178,
+                                                                lineNumber: 2189,
                                                                 columnNumber: 31
                                                             }, this),
                                                             activity.type === "meeting_scheduled" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8370,7 +8390,7 @@ function LeadsPage() {
                                                                         children: activity.meetingDetails
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 2196,
+                                                                        lineNumber: 2207,
                                                                         columnNumber: 37
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8383,7 +8403,7 @@ function LeadsPage() {
                                                                                         className: "w-3.5 h-3.5"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                                        lineNumber: 2205,
+                                                                                        lineNumber: 2216,
                                                                                         columnNumber: 41
                                                                                     }, this),
                                                                                     new Date(activity.meetingDate).toLocaleDateString(),
@@ -8391,7 +8411,7 @@ function LeadsPage() {
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 2204,
+                                                                                lineNumber: 2215,
                                                                                 columnNumber: 39
                                                                             }, this),
                                                                             activity.meetingType === "online" && activity.meetingLink && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -8404,14 +8424,14 @@ function LeadsPage() {
                                                                                         className: "w-3.5 h-3.5"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                                        lineNumber: 2217,
+                                                                                        lineNumber: 2228,
                                                                                         columnNumber: 41
                                                                                     }, this),
                                                                                     "Join Meeting"
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 2211,
+                                                                                lineNumber: 2222,
                                                                                 columnNumber: 39
                                                                             }, this),
                                                                             activity.meetingType === "offline" && activity.meetingLocation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8421,20 +8441,20 @@ function LeadsPage() {
                                                                                         className: "w-3.5 h-3.5"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                                        lineNumber: 2223,
+                                                                                        lineNumber: 2234,
                                                                                         columnNumber: 41
                                                                                     }, this),
                                                                                     activity.meetingLocation
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 2222,
+                                                                                lineNumber: 2233,
                                                                                 columnNumber: 39
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 2202,
+                                                                        lineNumber: 2213,
                                                                         columnNumber: 35
                                                                     }, this),
                                                                     activity.meetingAttendees && activity.meetingAttendees.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8444,7 +8464,7 @@ function LeadsPage() {
                                                                                 className: "w-3.5 h-3.5 text-muted-foreground"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 2232,
+                                                                                lineNumber: 2243,
                                                                                 columnNumber: 39
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8457,12 +8477,12 @@ function LeadsPage() {
                                                                                                 children: attendee.initials
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                                lineNumber: 2236,
+                                                                                                lineNumber: 2247,
                                                                                                 columnNumber: 45
                                                                                             }, this)
                                                                                         }, attendee.id, false, {
                                                                                             fileName: "[project]/app/leads/page.tsx",
-                                                                                            lineNumber: 2235,
+                                                                                            lineNumber: 2246,
                                                                                             columnNumber: 43
                                                                                         }, this)),
                                                                                     activity.meetingAttendees.length > 4 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8473,13 +8493,13 @@ function LeadsPage() {
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                                        lineNumber: 2242,
+                                                                                        lineNumber: 2253,
                                                                                         columnNumber: 43
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 2233,
+                                                                                lineNumber: 2244,
                                                                                 columnNumber: 39
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8491,19 +8511,19 @@ function LeadsPage() {
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 2247,
+                                                                                lineNumber: 2258,
                                                                                 columnNumber: 39
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 2231,
+                                                                        lineNumber: 2242,
                                                                         columnNumber: 37
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 2193,
+                                                                lineNumber: 2204,
                                                                 columnNumber: 33
                                                             }, this),
                                                             activity.changes && Object.keys(activity.changes).length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8519,7 +8539,7 @@ function LeadsPage() {
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 2260,
+                                                                                lineNumber: 2271,
                                                                                 columnNumber: 39
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8527,14 +8547,14 @@ function LeadsPage() {
                                                                                 children: String(value.old)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 2261,
+                                                                                lineNumber: 2272,
                                                                                 columnNumber: 39
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                 children: "→"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 2262,
+                                                                                lineNumber: 2273,
                                                                                 columnNumber: 39
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8542,52 +8562,52 @@ function LeadsPage() {
                                                                                 children: String(value.new)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                                lineNumber: 2263,
+                                                                                lineNumber: 2274,
                                                                                 columnNumber: 39
                                                                             }, this)
                                                                         ]
                                                                     }, key, true, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 2259,
+                                                                        lineNumber: 2270,
                                                                         columnNumber: 37
                                                                     }, this))
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 2257,
+                                                                lineNumber: 2268,
                                                                 columnNumber: 33
                                                             }, this)
                                                         ]
                                                     }, activity.id, true, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 2174,
+                                                        lineNumber: 2185,
                                                         columnNumber: 29
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 2172,
+                                                lineNumber: 2183,
                                                 columnNumber: 25
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/leads/page.tsx",
-                                            lineNumber: 2165,
+                                            lineNumber: 2176,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/leads/page.tsx",
-                                    lineNumber: 1937,
+                                    lineNumber: 1948,
                                     columnNumber: 17
                                 }, this)
                             ]
                         }, void 0, true)
                     }, void 0, false, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 1873,
+                        lineNumber: 1884,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/leads/page.tsx",
-                    lineNumber: 1872,
+                    lineNumber: 1883,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Dialog"], {
@@ -8602,20 +8622,20 @@ function LeadsPage() {
                                         children: "Edit Lead"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2283,
+                                        lineNumber: 2294,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogDescription"], {
                                         children: "Update lead information. Changes will be tracked in activity history."
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2284,
+                                        lineNumber: 2295,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2282,
+                                lineNumber: 2293,
                                 columnNumber: 13
                             }, this),
                             selectedLead && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(EditLeadForm, {
@@ -8624,18 +8644,18 @@ function LeadsPage() {
                                 onCancel: ()=>setIsEditDialogOpen(false)
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2290,
+                                lineNumber: 2301,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2281,
+                        lineNumber: 2292,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/leads/page.tsx",
-                    lineNumber: 2280,
+                    lineNumber: 2291,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Dialog"], {
@@ -8653,27 +8673,27 @@ function LeadsPage() {
                                                 className: "w-5 h-5 text-primary"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 2300,
+                                                lineNumber: 2311,
                                                 columnNumber: 17
                                             }, this),
                                             "Schedule Meeting"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2299,
+                                        lineNumber: 2310,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogDescription"], {
                                         children: selectedLead ? `Schedule a meeting with ${selectedLead.name}` : "Schedule a new meeting"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2303,
+                                        lineNumber: 2314,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2298,
+                                lineNumber: 2309,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8687,7 +8707,7 @@ function LeadsPage() {
                                                 children: "Meeting Type"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 2311,
+                                                lineNumber: 2322,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8703,14 +8723,14 @@ function LeadsPage() {
                                                                 className: "w-4 h-4"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 2319,
+                                                                lineNumber: 2330,
                                                                 columnNumber: 21
                                                             }, this),
                                                             "Online"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 2313,
+                                                        lineNumber: 2324,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -8723,26 +8743,26 @@ function LeadsPage() {
                                                                 className: "w-4 h-4"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 2328,
+                                                                lineNumber: 2339,
                                                                 columnNumber: 21
                                                             }, this),
                                                             "Offline"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 2322,
+                                                        lineNumber: 2333,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 2312,
+                                                lineNumber: 2323,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2310,
+                                        lineNumber: 2321,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8753,7 +8773,7 @@ function LeadsPage() {
                                                 children: "Meeting Title / Agenda *"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 2336,
+                                                lineNumber: 2347,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$textarea$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Textarea"], {
@@ -8764,13 +8784,13 @@ function LeadsPage() {
                                                 rows: 2
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 2337,
+                                                lineNumber: 2348,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2335,
+                                        lineNumber: 2346,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8784,7 +8804,7 @@ function LeadsPage() {
                                                         children: "Date *"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 2349,
+                                                        lineNumber: 2360,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -8794,13 +8814,13 @@ function LeadsPage() {
                                                         onChange: (e)=>setMeetingDate(e.target.value)
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 2350,
+                                                        lineNumber: 2361,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 2348,
+                                                lineNumber: 2359,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8811,7 +8831,7 @@ function LeadsPage() {
                                                         children: "Time"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 2358,
+                                                        lineNumber: 2369,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -8821,19 +8841,19 @@ function LeadsPage() {
                                                         onChange: (e)=>setMeetingTime(e.target.value)
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 2359,
+                                                        lineNumber: 2370,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 2357,
+                                                lineNumber: 2368,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2347,
+                                        lineNumber: 2358,
                                         columnNumber: 15
                                     }, this),
                                     meetingType === "offline" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8844,7 +8864,7 @@ function LeadsPage() {
                                                 children: "Location"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 2371,
+                                                lineNumber: 2382,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8854,7 +8874,7 @@ function LeadsPage() {
                                                         className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 2373,
+                                                        lineNumber: 2384,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -8865,19 +8885,19 @@ function LeadsPage() {
                                                         onChange: (e)=>setMeetingLocation(e.target.value)
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 2374,
+                                                        lineNumber: 2385,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 2372,
+                                                lineNumber: 2383,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2370,
+                                        lineNumber: 2381,
                                         columnNumber: 17
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "space-y-2",
@@ -8887,7 +8907,7 @@ function LeadsPage() {
                                                 children: "Meeting Link"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 2385,
+                                                lineNumber: 2396,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8897,7 +8917,7 @@ function LeadsPage() {
                                                         className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 2387,
+                                                        lineNumber: 2398,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -8908,19 +8928,19 @@ function LeadsPage() {
                                                         onChange: (e)=>setMeetingLink(e.target.value)
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 2388,
+                                                        lineNumber: 2399,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 2386,
+                                                lineNumber: 2397,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2384,
+                                        lineNumber: 2395,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8930,7 +8950,7 @@ function LeadsPage() {
                                                 children: "Assign Team Members"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 2401,
+                                                lineNumber: 2412,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8949,7 +8969,7 @@ function LeadsPage() {
                                                                 className: "pointer-events-none"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 2418,
+                                                                lineNumber: 2429,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$avatar$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Avatar"], {
@@ -8959,12 +8979,12 @@ function LeadsPage() {
                                                                     children: member.initials
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/leads/page.tsx",
-                                                                    lineNumber: 2423,
+                                                                    lineNumber: 2434,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 2422,
+                                                                lineNumber: 2433,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8975,7 +8995,7 @@ function LeadsPage() {
                                                                         children: member.name
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 2428,
+                                                                        lineNumber: 2439,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -8983,24 +9003,24 @@ function LeadsPage() {
                                                                         children: member.jobTitle
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/leads/page.tsx",
-                                                                        lineNumber: 2429,
+                                                                        lineNumber: 2440,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/leads/page.tsx",
-                                                                lineNumber: 2427,
+                                                                lineNumber: 2438,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, member.id, true, {
                                                         fileName: "[project]/app/leads/page.tsx",
-                                                        lineNumber: 2404,
+                                                        lineNumber: 2415,
                                                         columnNumber: 21
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 2402,
+                                                lineNumber: 2413,
                                                 columnNumber: 17
                                             }, this),
                                             meetingAttendees.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -9013,19 +9033,19 @@ function LeadsPage() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 2435,
+                                                lineNumber: 2446,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2400,
+                                        lineNumber: 2411,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2308,
+                                lineNumber: 2319,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogFooter"], {
@@ -9046,7 +9066,7 @@ function LeadsPage() {
                                         children: "Cancel"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2443,
+                                        lineNumber: 2454,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -9058,42 +9078,42 @@ function LeadsPage() {
                                                 className: "w-4 h-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/leads/page.tsx",
-                                                lineNumber: 2463,
+                                                lineNumber: 2474,
                                                 columnNumber: 17
                                             }, this),
                                             "Schedule Meeting"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2458,
+                                        lineNumber: 2469,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2442,
+                                lineNumber: 2453,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2297,
+                        lineNumber: 2308,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/leads/page.tsx",
-                    lineNumber: 2296,
+                    lineNumber: 2307,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/leads/page.tsx",
-            lineNumber: 926,
+            lineNumber: 930,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/leads/page.tsx",
-        lineNumber: 925,
+        lineNumber: 929,
         columnNumber: 5
     }, this);
 }
@@ -9145,7 +9165,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 children: "Full Name"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2519,
+                                lineNumber: 2530,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -9155,13 +9175,13 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 placeholder: "Lead name"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2520,
+                                lineNumber: 2531,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2518,
+                        lineNumber: 2529,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9172,7 +9192,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 children: "Email"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2528,
+                                lineNumber: 2539,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -9183,13 +9203,13 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 placeholder: "email@example.com"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2529,
+                                lineNumber: 2540,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2527,
+                        lineNumber: 2538,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9200,7 +9220,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 children: "Phone"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2538,
+                                lineNumber: 2549,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -9210,13 +9230,13 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 placeholder: "+1 (555) 123-4567"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2539,
+                                lineNumber: 2550,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2537,
+                        lineNumber: 2548,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9227,7 +9247,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 children: "Company"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2547,
+                                lineNumber: 2558,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -9237,13 +9257,13 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 placeholder: "Company name"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2548,
+                                lineNumber: 2559,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2546,
+                        lineNumber: 2557,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9254,7 +9274,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 children: "Status"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2556,
+                                lineNumber: 2567,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -9268,7 +9288,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "Hot"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2563,
+                                        lineNumber: 2574,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -9276,7 +9296,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "Warm"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2564,
+                                        lineNumber: 2575,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -9284,19 +9304,19 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "Cold"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2565,
+                                        lineNumber: 2576,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2557,
+                                lineNumber: 2568,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2555,
+                        lineNumber: 2566,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9307,7 +9327,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 children: "Stage"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2569,
+                                lineNumber: 2580,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -9321,7 +9341,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "New"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2576,
+                                        lineNumber: 2587,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -9329,7 +9349,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "Contacted"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2577,
+                                        lineNumber: 2588,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -9337,7 +9357,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "Qualified"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2578,
+                                        lineNumber: 2589,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -9345,7 +9365,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "Proposal"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2579,
+                                        lineNumber: 2590,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -9353,7 +9373,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "Negotiation"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2580,
+                                        lineNumber: 2591,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -9361,7 +9381,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "Won"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2581,
+                                        lineNumber: 2592,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -9369,19 +9389,19 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "Lost"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2582,
+                                        lineNumber: 2593,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2570,
+                                lineNumber: 2581,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2568,
+                        lineNumber: 2579,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9392,7 +9412,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 children: "Priority"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2586,
+                                lineNumber: 2597,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -9406,7 +9426,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "High"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2593,
+                                        lineNumber: 2604,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -9414,7 +9434,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "Medium"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2594,
+                                        lineNumber: 2605,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -9422,19 +9442,19 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "Low"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2595,
+                                        lineNumber: 2606,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2587,
+                                lineNumber: 2598,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2585,
+                        lineNumber: 2596,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9445,7 +9465,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 children: "Category"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2599,
+                                lineNumber: 2610,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -9458,18 +9478,18 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: config.label
                                     }, key, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2607,
+                                        lineNumber: 2618,
                                         columnNumber: 15
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2600,
+                                lineNumber: 2611,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2598,
+                        lineNumber: 2609,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9480,7 +9500,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 children: "Deal Value ($)"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2614,
+                                lineNumber: 2625,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -9491,13 +9511,13 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 placeholder: "10000"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2615,
+                                lineNumber: 2626,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2613,
+                        lineNumber: 2624,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9508,7 +9528,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 children: "Win Probability (%)"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2624,
+                                lineNumber: 2635,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -9521,13 +9541,13 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 max: 100
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2625,
+                                lineNumber: 2636,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2623,
+                        lineNumber: 2634,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9538,7 +9558,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 children: "Source"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2636,
+                                lineNumber: 2647,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -9552,7 +9572,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "Website"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2643,
+                                        lineNumber: 2654,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -9560,7 +9580,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "Referral"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2644,
+                                        lineNumber: 2655,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -9568,7 +9588,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "LinkedIn"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2645,
+                                        lineNumber: 2656,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -9576,7 +9596,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "Cold Email"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2646,
+                                        lineNumber: 2657,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -9584,7 +9604,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "Conference"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2647,
+                                        lineNumber: 2658,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -9592,19 +9612,19 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                         children: "Webinar"
                                     }, void 0, false, {
                                         fileName: "[project]/app/leads/page.tsx",
-                                        lineNumber: 2648,
+                                        lineNumber: 2659,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2637,
+                                lineNumber: 2648,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2635,
+                        lineNumber: 2646,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9615,7 +9635,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 children: "Next Follow-Up"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2652,
+                                lineNumber: 2663,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -9625,19 +9645,19 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                                 onChange: (e)=>handleChange("nextFollowUp", e.target.value)
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
-                                lineNumber: 2653,
+                                lineNumber: 2664,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2651,
+                        lineNumber: 2662,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/leads/page.tsx",
-                lineNumber: 2517,
+                lineNumber: 2528,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9648,7 +9668,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                         children: "Assigned To"
                     }, void 0, false, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2662,
+                        lineNumber: 2673,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -9658,13 +9678,13 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                         placeholder: "Team member name"
                     }, void 0, false, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2663,
+                        lineNumber: 2674,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/leads/page.tsx",
-                lineNumber: 2661,
+                lineNumber: 2672,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9675,7 +9695,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                         children: "Tags (comma separated)"
                     }, void 0, false, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2671,
+                        lineNumber: 2682,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
@@ -9685,13 +9705,13 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                         placeholder: "SEO, Enterprise, Priority"
                     }, void 0, false, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2672,
+                        lineNumber: 2683,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/leads/page.tsx",
-                lineNumber: 2670,
+                lineNumber: 2681,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9702,7 +9722,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                         children: "Notes"
                     }, void 0, false, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2680,
+                        lineNumber: 2691,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
@@ -9713,13 +9733,13 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                         className: "w-full px-3 py-2 bg-secondary text-foreground rounded-md border border-input min-h-24 resize-none"
                     }, void 0, false, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2681,
+                        lineNumber: 2692,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/leads/page.tsx",
-                lineNumber: 2679,
+                lineNumber: 2690,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -9731,7 +9751,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                         children: "Save Changes"
                     }, void 0, false, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2690,
+                        lineNumber: 2701,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -9742,19 +9762,19 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                         children: "Cancel"
                     }, void 0, false, {
                         fileName: "[project]/app/leads/page.tsx",
-                        lineNumber: 2693,
+                        lineNumber: 2704,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/leads/page.tsx",
-                lineNumber: 2689,
+                lineNumber: 2700,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/leads/page.tsx",
-        lineNumber: 2516,
+        lineNumber: 2527,
         columnNumber: 5
     }, this);
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { generateId } from "@/lib/id-generator"
 import type { Task, TaskStatus, TaskPriority, TaskType, SwimlaneType, TaskTemplate, AutomationRule } from "@/lib/types/task"
 import { DEFAULT_COLUMNS, PRIORITY_CONFIG, STATUS_CONFIG, TASK_TYPE_CONFIG } from "@/lib/types/task"
 import { sampleTasks, teamMembers, projects, taskTemplates, automationRules } from "@/lib/data/tasks"
@@ -158,7 +159,7 @@ export default function TasksPage() {
   const handleCloneTask = (task: Task) => {
     const clonedTask: Task = {
       ...task,
-      id: `TSK-${Date.now()}`,
+      id: generateId("TSK", tasks),
       title: `${task.title} (Copy)`,
       status: "todo",
       createdAt: new Date().toISOString(),
@@ -178,7 +179,7 @@ export default function TasksPage() {
 
   const handleCreateTask = (formData: FormData) => {
     const newTask: Task = {
-      id: `TSK-${Date.now()}`,
+      id: generateId("TSK", tasks),
       title: formData.get("title") as string,
       description: formData.get("description") as string || "",
       status: formData.get("status") as TaskStatus || initialStatus,
@@ -218,7 +219,7 @@ export default function TasksPage() {
 
   const handleUseTemplate = (template: TaskTemplate) => {
     const newTask: Task = {
-      id: `TSK-${Date.now()}`,
+      id: generateId("TSK", tasks),
       title: template.name,
       description: template.description,
       status: "todo",
