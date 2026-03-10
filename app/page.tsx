@@ -44,6 +44,10 @@ import {
   ComposedChart,
 } from "recharts"
 import { useState } from "react"
+import { sampleTasks } from "@/lib/data/tasks"
+import { initialProjects } from "@/lib/data/projects"
+import { invoicesData } from "@/lib/data/finance-data"
+import { employees, leaveRequests, attendanceRecords } from "@/lib/data/hr"
 
 const revenueData = [
   { month: "Jan", revenue: 45000, leads: 120 },
@@ -56,10 +60,10 @@ const revenueData = [
 ]
 
 const projectStatusData = [
-  { name: "Completed", value: 12, color: "#4ade80" },
-  { name: "In Progress", value: 8, color: "#60a5fa" },
-  { name: "On Hold", value: 3, color: "#fbbf24" },
-  { name: "Planning", value: 5, color: "#a78bfa" },
+  { name: "Completed", value: initialProjects.filter(p => p.status === 'completed').length, color: "#4ade80" },
+  { name: "In Progress", value: initialProjects.filter(p => p.status === 'in-progress').length, color: "#60a5fa" },
+  { name: "On Hold", value: initialProjects.filter(p => p.status === 'on-hold').length, color: "#fbbf24" },
+  { name: "Planning", value: initialProjects.filter(p => p.status === 'planning').length, color: "#a78bfa" },
 ]
 
 const recentLeads = [
@@ -69,12 +73,15 @@ const recentLeads = [
   { name: "Michael Brown", company: "ScaleUp Ltd", status: "Cold", value: "$5,000", avatar: "MB" },
 ]
 
-const activeProjects = [
-  { name: "E-commerce Redesign", client: "TechMart", progress: 75, dueDate: "Dec 28" },
-  { name: "SEO Campaign", client: "GreenLife", progress: 45, dueDate: "Jan 5" },
-  { name: "Social Media Strategy", client: "FoodieHub", progress: 90, dueDate: "Dec 22" },
-  { name: "PPC Management", client: "AutoDeal", progress: 30, dueDate: "Jan 15" },
-]
+const activeProjects = initialProjects
+  .filter(p => p.status === 'in-progress')
+  .slice(0, 4)
+  .map(p => ({
+    name: p.name,
+    client: p.client,
+    progress: p.progress,
+    dueDate: new Date(p.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  }))
 
 const teamPerformance = [
   { name: "Design", tasks: 24, completed: 18 },
@@ -111,49 +118,12 @@ const monthlyTargetData = [
 ]
 
 const recentActivities = [
-  {
-    id: 1,
-    type: "lead",
-    action: "New Lead Added",
-    detail: "Sarah Mitchell from TechStart Inc",
-    time: "2 hours ago",
-    icon: Users,
-  },
-  {
-    id: 2,
-    type: "project",
-    action: "Project Completed",
-    detail: "E-commerce Redesign for TechMart",
-    time: "5 hours ago",
-    icon: CheckCircle,
-  },
-  {
-    id: 3,
-    type: "task",
-    action: "Task Created",
-    detail: "SEO Optimization for GreenLife",
-    time: "1 day ago",
-    icon: Target,
-  },
-  {
-    id: 4,
-    type: "meeting",
-    action: "Client Meeting",
-    detail: "Strategy discussion with AutoDeal",
-    time: "1 day ago",
-    icon: Calendar,
-  },
-  {
-    id: 5,
-    type: "alert",
-    action: "Overdue Invoice",
-    detail: "Invoice #2024-001 - $5,200",
-    time: "2 days ago",
-    icon: AlertCircle,
-  },
+  { id: 1, type: "lead", action: "New Lead Added", detail: "Sarah Mitchell from TechStart Inc", time: "2 hours ago", icon: Users },
+  { id: 2, type: "project", action: "Project Completed", detail: "E-commerce Redesign for TechMart", time: "5 hours ago", icon: CheckCircle },
+  { id: 3, type: "task", action: "Task Created", detail: "SEO Optimization for GreenLife", time: "1 day ago", icon: Target },
+  { id: 4, type: "meeting", action: "Client Meeting", detail: "Strategy discussion with AutoDeal", time: "1 day ago", icon: Calendar },
+  { id: 5, type: "alert", action: "Overdue Invoice", detail: "Invoice #2024-001 - $5,200", time: "2 days ago", icon: AlertCircle },
 ]
-
-
 
 const quickActions = [
   { label: "New Lead", icon: Users, color: "bg-blue-500/20 text-blue-400" },
@@ -171,14 +141,68 @@ const kpis = [
   { label: "Project ROI", value: "285%", trend: "-3.1%", color: "text-red-400" },
 ]
 
+// --- Computed Real Data ---
+
+const upcomingTasks = sampleTasks
+  .filter(t => t.status !== 'done')
+  .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+
+const dailyTasks = upcomingTasks.slice(0, 5).map(t => ({
+  id: t.id,
+  title: t.title,
+  time: new Date(t.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+  priority: t.priority,
+  completed: t.status === 'done'
+}))
+
+const tasksCompletedToday = sampleTasks.filter(t => t.status === 'done').length
+
+const totalMRR = invoicesData
+  .filter(i => i.recurringInvoice)
+  .reduce((sum, inv) => sum + inv.amount, 0)
+const overdueInvoices = invoicesData.filter(i => i.status === 'overdue')
+const totalOverdue = overdueInvoices.reduce((sum, inv) => sum + (inv.amount - inv.paid), 0)
+const pendingInvoices = invoicesData.filter(i => i.status === 'pending' || i.status === 'sent')
+const totalPending = pendingInvoices.reduce((sum, inv) => sum + (inv.amount - inv.paid), 0)
+
+const financialSummary = {
+  mrr: `$${(totalMRR / 1000).toFixed(1)}k`,
+  mrrGrowth: "+3.2%",
+  outstanding: `$${(totalPending / 1000).toFixed(1)}k`,
+  invoicesPending: pendingInvoices.length,
+  overdue: `$${(totalOverdue / 1000).toFixed(1)}k`,
+  invoicesOverdue: overdueInvoices.length,
+  netProfitYTD: "$142,500",
+}
+
+const todayDateStr = new Date().toISOString().split('T')[0]
+const teamOnLeave = leaveRequests.filter(lr =>
+  lr.status === 'approved' &&
+  new Date(lr.startDate) <= new Date() &&
+  new Date(lr.endDate) >= new Date()
+)
+const recentAttendanceDate = attendanceRecords.length > 0 ? attendanceRecords[attendanceRecords.length - 1].date : todayDateStr
+const recentAttendance = attendanceRecords.filter(a => a.date === recentAttendanceDate)
+const presentCount = recentAttendance.filter(a => ['present', 'late', 'remote', 'half-day'].includes(a.status)).length
+const activeEmployees = employees.filter(e => e.status === 'active').length
+const attendanceRate = activeEmployees > 0 ? Math.round((presentCount / activeEmployees) * 100) : 0
+const teamSnapshot = {
+  onLeave: teamOnLeave.length,
+  attendanceRate: `${attendanceRate}%`,
+  activeEmployees
+}
+
+const uniqueClientsCount = [...new Set(initialProjects.map(p => p.client))].length
+const totalRevenuePaid = invoicesData.filter(i => i.status === 'paid').reduce((acc, i) => acc + i.paid, 0)
+
 export default function DashboardPage() {
 
   // Calculate totals for hero section
   const todayStats = {
-    newLeads: 12,
+    newLeads: 12, // Based on mock data since Leads module isn't connected
     meetings: 3,
-    tasksCompleted: 8,
-    revenue: "$15,420",
+    tasksCompleted: tasksCompletedToday,
+    revenue: `$${(totalRevenuePaid / 1000).toFixed(1)}k`,
   }
 
   return (
@@ -241,405 +265,346 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Quick Action Shortcuts */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 animate-in fade-in duration-500">
-          {quickActions.map((action, i) => (
-            <button
-              key={i}
-              className={`flex flex-col items-center justify-center gap-2 p-4 rounded-lg border border-secondary/50 hover:border-primary/50 transition-all hover:scale-105 ${action.color}`}
-            >
-              <action.icon className="w-5 h-5" />
-              <span className="text-xs font-medium text-center">{action.label}</span>
-            </button>
-          ))}
-        </div>
+        {/* Main Dashboard Layout - 2 Columns */}
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
 
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard title="Total Leads" value="1,284" change={12.5} icon={Users} delay={0} iconColor="text-chart-1" />
-          <StatCard
-            title="Active Clients"
-            value="86"
-            change={8.2}
-            icon={UserCheck}
-            delay={100}
-            iconColor="text-chart-2"
-          />
-          <StatCard
-            title="Projects"
-            value="28"
-            change={-3.1}
-            icon={FolderKanban}
-            delay={200}
-            iconColor="text-chart-3"
-          />
-          <StatCard
-            title="Revenue"
-            value="$342K"
-            change={15.3}
-            icon={DollarSign}
-            delay={300}
-            iconColor="text-chart-4"
-          />
-        </div>
+          {/* LEFT COLUMN: DAILY OPERATIONS (5 columns wide on XL) */}
+          <div className="xl:col-span-5 space-y-6">
 
-        {/* Advanced KPIs with Icons */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {kpis.map((kpi, i) => {
-            const isPositive = kpi.trend.startsWith("+")
-            const TrendIcon = isPositive ? TrendingUp : TrendingDown
-            return (
-              <AnimatedCard key={i} delay={400 + i * 100}>
-                <CardContent className="pt-6">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm text-muted-foreground">{kpi.label}</p>
-                      <div className={`flex items-center gap-1 text-xs font-medium ${kpi.color}`}>
-                        <TrendIcon className="w-3 h-3" />
-                        {kpi.trend}
+            {/* 1. Daily Priority Tasks */}
+            <AnimatedCard delay={100} className="border-primary/20 shadow-md shadow-primary/5">
+              <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border/50 bg-muted/30">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-md bg-blue-500/20">
+                    <CheckCircle className="w-4 h-4 text-blue-400" />
+                  </div>
+                  <CardTitle className="text-base font-semibold">Today's Priorities</CardTitle>
+                </div>
+                <Badge variant="outline" className="text-xs font-normal">
+                  {todayStats.tasksCompleted} / {dailyTasks.length} Done
+                </Badge>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="divide-y divide-border/50">
+                  {dailyTasks.map((task, i) => (
+                    <div key={task.id} className="p-4 flex gap-3 hover:bg-muted/50 transition-colors group">
+                      <div className="mt-0.5">
+                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center cursor-pointer transition-colors ${task.completed ? 'bg-primary border-primary' : 'border-muted-foreground/50 hover:border-primary delay-75'}`}>
+                          {task.completed && <CheckCircle className="w-3.5 h-3.5 text-primary-foreground" />}
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm font-medium ${task.completed ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                          {task.title}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1.5 mt-1">
+                          <Badge variant="secondary" className="text-[10px] uppercase font-semibold tracking-wider h-5 px-1.5">
+                            {task.time}
+                          </Badge>
+                          <span className={`text-[10px] font-medium uppercase tracking-wider ${task.priority === 'high' ? 'text-red-400' :
+                            task.priority === 'medium' ? 'text-amber-400' : 'text-blue-400'
+                            }`}>
+                            {task.priority} Priority
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <div className="text-3xl font-bold">{kpi.value}</div>
-                    <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-1000 ${isPositive ? 'bg-green-500' : 'bg-red-500'}`}
-                        style={{ width: `${Math.abs(parseFloat(kpi.trend)) * 10}%` }}
-                      />
-                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </AnimatedCard>
+
+            {/* 2. Calendar / Upcoming Widget */}
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 fill-mode-both">
+              <UpcomingWidget delay={0} />
+            </div>
+
+            {/* 3. Recent Activities */}
+            <AnimatedCard delay={300}>
+              <CardHeader className="flex flex-row items-center justify-between pb-3">
+                <CardTitle className="text-base font-medium">Activity Feed</CardTitle>
+                <button className="text-xs text-primary hover:underline flex items-center gap-1">
+                  View all <ArrowRight className="w-3 h-3" />
+                </button>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+                  {recentActivities.map((activity, i) => {
+                    const Icon = activity.icon
+                    const typeColors: Record<string, string> = {
+                      lead: "bg-blue-500/20 text-blue-400",
+                      project: "bg-green-500/20 text-green-400",
+                      task: "bg-purple-500/20 text-purple-400",
+                      meeting: "bg-amber-500/20 text-amber-400",
+                      alert: "bg-red-500/20 text-red-400",
+                    }
+                    return (
+                      <div key={i} className="flex gap-3 relative">
+                        {/* Timeline line */}
+                        {i !== recentActivities.length - 1 && (
+                          <div className="absolute left-4 top-8 bottom-[-16px] w-[1px] bg-border/50" />
+                        )}
+                        <div className={`p-2 rounded-full h-8 w-8 flex items-center justify-center relative z-10 ${typeColors[activity.type]}`}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 min-w-0 pb-1">
+                          <p className="text-sm font-medium">{activity.action}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5 mb-1">{activity.detail}</p>
+                          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{activity.time}</span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </CardContent>
+            </AnimatedCard>
+          </div>
+
+
+          {/* RIGHT COLUMN: BUSINESS HEALTH (7 columns wide on XL) */}
+          <div className="xl:col-span-7 space-y-6">
+
+            {/* 1. Quick Action Shortcuts */}
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 animate-in fade-in duration-500">
+              {quickActions.map((action, i) => (
+                <button
+                  key={i}
+                  className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border border-secondary/50 hover:border-primary/50 transition-all hover:scale-105 ${action.color}`}
+                >
+                  <action.icon className="w-5 h-5" />
+                  <span className="text-[10px] font-medium text-center leading-tight">{action.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* 2. Top-level KPIs */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <StatCard title="Total Leads" value="1,284" change={12.5} icon={Users} delay={100} iconColor="text-chart-1" />
+              <StatCard title="Active Clients" value="86" change={8.2} icon={UserCheck} delay={200} iconColor="text-chart-2" />
+              <StatCard title="Projects" value="28" change={-3.1} icon={FolderKanban} delay={300} iconColor="text-chart-3" />
+              <StatCard title="Revenue" value="$342K" change={15.3} icon={DollarSign} delay={400} iconColor="text-chart-4" />
+            </div>
+
+            {/* 3. Financial Overview (CRUCIAL FOR OWNERS) */}
+            <AnimatedCard delay={500} className="border-amber-500/20 bg-gradient-to-br from-background to-amber-500/5">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base font-semibold flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-amber-500" />
+                  Financial Snapshot
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground flex items-center justify-between">
+                      MRR <Badge variant="secondary" className="text-[9px] h-4 px-1 bg-green-500/10 text-green-500 border-green-500/20">{financialSummary.mrrGrowth}</Badge>
+                    </p>
+                    <p className="text-2xl font-bold tracking-tight">{financialSummary.mrr}</p>
+                    <p className="text-[10px] text-muted-foreground">Monthly Recurring Revenue</p>
+                  </div>
+                  <div className="space-y-1 border-l border-border/50 pl-6">
+                    <p className="text-xs font-medium text-muted-foreground flex items-center justify-between">
+                      Pending <Badge variant="secondary" className="text-[9px] h-4 px-1">{financialSummary.invoicesPending} inv</Badge>
+                    </p>
+                    <p className="text-2xl font-bold tracking-tight text-amber-500">{financialSummary.outstanding}</p>
+                    <p className="text-[10px] text-muted-foreground">Expected incoming</p>
+                  </div>
+                  <div className="space-y-1 border-l border-border/50 pl-6">
+                    <p className="text-xs font-medium text-muted-foreground flex items-center justify-between">
+                      Overdue <Badge variant="secondary" className="text-[9px] h-4 px-1 bg-red-500/10 text-red-500 border-red-500/20">{financialSummary.invoicesOverdue} inv</Badge>
+                    </p>
+                    <p className="text-2xl font-bold tracking-tight text-red-500">{financialSummary.overdue}</p>
+                    <p className="text-[10px] text-muted-foreground">Requires attention</p>
+                  </div>
+                </div>
+              </CardContent>
+            </AnimatedCard>
+
+            {/* 4. Charts Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Revenue vs Target */}
+              <AnimatedCard delay={600}>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Revenue vs Target</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[220px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={monthlyTargetData}>
+                        <defs>
+                          <linearGradient id="profitGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                        <XAxis dataKey="month" stroke="#666" fontSize={11} tickLine={false} axisLine={false} />
+                        <YAxis stroke="#666" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v / 1000}k`} width={40} />
+                        <Tooltip
+                          contentStyle={{ backgroundColor: "#1a1a2e", border: "1px solid #333", borderRadius: "8px", fontSize: "12px" }}
+                          formatter={(value: number) => `$${value.toLocaleString()}`}
+                        />
+                        <Bar dataKey="target" fill="#666" opacity={0.3} name="Target" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                        <Bar dataKey="actual" fill="#60a5fa" name="Actual Revenue" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                        <Line type="monotone" dataKey="profit" stroke="#10b981" strokeWidth={2} name="Profit" />
+                      </ComposedChart>
+                    </ResponsiveContainer>
                   </div>
                 </CardContent>
               </AnimatedCard>
-            )
-          })}
-        </div>
 
-        {/* Charts Row 1 */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Revenue vs Target */}
-          <AnimatedCard className="lg:col-span-2" delay={800}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-base font-medium">Revenue vs Target</CardTitle>
-              <Badge variant="secondary" className="text-xs">
-                7 months
-              </Badge>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart data={monthlyTargetData}>
-                    <defs>
-                      <linearGradient id="profitGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                    <XAxis dataKey="month" stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis
-                      stroke="#666"
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(v) => `$${v / 1000}k`}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#1a1a2e",
-                        border: "1px solid #333",
-                        borderRadius: "8px",
-                        fontSize: "12px",
-                      }}
-                      formatter={(value: number) => `$${value.toLocaleString()}`}
-                    />
-                    <Bar dataKey="target" fill="#666" opacity={0.3} name="Target" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="actual" fill="#60a5fa" name="Actual Revenue" radius={[4, 4, 0, 0]} />
-                    <Area
-                      type="monotone"
-                      dataKey="profit"
-                      fill="url(#profitGradient)"
-                      stroke="#10b981"
-                      strokeWidth={2}
-                      name="Profit"
-                    />
-                  </ComposedChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </AnimatedCard>
-
-          {/* Client Source */}
-          <AnimatedCard delay={900}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base font-medium">Client Sources</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[200px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={clientSourceData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={80}
-                      paddingAngle={4}
-                      dataKey="value"
-                    >
-                      {clientSourceData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#1a1a2e",
-                        border: "1px solid #333",
-                        borderRadius: "8px",
-                        fontSize: "12px",
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="space-y-2 mt-3">
-                {clientSourceData.map((item) => (
-                  <div key={item.name} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
-                      <span className="text-muted-foreground">{item.name}</span>
-                    </div>
-                    <span className="font-medium">{item.value}%</span>
+              {/* Conversion Funnel */}
+              <AnimatedCard delay={700}>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Pipeline Health</CardTitle>
+                  <Badge variant="outline" className="text-[10px]">Trailing 7W</Badge>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[220px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={conversionData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                        <XAxis dataKey="week" stroke="#666" fontSize={11} tickLine={false} axisLine={false} />
+                        <YAxis yAxisId="left" stroke="#666" fontSize={11} tickLine={false} axisLine={false} width={30} />
+                        <YAxis yAxisId="right" orientation="right" stroke="#f97316" fontSize={11} tickLine={false} axisLine={false} width={35} tickFormatter={(v) => `${v}%`} />
+                        <Tooltip contentStyle={{ backgroundColor: "#1a1a2e", border: "1px solid #333", borderRadius: "8px", fontSize: "12px" }} />
+                        <Bar yAxisId="left" dataKey="leads" fill="#94a3b8" name="Total Leads" radius={[4, 4, 0, 0]} stackId="a" maxBarSize={30} />
+                        <Bar yAxisId="left" dataKey="qualified" fill="#60a5fa" name="Qualified" radius={[4, 4, 0, 0]} stackId="a" maxBarSize={30} />
+                        <Bar yAxisId="left" dataKey="converted" fill="#4ade80" name="Converted" radius={[4, 4, 0, 0]} stackId="a" maxBarSize={30} />
+                        <Line yAxisId="right" type="monotone" dataKey="rate" stroke="#f97316" strokeWidth={2} name="Conv. Rate %" />
+                      </ComposedChart>
+                    </ResponsiveContainer>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </AnimatedCard>
-        </div>
+                </CardContent>
+              </AnimatedCard>
+            </div>
 
-        {/* Charts Row 2 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Conversion Funnel */}
-          <AnimatedCard delay={1000}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-base font-medium">Conversion Funnel</CardTitle>
-              <Badge variant="secondary" className="text-xs">
-                7 weeks
-              </Badge>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[280px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart data={conversionData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                    <XAxis dataKey="week" stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#1a1a2e",
-                        border: "1px solid #333",
-                        borderRadius: "8px",
-                        fontSize: "12px",
-                      }}
-                    />
-                    <Bar dataKey="leads" fill="#94a3b8" name="Total Leads" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="qualified" fill="#60a5fa" name="Qualified" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="converted" fill="#4ade80" name="Converted" radius={[4, 4, 0, 0]} />
-                    <Line type="monotone" dataKey="rate" stroke="#f97316" strokeWidth={2} name="Conv. Rate %" />
-                  </ComposedChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </AnimatedCard>
-
-          {/* Project Status */}
-          <AnimatedCard delay={1100}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base font-medium">Project Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[200px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={projectStatusData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={80}
-                      paddingAngle={4}
-                      dataKey="value"
-                    >
-                      {projectStatusData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#1a1a2e",
-                        border: "1px solid #333",
-                        borderRadius: "8px",
-                        fontSize: "12px",
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="grid grid-cols-2 gap-2 mt-3">
-                {projectStatusData.map((item) => (
-                  <div key={item.name} className="flex items-center gap-2 text-xs">
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
-                    <span className="text-muted-foreground truncate">{item.name}</span>
-                    <span className="font-medium ml-auto">{item.value}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </AnimatedCard>
-        </div>
-
-        {/* Bottom Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-          {/* Calendar Widget */}
-          <UpcomingWidget delay={1200} />
-
-          {/* Recent Activities */}
-          <AnimatedCard delay={1300} className="lg:col-span-3">
-            <CardHeader className="flex flex-row items-center justify-between pb-3">
-              <CardTitle className="text-base font-medium">Recent Activities</CardTitle>
-              <button className="text-xs text-primary hover:underline flex items-center gap-1">
-                View all <ArrowRight className="w-3 h-3" />
-              </button>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3 max-h-[400px] overflow-y-auto">
-                {recentActivities.map((activity, i) => {
-                  const Icon = activity.icon
-                  const typeColors: Record<string, string> = {
-                    lead: "bg-blue-500/20 text-blue-400",
-                    project: "bg-green-500/20 text-green-400",
-                    task: "bg-purple-500/20 text-purple-400",
-                    meeting: "bg-amber-500/20 text-amber-400",
-                    alert: "bg-red-500/20 text-red-400",
-                  }
-                  return (
-                    <div key={i} className="flex gap-3 pb-3 border-b border-secondary/50 last:border-0 last:pb-0">
-                      <div className={`p-2 rounded-lg ${typeColors[activity.type]}`}>
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium">{activity.action}</p>
-                        <p className="text-xs text-muted-foreground truncate">{activity.detail}</p>
-                      </div>
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">{activity.time}</span>
-                    </div>
-                  )
-                })}
-              </div>
-            </CardContent>
-          </AnimatedCard>
-
-          {/* Recent Leads */}
-          <AnimatedCard delay={1400}>
-            <CardHeader className="flex flex-row items-center justify-between pb-3">
-              <CardTitle className="text-base font-medium">Recent Leads</CardTitle>
-              <button className="text-xs text-primary hover:underline flex items-center gap-1">
-                View all <ArrowRight className="w-3 h-3" />
-              </button>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {recentLeads.map((lead, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary/50 transition-colors cursor-pointer"
-                >
-                  <Avatar className="w-9 h-9">
-                    <AvatarFallback className="bg-primary/20 text-primary text-xs">{lead.avatar}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{lead.name}</p>
-                    <p className="text-xs text-muted-foreground truncate">{lead.company}</p>
-                  </div>
-                  <div className="text-right">
-                    <Badge
-                      variant="secondary"
-                      className={
-                        lead.status === "Hot"
-                          ? "bg-destructive/20 text-destructive border-0"
-                          : lead.status === "Warm"
-                            ? "bg-warning/20 text-warning border-0"
-                            : "bg-muted text-muted-foreground border-0"
-                      }
-                    >
-                      {lead.status}
-                    </Badge>
-                    <p className="text-xs text-muted-foreground mt-1">{lead.value}</p>
-                  </div>
+            {/* 5. Health KPIs & Active Projects */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
+                {/* Micro KPIs */}
+                <div className="grid grid-cols-2 gap-4">
+                  {kpis.map((kpi, i) => {
+                    const isPositive = kpi.trend.startsWith("+")
+                    const TrendIcon = isPositive ? TrendingUp : TrendingDown
+                    return (
+                      <AnimatedCard key={i} delay={800 + i * 50}>
+                        <CardContent className="p-4">
+                          <p className="text-xs text-muted-foreground mb-1">{kpi.label}</p>
+                          <div className="flex items-end justify-between">
+                            <p className="text-xl font-bold">{kpi.value}</p>
+                            <span className={`flex items-center gap-0.5 text-[10px] font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                              <TrendIcon className="w-3 h-3" />
+                              {kpi.trend}
+                            </span>
+                          </div>
+                        </CardContent>
+                      </AnimatedCard>
+                    )
+                  })}
                 </div>
-              ))}
-            </CardContent>
-          </AnimatedCard>
-
-          {/* Active Projects */}
-          <AnimatedCard delay={1500}>
-            <CardHeader className="flex flex-row items-center justify-between pb-3">
-              <CardTitle className="text-base font-medium">Active Projects</CardTitle>
-              <button className="p-1 rounded hover:bg-secondary transition-colors">
-                <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
-              </button>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {activeProjects.map((project, i) => (
-                <div key={i} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium">{project.name}</p>
-                      <p className="text-xs text-muted-foreground">{project.client}</p>
-                    </div>
-                    <span className="text-xs text-muted-foreground">{project.dueDate}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Progress value={project.progress} className="h-1.5 flex-1" />
-                    <span className="text-xs font-medium w-8">{project.progress}%</span>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </AnimatedCard>
-
-          {/* Team Performance */}
-          <AnimatedCard delay={1600}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base font-medium">Team Performance</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[220px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={teamPerformance} layout="vertical">
-                    <CartesianGrid strokeDasharray="3 3" stroke="#333" horizontal={false} />
-                    <XAxis type="number" stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis
-                      type="category"
-                      dataKey="name"
-                      stroke="#666"
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                      width={60}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#1a1a2e",
-                        border: "1px solid #333",
-                        borderRadius: "8px",
-                        fontSize: "12px",
-                      }}
-                    />
-                    <Bar dataKey="tasks" fill="#333" radius={[0, 4, 4, 0]} name="Total Tasks" />
-                    <Bar dataKey="completed" fill="#60a5fa" radius={[0, 4, 4, 0]} name="Completed" />
-                  </BarChart>
-                </ResponsiveContainer>
               </div>
-            </CardContent>
-          </AnimatedCard>
+
+              {/* Active Projects Mini-List */}
+              <AnimatedCard delay={900} className="flex flex-col">
+                <CardHeader className="flex flex-row items-center justify-between pb-3 pt-4 px-4">
+                  <CardTitle className="text-sm font-medium">Projects in Flight</CardTitle>
+                </CardHeader>
+                <CardContent className="px-4 pb-4 flex-1">
+                  <div className="space-y-4">
+                    {activeProjects.slice(0, 3).map((project, i) => (
+                      <div key={i} className="space-y-1.5">
+                        <div className="flex justify-between items-end">
+                          <div>
+                            <p className="text-sm font-medium leading-none">{project.name}</p>
+                            <p className="text-[10px] text-muted-foreground mt-1">{project.client}</p>
+                          </div>
+                          <span className="text-[10px] font-medium bg-secondary px-1.5 py-0.5 rounded text-muted-foreground">
+                            Due {project.dueDate}
+                          </span>
+                        </div>
+                        <Progress value={project.progress} className="h-1.5" />
+                      </div>
+                    ))}
+                  </div>
+                  <button className="w-full mt-4 text-xs text-muted-foreground hover:text-foreground transition-colors pb-1 border-b border-transparent hover:border-foreground mx-auto block text-center">
+                    View all projects
+                  </button>
+                </CardContent>
+              </AnimatedCard>
+            </div>
+
+            {/* 6. Team Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <AnimatedCard delay={1000}>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Team Performance</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[200px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={teamPerformance} layout="vertical">
+                        <CartesianGrid strokeDasharray="3 3" stroke="#333" horizontal={false} />
+                        <XAxis type="number" stroke="#666" fontSize={11} tickLine={false} axisLine={false} />
+                        <YAxis
+                          type="category"
+                          dataKey="name"
+                          stroke="#666"
+                          fontSize={11}
+                          tickLine={false}
+                          axisLine={false}
+                          width={60}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "#1a1a2e",
+                            border: "1px solid #333",
+                            borderRadius: "8px",
+                            fontSize: "12px",
+                          }}
+                        />
+                        <Bar dataKey="tasks" fill="#333" radius={[0, 4, 4, 0]} name="Total Tasks" maxBarSize={20} />
+                        <Bar dataKey="completed" fill="#60a5fa" radius={[0, 4, 4, 0]} name="Completed" maxBarSize={20} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </AnimatedCard>
+
+              {/* Team Status Snapshot [REAL DATA] */}
+              <AnimatedCard delay={1050} className="border-indigo-500/20 bg-gradient-to-br from-background to-indigo-500/5">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <Users className="w-4 h-4 text-indigo-500" />
+                    Team Status Today
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col justify-center h-[200px] space-y-6 pt-0">
+                  <div className="flex items-center justify-between px-2">
+                    <div className="space-y-1 text-center">
+                      <p className="text-3xl font-bold tracking-tight">{teamSnapshot.activeEmployees}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Members</p>
+                    </div>
+                    <div className="h-10 w-[1px] bg-border/50"></div>
+                    <div className="space-y-1 text-center">
+                      <p className="text-3xl font-bold tracking-tight text-amber-500">{teamSnapshot.onLeave}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">On Leave</p>
+                    </div>
+                    <div className="h-10 w-[1px] bg-border/50"></div>
+                    <div className="space-y-1 text-center">
+                      <p className="text-3xl font-bold tracking-tight text-green-500">{teamSnapshot.attendanceRate}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Present</p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Progress value={parseInt(teamSnapshot.attendanceRate)} className="h-1.5" />
+                    <p className="text-[10px] text-muted-foreground text-center">Live data from HR & Team module</p>
+                  </div>
+                </CardContent>
+              </AnimatedCard>
+            </div>
+
+          </div>
         </div>
       </div>
     </DashboardLayout >

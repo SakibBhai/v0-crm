@@ -1,7 +1,7 @@
 ﻿"use client"
 
 import type React from "react"
-import { useState, use } from "react"
+import { useState, use, useEffect } from "react"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { AnimatedCard } from "@/components/animated-card"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,8 +17,9 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { InvoiceDetailDialog } from "@/components/invoices/invoice-detail-dialog"
-import { sampleInvoices, samplePayments } from "@/lib/data/invoices"
-import type { Invoice, Payment } from "@/lib/types/finance"
+import { sampleInvoices, samplePayments, generateInvoiceNumber } from "@/lib/data/invoices"
+import type { Invoice, InvoiceItem, Payment } from "@/lib/types/finance"
+import { INVOICE_STATUS_CONFIG } from "@/lib/types/finance"
 import {
     ArrowLeft,
     Calendar,
@@ -49,20 +50,20 @@ import {
     Presentation,
     Receipt,
     Eye,
+    Settings2,
+    Repeat,
+    Trash2 as TrashIcon,
 } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
 import Link from "next/link"
 
 // Types
-interface Task {
-    id: string
-    title: string
-    status: "todo" | "in-progress" | "review" | "done"
-    priority: "low" | "medium" | "high"
-    assignee: string
-    dueDate: string
-    description?: string
-}
+import type { Task, TaskStatus, TaskPriority, TaskType } from "@/lib/types/task"
+import { PRIORITY_CONFIG, STATUS_CONFIG as TASK_STATUS_CONFIG, TASK_TYPE_CONFIG } from "@/lib/types/task"
+import { sampleTasks, teamMembers } from "@/lib/data/tasks"
+import { generateId } from "@/lib/id-generator"
+import { DatePicker } from "@/components/ui/date-picker"
+import { cn } from "@/lib/utils"
 
 interface TeamMember {
     id: string
@@ -97,6 +98,7 @@ interface Project {
     name: string
     description: string
     client: string
+    clientEmail?: string
     projectManager: string
     status: "planning" | "in-progress" | "review" | "completed" | "on-hold"
     progress: number
@@ -107,7 +109,9 @@ interface Project {
     briefLink?: string
     driveLink?: string
     researchLink?: string
-    tasks: Task[]
+    billingType: "one-time" | "recurring"
+    recurringInterval?: "monthly"
+    monthlyRate?: number
     team: TeamMember[]
     files: ProjectFile[]
     discussions: Discussion[]
@@ -120,6 +124,7 @@ const projectsMap: Record<string, Project> = {
         name: "E-commerce Redesign",
         description: "Complete website redesign with new branding, improved UX/UI, and modern technology stack. The project includes full responsive design, payment integration, and inventory management system.",
         client: "TechMart Solutions",
+        clientEmail: "billing@techmart.com",
         projectManager: "John Smith",
         status: "in-progress",
         progress: 75,
@@ -130,18 +135,7 @@ const projectsMap: Record<string, Project> = {
         briefLink: "https://docs.google.com/document/d/project-brief",
         driveLink: "https://drive.google.com/drive/folders/project-files",
         researchLink: "https://notion.so/research-documents",
-        tasks: [
-            { id: "1", title: "Design System Setup", status: "done", priority: "high", assignee: "SM", dueDate: "2024-10-20" },
-            { id: "2", title: "Homepage Wireframes", status: "done", priority: "high", assignee: "SM", dueDate: "2024-10-25" },
-            { id: "3", title: "Product Page Design", status: "done", priority: "medium", assignee: "SM", dueDate: "2024-11-01" },
-            { id: "4", title: "Cart & Checkout Flow", status: "done", priority: "high", assignee: "EC", dueDate: "2024-11-05" },
-            { id: "5", title: "Frontend Development", status: "in-progress", priority: "high", assignee: "JD", dueDate: "2024-11-20" },
-            { id: "6", title: "Backend API Integration", status: "in-progress", priority: "high", assignee: "JD", dueDate: "2024-11-25" },
-            { id: "7", title: "Payment Gateway Setup", status: "todo", priority: "high", assignee: "JD", dueDate: "2024-12-01" },
-            { id: "8", title: "User Testing", status: "todo", priority: "medium", assignee: "EC", dueDate: "2024-12-10" },
-            { id: "9", title: "Performance Optimization", status: "todo", priority: "medium", assignee: "JD", dueDate: "2024-12-15" },
-            { id: "10", title: "Launch Preparation", status: "todo", priority: "high", assignee: "JS", dueDate: "2024-12-25" },
-        ],
+        billingType: "one-time",
         team: [
             { id: "1", name: "John Smith", role: "Project Manager", workload: 60, tasksAssigned: 1 },
             { id: "2", name: "Sarah Mitchell", role: "UI/UX Designer", workload: 85, tasksAssigned: 3 },
@@ -165,18 +159,12 @@ const projectsMap: Record<string, Project> = {
     "PJ-0002": {
         id: "PJ-0002", name: "SEO Campaign Q4",
         description: "Comprehensive SEO optimization and content strategy for Q4.",
-        client: "GreenLife Organics", projectManager: "Emily Chen",
+        client: "GreenLife Organics", clientEmail: "accounts@greenlife.com", projectManager: "Emily Chen",
         status: "in-progress", progress: 45, budget: 12000, spent: 5400,
         startDate: "2024-11-01", deadline: "2025-01-05",
         briefLink: "https://docs.google.com/document/d/seo-brief",
         driveLink: "https://drive.google.com/drive/folders/seo-files",
-        tasks: [
-            { id: "1", title: "Technical SEO Audit", status: "done", priority: "high", assignee: "JW", dueDate: "2024-11-10" },
-            { id: "2", title: "Keyword Research", status: "done", priority: "high", assignee: "AT", dueDate: "2024-11-15" },
-            { id: "3", title: "On-Page Optimization", status: "in-progress", priority: "high", assignee: "JW", dueDate: "2024-11-30" },
-            { id: "4", title: "Content Calendar Creation", status: "in-progress", priority: "medium", assignee: "AT", dueDate: "2024-12-05" },
-            { id: "5", title: "Blog Posts (8x)", status: "todo", priority: "medium", assignee: "AT", dueDate: "2024-12-20" },
-        ],
+        billingType: "recurring", recurringInterval: "monthly", monthlyRate: 4000,
         team: [
             { id: "1", name: "Emily Chen", role: "SEO Manager", workload: 70, tasksAssigned: 0 },
             { id: "2", name: "Jake Wilson", role: "SEO Specialist", workload: 80, tasksAssigned: 3 },
@@ -188,15 +176,10 @@ const projectsMap: Record<string, Project> = {
     "PJ-0003": {
         id: "PJ-0003", name: "Social Media Strategy",
         description: "Full social media management and content calendar for FoodieHub.",
-        client: "FoodieHub", projectManager: "Sarah Mitchell",
+        client: "FoodieHub", clientEmail: "finance@foodiehub.com", projectManager: "Sarah Mitchell",
         status: "review", progress: 90, budget: 8000, spent: 7200,
         startDate: "2024-09-20", deadline: "2024-12-22",
-        tasks: [
-            { id: "1", title: "Social Media Audit", status: "done", priority: "high", assignee: "EC", dueDate: "2024-09-25" },
-            { id: "2", title: "Strategy Document", status: "done", priority: "high", assignee: "MB", dueDate: "2024-10-01" },
-            { id: "3", title: "Content Calendar Q4", status: "done", priority: "medium", assignee: "EC", dueDate: "2024-10-10" },
-            { id: "4", title: "Final Review", status: "review", priority: "high", assignee: "MB", dueDate: "2024-12-22" },
-        ],
+        billingType: "recurring", recurringInterval: "monthly", monthlyRate: 2000,
         team: [
             { id: "1", name: "Sarah Mitchell", role: "Social Media Manager", workload: 50, tasksAssigned: 0 },
             { id: "2", name: "Emily Chen", role: "Content Creator", workload: 60, tasksAssigned: 2 },
@@ -208,27 +191,20 @@ const projectsMap: Record<string, Project> = {
     "PJ-0004": {
         id: "PJ-0004", name: "PPC Management",
         description: "Google Ads and Meta advertising campaigns. Currently on hold.",
-        client: "AutoDeal Motors", projectManager: "David Park",
+        client: "AutoDeal Motors", clientEmail: "billing@autodeal.com", projectManager: "David Park",
         status: "on-hold", progress: 30, budget: 15000, spent: 4500,
         startDate: "2024-10-01", deadline: "2025-01-15",
-        tasks: [
-            { id: "1", title: "Campaign Audit", status: "done", priority: "high", assignee: "DP", dueDate: "2024-10-10" },
-            { id: "2", title: "Google Ads Setup", status: "in-progress", priority: "high", assignee: "JW", dueDate: "2024-10-25" },
-        ],
+        billingType: "recurring", recurringInterval: "monthly", monthlyRate: 3000,
         team: [{ id: "1", name: "David Park", role: "PPC Manager", workload: 30, tasksAssigned: 1 }, { id: "2", name: "Jake Wilson", role: "PPC Specialist", workload: 35, tasksAssigned: 2 }],
         files: [], discussions: [{ id: "1", author: "David Park", content: "On hold pending client budget approval.", timestamp: "2024-12-01T09:00:00", mentions: [] }],
     },
     "PJ-0005": {
         id: "PJ-0005", name: "Brand Identity Overhaul",
         description: "Complete rebranding including logo, colors, and guidelines.",
-        client: "LuxStay Hotels", projectManager: "John Smith",
+        client: "LuxStay Hotels", clientEmail: "ap@luxstay.com", projectManager: "John Smith",
         status: "planning", progress: 15, budget: 35000, spent: 5250,
         startDate: "2024-12-01", deadline: "2025-03-15",
-        tasks: [
-            { id: "1", title: "Brand Discovery Workshop", status: "done", priority: "high", assignee: "SM", dueDate: "2024-12-05" },
-            { id: "2", title: "Competitor Analysis", status: "in-progress", priority: "medium", assignee: "JD", dueDate: "2024-12-15" },
-            { id: "3", title: "Logo Concepts", status: "todo", priority: "high", assignee: "SM", dueDate: "2025-01-05" },
-        ],
+        billingType: "one-time",
         team: [
             { id: "1", name: "John Smith", role: "Project Manager", workload: 40, tasksAssigned: 0 },
             { id: "2", name: "Sarah Mitchell", role: "Lead Designer", workload: 55, tasksAssigned: 3 },
@@ -240,15 +216,10 @@ const projectsMap: Record<string, Project> = {
     "PJ-0006": {
         id: "PJ-0006", name: "Email Marketing Automation",
         description: "Automated email sequences and newsletters. Project completed.",
-        client: "TechMart Solutions", projectManager: "Emily Chen",
+        client: "TechMart Solutions", clientEmail: "billing@techmart.com", projectManager: "Emily Chen",
         status: "completed", progress: 100, budget: 6000, spent: 5800,
         startDate: "2024-08-15", deadline: "2024-11-30",
-        tasks: [
-            { id: "1", title: "Email Strategy", status: "done", priority: "high", assignee: "AT", dueDate: "2024-08-25" },
-            { id: "2", title: "Template Design", status: "done", priority: "high", assignee: "MB", dueDate: "2024-09-10" },
-            { id: "3", title: "Automation Setup", status: "done", priority: "high", assignee: "AT", dueDate: "2024-10-15" },
-            { id: "4", title: "Testing & Launch", status: "done", priority: "medium", assignee: "AT", dueDate: "2024-11-30" },
-        ],
+        billingType: "one-time",
         team: [
             { id: "1", name: "Emily Chen", role: "Project Manager", workload: 0, tasksAssigned: 0 },
             { id: "2", name: "Amy Thompson", role: "Email Specialist", workload: 0, tasksAssigned: 3 },
@@ -303,8 +274,10 @@ const fileIcons = {
 export default function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params)
     const [project, setProject] = useState<Project>(getProjectById(resolvedParams.id))
+    const [projectTasks, setProjectTasks] = useState<Task[]>(sampleTasks.filter(t => t.projectId === resolvedParams.id))
     const [activeTab, setActiveTab] = useState("overview")
     const [isAddTaskOpen, setIsAddTaskOpen] = useState(false)
+    const [initialStatus, setInitialStatus] = useState<TaskStatus>("todo")
     const [isEditOpen, setIsEditOpen] = useState(false)
     const [isRecordPaymentOpen, setIsRecordPaymentOpen] = useState(false)
     const [isGenerateInvoiceOpen, setIsGenerateInvoiceOpen] = useState(false)
@@ -317,10 +290,102 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
     const [isInvoiceDetailOpen, setIsInvoiceDetailOpen] = useState(false)
 
+    // Invoice form state
+    const [invoiceLineItems, setInvoiceLineItems] = useState<InvoiceItem[]>([
+        { id: "item-new-1", description: "", quantity: 1, unitPrice: 0, amount: 0 }
+    ])
+    const [invoiceTaxRate, setInvoiceTaxRate] = useState(5)
+    const [invoiceDiscount, setInvoiceDiscount] = useState(0)
+    const [invoiceNotes, setInvoiceNotes] = useState("")
+    const [invoicePaymentTerms, setInvoicePaymentTerms] = useState("30")
+    const [recordPaymentInvoiceId, setRecordPaymentInvoiceId] = useState("")
+    const [recordPaymentAmount, setRecordPaymentAmount] = useState("")
+    const [recordPaymentMethod, setRecordPaymentMethod] = useState("bank_transfer")
+
+    // Computed invoice form totals
+    const invoiceSubtotal = invoiceLineItems.reduce((sum, item) => sum + item.amount, 0)
+    const invoiceTaxAmount = invoiceSubtotal * (invoiceTaxRate / 100)
+    const invoiceTotal = invoiceSubtotal + invoiceTaxAmount - invoiceDiscount
+
+    // Helper to create an invoice
+    const createInvoiceFromData = (items: InvoiceItem[], notes?: string, isAuto?: boolean): Invoice => {
+        const subtotal = items.reduce((sum, item) => sum + item.amount, 0)
+        const taxAmt = subtotal * (invoiceTaxRate / 100)
+        const total = subtotal + taxAmt - invoiceDiscount
+        const now = new Date()
+        const dueDate = new Date(now.getTime() + Number(invoicePaymentTerms) * 24 * 60 * 60 * 1000)
+        return {
+            id: `inv-${Date.now()}`,
+            invoiceNumber: generateInvoiceNumber(invoices),
+            projectId: project.id,
+            projectName: project.name,
+            clientId: project.id,
+            clientName: project.client,
+            clientEmail: project.clientEmail || "",
+            subtotal,
+            taxRate: invoiceTaxRate,
+            taxAmount: taxAmt,
+            discount: invoiceDiscount,
+            totalAmount: total,
+            amountPaid: 0,
+            amountDue: total,
+            status: isAuto ? "sent" : "draft",
+            issueDate: now.toISOString().split("T")[0],
+            dueDate: dueDate.toISOString().split("T")[0],
+            items,
+            notes: notes || invoiceNotes || undefined,
+            terms: `Payment due within ${invoicePaymentTerms} days.`,
+            createdAt: now.toISOString(),
+            updatedAt: now.toISOString(),
+        }
+    }
+
+    // Auto-invoice: when one-time project completed, generate final invoice
+    useEffect(() => {
+        if (project.status === "completed" && project.billingType === "one-time") {
+            const hasCompletionInvoice = invoices.some(inv =>
+                inv.notes?.includes("Auto-generated") && inv.projectId === project.id
+            )
+            if (!hasCompletionInvoice) {
+                const remainingAmount = project.budget - project.spent
+                if (remainingAmount > 0) {
+                    const autoInvoice = createInvoiceFromData(
+                        [{ id: `item-auto-${Date.now()}`, description: `Final Payment - ${project.name}`, quantity: 1, unitPrice: remainingAmount, amount: remainingAmount }],
+                        `Auto-generated invoice upon project completion for ${project.name}.`,
+                        true
+                    )
+                    setInvoices(prev => [autoInvoice, ...prev])
+                }
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [project.status])
+
+    // Auto-invoice: for recurring projects, check if monthly invoice is due
+    useEffect(() => {
+        if (project.billingType === "recurring" && project.monthlyRate && project.status !== "on-hold") {
+            const now = new Date()
+            const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
+            const hasThisMonthInvoice = invoices.some(inv =>
+                inv.projectId === project.id && inv.issueDate.startsWith(currentMonth)
+            )
+            if (!hasThisMonthInvoice) {
+                const monthName = now.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+                const autoInvoice = createInvoiceFromData(
+                    [{ id: `item-rec-${Date.now()}`, description: `Monthly Service - ${project.name} (${monthName})`, quantity: 1, unitPrice: project.monthlyRate, amount: project.monthlyRate }],
+                    `Auto-generated monthly invoice for ${project.name}.`,
+                    true
+                )
+                setInvoices(prev => [autoInvoice, ...prev])
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
     const StatusIcon = statusConfig[project.status].icon
 
-    const completedTasks = project.tasks.filter(t => t.status === "done").length
-    const taskCompletionRate = Math.round((completedTasks / project.tasks.length) * 100)
+    const completedTasks = projectTasks.filter(t => t.status === "done").length
+    const taskCompletionRate = projectTasks.length > 0 ? Math.round((completedTasks / projectTasks.length) * 100) : 0
     const budgetUsedPercent = Math.round((project.spent / project.budget) * 100)
 
     const handleSendMessage = () => {
@@ -410,7 +475,91 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     const totalPaid = invoices.reduce((sum, inv) => sum + inv.amountPaid, 0)
     const totalOutstanding = invoices.reduce((sum, inv) => sum + inv.amountDue, 0)
 
-    const taskStatuses: Array<"todo" | "in-progress" | "review" | "done"> = ["todo", "in-progress", "review", "done"]
+    // Project payments (filtered)
+    const projectPayments = payments.filter(p => invoices.some(inv => inv.id === p.invoiceId))
+
+    // Unpaid invoices for payment dropdown
+    const unpaidInvoices = invoices.filter(inv => inv.status !== "paid" && inv.status !== "cancelled" && inv.status !== "draft")
+
+    // Generate Invoice form submit
+    const handleGenerateInvoice = (e: React.FormEvent) => {
+        e.preventDefault()
+        if (invoiceLineItems.every(item => item.amount === 0)) return
+        const newInvoice = createInvoiceFromData(invoiceLineItems.filter(item => item.amount > 0))
+        setInvoices(prev => [newInvoice, ...prev])
+        setIsGenerateInvoiceOpen(false)
+        // Reset form
+        setInvoiceLineItems([{ id: `item-new-${Date.now()}`, description: "", quantity: 1, unitPrice: 0, amount: 0 }])
+        setInvoiceDiscount(0)
+        setInvoiceNotes("")
+    }
+
+    // Record Payment form submit
+    const handleRecordPaymentSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!recordPaymentInvoiceId || !recordPaymentAmount) return
+        handleRecordPaymentForInvoice(recordPaymentInvoiceId, Number(recordPaymentAmount))
+        setIsRecordPaymentOpen(false)
+        setRecordPaymentInvoiceId("")
+        setRecordPaymentAmount("")
+    }
+
+    // Line item helpers
+    const addLineItem = () => {
+        setInvoiceLineItems(prev => [...prev, { id: `item-new-${Date.now()}`, description: "", quantity: 1, unitPrice: 0, amount: 0 }])
+    }
+    const removeLineItem = (id: string) => {
+        if (invoiceLineItems.length <= 1) return
+        setInvoiceLineItems(prev => prev.filter(item => item.id !== id))
+    }
+    const updateLineItem = (id: string, field: keyof InvoiceItem, value: string | number) => {
+        setInvoiceLineItems(prev => prev.map(item => {
+            if (item.id !== id) return item
+            const updated = { ...item, [field]: value }
+            if (field === "quantity" || field === "unitPrice") {
+                updated.amount = Number(updated.quantity) * Number(updated.unitPrice)
+            }
+            return updated
+        }))
+    }
+
+    const taskStatuses: Array<"todo" | "in-progress" | "in-review" | "done"> = ["todo", "in-progress", "in-review", "done"]
+
+    const handleCreateTask = (formData: FormData) => {
+        const newTask: Task = {
+            id: generateId("TSK", projectTasks),
+            title: formData.get("title") as string,
+            description: formData.get("description") as string || "",
+            status: formData.get("status") as TaskStatus || initialStatus,
+            priority: formData.get("priority") as TaskPriority || "medium",
+            taskType: formData.get("taskType") as TaskType || "general",
+            projectId: project.id,
+            projectName: project.name,
+            assignees: [teamMembers.find((m) => m.id === formData.get("assignee")) || teamMembers[0]],
+            assignedById: "2",
+            assignedByName: "Ali Hasan",
+            reporterId: "2",
+            reporterName: "Ali Hasan",
+            dueDate: formData.get("dueDate") as string || new Date().toISOString().split("T")[0],
+            startDate: formData.get("startDate") as string || new Date().toISOString().split("T")[0],
+            tags: (formData.get("tags") as string || "").split(",").map((t) => t.trim()).filter(Boolean),
+            subtasks: [],
+            comments: [],
+            attachments: [],
+            dependencies: [],
+            timeEntries: [],
+            referenceLinks: [],
+            estimatedHours: Number(formData.get("estimatedHours")) || 0,
+            actualHours: 0,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            activityLog: [{ id: "1", timestamp: new Date().toISOString(), userId: "2", userName: "Ali Hasan", action: "created task" }],
+            isBlocked: false,
+            isRecurring: false,
+        }
+        setProjectTasks((prev) => [newTask, ...prev])
+        setIsAddTaskOpen(false)
+    }
 
     return (
         <DashboardLayout>
@@ -625,7 +774,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                                         </div>
                                     </div>
                                     <div className="mt-4 text-center text-sm text-muted-foreground">
-                                        {completedTasks} of {project.tasks.length} tasks completed
+                                        {completedTasks} of {projectTasks.length} tasks completed
                                     </div>
                                 </AnimatedCard>
                             </div>
@@ -660,37 +809,61 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                         {taskViewMode === "kanban" && (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto pb-4">
                                 {taskStatuses.map((status) => {
-                                    const statusTasks = project.tasks.filter(t => t.status === status)
+                                    const statusTasks = projectTasks.filter(t => t.status === status)
                                     return (
-                                        <AnimatedCard key={status} hover={false} className="min-w-[250px]">
+                                        <AnimatedCard key={status} hover={false} className="min-w-[250px] bg-secondary/20">
                                             <CardHeader className="pb-3">
                                                 <CardTitle className="text-sm font-medium flex items-center justify-between">
-                                                    <Badge className={`${taskStatusConfig[status].color} border-0`}>
-                                                        {taskStatusConfig[status].label}
+                                                    <Badge className={`${TASK_STATUS_CONFIG[status].color} border-0`}>
+                                                        {TASK_STATUS_CONFIG[status].label}
                                                     </Badge>
                                                     <span className="text-muted-foreground">{statusTasks.length}</span>
                                                 </CardTitle>
                                             </CardHeader>
                                             <CardContent className="space-y-2 max-h-[400px] overflow-y-auto">
                                                 {statusTasks.map((task) => (
-                                                    <div key={task.id} className="p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors cursor-pointer group">
+                                                    <div key={task.id} className="p-3 rounded-lg bg-background border border-border/50 hover:border-primary/50 transition-colors cursor-pointer group">
                                                         <div className="flex items-start justify-between gap-2">
-                                                            <p className="font-medium text-sm">{task.title}</p>
-                                                            <GripVertical className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                            <p className="font-medium text-sm leading-tight">{task.title}</p>
+                                                            <GripVertical className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                                                         </div>
-                                                        <div className="flex items-center justify-between mt-2">
-                                                            <Badge className={`${priorityConfig[task.priority].color} border-0 text-xs`}>
-                                                                {task.priority}
-                                                            </Badge>
+                                                        {task.description && (
+                                                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{task.description}</p>
+                                                        )}
+                                                        <div className="flex items-center justify-between mt-3">
                                                             <div className="flex items-center gap-2">
-                                                                <Avatar className="w-5 h-5">
-                                                                    <AvatarFallback className="text-[8px] bg-primary/20 text-primary">{task.assignee}</AvatarFallback>
-                                                                </Avatar>
-                                                                <span className="text-xs text-muted-foreground">{new Date(task.dueDate).toLocaleDateString()}</span>
+                                                                <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 border-0", PRIORITY_CONFIG[task.priority].color.replace("text-", "bg-") / 10, PRIORITY_CONFIG[task.priority].color)}>
+                                                                    {PRIORITY_CONFIG[task.priority].label}
+                                                                </Badge>
+                                                                {task.taskType && TASK_TYPE_CONFIG[task.taskType] && (
+                                                                    <span className="text-muted-foreground scale-75" title={TASK_TYPE_CONFIG[task.taskType].label}>
+                                                                        {TASK_TYPE_CONFIG[task.taskType].icon}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                                                    <Clock className="w-3 h-3" />
+                                                                    {new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                                                </span>
+                                                                <div className="flex -space-x-2">
+                                                                    {task.assignees.slice(0, 3).map((assignee, i) => (
+                                                                        <Avatar key={i} className="w-5 h-5 border border-background">
+                                                                            <AvatarFallback className="text-[8px] bg-primary/10 text-primary">
+                                                                                {assignee.name.split(' ').map(n => n[0]).join('')}
+                                                                            </AvatarFallback>
+                                                                        </Avatar>
+                                                                    ))}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 ))}
+                                                {statusTasks.length === 0 && (
+                                                    <div className="p-4 text-center border-2 border-dashed border-border rounded-lg text-muted-foreground text-sm">
+                                                        No tasks
+                                                    </div>
+                                                )}
                                             </CardContent>
                                         </AnimatedCard>
                                     )
@@ -704,36 +877,67 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                                     <div className="overflow-x-auto">
                                         <table className="w-full">
                                             <thead>
-                                                <tr className="border-b border-border">
-                                                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Task</th>
-                                                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Status</th>
-                                                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Priority</th>
-                                                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Assignee</th>
-                                                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Due Date</th>
+                                                <tr className="border-b border-border bg-secondary/30">
+                                                    <th className="text-left py-3 px-4 text-xs font-semibold text-muted-foreground">Task</th>
+                                                    <th className="text-left py-3 px-4 text-xs font-semibold text-muted-foreground">Type</th>
+                                                    <th className="text-left py-3 px-4 text-xs font-semibold text-muted-foreground">Status</th>
+                                                    <th className="text-left py-3 px-4 text-xs font-semibold text-muted-foreground">Priority</th>
+                                                    <th className="text-left py-3 px-4 text-xs font-semibold text-muted-foreground">Assignees</th>
+                                                    <th className="text-left py-3 px-4 text-xs font-semibold text-muted-foreground">Due Date</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {project.tasks.map((task) => (
-                                                    <tr key={task.id} className="border-b border-border/50 hover:bg-secondary/30 transition-colors cursor-pointer">
-                                                        <td className="py-3 px-4 font-medium text-sm">{task.title}</td>
+                                                {projectTasks.map((task) => (
+                                                    <tr key={task.id} className="border-b border-border/50 hover:bg-secondary/30 transition-colors cursor-pointer text-sm">
+                                                        <td className="py-3 px-4 font-medium">
+                                                            <div className="flex flex-col">
+                                                                <span>{task.title}</span>
+                                                                <span className="text-xs text-muted-foreground font-normal truncate max-w-[200px]">{task.description}</span>
+                                                            </div>
+                                                        </td>
                                                         <td className="py-3 px-4">
-                                                            <Badge className={`${taskStatusConfig[task.status].color} border-0`}>
-                                                                {taskStatusConfig[task.status].label}
+                                                            {task.taskType && TASK_TYPE_CONFIG[task.taskType] && (
+                                                                <div className="flex items-center gap-1.5 text-muted-foreground bg-secondary/50 w-fit px-2 py-1 rounded-md text-xs">
+                                                                    <span className="scale-75">{TASK_TYPE_CONFIG[task.taskType].icon}</span>
+                                                                    <span>{TASK_TYPE_CONFIG[task.taskType].label}</span>
+                                                                </div>
+                                                            )}
+                                                        </td>
+                                                        <td className="py-3 px-4">
+                                                            <Badge className={`${TASK_STATUS_CONFIG[task.status].color} border-0`}>
+                                                                {TASK_STATUS_CONFIG[task.status].label}
                                                             </Badge>
                                                         </td>
                                                         <td className="py-3 px-4">
-                                                            <Badge className={`${priorityConfig[task.priority].color} border-0`}>
-                                                                {task.priority}
+                                                            <Badge variant="outline" className={cn("border-0 gap-1.5", PRIORITY_CONFIG[task.priority].color.replace("text-", "bg-") / 10, PRIORITY_CONFIG[task.priority].color)}>
+                                                                <span className={cn("w-1.5 h-1.5 rounded-full", PRIORITY_CONFIG[task.priority].color.replace("text-", "bg-"))} />
+                                                                {PRIORITY_CONFIG[task.priority].label}
                                                             </Badge>
                                                         </td>
                                                         <td className="py-3 px-4">
-                                                            <Avatar className="w-6 h-6">
-                                                                <AvatarFallback className="text-xs bg-primary/20 text-primary">{task.assignee}</AvatarFallback>
-                                                            </Avatar>
+                                                            <div className="flex -space-x-2">
+                                                                {task.assignees.map((assignee, i) => (
+                                                                    <Avatar key={i} className="w-6 h-6 border-2 border-background">
+                                                                        <AvatarFallback className="text-[10px] bg-primary/20 text-primary">
+                                                                            {assignee.name.split(' ').map(n => n[0]).join('')}
+                                                                        </AvatarFallback>
+                                                                    </Avatar>
+                                                                ))}
+                                                            </div>
                                                         </td>
-                                                        <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(task.dueDate).toLocaleDateString()}</td>
+                                                        <td className="py-3 px-4 text-muted-foreground flex items-center gap-2">
+                                                            <Calendar className="w-3.5 h-3.5" />
+                                                            {new Date(task.dueDate).toLocaleDateString()}
+                                                        </td>
                                                     </tr>
                                                 ))}
+                                                {projectTasks.length === 0 && (
+                                                    <tr>
+                                                        <td colSpan={6} className="py-8 text-center text-muted-foreground">
+                                                            No tasks found for this project.
+                                                        </td>
+                                                    </tr>
+                                                )}
                                             </tbody>
                                         </table>
                                     </div>
@@ -932,9 +1136,15 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                     {/* Billing Tab */}
                     <TabsContent value="billing" className="space-y-6 mt-6">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div>
-                                <h3 className="font-semibold text-lg">Invoices & Payments</h3>
-                                <p className="text-sm text-muted-foreground">Manage billing for this project</p>
+                            <div className="flex items-center gap-3">
+                                <div>
+                                    <h3 className="font-semibold text-lg">Invoices & Payments</h3>
+                                    <p className="text-sm text-muted-foreground">Manage billing for this project</p>
+                                </div>
+                                <Badge className={`${project.billingType === "recurring" ? "bg-blue-500/20 text-blue-400" : "bg-green-500/20 text-green-400"} border-0 gap-1.5`}>
+                                    {project.billingType === "recurring" ? <Repeat className="w-3 h-3" /> : <DollarSign className="w-3 h-3" />}
+                                    {project.billingType === "recurring" ? "Recurring" : "One-Time"}
+                                </Badge>
                             </div>
                             <div className="flex gap-2">
                                 <Button variant="outline" className="gap-2" onClick={() => setIsRecordPaymentOpen(true)}>
@@ -949,13 +1159,14 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                         </div>
 
                         {/* Billing Stats */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className={`grid grid-cols-1 ${project.billingType === "recurring" ? "sm:grid-cols-4" : "sm:grid-cols-3"} gap-4`}>
                             <AnimatedCard className="p-4">
                                 <div className="flex items-center gap-2 text-muted-foreground text-sm mb-2">
-                                    <DollarSign className="w-4 h-4" />
+                                    <Receipt className="w-4 h-4" />
                                     Total Billed
                                 </div>
                                 <p className="text-2xl font-bold text-primary">${totalBilled.toLocaleString()}</p>
+                                <p className="text-xs text-muted-foreground mt-1">{invoices.length} invoice{invoices.length !== 1 ? "s" : ""}</p>
                             </AnimatedCard>
                             <AnimatedCard className="p-4" delay={50}>
                                 <div className="flex items-center gap-2 text-muted-foreground text-sm mb-2">
@@ -963,6 +1174,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                                     Paid
                                 </div>
                                 <p className="text-2xl font-bold text-green-500">${totalPaid.toLocaleString()}</p>
+                                <p className="text-xs text-muted-foreground mt-1">{totalBilled > 0 ? Math.round((totalPaid / totalBilled) * 100) : 0}% collected</p>
                             </AnimatedCard>
                             <AnimatedCard className="p-4" delay={100}>
                                 <div className="flex items-center gap-2 text-muted-foreground text-sm mb-2">
@@ -970,57 +1182,75 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                                     Outstanding
                                 </div>
                                 <p className="text-2xl font-bold text-yellow-500">${totalOutstanding.toLocaleString()}</p>
+                                <p className="text-xs text-muted-foreground mt-1">{unpaidInvoices.length} unpaid</p>
                             </AnimatedCard>
+                            {project.billingType === "recurring" && (
+                                <AnimatedCard className="p-4" delay={150}>
+                                    <div className="flex items-center gap-2 text-muted-foreground text-sm mb-2">
+                                        <Repeat className="w-4 h-4" />
+                                        Monthly Rate
+                                    </div>
+                                    <p className="text-2xl font-bold text-blue-400">${(project.monthlyRate || 0).toLocaleString()}</p>
+                                    <p className="text-xs text-muted-foreground mt-1">per month</p>
+                                </AnimatedCard>
+                            )}
                         </div>
 
                         {/* Invoices Table */}
-                        <AnimatedCard delay={150}>
+                        <AnimatedCard delay={200}>
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-sm font-medium">All Invoices</CardTitle>
+                            </CardHeader>
                             <CardContent className="p-0">
                                 <div className="overflow-x-auto">
                                     <table className="w-full">
                                         <thead>
-                                            <tr className="border-b border-border">
-                                                <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Invoice #</th>
-                                                <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Date</th>
-                                                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">Amount</th>
-                                                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">Paid</th>
-                                                <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Status</th>
-                                                <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground">Due Date</th>
-                                                <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground">Actions</th>
+                                            <tr className="border-b border-border bg-secondary/30">
+                                                <th className="text-left py-3 px-4 text-xs font-semibold text-muted-foreground">Invoice #</th>
+                                                <th className="text-left py-3 px-4 text-xs font-semibold text-muted-foreground">Issue Date</th>
+                                                <th className="text-right py-3 px-4 text-xs font-semibold text-muted-foreground">Amount</th>
+                                                <th className="text-right py-3 px-4 text-xs font-semibold text-muted-foreground">Tax</th>
+                                                <th className="text-right py-3 px-4 text-xs font-semibold text-muted-foreground">Paid</th>
+                                                <th className="text-left py-3 px-4 text-xs font-semibold text-muted-foreground">Status</th>
+                                                <th className="text-left py-3 px-4 text-xs font-semibold text-muted-foreground">Due Date</th>
+                                                <th className="text-right py-3 px-4 text-xs font-semibold text-muted-foreground">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {invoices.map((invoice) => {
-                                                const statusColors: Record<string, string> = {
-                                                    draft: "bg-muted text-muted-foreground",
-                                                    sent: "bg-blue-500/20 text-blue-400",
-                                                    partial: "bg-yellow-500/20 text-yellow-400",
-                                                    paid: "bg-green-500/20 text-green-400",
-                                                    overdue: "bg-red-500/20 text-red-400",
-                                                    cancelled: "bg-gray-500/20 text-gray-400",
-                                                }
+                                                const statusCfg = INVOICE_STATUS_CONFIG[invoice.status] || { label: invoice.status, color: "bg-muted text-muted-foreground" }
+                                                const isOverdue = !invoice.paidDate && new Date(invoice.dueDate) < new Date() && invoice.status !== "paid" && invoice.status !== "cancelled"
                                                 return (
-                                                    <tr key={invoice.id} className="border-b border-border/50 hover:bg-secondary/30 transition-colors">
-                                                        <td className="py-3 px-4 font-mono text-sm">{invoice.invoiceNumber}</td>
-                                                        <td className="py-3 px-4 text-sm">{new Date(invoice.issueDate).toLocaleDateString()}</td>
+                                                    <tr key={invoice.id} className="border-b border-border/50 hover:bg-secondary/30 transition-colors cursor-pointer" onClick={() => handleViewInvoice(invoice)}>
+                                                        <td className="py-3 px-4">
+                                                            <span className="font-mono text-sm font-medium">{invoice.invoiceNumber}</span>
+                                                            {invoice.notes?.includes("Auto-generated") && (
+                                                                <Badge variant="outline" className="ml-2 text-[10px] px-1.5 py-0">Auto</Badge>
+                                                            )}
+                                                        </td>
+                                                        <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(invoice.issueDate).toLocaleDateString()}</td>
                                                         <td className="py-3 px-4 text-sm font-medium text-right">${invoice.totalAmount.toLocaleString()}</td>
+                                                        <td className="py-3 px-4 text-sm text-muted-foreground text-right">${invoice.taxAmount.toLocaleString()}</td>
                                                         <td className="py-3 px-4 text-sm text-green-500 text-right">${invoice.amountPaid.toLocaleString()}</td>
                                                         <td className="py-3 px-4">
-                                                            <Badge className={`${statusColors[invoice.status]} border-0 capitalize`}>
-                                                                {invoice.status}
+                                                            <Badge className={`${isOverdue ? "bg-red-500/20 text-red-400" : statusCfg.color} border-0`}>
+                                                                {isOverdue ? "Overdue" : statusCfg.label}
                                                             </Badge>
                                                         </td>
                                                         <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(invoice.dueDate).toLocaleDateString()}</td>
-                                                        <td className="py-3 px-4 text-right">
+                                                        <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                                                             <div className="flex items-center justify-end gap-1">
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="sm"
-                                                                    className="gap-1"
+                                                                    className="gap-1 text-xs"
                                                                     onClick={() => handleViewInvoice(invoice)}
                                                                 >
                                                                     <Eye className="w-3.5 h-3.5" />
                                                                     View
+                                                                </Button>
+                                                                <Button variant="ghost" size="sm">
+                                                                    <Send className="w-3.5 h-3.5" />
                                                                 </Button>
                                                                 <Button variant="ghost" size="sm">
                                                                     <Download className="w-3.5 h-3.5" />
@@ -1032,8 +1262,10 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                                             })}
                                             {invoices.length === 0 && (
                                                 <tr>
-                                                    <td colSpan={7} className="py-8 text-center text-muted-foreground">
-                                                        No invoices yet. Click "Generate Invoice" to create one.
+                                                    <td colSpan={8} className="py-12 text-center">
+                                                        <Receipt className="w-8 h-8 mx-auto text-muted-foreground/50 mb-2" />
+                                                        <p className="text-muted-foreground text-sm">No invoices yet</p>
+                                                        <p className="text-muted-foreground text-xs mt-1">Click &quot;Generate Invoice&quot; to create one</p>
                                                     </td>
                                                 </tr>
                                             )}
@@ -1044,23 +1276,33 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                         </AnimatedCard>
 
                         {/* Payment History */}
-                        <div>
-                            <h4 className="font-medium mb-3">Recent Payments</h4>
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 rounded-lg bg-green-500/20">
-                                            <CheckCircle className="w-4 h-4 text-green-500" />
+                        <AnimatedCard delay={250}>
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-sm font-medium">Payment History</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-2">
+                                    {projectPayments.length > 0 ? projectPayments.slice(0, 10).map((payment) => (
+                                        <div key={payment.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 hover:bg-secondary/70 transition-colors">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 rounded-lg bg-green-500/20">
+                                                    <CheckCircle className="w-4 h-4 text-green-500" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium text-sm">${payment.amount.toLocaleString()} received</p>
+                                                    <p className="text-xs text-muted-foreground">{payment.invoiceNumber} • {payment.paymentMethod.replace("_", " ")}</p>
+                                                </div>
+                                            </div>
+                                            <span className="text-xs text-muted-foreground">{new Date(payment.paymentDate).toLocaleDateString()}</span>
                                         </div>
-                                        <div>
-                                            <p className="font-medium text-sm">$10,000.00 received</p>
-                                            <p className="text-xs text-muted-foreground">INV-2024-001 â€¢ Bank Transfer</p>
+                                    )) : (
+                                        <div className="py-6 text-center text-muted-foreground text-sm">
+                                            No payments recorded yet
                                         </div>
-                                    </div>
-                                    <span className="text-xs text-muted-foreground">Dec 10, 2024</span>
+                                    )}
                                 </div>
-                            </div>
-                        </div>
+                            </CardContent>
+                        </AnimatedCard>
                     </TabsContent>
                 </Tabs>
 
@@ -1219,23 +1461,38 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                             </DialogTitle>
                             <DialogDescription>Record a payment received for this project</DialogDescription>
                         </DialogHeader>
-                        <form className="space-y-4">
+                        <form onSubmit={handleRecordPaymentSubmit} className="space-y-4">
                             <div className="space-y-2">
                                 <Label>Invoice</Label>
-                                <Select defaultValue="inv-001">
+                                <Select value={recordPaymentInvoiceId} onValueChange={(val) => {
+                                    setRecordPaymentInvoiceId(val)
+                                    const inv = invoices.find(i => i.id === val)
+                                    if (inv) setRecordPaymentAmount(String(inv.amountDue))
+                                }}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select invoice" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="inv-001">INV-2024-001 - $19,425.00 (Partial)</SelectItem>
-                                        <SelectItem value="inv-004">INV-2024-004 - $5,512.50 (Sent)</SelectItem>
+                                        {unpaidInvoices.length > 0 ? unpaidInvoices.map(inv => (
+                                            <SelectItem key={inv.id} value={inv.id}>
+                                                {inv.invoiceNumber} - ${inv.amountDue.toLocaleString()} ({inv.status})
+                                            </SelectItem>
+                                        )) : (
+                                            <SelectItem value="none" disabled>No unpaid invoices</SelectItem>
+                                        )}
                                     </SelectContent>
                                 </Select>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label>Amount ($)</Label>
-                                    <Input type="number" placeholder="0.00" defaultValue="9425" />
+                                    <Input
+                                        type="number"
+                                        placeholder="0.00"
+                                        value={recordPaymentAmount}
+                                        onChange={(e) => setRecordPaymentAmount(e.target.value)}
+                                        required
+                                    />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Payment Date</Label>
@@ -1244,16 +1501,16 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                             </div>
                             <div className="space-y-2">
                                 <Label>Payment Method</Label>
-                                <Select defaultValue="bank_transfer">
+                                <Select value={recordPaymentMethod} onValueChange={setRecordPaymentMethod}>
                                     <SelectTrigger>
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="bank_transfer">ðŸ¦ Bank Transfer</SelectItem>
-                                        <SelectItem value="credit_card">ðŸ’³ Credit Card</SelectItem>
-                                        <SelectItem value="cash">ðŸ’µ Cash</SelectItem>
-                                        <SelectItem value="check">ðŸ“ Check</SelectItem>
-                                        <SelectItem value="other">ðŸ“‹ Other</SelectItem>
+                                        <SelectItem value="bank_transfer">🏦 Bank Transfer</SelectItem>
+                                        <SelectItem value="credit_card">💳 Credit Card</SelectItem>
+                                        <SelectItem value="cash">💵 Cash</SelectItem>
+                                        <SelectItem value="check">📄 Check</SelectItem>
+                                        <SelectItem value="other">📋 Other</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -1267,7 +1524,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                             </div>
                             <DialogFooter>
                                 <Button type="button" variant="outline" onClick={() => setIsRecordPaymentOpen(false)}>Cancel</Button>
-                                <Button type="submit" className="gap-2">
+                                <Button type="submit" className="gap-2" disabled={!recordPaymentInvoiceId || !recordPaymentAmount}>
                                     <CheckCircle className="w-4 h-4" />
                                     Record Payment
                                 </Button>
@@ -1278,7 +1535,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
 
                 {/* Generate Invoice Dialog */}
                 <Dialog open={isGenerateInvoiceOpen} onOpenChange={setIsGenerateInvoiceOpen}>
-                    <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                    <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle className="flex items-center gap-2">
                                 <Receipt className="w-5 h-5 text-primary" />
@@ -1286,25 +1543,44 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                             </DialogTitle>
                             <DialogDescription>Create a new invoice for {project.name}</DialogDescription>
                         </DialogHeader>
-                        <form className="space-y-4">
+                        <form onSubmit={handleGenerateInvoice} className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label>Invoice Number</Label>
-                                    <Input value="INV-2024-005" readOnly className="bg-secondary" />
+                                    <Input value={generateInvoiceNumber(invoices)} readOnly className="bg-secondary font-mono" />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Issue Date</Label>
                                     <Input type="date" defaultValue={new Date().toISOString().split('T')[0]} />
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-3 gap-4">
                                 <div className="space-y-2">
                                     <Label>Client</Label>
                                     <Input value={project.client} readOnly className="bg-secondary" />
                                 </div>
                                 <div className="space-y-2">
+                                    <Label>Payment Terms</Label>
+                                    <Select value={invoicePaymentTerms} onValueChange={setInvoicePaymentTerms}>
+                                        <SelectTrigger>
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="15">Net 15</SelectItem>
+                                            <SelectItem value="30">Net 30</SelectItem>
+                                            <SelectItem value="45">Net 45</SelectItem>
+                                            <SelectItem value="60">Net 60</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
                                     <Label>Due Date</Label>
-                                    <Input type="date" />
+                                    <Input
+                                        type="date"
+                                        value={new Date(Date.now() + Number(invoicePaymentTerms) * 86400000).toISOString().split('T')[0]}
+                                        readOnly
+                                        className="bg-secondary"
+                                    />
                                 </div>
                             </div>
 
@@ -1315,57 +1591,105 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                                         <thead className="bg-secondary">
                                             <tr>
                                                 <th className="text-left py-2 px-3 font-medium">Description</th>
-                                                <th className="text-center py-2 px-3 font-medium w-16">Qty</th>
-                                                <th className="text-right py-2 px-3 font-medium w-24">Rate</th>
-                                                <th className="text-right py-2 px-3 font-medium w-24">Amount</th>
+                                                <th className="text-center py-2 px-3 font-medium w-20">Qty</th>
+                                                <th className="text-right py-2 px-3 font-medium w-28">Rate</th>
+                                                <th className="text-right py-2 px-3 font-medium w-28">Amount</th>
+                                                <th className="w-10"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr className="border-t border-border">
-                                                <td className="py-2 px-3">
-                                                    <Input placeholder="Service description" className="h-8" defaultValue="Project Development" />
-                                                </td>
-                                                <td className="py-2 px-3">
-                                                    <Input type="number" className="h-8 text-center" defaultValue="1" />
-                                                </td>
-                                                <td className="py-2 px-3">
-                                                    <Input type="number" className="h-8 text-right" defaultValue="5000" />
-                                                </td>
-                                                <td className="py-2 px-3 text-right font-medium">$5,000</td>
-                                            </tr>
+                                            {invoiceLineItems.map((item) => (
+                                                <tr key={item.id} className="border-t border-border">
+                                                    <td className="py-2 px-3">
+                                                        <Input
+                                                            placeholder="Service description"
+                                                            className="h-8"
+                                                            value={item.description}
+                                                            onChange={(e) => updateLineItem(item.id, "description", e.target.value)}
+                                                        />
+                                                    </td>
+                                                    <td className="py-2 px-3">
+                                                        <Input
+                                                            type="number"
+                                                            className="h-8 text-center"
+                                                            value={item.quantity}
+                                                            min={1}
+                                                            onChange={(e) => updateLineItem(item.id, "quantity", Number(e.target.value))}
+                                                        />
+                                                    </td>
+                                                    <td className="py-2 px-3">
+                                                        <Input
+                                                            type="number"
+                                                            className="h-8 text-right"
+                                                            value={item.unitPrice}
+                                                            min={0}
+                                                            onChange={(e) => updateLineItem(item.id, "unitPrice", Number(e.target.value))}
+                                                        />
+                                                    </td>
+                                                    <td className="py-2 px-3 text-right font-medium">${item.amount.toLocaleString()}</td>
+                                                    <td className="py-2 px-1">
+                                                        {invoiceLineItems.length > 1 && (
+                                                            <Button type="button" variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => removeLineItem(item.id)}>
+                                                                <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                                                            </Button>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))}
                                         </tbody>
                                     </table>
                                 </div>
-                                <Button type="button" variant="outline" size="sm" className="gap-1">
+                                <Button type="button" variant="outline" size="sm" className="gap-1" onClick={addLineItem}>
                                     <Plus className="w-3 h-3" /> Add Line Item
                                 </Button>
                             </div>
 
-                            <div className="flex justify-end">
-                                <div className="w-48 space-y-2 text-sm">
+                            <div className="flex justify-between items-start">
+                                <div className="space-y-2 flex-1 mr-8">
+                                    <Label>Discount ($)</Label>
+                                    <Input
+                                        type="number"
+                                        className="w-32"
+                                        value={invoiceDiscount}
+                                        min={0}
+                                        onChange={(e) => setInvoiceDiscount(Number(e.target.value))}
+                                    />
+                                </div>
+                                <div className="w-56 space-y-2 text-sm">
                                     <div className="flex justify-between">
                                         <span className="text-muted-foreground">Subtotal</span>
-                                        <span>$5,000.00</span>
+                                        <span>${invoiceSubtotal.toLocaleString()}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-muted-foreground">Tax (5%)</span>
-                                        <span>$250.00</span>
+                                        <span className="text-muted-foreground">Tax ({invoiceTaxRate}%)</span>
+                                        <span>${invoiceTaxAmount.toLocaleString()}</span>
                                     </div>
-                                    <div className="flex justify-between font-semibold border-t pt-2">
+                                    {invoiceDiscount > 0 && (
+                                        <div className="flex justify-between text-red-400">
+                                            <span>Discount</span>
+                                            <span>-${invoiceDiscount.toLocaleString()}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between font-semibold border-t pt-2 text-base">
                                         <span>Total</span>
-                                        <span>$5,250.00</span>
+                                        <span className="text-primary">${invoiceTotal.toLocaleString()}</span>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
                                 <Label>Notes (Optional)</Label>
-                                <Textarea placeholder="Add any notes for the client..." rows={2} />
+                                <Textarea
+                                    placeholder="Add any notes for the client..."
+                                    rows={2}
+                                    value={invoiceNotes}
+                                    onChange={(e) => setInvoiceNotes(e.target.value)}
+                                />
                             </div>
 
                             <DialogFooter>
                                 <Button type="button" variant="outline" onClick={() => setIsGenerateInvoiceOpen(false)}>Cancel</Button>
-                                <Button type="submit" className="gap-2">
+                                <Button type="submit" className="gap-2" disabled={invoiceSubtotal <= 0}>
                                     <Receipt className="w-4 h-4" />
                                     Create Invoice
                                 </Button>
@@ -1383,7 +1707,243 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                     onRecordPayment={handleRecordPaymentForInvoice}
                     payments={payments}
                 />
+
+                {/* Create Task Dialog */}
+                <Dialog open={isAddTaskOpen} onOpenChange={setIsAddTaskOpen}>
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <DialogHeader className="pb-4 border-b border-border">
+                            <DialogTitle className="flex items-center gap-3 text-xl">
+                                <div className="p-2 rounded-lg bg-primary/20">
+                                    <Plus className="w-5 h-5 text-primary" />
+                                </div>
+                                Create New Task
+                            </DialogTitle>
+                            <DialogDescription className="text-sm text-muted-foreground mt-1">
+                                Add a new task to {project.name}
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <form onSubmit={(e) => { e.preventDefault(); handleCreateTask(new FormData(e.currentTarget)) }} className="space-y-6 pt-4">
+                            {/* Task Details Section */}
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                                    <FileText className="w-4 h-4" />
+                                    Task Details
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="title" className="text-sm">
+                                        Task Title <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Input
+                                        id="title"
+                                        name="title"
+                                        placeholder="e.g., Implement user authentication"
+                                        required
+                                        className="bg-secondary/50 border-border"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="description" className="text-sm">Description</Label>
+                                    <Textarea
+                                        id="description"
+                                        name="description"
+                                        placeholder="Describe the task in detail..."
+                                        rows={3}
+                                        className="bg-secondary/50 border-border resize-none"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="status" className="text-sm">Status</Label>
+                                        <Select name="status" defaultValue={initialStatus}>
+                                            <SelectTrigger className="bg-secondary/50 border-border">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {Object.entries(TASK_STATUS_CONFIG).map(([k, v]) => (
+                                                    <SelectItem key={k} value={k}>
+                                                        <span className="flex items-center gap-2">
+                                                            <span className={cn("w-2 h-2 rounded-full", v.color.replace("text-", "bg-"))} />
+                                                            {v.label}
+                                                        </span>
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="taskType" className="text-sm">Task Type</Label>
+                                        <Select name="taskType" defaultValue="general">
+                                            <SelectTrigger className="bg-secondary/50 border-border">
+                                                <SelectValue placeholder="Select task type" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {Object.entries(TASK_TYPE_CONFIG).map(([k, v]) => (
+                                                    <SelectItem key={k} value={k}>
+                                                        <span className="flex items-center gap-2">
+                                                            <span className="scale-75">{v.icon}</span>
+                                                            {v.label}
+                                                        </span>
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Assignment & Schedule Section */}
+                            <div className="space-y-4 pt-4 border-t border-border">
+                                <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                                    <Users className="w-4 h-4" />
+                                    Assignment & Schedule
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="assignee" className="text-sm">Assignee</Label>
+                                        <Select name="assignee" defaultValue="1">
+                                            <SelectTrigger className="bg-secondary/50 border-border">
+                                                <SelectValue placeholder="Select assignee" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {teamMembers.map((m) => (
+                                                    <SelectItem key={m.id} value={m.id}>
+                                                        <span className="flex items-center gap-2">
+                                                            <span className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-medium">
+                                                                {m.name.split(" ").map(n => n[0]).join("")}
+                                                            </span>
+                                                            {m.name}
+                                                        </span>
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="priority" className="text-sm">Priority</Label>
+                                        <Select name="priority" defaultValue="medium">
+                                            <SelectTrigger className="bg-secondary/50 border-border">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {Object.entries(PRIORITY_CONFIG).map(([k, v]) => (
+                                                    <SelectItem key={k} value={k}>
+                                                        <span className="flex items-center gap-2">
+                                                            <span className={cn("w-2 h-2 rounded-full", v.color.replace("text-", "bg-"))} />
+                                                            {v.label}
+                                                        </span>
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="startDate" className="text-sm">Start Date</Label>
+                                        <DatePicker
+                                            name="startDate"
+                                            placeholder="Select start date"
+                                            defaultValue={new Date()}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="dueDate" className="text-sm">
+                                            Due Date <span className="text-destructive">*</span>
+                                        </Label>
+                                        <DatePicker
+                                            name="dueDate"
+                                            placeholder="Select due date"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Reference Links Section */}
+                            <div className="space-y-4 pt-4 border-t border-border">
+                                <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                                    <Link2 className="w-4 h-4" />
+                                    Reference Links
+                                </div>
+                                <div className="space-y-3">
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <div className="col-span-2">
+                                            <Input
+                                                id="referenceUrl1"
+                                                name="referenceUrl1"
+                                                placeholder="https://figma.com/design/..."
+                                                className="bg-secondary/50 border-border text-sm"
+                                            />
+                                        </div>
+                                        <Input
+                                            id="referenceTitle1"
+                                            name="referenceTitle1"
+                                            placeholder="Link title"
+                                            className="bg-secondary/50 border-border text-sm"
+                                        />
+                                    </div>
+                                    <p className="text-[10px] text-muted-foreground">Add Figma, Docs, or other reference links</p>
+                                </div>
+                            </div>
+
+                            {/* Additional Settings Section */}
+                            <div className="space-y-4 pt-4 border-t border-border">
+                                <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                                    <Settings2 className="w-4 h-4" />
+                                    Additional Settings
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="estimatedHours" className="text-sm">
+                                            <span className="flex items-center gap-1">
+                                                <Clock className="w-3 h-3" />
+                                                Estimated Hours
+                                            </span>
+                                        </Label>
+                                        <Input
+                                            id="estimatedHours"
+                                            name="estimatedHours"
+                                            type="number"
+                                            min="0"
+                                            step="0.5"
+                                            placeholder="4"
+                                            className="bg-secondary/50 border-border"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="tags" className="text-sm">Tags</Label>
+                                        <Input
+                                            id="tags"
+                                            name="tags"
+                                            placeholder="e.g., frontend, urgent, bug"
+                                            className="bg-secondary/50 border-border"
+                                        />
+                                        <p className="text-[10px] text-muted-foreground">Separate with commas</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Footer Actions */}
+                            <DialogFooter className="pt-4 border-t border-border gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setIsAddTaskOpen(false)}
+                                    className="gap-2"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button type="submit" className="gap-2 min-w-[140px]">
+                                    <Plus className="w-4 h-4" />
+                                    Create Task
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
             </div>
         </DashboardLayout>
     )
 }
+

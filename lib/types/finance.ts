@@ -427,3 +427,143 @@ export const ENTITY_STATUS_CONFIG: Record<EntityStatus, { label: string; color: 
     active: { label: "Active", color: "text-green-500", bgColor: "bg-green-500/10" },
     neutralized: { label: "Neutralized", color: "text-gray-500", bgColor: "bg-gray-500/10" },
 }
+
+// ==================== Service Templates ====================
+
+export interface ServiceTemplateItem {
+    description: string
+    quantity: number
+    unitPrice: number
+}
+
+export interface ServiceTemplate {
+    id: string
+    name: string
+    description: string
+    category: string
+    icon: string
+    color: string
+    bgColor: string
+    defaultItems: ServiceTemplateItem[]
+    defaultTaxRate: number
+    defaultPaymentTerms: number // days
+}
+
+export const AGENCY_SERVICE_TEMPLATES: ServiceTemplate[] = [
+    {
+        id: "seo_retainer",
+        name: "SEO Monthly Retainer",
+        description: "Ongoing search engine optimization services",
+        category: "seo",
+        icon: "🔍",
+        color: "text-green-500",
+        bgColor: "bg-green-500/10",
+        defaultItems: [
+            { description: "Monthly SEO Audit & Reporting", quantity: 1, unitPrice: 1500 },
+            { description: "Keyword Research & Optimization", quantity: 1, unitPrice: 800 },
+            { description: "Backlink Building (10 links)", quantity: 1, unitPrice: 1200 },
+            { description: "Technical SEO Maintenance", quantity: 1, unitPrice: 500 },
+        ],
+        defaultTaxRate: 5,
+        defaultPaymentTerms: 15,
+    },
+    {
+        id: "ppc_management",
+        name: "PPC Campaign Management",
+        description: "Pay-per-click advertising management",
+        category: "marketing",
+        icon: "📊",
+        color: "text-blue-500",
+        bgColor: "bg-blue-500/10",
+        defaultItems: [
+            { description: "PPC Strategy & Campaign Setup", quantity: 1, unitPrice: 2000 },
+            { description: "Ad Copywriting & Creative", quantity: 1, unitPrice: 800 },
+            { description: "Monthly Campaign Optimization", quantity: 1, unitPrice: 1500 },
+            { description: "Performance Reporting & Analytics", quantity: 1, unitPrice: 500 },
+        ],
+        defaultTaxRate: 5,
+        defaultPaymentTerms: 30,
+    },
+    {
+        id: "social_media",
+        name: "Social Media Package",
+        description: "Full social media management service",
+        category: "social",
+        icon: "📱",
+        color: "text-pink-500",
+        bgColor: "bg-pink-500/10",
+        defaultItems: [
+            { description: "Content Calendar & Strategy", quantity: 1, unitPrice: 1000 },
+            { description: "Social Media Posts (20/month)", quantity: 1, unitPrice: 2000 },
+            { description: "Community Management", quantity: 1, unitPrice: 800 },
+            { description: "Monthly Analytics Report", quantity: 1, unitPrice: 400 },
+        ],
+        defaultTaxRate: 5,
+        defaultPaymentTerms: 15,
+    },
+    {
+        id: "web_development",
+        name: "Website Development",
+        description: "Custom website design and development",
+        category: "development",
+        icon: "💻",
+        color: "text-indigo-500",
+        bgColor: "bg-indigo-500/10",
+        defaultItems: [
+            { description: "UI/UX Design & Wireframing", quantity: 1, unitPrice: 5000 },
+            { description: "Frontend Development", quantity: 1, unitPrice: 8000 },
+            { description: "Backend Development & API", quantity: 1, unitPrice: 6000 },
+            { description: "Testing & QA", quantity: 1, unitPrice: 2000 },
+            { description: "Deployment & Launch Support", quantity: 1, unitPrice: 1500 },
+        ],
+        defaultTaxRate: 5,
+        defaultPaymentTerms: 30,
+    },
+    {
+        id: "content_marketing",
+        name: "Content Marketing",
+        description: "Content creation and marketing strategy",
+        category: "content",
+        icon: "✍️",
+        color: "text-amber-500",
+        bgColor: "bg-amber-500/10",
+        defaultItems: [
+            { description: "Blog Posts (8 articles/month)", quantity: 1, unitPrice: 2400 },
+            { description: "Email Newsletter Campaign", quantity: 1, unitPrice: 800 },
+            { description: "Content Strategy & Planning", quantity: 1, unitPrice: 600 },
+            { description: "SEO Content Optimization", quantity: 1, unitPrice: 400 },
+        ],
+        defaultTaxRate: 5,
+        defaultPaymentTerms: 15,
+    },
+    {
+        id: "brand_strategy",
+        name: "Brand Strategy & Identity",
+        description: "Comprehensive brand development",
+        category: "branding",
+        icon: "🎨",
+        color: "text-purple-500",
+        bgColor: "bg-purple-500/10",
+        defaultItems: [
+            { description: "Brand Discovery & Research", quantity: 1, unitPrice: 3000 },
+            { description: "Logo Design (3 concepts)", quantity: 1, unitPrice: 4000 },
+            { description: "Brand Guidelines Document", quantity: 1, unitPrice: 2500 },
+            { description: "Collateral Design Package", quantity: 1, unitPrice: 3000 },
+            { description: "Brand Launch Support", quantity: 1, unitPrice: 1500 },
+        ],
+        defaultTaxRate: 5,
+        defaultPaymentTerms: 30,
+    },
+]
+
+// Invoice category config for UI badges
+export const INVOICE_CATEGORY_CONFIG: Record<string, { label: string; color: string; bgColor: string; icon: string }> = {
+    development: { label: "Web Dev", color: "text-indigo-400", bgColor: "bg-indigo-500/15", icon: "💻" },
+    marketing: { label: "PPC/Ads", color: "text-blue-400", bgColor: "bg-blue-500/15", icon: "📊" },
+    seo: { label: "SEO", color: "text-green-400", bgColor: "bg-green-500/15", icon: "🔍" },
+    social: { label: "Social", color: "text-pink-400", bgColor: "bg-pink-500/15", icon: "📱" },
+    content: { label: "Content", color: "text-amber-400", bgColor: "bg-amber-500/15", icon: "✍️" },
+    branding: { label: "Branding", color: "text-purple-400", bgColor: "bg-purple-500/15", icon: "🎨" },
+    creative: { label: "Creative", color: "text-orange-400", bgColor: "bg-orange-500/15", icon: "🎬" },
+    consulting: { label: "Consulting", color: "text-cyan-400", bgColor: "bg-cyan-500/15", icon: "💼" },
+}

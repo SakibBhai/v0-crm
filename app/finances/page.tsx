@@ -25,6 +25,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
+import { AGENCY_SERVICE_TEMPLATES, INVOICE_CATEGORY_CONFIG } from "@/lib/types/finance"
 import {
   Search,
   Plus,
@@ -83,770 +84,7 @@ import {
   ComposedChart,
 } from "recharts"
 
-const invoicesData = [
-  {
-    id: "INV-2024-001",
-    invoiceNumber: "INV-2024-001",
-    client: "TechCorp Inc",
-    clientEmail: "accounting@techcorp.com",
-    clientLogo: "/placeholder.svg?height=40&width=40",
-    project: "Website Redesign",
-    projectId: "PRJ-001",
-    amount: 15000,
-    paid: 15000,
-    tax: 1200,
-    discount: 0,
-    status: "paid",
-    dueDate: "2024-01-15",
-    issueDate: "2024-01-01",
-    paidDate: "2024-01-14",
-    paymentMethod: "Bank Transfer",
-    paymentTerms: "Net 30",
-    currency: "USD",
-    items: [
-      {
-        id: 1,
-        description: "UI/UX Design - Homepage & Landing Pages",
-        quantity: 1,
-        rate: 5000,
-        amount: 5000,
-        taxable: true,
-      },
-      {
-        id: 2,
-        description: "Frontend Development (React + Next.js)",
-        quantity: 40,
-        rate: 150,
-        amount: 6000,
-        taxable: true,
-      },
-      {
-        id: 3,
-        description: "Backend Integration & API Development",
-        quantity: 20,
-        rate: 200,
-        amount: 4000,
-        taxable: true,
-      },
-    ],
-    notes: "Thank you for your business! Payment received on time.",
-    internalNotes: "Client prefers monthly billing",
-    category: "development",
-    recurringInvoice: false,
-    attachments: ["contract.pdf", "mockups.zip"],
-  },
-  {
-    id: "INV-2024-002",
-    invoiceNumber: "INV-2024-002",
-    client: "StartupXYZ",
-    clientEmail: "finance@startupxyz.com",
-    clientLogo: "/placeholder.svg?height=40&width=40",
-    project: "SEO Campaign Q1",
-    projectId: "PRJ-002",
-    amount: 8500,
-    paid: 4250,
-    tax: 680,
-    discount: 500,
-    status: "partial",
-    dueDate: "2024-01-20",
-    issueDate: "2024-01-05",
-    paidDate: "2024-01-06",
-    paymentMethod: "Credit Card",
-    paymentTerms: "50% upfront, 50% on completion",
-    currency: "USD",
-    items: [
-      {
-        id: 1,
-        description: "Comprehensive SEO Audit & Strategy",
-        quantity: 1,
-        rate: 1500,
-        amount: 1500,
-        taxable: true,
-      },
-      {
-        id: 2,
-        description: "Monthly SEO Management & Optimization",
-        quantity: 3,
-        rate: 2000,
-        amount: 6000,
-        taxable: true,
-      },
-      { id: 3, description: "Content Writing & Blog Posts", quantity: 5, rate: 200, amount: 1000, taxable: true },
-    ],
-    notes: "50% paid upfront. Balance due upon completion.",
-    internalNotes: "New client - watch payment closely",
-    category: "marketing",
-    recurringInvoice: false,
-    attachments: ["proposal.pdf"],
-  },
-  {
-    id: "INV-2024-003",
-    invoiceNumber: "INV-2024-003",
-    client: "GrowthLabs",
-    clientEmail: "billing@growthlabs.io",
-    clientLogo: "/placeholder.svg?height=40&width=40",
-    project: "Social Media Management",
-    projectId: "PRJ-003",
-    amount: 12000,
-    paid: 0,
-    tax: 960,
-    discount: 0,
-    status: "pending",
-    dueDate: "2024-02-01",
-    issueDate: "2024-01-10",
-    paidDate: null,
-    paymentMethod: "ACH",
-    paymentTerms: "Net 30",
-    currency: "USD",
-    items: [
-      { id: 1, description: "Social Media Strategy Development", quantity: 1, rate: 3000, amount: 3000, taxable: true },
-      { id: 2, description: "Monthly Social Media Management", quantity: 3, rate: 2500, amount: 7500, taxable: true },
-      { id: 3, description: "Paid Ad Campaign Management", quantity: 1, rate: 1500, amount: 1500, taxable: true },
-    ],
-    notes: "Net 30 payment terms. Auto-pay enabled.",
-    internalNotes: "Recurring client - good payment history",
-    category: "social",
-    recurringInvoice: true,
-    attachments: ["strategy.pdf", "content-calendar.xlsx"],
-  },
-  {
-    id: "INV-2024-004",
-    invoiceNumber: "INV-2024-004",
-    client: "MediaFlow",
-    clientEmail: "accounts@mediaflow.com",
-    clientLogo: "/placeholder.svg?height=40&width=40",
-    project: "Video Production - Product Launch",
-    projectId: "PRJ-004",
-    amount: 25000,
-    paid: 0,
-    tax: 2000,
-    discount: 1000,
-    status: "overdue",
-    dueDate: "2024-01-10",
-    issueDate: "2023-12-15",
-    paidDate: null,
-    paymentMethod: "Bank Transfer",
-    paymentTerms: "Net 15",
-    currency: "USD",
-    items: [
-      {
-        id: 1,
-        description: "Video Shooting & Production (5 days)",
-        quantity: 5,
-        rate: 2000,
-        amount: 10000,
-        taxable: true,
-      },
-      { id: 2, description: "Post Production & Editing", quantity: 5, rate: 1500, amount: 7500, taxable: true },
-      { id: 3, description: "Motion Graphics & Animation", quantity: 5, rate: 1500, amount: 7500, taxable: true },
-    ],
-    notes: "OVERDUE - Payment reminder sent multiple times",
-    internalNotes: "CLIENT DELAYED - Consider legal action if not paid by Feb 1",
-    category: "creative",
-    recurringInvoice: false,
-    attachments: ["contract_signed.pdf", "deliverables.zip"],
-  },
-  {
-    id: "INV-2024-005",
-    invoiceNumber: "INV-2024-005",
-    client: "BrandFirst",
-    clientEmail: "contact@brandfirst.co",
-    clientLogo: "/placeholder.svg?height=40&width=40",
-    project: "Brand Identity Package",
-    projectId: "PRJ-005",
-    amount: 18000,
-    paid: 0,
-    tax: 1440,
-    discount: 2000,
-    status: "draft",
-    dueDate: "2024-02-15",
-    issueDate: "2024-01-18",
-    paidDate: null,
-    paymentMethod: "Wire Transfer",
-    paymentTerms: "Net 45",
-    currency: "USD",
-    items: [
-      { id: 1, description: "Logo Design & Brand Mark", quantity: 1, rate: 5000, amount: 5000, taxable: true },
-      { id: 2, description: "Brand Guidelines & Style Guide", quantity: 1, rate: 8000, amount: 8000, taxable: true },
-      { id: 3, description: "Marketing Collateral Design", quantity: 1, rate: 5000, amount: 5000, taxable: true },
-    ],
-    notes: "DRAFT - Pending client approval on final deliverables",
-    internalNotes: "10% discount for early payment within 7 days",
-    category: "branding",
-    recurringInvoice: false,
-    attachments: [],
-  },
-  {
-    id: "INV-2024-006",
-    invoiceNumber: "INV-2024-006",
-    client: "E-Shop Pro",
-    clientEmail: "billing@eshoppro.com",
-    clientLogo: "/placeholder.svg?height=40&width=40",
-    project: "E-commerce Platform Development",
-    projectId: "PRJ-006",
-    amount: 45000,
-    paid: 45000,
-    tax: 3600,
-    discount: 3000,
-    status: "paid",
-    dueDate: "2024-01-25",
-    issueDate: "2024-01-01",
-    paidDate: "2024-01-24",
-    paymentMethod: "Bank Transfer",
-    paymentTerms: "Net 30",
-    currency: "USD",
-    items: [
-      {
-        id: 1,
-        description: "Full E-commerce Platform Development",
-        quantity: 1,
-        rate: 30000,
-        amount: 30000,
-        taxable: true,
-      },
-      {
-        id: 2,
-        description: "Payment Gateway Integration (Stripe)",
-        quantity: 1,
-        rate: 10000,
-        amount: 10000,
-        taxable: true,
-      },
-      { id: 3, description: "Training, Documentation & Support", quantity: 1, rate: 5000, amount: 5000, taxable: true },
-    ],
-    notes: "Project completed successfully. Payment received in full.",
-    internalNotes: "VIP Client - Expedite all future requests",
-    category: "development",
-    recurringInvoice: false,
-    attachments: ["final_deliverables.zip", "documentation.pdf"],
-  },
-  {
-    id: "INV-2024-007",
-    invoiceNumber: "INV-2024-007",
-    client: "HealthTech Solutions",
-    clientEmail: "finance@healthtech.com",
-    clientLogo: "/placeholder.svg?height=40&width=40",
-    project: "PPC Campaign Management",
-    projectId: "PRJ-007",
-    amount: 6500,
-    paid: 0,
-    tax: 520,
-    discount: 0,
-    status: "sent",
-    dueDate: "2024-02-10",
-    issueDate: "2024-01-20",
-    paidDate: null,
-    paymentMethod: "Credit Card",
-    paymentTerms: "Net 30",
-    currency: "USD",
-    items: [
-      {
-        id: 1,
-        description: "Google Ads Campaign Setup & Strategy",
-        quantity: 1,
-        rate: 1500,
-        amount: 1500,
-        taxable: true,
-      },
-      { id: 2, description: "Monthly Campaign Management", quantity: 2, rate: 2000, amount: 4000, taxable: true },
-      { id: 3, description: "Performance Reporting & Analytics", quantity: 2, rate: 500, amount: 1000, taxable: true },
-    ],
-    notes: "Invoice sent via email on Jan 20. Auto-pay enabled.",
-    internalNotes: "Monthly recurring - set up auto-invoice",
-    category: "marketing",
-    recurringInvoice: true,
-    attachments: ["campaign_strategy.pdf"],
-  },
-  {
-    id: "INV-2024-008",
-    invoiceNumber: "INV-2024-008",
-    client: "FinanceFirst",
-    clientEmail: "ap@financefirst.com",
-    clientLogo: "/placeholder.svg?height=40&width=40",
-    project: "Content Marketing Package",
-    projectId: "PRJ-008",
-    amount: 9000,
-    paid: 9000,
-    tax: 720,
-    discount: 0,
-    status: "paid",
-    dueDate: "2024-01-05",
-    issueDate: "2023-12-20",
-    paidDate: "2024-01-03",
-    paymentMethod: "ACH",
-    paymentTerms: "Net 15",
-    currency: "USD",
-    items: [
-      { id: 1, description: "Content Marketing Strategy", quantity: 1, rate: 2000, amount: 2000, taxable: true },
-      { id: 2, description: "Blog Writing & SEO Optimization", quantity: 10, rate: 400, amount: 4000, taxable: true },
-      { id: 3, description: "Email Marketing Campaigns", quantity: 6, rate: 500, amount: 3000, taxable: true },
-    ],
-    notes: "Paid early. Thank you!",
-    internalNotes: "Long-term client - priority support",
-    category: "content",
-    recurringInvoice: true,
-    attachments: ["content_calendar.xlsx"],
-  },
-]
-
-const incomeData: {
-  id: number
-  description: string
-  category: string
-  amount: number
-  date: string
-  client: string
-  project: string
-  status: string
-  entityStatus: "active" | "neutralized"
-  invoiceId: string
-  paymentMethod: string
-  recurring: boolean
-  taxAmount: number
-  createdAt: string
-  updatedAt: string
-  createdBy: string
-}[] = [
-    {
-      id: 1,
-      description: "Monthly Retainer - TechCorp Inc",
-      category: "Retainer",
-      amount: 15000,
-      date: "2024-01-15",
-      client: "TechCorp Inc",
-      project: "Website Redesign",
-      status: "received",
-      entityStatus: "active",
-      invoiceId: "INV-2024-001",
-      paymentMethod: "Bank Transfer",
-      recurring: true,
-      taxAmount: 1200,
-      createdAt: "2024-01-15T10:00:00Z",
-      updatedAt: "2024-01-15T10:00:00Z",
-      createdBy: "Sarah Chen",
-    },
-    {
-      id: 2,
-      description: "Project Payment - E-commerce Platform",
-      category: "Project",
-      amount: 45000,
-      date: "2024-01-24",
-      client: "E-Shop Pro",
-      project: "E-commerce Platform",
-      status: "received",
-      entityStatus: "active",
-      invoiceId: "INV-2024-006",
-      paymentMethod: "Bank Transfer",
-      recurring: false,
-      taxAmount: 3600,
-      createdAt: "2024-01-24T09:30:00Z",
-      updatedAt: "2024-01-24T09:30:00Z",
-      createdBy: "Michael Torres",
-    },
-    {
-      id: 3,
-      description: "Partial Payment - SEO Campaign",
-      category: "Project",
-      amount: 4250,
-      date: "2024-01-06",
-      client: "StartupXYZ",
-      project: "SEO Campaign Q1",
-      status: "received",
-      entityStatus: "active",
-      invoiceId: "INV-2024-002",
-      paymentMethod: "Credit Card",
-      recurring: false,
-      taxAmount: 340,
-      createdAt: "2024-01-06T14:00:00Z",
-      updatedAt: "2024-01-06T14:00:00Z",
-      createdBy: "Sarah Chen",
-    },
-    {
-      id: 4,
-      description: "Monthly Retainer - FinanceFirst",
-      category: "Retainer",
-      amount: 9000,
-      date: "2024-01-03",
-      client: "FinanceFirst",
-      project: "Content Marketing",
-      status: "received",
-      entityStatus: "active",
-      invoiceId: "INV-2024-008",
-      paymentMethod: "ACH",
-      recurring: true,
-      taxAmount: 720,
-      createdAt: "2024-01-03T11:00:00Z",
-      updatedAt: "2024-01-03T11:00:00Z",
-      createdBy: "Sarah Chen",
-    },
-    {
-      id: 5,
-      description: "Consulting Services - Brand Strategy",
-      category: "Consulting",
-      amount: 3500,
-      date: "2024-01-18",
-      client: "BrandFirst",
-      project: "Brand Identity",
-      status: "pending",
-      entityStatus: "active",
-      invoiceId: "INV-2024-009",
-      paymentMethod: "Wire Transfer",
-      recurring: false,
-      taxAmount: 280,
-      createdAt: "2024-01-18T10:30:00Z",
-      updatedAt: "2024-01-18T10:30:00Z",
-      createdBy: "Michael Torres",
-    },
-    {
-      id: 6,
-      description: "Ad Management Fee - GrowthLabs",
-      category: "Management Fee",
-      amount: 2500,
-      date: "2024-01-12",
-      client: "GrowthLabs",
-      project: "Social Media Management",
-      status: "received",
-      entityStatus: "active",
-      invoiceId: "INV-2024-010",
-      paymentMethod: "ACH",
-      recurring: true,
-      taxAmount: 200,
-      createdAt: "2024-01-12T15:00:00Z",
-      updatedAt: "2024-01-12T15:00:00Z",
-      createdBy: "Sarah Chen",
-    },
-  ]
-
-type ExpenseDataType = {
-  id: number
-  description: string
-  category: string
-  amount: number
-  date: string
-  vendor: string
-  status: string
-  entityStatus: "active" | "neutralized"
-  recurring: boolean
-  recurringFrequency: string | null
-  approvalStatus: string
-  approvedBy: string | null
-  paymentMethod: string
-  receiptUrl: string | null
-  taxDeductible: boolean
-  notes: string
-  department: string
-  project: string | null
-  createdAt: string
-  updatedAt: string
-  createdBy: string
-}
-
-const expensesData: ExpenseDataType[] = [
-  {
-    id: 1,
-    description: "Adobe Creative Cloud - Team Plan",
-    category: "Software",
-    amount: 599,
-    date: "2024-01-15",
-    vendor: "Adobe Inc",
-    status: "paid",
-    entityStatus: "active",
-    recurring: true,
-    recurringFrequency: "monthly",
-    approvalStatus: "approved",
-    approvedBy: "Sarah Chen",
-    paymentMethod: "Credit Card",
-    receiptUrl: "receipt_001.pdf",
-    taxDeductible: true,
-    notes: "Annual subscription billed monthly",
-    department: "Creative",
-    project: null,
-    createdAt: "2024-01-15T08:00:00Z",
-    updatedAt: "2024-01-15T08:00:00Z",
-    createdBy: "Sarah Chen",
-  },
-  {
-    id: 2,
-    description: "Google Ads - Client Campaign Budget",
-    category: "Advertising",
-    amount: 2500,
-    date: "2024-01-14",
-    vendor: "Google LLC",
-    status: "paid",
-    entityStatus: "active" as const,
-    recurring: false,
-    recurringFrequency: null,
-    approvalStatus: "approved",
-    approvedBy: "Michael Torres",
-    paymentMethod: "Credit Card",
-    receiptUrl: "receipt_002.pdf",
-    taxDeductible: true,
-    notes: "Campaign for StartupXYZ - billable to client",
-    department: "Marketing",
-    project: "PRJ-002",
-    createdAt: "2024-01-14T10:00:00Z",
-    updatedAt: "2024-01-14T10:00:00Z",
-    createdBy: "Michael Torres",
-  },
-  {
-    id: 3,
-    description: "Office Space Rent - WeWork Downtown",
-    category: "Operations",
-    amount: 4500,
-    date: "2024-01-01",
-    vendor: "WeWork",
-    status: "paid",
-    entityStatus: "active" as const,
-    recurring: true,
-    recurringFrequency: "monthly",
-    approvalStatus: "approved",
-    approvedBy: "Sarah Chen",
-    paymentMethod: "ACH",
-    receiptUrl: "receipt_003.pdf",
-    taxDeductible: true,
-    notes: "Monthly office rent including utilities",
-    department: "Operations",
-    project: null,
-    createdAt: "2024-01-01T09:00:00Z",
-    updatedAt: "2024-01-01T09:00:00Z",
-    createdBy: "Sarah Chen",
-  },
-  {
-    id: 4,
-    description: "Freelancer Payment - UI/UX Designer",
-    category: "Contractors",
-    amount: 3200,
-    date: "2024-01-12",
-    vendor: "Sarah Miller Design",
-    status: "pending",
-    entityStatus: "active" as const,
-    recurring: false,
-    recurringFrequency: null,
-    approvalStatus: "approved",
-    approvedBy: "Sarah Chen",
-    paymentMethod: "PayPal",
-    receiptUrl: "invoice_freelancer_001.pdf",
-    taxDeductible: true,
-    notes: "40 hours @ $80/hr - TechCorp project",
-    department: "Creative",
-    project: "PRJ-001",
-    createdAt: "2024-01-12T11:00:00Z",
-    updatedAt: "2024-01-12T11:00:00Z",
-    createdBy: "Sarah Chen",
-  },
-  {
-    id: 5,
-    description: "HubSpot Marketing Hub - Professional",
-    category: "Software",
-    amount: 890,
-    date: "2024-01-10",
-    vendor: "HubSpot Inc",
-    status: "paid",
-    entityStatus: "active" as const,
-    recurring: true,
-    recurringFrequency: "monthly",
-    approvalStatus: "approved",
-    approvedBy: "Michael Torres",
-    paymentMethod: "Credit Card",
-    receiptUrl: "receipt_005.pdf",
-    taxDeductible: true,
-    notes: "CRM and marketing automation",
-    department: "Sales",
-    project: null,
-    createdAt: "2024-01-10T09:30:00Z",
-    updatedAt: "2024-01-10T09:30:00Z",
-    createdBy: "Michael Torres",
-  },
-  {
-    id: 6,
-    description: "Team Building Event - Q1 Kickoff",
-    category: "Team",
-    amount: 1450,
-    date: "2024-01-18",
-    vendor: "Various Vendors",
-    status: "paid",
-    entityStatus: "active" as const,
-    recurring: false,
-    recurringFrequency: null,
-    approvalStatus: "approved",
-    approvedBy: "Sarah Chen",
-    paymentMethod: "Company Card",
-    receiptUrl: "receipts_team_event.zip",
-    taxDeductible: false,
-    notes: "Dinner and activities for 12 team members",
-    department: "HR",
-    project: null,
-    createdAt: "2024-01-18T16:00:00Z",
-    updatedAt: "2024-01-18T16:00:00Z",
-    createdBy: "Sarah Chen",
-  },
-  {
-    id: 7,
-    description: "Stock Photography & Assets - Shutterstock",
-    category: "Assets",
-    amount: 299,
-    date: "2024-01-08",
-    vendor: "Shutterstock",
-    status: "paid",
-    entityStatus: "active" as const,
-    recurring: true,
-    recurringFrequency: "monthly",
-    approvalStatus: "approved",
-    approvedBy: "Sarah Chen",
-    paymentMethod: "Credit Card",
-    receiptUrl: "receipt_007.pdf",
-    taxDeductible: true,
-    notes: "Team subscription - 750 images/month",
-    department: "Creative",
-    project: null,
-    createdAt: "2024-01-08T10:00:00Z",
-    updatedAt: "2024-01-08T10:00:00Z",
-    createdBy: "Sarah Chen",
-  },
-  {
-    id: 8,
-    description: "Client Gift Baskets - Holiday Season",
-    category: "Client Relations",
-    amount: 750,
-    date: "2024-01-20",
-    vendor: "Premium Gift Co",
-    status: "pending_approval",
-    entityStatus: "active" as const,
-    recurring: false,
-    recurringFrequency: null,
-    approvalStatus: "pending",
-    approvedBy: null,
-    paymentMethod: "Credit Card",
-    receiptUrl: "receipt_008.pdf",
-    taxDeductible: true,
-    notes: "Gift baskets for top 5 clients",
-    department: "Business Development",
-    project: null,
-    createdAt: "2024-01-20T14:00:00Z",
-    updatedAt: "2024-01-20T14:00:00Z",
-    createdBy: "Michael Torres",
-  },
-  {
-    id: 9,
-    description: "AWS Cloud Hosting - Production Servers",
-    category: "Infrastructure",
-    amount: 1280,
-    date: "2024-01-05",
-    vendor: "Amazon Web Services",
-    status: "paid",
-    entityStatus: "active" as const,
-    recurring: true,
-    recurringFrequency: "monthly",
-    approvalStatus: "approved",
-    approvedBy: "Sarah Chen",
-    paymentMethod: "Credit Card",
-    receiptUrl: "receipt_009.pdf",
-    taxDeductible: true,
-    notes: "Client project hosting costs",
-    department: "Development",
-    project: "PRJ-006",
-    createdAt: "2024-01-05T08:30:00Z",
-    updatedAt: "2024-01-05T08:30:00Z",
-    createdBy: "Sarah Chen",
-  },
-  {
-    id: 10,
-    description: "Professional Development - Marketing Conference",
-    category: "Training",
-    amount: 899,
-    date: "2024-01-22",
-    vendor: "Marketing Summit 2024",
-    status: "pending_approval",
-    entityStatus: "active" as const,
-    recurring: false,
-    recurringFrequency: null,
-    approvalStatus: "pending",
-    approvedBy: null,
-    paymentMethod: "Company Card",
-    receiptUrl: null,
-    taxDeductible: true,
-    notes: "Conference ticket for Michael Torres",
-    department: "Marketing",
-    project: null,
-    createdAt: "2024-01-22T09:00:00Z",
-    updatedAt: "2024-01-22T09:00:00Z",
-    createdBy: "Michael Torres",
-  },
-]
-
-const revenueData = [
-  { month: "Jul", revenue: 65000, expenses: 42000, profit: 23000, projectRevenue: 45000, retainerRevenue: 20000 },
-  { month: "Aug", revenue: 72000, expenses: 45000, profit: 27000, projectRevenue: 50000, retainerRevenue: 22000 },
-  { month: "Sep", revenue: 68000, expenses: 40000, profit: 28000, projectRevenue: 43000, retainerRevenue: 25000 },
-  { month: "Oct", revenue: 85000, expenses: 52000, profit: 33000, projectRevenue: 60000, retainerRevenue: 25000 },
-  { month: "Nov", revenue: 92000, expenses: 55000, profit: 37000, projectRevenue: 65000, retainerRevenue: 27000 },
-  { month: "Dec", revenue: 98000, expenses: 58000, profit: 40000, projectRevenue: 70000, retainerRevenue: 28000 },
-  { month: "Jan", revenue: 105000, expenses: 62000, profit: 43000, projectRevenue: 73250, retainerRevenue: 31750 },
-]
-
-const incomeCategoryData = [
-  { name: "Retainer", value: 26500, color: "#6366f1" },
-  { name: "Project", value: 49250, color: "#22c55e" },
-  { name: "Consulting", value: 3500, color: "#f59e0b" },
-  { name: "Management Fee", value: 2500, color: "#ec4899" },
-]
-
-// Category breakdown
-const categoryData = [
-  { name: "Development", value: 60000, color: "#6366f1" },
-  { name: "Marketing", value: 15000, color: "#22c55e" },
-  { name: "Creative", value: 25000, color: "#f59e0b" },
-  { name: "Social Media", value: 12000, color: "#ec4899" },
-  { name: "Branding", value: 18000, color: "#8b5cf6" },
-]
-
-// Payment methods breakdown
-const paymentMethodData = [
-  { name: "Bank Transfer", value: 105000, color: "#6366f1" },
-  { name: "Credit Card", value: 10750, color: "#22c55e" },
-  { name: "ACH", value: 11500, color: "#f59e0b" },
-  { name: "Wire Transfer", value: 3500, color: "#ec4899" },
-]
-
-const expenseCategoryData = [
-  { name: "Software", value: 1788, color: "#6366f1", count: 3 },
-  { name: "Operations", value: 4500, color: "#22c55e", count: 1 },
-  { name: "Contractors", value: 3200, color: "#f59e0b", count: 1 },
-  { name: "Advertising", value: 2500, color: "#ec4899", count: 1 },
-  { name: "Infrastructure", value: 1280, color: "#8b5cf6", count: 1 },
-  { name: "Team", value: 1450, color: "#14b8a6", count: 1 },
-  { name: "Training", value: 899, color: "#f97316", count: 1 },
-  { name: "Client Relations", value: 750, color: "#a855f7", count: 1 },
-  { name: "Assets", value: 299, color: "#06b6d4", count: 1 },
-]
-
-// Cash flow data
-const cashFlowData = [
-  { week: "W1", inflow: 28000, outflow: 15000, net: 13000 },
-  { week: "W2", inflow: 32000, outflow: 18000, net: 14000 },
-  { week: "W3", inflow: 25000, outflow: 12000, net: 13000 },
-  { week: "W4", inflow: 35000, outflow: 20000, net: 15000 },
-]
-
-const profitMarginData = [
-  { month: "Jul", margin: 35.4 },
-  { month: "Aug", margin: 37.5 },
-  { month: "Sep", margin: 41.2 },
-  { month: "Oct", margin: 38.8 },
-  { month: "Nov", margin: 40.2 },
-  { month: "Dec", margin: 40.8 },
-  { month: "Jan", margin: 41.0 },
-]
-
-// Budget data
-const budgetData = [
-  { category: "Marketing", budget: 25000, spent: 18500, remaining: 6500 },
-  { category: "Development", budget: 45000, spent: 38000, remaining: 7000 },
-  { category: "Operations", budget: 15000, spent: 12500, remaining: 2500 },
-  { category: "Software", budget: 8000, spent: 6200, remaining: 1800 },
-  { category: "Team", budget: 12000, spent: 9800, remaining: 2200 },
-]
-
+import { invoicesData, incomeData, ExpenseDataType, expensesData, revenueData, incomeCategoryData, categoryData, paymentMethodData, expenseCategoryData, cashFlowData, profitMarginData, budgetData } from "@/lib/data/finance-data";
 // Invoice kanban columns
 const invoiceColumns = [
   { id: "draft", title: "Draft", color: "bg-muted-foreground" },
@@ -934,6 +172,7 @@ export default function FinancesPage() {
   const [dropTarget, setDropTarget] = useState<string | null>(null)
   const [showAddExpenseDialog, setShowAddExpenseDialog] = useState(false)
   const [showAddIncomeDialog, setShowAddIncomeDialog] = useState(false)
+  const [showCreateInvoiceDialog, setShowCreateInvoiceDialog] = useState(false)
 
   // Activity Log and Edit States
   const [activityLog, setActivityLog] = useState(initialActivityLog)
@@ -941,6 +180,7 @@ export default function FinancesPage() {
   const [showEditExpenseDialog, setShowEditExpenseDialog] = useState(false)
   const [showEditIncomeDialog, setShowEditIncomeDialog] = useState(false)
   const [showEditInvoiceDialog, setShowEditInvoiceDialog] = useState(false)
+  const [showViewInvoiceDialog, setShowViewInvoiceDialog] = useState(false)
   const [showNeutralizeDialog, setShowNeutralizeDialog] = useState(false)
   const [showDeleteInvoiceDialog, setShowDeleteInvoiceDialog] = useState(false)
   const [neutralizeTarget, setNeutralizeTarget] = useState<{ type: "expense" | "income"; id: number } | null>(null)
@@ -988,6 +228,39 @@ export default function FinancesPage() {
     notes: "",
   })
 
+  // Invoice form state
+  const defaultInvoiceFormData = {
+    client: "",
+    clientEmail: "",
+    project: "",
+    projectId: "",
+    issueDate: new Date().toISOString().split("T")[0],
+    dueDate: "",
+    paymentTerms: "Net 30",
+    paymentMethod: "Bank Transfer",
+    category: "development",
+    notes: "",
+    internalNotes: "",
+    recurringInvoice: false,
+    taxRate: 8,
+    discount: 0,
+  }
+  const [invoiceFormData, setInvoiceFormData] = useState(defaultInvoiceFormData)
+  const [invoiceLineItems, setInvoiceLineItems] = useState<{ id: number; description: string; quantity: number; rate: number; amount: number; taxable: boolean }[]>([
+    { id: 1, description: "", quantity: 1, rate: 0, amount: 0, taxable: true },
+  ])
+  const [editInvoiceLineItems, setEditInvoiceLineItems] = useState<{ id: number; description: string; quantity: number; rate: number; amount: number; taxable: boolean }[]>([])
+  const [editInvoiceFormData, setEditInvoiceFormData] = useState(defaultInvoiceFormData)
+
+  // Computed invoice totals
+  const invoiceSubtotal = invoiceLineItems.reduce((sum, item) => sum + item.amount, 0)
+  const invoiceTaxAmount = invoiceSubtotal * (invoiceFormData.taxRate / 100)
+  const invoiceTotal = invoiceSubtotal + invoiceTaxAmount - invoiceFormData.discount
+
+  const editInvoiceSubtotal = editInvoiceLineItems.reduce((sum, item) => sum + item.amount, 0)
+  const editInvoiceTaxAmount = editInvoiceSubtotal * (editInvoiceFormData.taxRate / 100)
+  const editInvoiceTotal = editInvoiceSubtotal + editInvoiceTaxAmount - editInvoiceFormData.discount
+
   const [filters, setFilters] = useState({
     status: "all",
     client: "all",
@@ -996,6 +269,8 @@ export default function FinancesPage() {
     paymentMethod: "all",
     recurring: "all",
   })
+
+  const activeFiltersCount = Object.values(filters).filter(v => v !== "all").length
 
   const totalRevenue = invoices.reduce((sum, inv) => sum + inv.paid, 0)
   const totalPending = invoices.reduce((sum, inv) => sum + (inv.status !== "paid" ? inv.amount - inv.paid : 0), 0)
@@ -1440,15 +715,237 @@ export default function FinancesPage() {
     })
   }
 
-  const activeFiltersCount = Object.values(filters).filter((v) => v !== "all").length
+  // ==================== Invoice Line Item Management ====================
 
-  const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat("en-US", {
+  const handleAddInvoiceLineItem = (isEdit = false) => {
+    const items = isEdit ? editInvoiceLineItems : invoiceLineItems
+    const setItems = isEdit ? setEditInvoiceLineItems : setInvoiceLineItems
+    const newId = items.length > 0 ? Math.max(...items.map(i => i.id)) + 1 : 1
+    setItems([...items, { id: newId, description: "", quantity: 1, rate: 0, amount: 0, taxable: true }])
+  }
+
+  const handleRemoveInvoiceLineItem = (itemId: number, isEdit = false) => {
+    const setItems = isEdit ? setEditInvoiceLineItems : setInvoiceLineItems
+    setItems(prev => prev.filter(item => item.id !== itemId))
+  }
+
+  const handleInvoiceLineItemChange = (itemId: number, field: string, value: string | number | boolean, isEdit = false) => {
+    const setItems = isEdit ? setEditInvoiceLineItems : setInvoiceLineItems
+    setItems(prev => prev.map(item => {
+      if (item.id !== itemId) return item
+      const updated = { ...item, [field]: value }
+      if (field === "quantity" || field === "rate") {
+        updated.amount = Number(updated.quantity) * Number(updated.rate)
+      }
+      return updated
+    }))
+  }
+
+  // ==================== Create Invoice ====================
+
+  const handleCreateInvoice = (asDraft: boolean) => {
+    if (!invoiceFormData.client || !invoiceFormData.project) {
+      alert("Please fill in client and project fields")
+      return
+    }
+    if (invoiceLineItems.length === 0 || invoiceLineItems.every(i => !i.description)) {
+      alert("Please add at least one line item")
+      return
+    }
+
+    const year = new Date().getFullYear()
+    const existingCount = invoices.filter(inv => inv.invoiceNumber.includes(year.toString())).length
+    const invoiceNumber = `INV-${year}-${(existingCount + 1).toString().padStart(3, "0")}`
+
+    const newInvoice = {
+      id: invoiceNumber,
+      invoiceNumber,
+      client: invoiceFormData.client,
+      clientEmail: invoiceFormData.clientEmail,
+      clientLogo: "/placeholder.svg?height=40&width=40",
+      project: invoiceFormData.project,
+      projectId: invoiceFormData.projectId || `PRJ-${Date.now()}`,
+      amount: invoiceTotal,
+      paid: 0,
+      tax: invoiceTaxAmount,
+      discount: invoiceFormData.discount,
+      status: asDraft ? "draft" : "sent",
+      dueDate: invoiceFormData.dueDate,
+      issueDate: invoiceFormData.issueDate,
+      paidDate: null as string | null,
+      paymentMethod: invoiceFormData.paymentMethod,
+      paymentTerms: invoiceFormData.paymentTerms,
+      currency: "USD",
+      items: invoiceLineItems.filter(i => i.description).map(item => ({
+        id: item.id,
+        description: item.description,
+        quantity: item.quantity,
+        rate: item.rate,
+        amount: item.amount,
+        taxable: item.taxable,
+      })),
+      notes: invoiceFormData.notes,
+      internalNotes: invoiceFormData.internalNotes,
+      category: invoiceFormData.category,
+      recurringInvoice: invoiceFormData.recurringInvoice,
+      attachments: [] as string[],
+    }
+
+    setInvoices(prev => [newInvoice, ...prev])
+
+    logActivity({
+      entityType: "invoice",
+      entityId: invoiceNumber,
+      entityDescription: `Invoice #${invoiceNumber} - ${invoiceFormData.client}`,
+      action: "created",
+      performedBy: "Current User",
+      performedAt: new Date().toISOString(),
+    })
+
+    // Reset form
+    setInvoiceFormData(defaultInvoiceFormData)
+    setInvoiceLineItems([{ id: 1, description: "", quantity: 1, rate: 0, amount: 0, taxable: true }])
+    setShowCreateInvoiceDialog(false)
+  }
+
+  // ==================== Edit Invoice ====================
+
+  const openEditInvoice = (invoice: typeof invoices[0]) => {
+    setSelectedInvoice(invoice)
+    setEditInvoiceFormData({
+      client: invoice.client,
+      clientEmail: invoice.clientEmail,
+      project: invoice.project,
+      projectId: invoice.projectId,
+      issueDate: invoice.issueDate,
+      dueDate: invoice.dueDate,
+      paymentTerms: invoice.paymentTerms,
+      paymentMethod: invoice.paymentMethod,
+      category: invoice.category,
+      notes: invoice.notes || "",
+      internalNotes: invoice.internalNotes || "",
+      recurringInvoice: invoice.recurringInvoice,
+      taxRate: invoice.amount > 0 ? Math.round((invoice.tax / (invoice.amount - invoice.tax + invoice.discount)) * 100) : 8,
+      discount: invoice.discount,
+    })
+    setEditInvoiceLineItems(invoice.items.map(item => ({
+      id: item.id,
+      description: item.description,
+      quantity: item.quantity,
+      rate: item.rate,
+      amount: item.amount,
+      taxable: item.taxable,
+    })))
+    setShowEditInvoiceDialog(true)
+  }
+
+  const handleSaveInvoiceEdit = () => {
+    if (!selectedInvoice) return
+
+    const updatedInvoice = {
+      ...selectedInvoice,
+      client: editInvoiceFormData.client,
+      clientEmail: editInvoiceFormData.clientEmail,
+      project: editInvoiceFormData.project,
+      projectId: editInvoiceFormData.projectId,
+      issueDate: editInvoiceFormData.issueDate,
+      dueDate: editInvoiceFormData.dueDate,
+      paymentTerms: editInvoiceFormData.paymentTerms,
+      paymentMethod: editInvoiceFormData.paymentMethod,
+      category: editInvoiceFormData.category,
+      notes: editInvoiceFormData.notes,
+      internalNotes: editInvoiceFormData.internalNotes,
+      recurringInvoice: editInvoiceFormData.recurringInvoice,
+      amount: editInvoiceTotal,
+      tax: editInvoiceTaxAmount,
+      discount: editInvoiceFormData.discount,
+      items: editInvoiceLineItems.filter(i => i.description).map(item => ({
+        id: item.id,
+        description: item.description,
+        quantity: item.quantity,
+        rate: item.rate,
+        amount: item.amount,
+        taxable: item.taxable,
+      })),
+    }
+
+    setInvoices(prev => prev.map(inv => inv.id === selectedInvoice.id ? updatedInvoice : inv))
+
+    logActivity({
+      entityType: "invoice",
+      entityId: selectedInvoice.id,
+      entityDescription: `Invoice #${selectedInvoice.invoiceNumber} - ${editInvoiceFormData.client}`,
+      action: "updated",
+      performedBy: "Current User",
+      performedAt: new Date().toISOString(),
+    })
+
+    setShowEditInvoiceDialog(false)
+    setSelectedInvoice(null)
+  }
+
+  // ==================== Duplicate Invoice ====================
+
+  const handleDuplicateInvoice = (invoice: typeof invoices[0]) => {
+    const year = new Date().getFullYear()
+    const existingCount = invoices.filter(inv => inv.invoiceNumber.includes(year.toString())).length
+    const invoiceNumber = `INV-${year}-${(existingCount + 1).toString().padStart(3, "0")}`
+
+    const duplicatedInvoice = {
+      ...invoice,
+      id: invoiceNumber,
+      invoiceNumber,
+      status: "draft",
+      paid: 0,
+      paidDate: null as string | null,
+      issueDate: new Date().toISOString().split("T")[0],
+    }
+
+    setInvoices(prev => [duplicatedInvoice, ...prev])
+
+    logActivity({
+      entityType: "invoice",
+      entityId: invoiceNumber,
+      entityDescription: `Invoice #${invoiceNumber} duplicated from #${invoice.invoiceNumber}`,
+      action: "created",
+      performedBy: "Current User",
+      performedAt: new Date().toISOString(),
+    })
+  }
+
+  // ==================== Invoice Status Change ====================
+
+  const handleInvoiceStatusChange = (invoiceId: string, newStatus: string) => {
+    const invoice = invoices.find(inv => inv.id === invoiceId)
+    if (!invoice) return
+
+    setInvoices(prev => prev.map(inv => {
+      if (inv.id !== invoiceId) return inv
+      if (newStatus === "paid") {
+        return { ...inv, status: newStatus, paid: inv.amount, paidDate: new Date().toISOString().split("T")[0] }
+      }
+      return { ...inv, status: newStatus }
+    }))
+
+    logActivity({
+      entityType: "invoice",
+      entityId: invoiceId,
+      entityDescription: `Invoice #${invoice.invoiceNumber} - ${invoice.client}`,
+      action: "status_changed",
+      changes: [{ field: "status", oldValue: invoice.status, newValue: newStatus }],
+      performedBy: "Current User",
+      performedAt: new Date().toISOString(),
+    })
+  }
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
+      maximumFractionDigits: 2,
     }).format(amount)
+  }
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "N/A"
@@ -1479,178 +976,10 @@ export default function FinancesPage() {
               <Upload className="mr-2 h-4 w-4" />
               Import
             </Button>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button size="sm">
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Invoice
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Create New Invoice</DialogTitle>
-                </DialogHeader>
-                <div className="grid gap-6 py-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="client">Client *</Label>
-                      <Select>
-                        <SelectTrigger id="client">
-                          <SelectValue placeholder="Select client" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="techcorp">TechCorp Inc</SelectItem>
-                          <SelectItem value="startup">StartupXYZ</SelectItem>
-                          <SelectItem value="growth">GrowthLabs</SelectItem>
-                          <SelectItem value="media">MediaFlow</SelectItem>
-                          <SelectItem value="brand">BrandFirst</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="project">Project *</Label>
-                      <Select>
-                        <SelectTrigger id="project">
-                          <SelectValue placeholder="Select project" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="web">Website Redesign</SelectItem>
-                          <SelectItem value="seo">SEO Campaign</SelectItem>
-                          <SelectItem value="social">Social Media Management</SelectItem>
-                          <SelectItem value="video">Video Production</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="issueDate">Issue Date *</Label>
-                      <Input id="issueDate" type="date" defaultValue={new Date().toISOString().split("T")[0]} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="dueDate">Due Date *</Label>
-                      <Input id="dueDate" type="date" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="paymentTerms">Payment Terms</Label>
-                      <Select>
-                        <SelectTrigger id="paymentTerms">
-                          <SelectValue placeholder="Select terms" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="net15">Net 15</SelectItem>
-                          <SelectItem value="net30">Net 30</SelectItem>
-                          <SelectItem value="net45">Net 45</SelectItem>
-                          <SelectItem value="due-on-receipt">Due on Receipt</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="paymentMethod">Payment Method</Label>
-                      <Select>
-                        <SelectTrigger id="paymentMethod">
-                          <SelectValue placeholder="Select method" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="bank">Bank Transfer</SelectItem>
-                          <SelectItem value="card">Credit Card</SelectItem>
-                          <SelectItem value="ach">ACH</SelectItem>
-                          <SelectItem value="wire">Wire Transfer</SelectItem>
-                          <SelectItem value="paypal">PayPal</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="category">Category</Label>
-                      <Select>
-                        <SelectTrigger id="category">
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="development">Development</SelectItem>
-                          <SelectItem value="marketing">Marketing</SelectItem>
-                          <SelectItem value="creative">Creative</SelectItem>
-                          <SelectItem value="social">Social Media</SelectItem>
-                          <SelectItem value="branding">Branding</SelectItem>
-                          <SelectItem value="consulting">Consulting</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Label>Line Items *</Label>
-                      <Checkbox id="recurring" />
-                      <Label htmlFor="recurring" className="text-sm font-normal">
-                        Recurring Invoice
-                      </Label>
-                    </div>
-                    <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
-                      <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground">
-                        <div className="col-span-5">Description</div>
-                        <div className="col-span-2">Quantity</div>
-                        <div className="col-span-2">Rate ($)</div>
-                        <div className="col-span-2">Amount</div>
-                        <div className="col-span-1"></div>
-                      </div>
-                      <div className="grid grid-cols-12 gap-2 items-center">
-                        <Input className="col-span-5" placeholder="Service or product description" />
-                        <Input className="col-span-2" type="number" placeholder="1" defaultValue="1" />
-                        <Input className="col-span-2" type="number" placeholder="0.00" step="0.01" />
-                        <div className="col-span-2 text-sm font-medium">$0.00</div>
-                        <Button variant="ghost" size="icon" className="col-span-1">
-                          <Trash2 className="h-4 w-4 text-muted-foreground" />
-                        </Button>
-                      </div>
-                      <Button variant="outline" size="sm" className="w-full bg-transparent">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Line Item
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="subtotal">Subtotal</Label>
-                      <Input id="subtotal" value="$0.00" disabled />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="tax">Tax (%)</Label>
-                      <Input id="tax" type="number" placeholder="8" step="0.1" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="discount">Discount ($)</Label>
-                      <Input id="discount" type="number" placeholder="0.00" step="0.01" />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="notes">Invoice Notes</Label>
-                    <Textarea id="notes" placeholder="Thank you for your business..." rows={3} />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="internalNotes">Internal Notes (Private)</Label>
-                    <Textarea id="internalNotes" placeholder="Notes for internal use only..." rows={2} />
-                  </div>
-
-                  <div className="flex justify-between items-center pt-4 border-t">
-                    <div className="text-lg font-bold">
-                      Total: <span className="text-2xl text-primary">$0.00</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline">Save as Draft</Button>
-                      <Button>Create & Send Invoice</Button>
-                    </div>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <Button size="sm" onClick={() => setShowCreateInvoiceDialog(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              New Invoice
+            </Button>
           </div>
         </div>
 
@@ -2198,6 +1527,7 @@ export default function FinancesPage() {
                               className={cn(
                                 "cursor-move hover:shadow-lg transition-shadow",
                                 draggedInvoice === invoice.id && "opacity-50",
+                                invoice.status === "overdue" && "ring-1 ring-red-500/30",
                               )}
                               draggable
                               onDragStart={() => handleDragStart(invoice.id)}
@@ -2208,7 +1538,7 @@ export default function FinancesPage() {
                                     <div className="flex items-center gap-2 mb-1">
                                       <p className="font-bold text-xs text-muted-foreground">{invoice.invoiceNumber}</p>
                                       {invoice.recurringInvoice && (
-                                        <Badge variant="outline" className="text-[10px] h-4 px-1">
+                                        <Badge variant="outline" className="text-[10px] h-4 px-1 border-blue-500/30 text-blue-400">
                                           <Repeat className="h-2 w-2 mr-0.5" />
                                           Recurring
                                         </Badge>
@@ -2216,6 +1546,13 @@ export default function FinancesPage() {
                                     </div>
                                     <p className="font-semibold text-sm">{invoice.client}</p>
                                     <p className="text-xs text-muted-foreground line-clamp-1">{invoice.project}</p>
+                                    {(() => {
+                                      const cat = INVOICE_CATEGORY_CONFIG[invoice.category]; return cat ? (
+                                        <Badge className={cn("text-[10px] mt-1 border-0 h-4", cat.bgColor, cat.color)}>
+                                          <span className="mr-0.5">{cat.icon}</span> {cat.label}
+                                        </Badge>
+                                      ) : null
+                                    })()}
                                   </div>
                                   <Dialog>
                                     <DialogTrigger asChild>
@@ -2487,20 +1824,26 @@ export default function FinancesPage() {
                                       </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                      <DropdownMenuItem>
+                                      <DropdownMenuItem onClick={() => openEditInvoice(invoice)}>
                                         <Edit className="mr-2 h-3 w-3" />
                                         Edit
                                       </DropdownMenuItem>
-                                      <DropdownMenuItem>
+                                      <DropdownMenuItem onClick={() => handleDuplicateInvoice(invoice)}>
                                         <Copy className="mr-2 h-3 w-3" />
                                         Duplicate
                                       </DropdownMenuItem>
-                                      <DropdownMenuItem>
+                                      <DropdownMenuItem onClick={() => handleInvoiceStatusChange(invoice.id, "sent")}>
                                         <Mail className="mr-2 h-3 w-3" />
                                         Send
                                       </DropdownMenuItem>
                                       <DropdownMenuSeparator />
-                                      <DropdownMenuItem className="text-red-500">
+                                      {invoice.status !== "paid" && (
+                                        <DropdownMenuItem onClick={() => handleInvoiceStatusChange(invoice.id, "paid")}>
+                                          <CheckCircle2 className="mr-2 h-3 w-3" />
+                                          Mark as Paid
+                                        </DropdownMenuItem>
+                                      )}
+                                      <DropdownMenuItem className="text-red-500" onClick={() => { setDeleteInvoiceTarget(invoice.id); setShowDeleteInvoiceDialog(true) }}>
                                         <Trash2 className="mr-2 h-3 w-3" />
                                         Delete
                                       </DropdownMenuItem>
@@ -2526,7 +1869,7 @@ export default function FinancesPage() {
                   const paidPercentage = (invoice.paid / invoice.amount) * 100
 
                   return (
-                    <AnimatedCard key={invoice.id} delay={idx * 0.05}>
+                    <AnimatedCard key={invoice.id} delay={idx * 0.05} className={cn(invoice.status === "overdue" && "ring-1 ring-red-500/30")}>
                       <CardContent className="p-4 space-y-3">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -2571,20 +1914,26 @@ export default function FinancesPage() {
                           </div>
                           <div>
                             <p className="text-muted-foreground">Due Date</p>
-                            <p className="font-medium">{formatDate(invoice.dueDate)}</p>
+                            <p className={cn("font-medium", invoice.status === "overdue" && "text-red-400")}>{formatDate(invoice.dueDate)}</p>
                           </div>
                         </div>
 
                         <div className="flex items-center justify-between pt-2 border-t">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <Badge variant="outline" className="text-xs">
                               {invoice.paymentMethod}
                             </Badge>
-                            <Badge variant="secondary" className="text-xs">
-                              {invoice.category}
-                            </Badge>
+                            {(() => {
+                              const cat = INVOICE_CATEGORY_CONFIG[invoice.category]; return cat ? (
+                                <Badge className={cn("text-[10px] border-0", cat.bgColor, cat.color)}>
+                                  <span className="mr-0.5">{cat.icon}</span> {cat.label}
+                                </Badge>
+                              ) : (
+                                <Badge variant="secondary" className="text-xs">{invoice.category}</Badge>
+                              )
+                            })()}
                             {invoice.recurringInvoice && (
-                              <Badge variant="outline" className="text-xs">
+                              <Badge variant="outline" className="text-xs border-blue-500/30 text-blue-400">
                                 <Repeat className="h-2 w-2 mr-1" />
                                 Recurring
                               </Badge>
@@ -2798,20 +2147,26 @@ export default function FinancesPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => openEditInvoice(invoice)}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit
                               </DropdownMenuItem>
-                              <DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleDuplicateInvoice(invoice)}>
                                 <Copy className="mr-2 h-4 w-4" />
                                 Duplicate
                               </DropdownMenuItem>
-                              <DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleInvoiceStatusChange(invoice.id, "sent")}>
                                 <Mail className="mr-2 h-4 w-4" />
                                 Send
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-red-500">
+                              {invoice.status !== "paid" && (
+                                <DropdownMenuItem onClick={() => handleInvoiceStatusChange(invoice.id, "paid")}>
+                                  <CheckCircle2 className="mr-2 h-4 w-4" />
+                                  Mark as Paid
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem className="text-red-500" onClick={() => { setDeleteInvoiceTarget(invoice.id); setShowDeleteInvoiceDialog(true) }}>
                                 <Trash2 className="mr-2 h-4 w-4" />
                                 Delete
                               </DropdownMenuItem>
@@ -2850,55 +2205,97 @@ export default function FinancesPage() {
                           const StatusIcon = statusConfig[invoice.status]?.icon
 
                           return (
-                            <tr key={invoice.id} className="border-b hover:bg-muted/30 transition-colors">
+                            <tr key={invoice.id} className={cn("border-b hover:bg-muted/30 transition-colors cursor-pointer", invoice.status === "overdue" && "bg-red-500/5")} onClick={() => { setSelectedInvoice(invoice); setShowViewInvoiceDialog(true) }}>
                               <td className="p-3">
-                                <p className="font-mono text-sm font-medium">{invoice.invoiceNumber}</p>
-                                {invoice.recurringInvoice && (
-                                  <Badge variant="outline" className="text-[10px] h-4 mt-1">
-                                    <Repeat className="h-2 w-2 mr-0.5" />
-                                    Recurring
-                                  </Badge>
-                                )}
+                                <p className="font-mono text-sm font-semibold">{invoice.invoiceNumber}</p>
+                                <div className="flex items-center gap-1 mt-1">
+                                  {invoice.recurringInvoice && (
+                                    <Badge variant="outline" className="text-[10px] h-4 border-blue-500/30 text-blue-400">
+                                      <Repeat className="h-2 w-2 mr-0.5" />
+                                      Recurring
+                                    </Badge>
+                                  )}
+                                </div>
                               </td>
                               <td className="p-3">
-                                <p className="font-medium">{invoice.client}</p>
-                                <p className="text-xs text-muted-foreground">{invoice.clientEmail}</p>
+                                <div className="flex items-center gap-2">
+                                  <Avatar className="h-7 w-7">
+                                    <AvatarImage src={invoice.clientLogo || "/placeholder.svg"} />
+                                    <AvatarFallback className="text-[10px]">{invoice.client.substring(0, 2)}</AvatarFallback>
+                                  </Avatar>
+                                  <div>
+                                    <p className="font-medium text-sm">{invoice.client}</p>
+                                    <p className="text-xs text-muted-foreground">{invoice.clientEmail}</p>
+                                  </div>
+                                </div>
                               </td>
                               <td className="p-3">
-                                <p className="text-sm">{invoice.project}</p>
-                                <Badge variant="secondary" className="text-[10px] mt-1">
-                                  {invoice.category}
-                                </Badge>
+                                <p className="text-sm font-medium">{invoice.project}</p>
+                                {(() => {
+                                  const cat = INVOICE_CATEGORY_CONFIG[invoice.category]; return cat ? (
+                                    <Badge className={cn("text-[10px] mt-1 border-0", cat.bgColor, cat.color)}>
+                                      <span className="mr-0.5">{cat.icon}</span> {cat.label}
+                                    </Badge>
+                                  ) : (
+                                    <Badge variant="secondary" className="text-[10px] mt-1">{invoice.category}</Badge>
+                                  )
+                                })()}
                               </td>
                               <td className="p-3">
                                 <p className="font-bold">{formatCurrency(invoice.amount)}</p>
                                 {invoice.tax > 0 && (
-                                  <p className="text-xs text-muted-foreground">+{formatCurrency(invoice.tax)} tax</p>
+                                  <p className="text-[10px] text-muted-foreground">+{formatCurrency(invoice.tax)} tax</p>
                                 )}
                               </td>
                               <td className="p-3">
-                                <p className="font-medium text-emerald-500">{formatCurrency(invoice.paid)}</p>
-                                <Progress value={paidPercentage} className="h-1 mt-1 w-20" />
+                                <div className="flex items-center gap-2">
+                                  <div className="min-w-[60px]">
+                                    <p className={cn("font-semibold text-sm", invoice.paid > 0 ? "text-emerald-500" : "text-muted-foreground")}>{formatCurrency(invoice.paid)}</p>
+                                  </div>
+                                  <div className="flex-1 min-w-[50px]">
+                                    <Progress value={paidPercentage} className="h-1.5" />
+                                    <p className="text-[10px] text-muted-foreground mt-0.5">{Math.round(paidPercentage)}%</p>
+                                  </div>
+                                </div>
                               </td>
                               <td className="p-3">
-                                <Badge className={statusConfig[invoice.status]?.color}>
-                                  {StatusIcon && <StatusIcon className="h-3 w-3 mr-1" />}
+                                <Badge className={cn(statusConfig[invoice.status]?.color, "gap-1")}>
+                                  {StatusIcon && <StatusIcon className="h-3 w-3" />}
                                   {statusConfig[invoice.status]?.label}
                                 </Badge>
+                                {invoice.status === "overdue" && (() => {
+                                  const daysOverdue = Math.floor((new Date().getTime() - new Date(invoice.dueDate).getTime()) / (1000 * 60 * 60 * 24))
+                                  return daysOverdue > 0 ? (
+                                    <p className="text-[10px] text-red-400 font-medium mt-1">{daysOverdue} days overdue</p>
+                                  ) : null
+                                })()}
                               </td>
                               <td className="p-3">
                                 <p className="text-sm">{formatDate(invoice.dueDate)}</p>
-                                {invoice.paidDate && (
-                                  <p className="text-xs text-emerald-500">Paid: {formatDate(invoice.paidDate)}</p>
-                                )}
+                                {invoice.paidDate ? (
+                                  <p className="text-[10px] text-emerald-500 flex items-center gap-0.5"><CheckCircle2 className="h-2.5 w-2.5" /> Paid: {formatDate(invoice.paidDate)}</p>
+                                ) : invoice.status === "overdue" ? (
+                                  <p className="text-[10px] text-red-400 font-medium">Past due</p>
+                                ) : null}
                               </td>
                               <td className="p-3">
                                 <Badge variant="outline" className="text-xs">
                                   {invoice.paymentMethod}
                                 </Badge>
                               </td>
-                              <td className="p-3">
+                              <td className="p-3" onClick={(e) => e.stopPropagation()}>
                                 <div className="flex items-center justify-end gap-1">
+                                  {(invoice.status === "overdue" || invoice.status === "pending" || invoice.status === "sent") && (
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-7 w-7 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10"
+                                      title="Send Reminder"
+                                      onClick={() => alert(`Payment reminder sent to ${invoice.clientEmail}`)}
+                                    >
+                                      <Mail className="h-3.5 w-3.5" />
+                                    </Button>
+                                  )}
                                   <Dialog>
                                     <DialogTrigger asChild>
                                       <Button
@@ -3137,20 +2534,26 @@ export default function FinancesPage() {
                                       </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                      <DropdownMenuItem>
+                                      <DropdownMenuItem onClick={() => openEditInvoice(invoice)}>
                                         <Edit className="mr-2 h-3 w-3" />
                                         Edit
                                       </DropdownMenuItem>
-                                      <DropdownMenuItem>
+                                      <DropdownMenuItem onClick={() => handleDuplicateInvoice(invoice)}>
                                         <Copy className="mr-2 h-3 w-3" />
                                         Duplicate
                                       </DropdownMenuItem>
-                                      <DropdownMenuItem>
+                                      <DropdownMenuItem onClick={() => handleInvoiceStatusChange(invoice.id, "sent")}>
                                         <Mail className="mr-2 h-3 w-3" />
                                         Send
                                       </DropdownMenuItem>
                                       <DropdownMenuSeparator />
-                                      <DropdownMenuItem className="text-red-500">
+                                      {invoice.status !== "paid" && (
+                                        <DropdownMenuItem onClick={() => handleInvoiceStatusChange(invoice.id, "paid")}>
+                                          <CheckCircle2 className="mr-2 h-3 w-3" />
+                                          Mark as Paid
+                                        </DropdownMenuItem>
+                                      )}
+                                      <DropdownMenuItem className="text-red-500" onClick={() => { setDeleteInvoiceTarget(invoice.id); setShowDeleteInvoiceDialog(true) }}>
                                         <Trash2 className="mr-2 h-3 w-3" />
                                         Delete
                                       </DropdownMenuItem>
@@ -4779,6 +4182,490 @@ export default function FinancesPage() {
             >
               Delete Invoice
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Invoice Dialog */}
+      <Dialog open={showCreateInvoiceDialog} onOpenChange={setShowCreateInvoiceDialog}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Receipt className="h-5 w-5 text-primary" />
+              Create New Invoice
+            </DialogTitle>
+            <p className="text-sm text-muted-foreground">Generate a professional invoice for your client</p>
+          </DialogHeader>
+          <div className="grid gap-6 py-4">
+
+            {/* Service Template Selector */}
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold flex items-center gap-1.5">
+                <FileText className="h-3.5 w-3.5" />
+                Quick Start — Service Template
+              </Label>
+              <div className="grid grid-cols-3 gap-2">
+                {AGENCY_SERVICE_TEMPLATES.map((template) => (
+                  <button
+                    key={template.id}
+                    type="button"
+                    className={cn(
+                      "flex items-center gap-2 p-2.5 rounded-lg border text-left transition-all hover:shadow-md hover:border-primary/50",
+                      invoiceFormData.category === template.category ? "border-primary bg-primary/5 ring-1 ring-primary/20" : "border-border hover:bg-muted/50"
+                    )}
+                    onClick={() => {
+                      setInvoiceLineItems(
+                        template.defaultItems.map((item, idx) => ({
+                          id: idx + 1,
+                          description: item.description,
+                          quantity: item.quantity,
+                          rate: item.unitPrice,
+                          amount: item.quantity * item.unitPrice,
+                          taxable: true,
+                        }))
+                      )
+                      setInvoiceFormData(prev => ({
+                        ...prev,
+                        category: template.category,
+                        taxRate: template.defaultTaxRate,
+                        paymentTerms: template.defaultPaymentTerms === 15 ? "Net 15" : template.defaultPaymentTerms === 45 ? "Net 45" : "Net 30",
+                      }))
+                    }}
+                  >
+                    <span className={cn("text-lg w-7 h-7 rounded-md flex items-center justify-center shrink-0", template.bgColor)}>{template.icon}</span>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold truncate">{template.name}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{template.description}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t pt-4" />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Client *</Label>
+                <Input
+                  placeholder="Client name"
+                  value={invoiceFormData.client}
+                  onChange={(e) => setInvoiceFormData(prev => ({ ...prev, client: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Client Email</Label>
+                <Input
+                  placeholder="client@email.com"
+                  value={invoiceFormData.clientEmail}
+                  onChange={(e) => setInvoiceFormData(prev => ({ ...prev, clientEmail: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Project *</Label>
+                <Input
+                  placeholder="Project name"
+                  value={invoiceFormData.project}
+                  onChange={(e) => setInvoiceFormData(prev => ({ ...prev, project: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Service Category</Label>
+                <Select value={invoiceFormData.category} onValueChange={(value) => setInvoiceFormData(prev => ({ ...prev, category: value }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(INVOICE_CATEGORY_CONFIG).map(([key, config]) => (
+                      <SelectItem key={key} value={key}>
+                        <span className="flex items-center gap-1.5">
+                          <span>{config.icon}</span> {config.label}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>Issue Date *</Label>
+                <Input
+                  type="date"
+                  value={invoiceFormData.issueDate}
+                  onChange={(e) => setInvoiceFormData(prev => ({ ...prev, issueDate: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Due Date *</Label>
+                <Input
+                  type="date"
+                  value={invoiceFormData.dueDate}
+                  onChange={(e) => setInvoiceFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Payment Terms</Label>
+                <Select value={invoiceFormData.paymentTerms} onValueChange={(value) => setInvoiceFormData(prev => ({ ...prev, paymentTerms: value }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Net 15">Net 15</SelectItem>
+                    <SelectItem value="Net 30">Net 30</SelectItem>
+                    <SelectItem value="Net 45">Net 45</SelectItem>
+                    <SelectItem value="Due on Receipt">Due on Receipt</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Payment Method</Label>
+                <Select value={invoiceFormData.paymentMethod} onValueChange={(value) => setInvoiceFormData(prev => ({ ...prev, paymentMethod: value }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                    <SelectItem value="Credit Card">Credit Card</SelectItem>
+                    <SelectItem value="ACH">ACH</SelectItem>
+                    <SelectItem value="Wire Transfer">Wire Transfer</SelectItem>
+                    <SelectItem value="PayPal">PayPal</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-end gap-2">
+                <Checkbox
+                  id="createRecurring"
+                  checked={invoiceFormData.recurringInvoice}
+                  onCheckedChange={(checked) => setInvoiceFormData(prev => ({ ...prev, recurringInvoice: checked as boolean }))}
+                />
+                <Label htmlFor="createRecurring" className="text-sm font-normal">Recurring Invoice</Label>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Label className="font-semibold">Line Items *</Label>
+              <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
+                <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground">
+                  <div className="col-span-5">Description</div>
+                  <div className="col-span-2">Quantity</div>
+                  <div className="col-span-2">Rate ($)</div>
+                  <div className="col-span-2">Amount</div>
+                  <div className="col-span-1"></div>
+                </div>
+                {invoiceLineItems.map((item) => (
+                  <div key={item.id} className="grid grid-cols-12 gap-2 items-center">
+                    <Input
+                      className="col-span-5"
+                      placeholder="Service or product description"
+                      value={item.description}
+                      onChange={(e) => handleInvoiceLineItemChange(item.id, "description", e.target.value)}
+                    />
+                    <Input
+                      className="col-span-2"
+                      type="number"
+                      placeholder="1"
+                      value={item.quantity}
+                      onChange={(e) => handleInvoiceLineItemChange(item.id, "quantity", Number(e.target.value))}
+                    />
+                    <Input
+                      className="col-span-2"
+                      type="number"
+                      placeholder="0.00"
+                      step="0.01"
+                      value={item.rate || ""}
+                      onChange={(e) => handleInvoiceLineItemChange(item.id, "rate", Number(e.target.value))}
+                    />
+                    <div className="col-span-2 text-sm font-medium">{formatCurrency(item.amount)}</div>
+                    <Button variant="ghost" size="icon" className="col-span-1" onClick={() => handleRemoveInvoiceLineItem(item.id)} disabled={invoiceLineItems.length === 1}>
+                      <Trash2 className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </div>
+                ))}
+                <Button variant="outline" size="sm" className="w-full bg-transparent" onClick={() => handleAddInvoiceLineItem()}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Line Item
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>Subtotal</Label>
+                <Input value={formatCurrency(invoiceSubtotal)} disabled className="font-semibold" />
+              </div>
+              <div className="space-y-2">
+                <Label>Tax (%)</Label>
+                <Input
+                  type="number"
+                  value={invoiceFormData.taxRate}
+                  step="0.1"
+                  onChange={(e) => setInvoiceFormData(prev => ({ ...prev, taxRate: Number(e.target.value) }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Discount ($)</Label>
+                <Input
+                  type="number"
+                  placeholder="0.00"
+                  step="0.01"
+                  value={invoiceFormData.discount || ""}
+                  onChange={(e) => setInvoiceFormData(prev => ({ ...prev, discount: Number(e.target.value) }))}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Invoice Notes</Label>
+                <Textarea
+                  placeholder="Thank you for your business..."
+                  rows={3}
+                  value={invoiceFormData.notes}
+                  onChange={(e) => setInvoiceFormData(prev => ({ ...prev, notes: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Internal Notes (Private)</Label>
+                <Textarea
+                  placeholder="Notes for internal use only..."
+                  rows={3}
+                  value={invoiceFormData.internalNotes}
+                  onChange={(e) => setInvoiceFormData(prev => ({ ...prev, internalNotes: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center pt-4 border-t">
+              <div>
+                <p className="text-xs text-muted-foreground">Invoice Total</p>
+                <p className="text-2xl font-bold text-primary">{formatCurrency(invoiceTotal)}</p>
+                {invoiceFormData.discount > 0 && (
+                  <p className="text-[10px] text-emerald-500">Discount: -{formatCurrency(invoiceFormData.discount)}</p>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => handleCreateInvoice(true)}>
+                  <FileText className="mr-1.5 h-4 w-4" />
+                  Save as Draft
+                </Button>
+                <Button onClick={() => handleCreateInvoice(false)} className="bg-primary">
+                  <Send className="mr-1.5 h-4 w-4" />
+                  Create &amp; Send Invoice
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Invoice Dialog */}
+      <Dialog open={showEditInvoiceDialog} onOpenChange={setShowEditInvoiceDialog}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Invoice - {selectedInvoice?.invoiceNumber}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-6 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Client *</Label>
+                <Input
+                  value={editInvoiceFormData.client}
+                  onChange={(e) => setEditInvoiceFormData(prev => ({ ...prev, client: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Client Email</Label>
+                <Input
+                  value={editInvoiceFormData.clientEmail}
+                  onChange={(e) => setEditInvoiceFormData(prev => ({ ...prev, clientEmail: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Project *</Label>
+                <Input
+                  value={editInvoiceFormData.project}
+                  onChange={(e) => setEditInvoiceFormData(prev => ({ ...prev, project: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Category</Label>
+                <Select value={editInvoiceFormData.category} onValueChange={(value) => setEditInvoiceFormData(prev => ({ ...prev, category: value }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="development">Development</SelectItem>
+                    <SelectItem value="marketing">Marketing</SelectItem>
+                    <SelectItem value="creative">Creative</SelectItem>
+                    <SelectItem value="social">Social Media</SelectItem>
+                    <SelectItem value="branding">Branding</SelectItem>
+                    <SelectItem value="consulting">Consulting</SelectItem>
+                    <SelectItem value="content">Content</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>Issue Date</Label>
+                <Input
+                  type="date"
+                  value={editInvoiceFormData.issueDate}
+                  onChange={(e) => setEditInvoiceFormData(prev => ({ ...prev, issueDate: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Due Date</Label>
+                <Input
+                  type="date"
+                  value={editInvoiceFormData.dueDate}
+                  onChange={(e) => setEditInvoiceFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Payment Terms</Label>
+                <Select value={editInvoiceFormData.paymentTerms} onValueChange={(value) => setEditInvoiceFormData(prev => ({ ...prev, paymentTerms: value }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Net 15">Net 15</SelectItem>
+                    <SelectItem value="Net 30">Net 30</SelectItem>
+                    <SelectItem value="Net 45">Net 45</SelectItem>
+                    <SelectItem value="Due on Receipt">Due on Receipt</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Payment Method</Label>
+                <Select value={editInvoiceFormData.paymentMethod} onValueChange={(value) => setEditInvoiceFormData(prev => ({ ...prev, paymentMethod: value }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                    <SelectItem value="Credit Card">Credit Card</SelectItem>
+                    <SelectItem value="ACH">ACH</SelectItem>
+                    <SelectItem value="Wire Transfer">Wire Transfer</SelectItem>
+                    <SelectItem value="PayPal">PayPal</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <Select value={selectedInvoice?.status || "draft"} onValueChange={(value) => { if (selectedInvoice) handleInvoiceStatusChange(selectedInvoice.id, value) }}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="sent">Sent (Unpaid)</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="partial">Partial</SelectItem>
+                    <SelectItem value="paid">Paid</SelectItem>
+                    <SelectItem value="overdue">Overdue</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Label>Line Items</Label>
+              <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
+                <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground">
+                  <div className="col-span-5">Description</div>
+                  <div className="col-span-2">Quantity</div>
+                  <div className="col-span-2">Rate ($)</div>
+                  <div className="col-span-2">Amount</div>
+                  <div className="col-span-1"></div>
+                </div>
+                {editInvoiceLineItems.map((item) => (
+                  <div key={item.id} className="grid grid-cols-12 gap-2 items-center">
+                    <Input
+                      className="col-span-5"
+                      value={item.description}
+                      onChange={(e) => handleInvoiceLineItemChange(item.id, "description", e.target.value, true)}
+                    />
+                    <Input
+                      className="col-span-2"
+                      type="number"
+                      value={item.quantity}
+                      onChange={(e) => handleInvoiceLineItemChange(item.id, "quantity", Number(e.target.value), true)}
+                    />
+                    <Input
+                      className="col-span-2"
+                      type="number"
+                      step="0.01"
+                      value={item.rate || ""}
+                      onChange={(e) => handleInvoiceLineItemChange(item.id, "rate", Number(e.target.value), true)}
+                    />
+                    <div className="col-span-2 text-sm font-medium">{formatCurrency(item.amount)}</div>
+                    <Button variant="ghost" size="icon" className="col-span-1" onClick={() => handleRemoveInvoiceLineItem(item.id, true)} disabled={editInvoiceLineItems.length === 1}>
+                      <Trash2 className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </div>
+                ))}
+                <Button variant="outline" size="sm" className="w-full bg-transparent" onClick={() => handleAddInvoiceLineItem(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Line Item
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>Subtotal</Label>
+                <Input value={formatCurrency(editInvoiceSubtotal)} disabled />
+              </div>
+              <div className="space-y-2">
+                <Label>Tax (%)</Label>
+                <Input
+                  type="number"
+                  value={editInvoiceFormData.taxRate}
+                  step="0.1"
+                  onChange={(e) => setEditInvoiceFormData(prev => ({ ...prev, taxRate: Number(e.target.value) }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Discount ($)</Label>
+                <Input
+                  type="number"
+                  value={editInvoiceFormData.discount || ""}
+                  step="0.01"
+                  onChange={(e) => setEditInvoiceFormData(prev => ({ ...prev, discount: Number(e.target.value) }))}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Invoice Notes</Label>
+                <Textarea
+                  rows={3}
+                  value={editInvoiceFormData.notes}
+                  onChange={(e) => setEditInvoiceFormData(prev => ({ ...prev, notes: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Internal Notes (Private)</Label>
+                <Textarea
+                  rows={3}
+                  value={editInvoiceFormData.internalNotes}
+                  onChange={(e) => setEditInvoiceFormData(prev => ({ ...prev, internalNotes: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center pt-4 border-t">
+              <div className="text-lg font-bold">
+                Total: <span className="text-2xl text-primary">{formatCurrency(editInvoiceTotal)}</span>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setShowEditInvoiceDialog(false)}>Cancel</Button>
+                <Button onClick={handleSaveInvoiceEdit}>Save Changes</Button>
+              </div>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
