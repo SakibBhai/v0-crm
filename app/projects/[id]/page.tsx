@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import type React from "react"
 import { useState, use, useEffect } from "react"
@@ -64,6 +64,7 @@ import { sampleTasks, teamMembers } from "@/lib/data/tasks"
 import { generateId } from "@/lib/id-generator"
 import { DatePicker } from "@/components/ui/date-picker"
 import { cn } from "@/lib/utils"
+import { getProjectById, updateProject as updateProjectAction } from "@/app/actions/projects"
 
 interface TeamMember {
     id: string
@@ -229,7 +230,7 @@ const projectsMap: Record<string, Project> = {
     },
 }
 
-const getProjectById = (id: string): Project => projectsMap[id] || projectsMap["PJ-0001"]
+const getProjectByIdLocal = (id: string): Project => projectsMap[id] || projectsMap["PJ-0001"]
 
 // Gantt chart data
 const ganttData = [
@@ -273,7 +274,8 @@ const fileIcons = {
 
 export default function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params)
-    const [project, setProject] = useState<Project>(getProjectById(resolvedParams.id))
+    const [project, setProject] = useState<Project>(getProjectByIdLocal(resolvedParams.id))
+    const [isDbLoaded, setIsDbLoaded] = useState(false)
     const [projectTasks, setProjectTasks] = useState<Task[]>(sampleTasks.filter(t => t.projectId === resolvedParams.id))
     const [activeTab, setActiveTab] = useState("overview")
     const [isAddTaskOpen, setIsAddTaskOpen] = useState(false)
@@ -301,6 +303,30 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     const [recordPaymentInvoiceId, setRecordPaymentInvoiceId] = useState("")
     const [recordPaymentAmount, setRecordPaymentAmount] = useState("")
     const [recordPaymentMethod, setRecordPaymentMethod] = useState("bank_transfer")
+
+    // Load project from DB
+    useEffect(() => {
+        async function loadProject() {
+            try {
+                const dbProject = await getProjectById(resolvedParams.id)
+                if (dbProject) {
+                    setProject({
+                        ...getProjectByIdLocal(resolvedParams.id), // fallback for team/files/discussions
+                        ...dbProject,
+                        deadline: dbProject.dueDate || dbProject.deadline || getProjectByIdLocal(resolvedParams.id).deadline,
+                        team: getProjectByIdLocal(resolvedParams.id).team,
+                        files: getProjectByIdLocal(resolvedParams.id).files,
+                        discussions: getProjectByIdLocal(resolvedParams.id).discussions,
+                    })
+                    setIsDbLoaded(true)
+                }
+            } catch (err) {
+                console.error("Failed to load project from DB:", err)
+            }
+        }
+        loadProject()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [resolvedParams.id])
 
     // Computed invoice form totals
     const invoiceSubtotal = invoiceLineItems.reduce((sum, item) => sum + item.amount, 0)
@@ -395,26 +421,37 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
         }
     }
 
-    const handleEditProject = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleEditProject = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         const formData = new FormData(e.currentTarget)
 
+        const updateData = {
+            name: formData.get("name") as string || project.name,
+            description: formData.get("description") as string || project.description,
+            client: formData.get("client") as string || project.client,
+            projectManager: formData.get("projectManager") as string || project.projectManager,
+            status: formData.get("status") as Project["status"] || project.status,
+            budget: Number(formData.get("budget")) || project.budget,
+            spent: Number(formData.get("spent")) || project.spent,
+            startDate: formData.get("startDate") as string || project.startDate,
+            dueDate: formData.get("deadline") as string || project.deadline,
+            progress: Number(formData.get("progress")) || project.progress,
+            briefLink: formData.get("briefLink") as string || project.briefLink,
+            driveLink: formData.get("driveLink") as string || project.driveLink,
+            researchLink: formData.get("researchLink") as string || project.researchLink,
+        }
+
         setProject(prev => ({
             ...prev,
-            name: formData.get("name") as string || prev.name,
-            description: formData.get("description") as string || prev.description,
-            client: formData.get("client") as string || prev.client,
-            projectManager: formData.get("projectManager") as string || prev.projectManager,
-            status: formData.get("status") as Project["status"] || prev.status,
-            budget: Number(formData.get("budget")) || prev.budget,
-            spent: Number(formData.get("spent")) || prev.spent,
-            startDate: formData.get("startDate") as string || prev.startDate,
-            deadline: formData.get("deadline") as string || prev.deadline,
-            progress: Number(formData.get("progress")) || prev.progress,
-            briefLink: formData.get("briefLink") as string || prev.briefLink,
-            driveLink: formData.get("driveLink") as string || prev.driveLink,
-            researchLink: formData.get("researchLink") as string || prev.researchLink,
+            ...updateData,
+            deadline: updateData.dueDate || prev.deadline,
         }))
+
+        try {
+            await updateProjectAction(resolvedParams.id, updateData)
+        } catch (err) {
+            console.error("Failed to update project:", err)
+        }
 
         setIsEditOpen(false)
     }

@@ -1,4 +1,80 @@
 {
-  "node": {},
+  "node": {
+    "005785efe96a2df2de60a121201dc9277895e07374": {
+      "workers": {
+        "app/clients/page": {
+          "moduleId": 78610,
+          "async": false,
+          "exportedName": "getClients",
+          "filename": "app/actions/clients.ts"
+        }
+      },
+      "layer": {
+        "app/clients/page": "action-browser"
+      },
+      "exportedName": "getClients",
+      "filename": "app/actions/clients.ts"
+    },
+    "4091d65f2a526ab28b6db776f22d0e9c97498db50b": {
+      "workers": {
+        "app/clients/page": {
+          "moduleId": 78610,
+          "async": false,
+          "exportedName": "createClient",
+          "filename": "app/actions/clients.ts"
+        }
+      },
+      "layer": {
+        "app/clients/page": "action-browser"
+      },
+      "exportedName": "createClient",
+      "filename": "app/actions/clients.ts"
+    },
+    "60ec923c02ddc1ced1ff8ea671fe8a90ca15fbd9b7": {
+      "workers": {
+        "app/clients/page": {
+          "moduleId": 78610,
+          "async": false,
+          "exportedName": "updateClient",
+          "filename": "app/actions/clients.ts"
+        }
+      },
+      "layer": {
+        "app/clients/page": "action-browser"
+      },
+      "exportedName": "updateClient",
+      "filename": "app/actions/clients.ts"
+    },
+    "4018c357fc09e6abc48028bb8f7a96d9404bd1e8c4": {
+      "workers": {
+        "app/clients/page": {
+          "moduleId": 78610,
+          "async": false,
+          "exportedName": "deleteClient",
+          "filename": "app/actions/clients.ts"
+        }
+      },
+      "layer": {
+        "app/clients/page": "action-browser"
+      },
+      "exportedName": "deleteClient",
+      "filename": "app/actions/clients.ts"
+    },
+    "4056d4b8d582325f7494c9cf27b858ca44aaf9038a": {
+      "workers": {
+        "app/clients/page": {
+          "moduleId": 78610,
+          "async": false,
+          "exportedName": "bulkDeleteClients",
+          "filename": "app/actions/clients.ts"
+        }
+      },
+      "layer": {
+        "app/clients/page": "action-browser"
+      },
+      "exportedName": "bulkDeleteClients",
+      "filename": "app/actions/clients.ts"
+    }
+  },
   "edge": {}
 }

@@ -1,0 +1,170 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id              String            @id @default(cuid())
+  name            String
+  company         String
+  email           String
+  phone           String
+  status          String // "hot" | "warm" | "cold"
+  stage           String // "new" | "contacted" | "qualified" | "proposal" | "negotiation" | "won" | "lost"
+  priority        String // "high" | "medium" | "low"
+  category        String
+  value           Float
+  probability     Int
+  source          String
+  assignedTo      String
+  activities      Int               @default(0)
+  tags            String[]
+  notes           String            @default("")
+  createdAt       DateTime          @default(now())
+  lastContact     DateTime          @default(now())
+  nextFollowUp    String            @default("")
+  starred         Boolean           @default(false)
+
+  noteHistory     NoteHistory[]
+  activityHistory ActivityHistory[]
+
+  clientId        String?
+  client          Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+}
+
+model NoteHistory {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  createdBy String
+
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+}
+
+model ActivityHistory {
+  id               String   @id @default(cuid())
+  type             String
+  description      String
+  timestamp        DateTime @default(now())
+  changedBy        String
+  changes          Json?
+  meetingType      String?
+  meetingDetails   String?
+  meetingDate      String?
+  meetingTime      String?
+  meetingLocation  String?
+  meetingLink      String?
+  meetingAttendees Json?
+
+  leadId           String
+  lead             Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+}
+
+model Client {
+  id                String   @id @default(cuid())
+  name              String
+  email             String
+  phone             String
+  company           String
+  website           String
+  address           String
+  status            String   // "active" | "inactive" | "paused" | "churned" | "prospect"
+  industry          String
+  totalRevenue      Float
+  monthlyRevenue    Float
+  activeProjects    Int
+  completedProjects Int
+  joinedDate        String
+  lastContact       String   @default("")
+  avatar            String?
+  notes             String   @default("")
+  starred           Boolean  @default(false)
+  healthScore       Int
+  satisfaction      Int
+  contractValue     Float
+  contractEnd       String
+  paymentStatus     String   // "paid" | "pending" | "overdue"
+  tags              String[]
+  accountManager    String
+  tier              String   // "enterprise" | "professional" | "starter"
+  engagementScore   Int
+  lifetimeValue     Float
+  openTickets       Int
+  npsScore          Int
+  revenueGrowth     Float
+  activeCampaigns   Int
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  leads             Lead[]
+}
+
+model Project {
+  id                String   @id @default(cuid())
+  name              String
+  description       String   @default("")
+  client            String
+  clientEmail       String   @default("")
+  projectManager    String
+  status            String   // planning | in-progress | review | completed | on-hold
+  priority          String   @default("medium") // low | medium | high
+  progress          Int      @default(0)
+  budget            Float    @default(0)
+  spent             Float    @default(0)
+  startDate         String
+  dueDate           String
+  team              String[] // initials array
+  tasksTotal        Int      @default(0)
+  tasksCompleted    Int      @default(0)
+  category          String   @default("")
+  briefLink         String?
+  driveLink         String?
+  researchLink      String?
+  billingType       String   @default("one-time") // one-time | recurring
+  recurringInterval String?  // 7-days | 15-days | 30-days | monthly
+  nextBillingDate   String?
+  monthlyRate       Float?
+  totalBilled       Float    @default(0)
+  paymentStatus     String   @default("pending") // pending | partial | paid | overdue
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Task {
+  id               String   @id @default(cuid())
+  title            String
+  description      String   @default("")
+  status           String   // backlog | todo | in-progress | in-review | done
+  priority         String   @default("medium") // low | medium | high | critical
+  taskType         String   @default("general")
+  projectId        String
+  projectName      String
+  assignees        Json     @default("[]")
+  assignedById     String   @default("")
+  assignedByName   String   @default("")
+  reporterId       String   @default("")
+  reporterName     String   @default("")
+  dueDate          String
+  startDate        String?
+  tags             String[]
+  subtasks         Json     @default("[]")
+  comments         Json     @default("[]")
+  attachments      Json     @default("[]")
+  dependencies     Json     @default("[]")
+  timeEntries      Json     @default("[]")
+  referenceLinks   Json     @default("[]")
+  activityLog      Json     @default("[]")
+  estimatedHours   Float    @default(0)
+  actualHours      Float    @default(0)
+  isBlocked        Boolean  @default(false)
+  isRecurring      Boolean  @default(false)
+  recurringPattern String?
+  customFields     Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}

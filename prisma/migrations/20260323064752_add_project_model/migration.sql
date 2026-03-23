@@ -1,0 +1,33 @@
+-- CreateTable
+CREATE TABLE "Project" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL DEFAULT '',
+    "client" TEXT NOT NULL,
+    "clientEmail" TEXT NOT NULL DEFAULT '',
+    "projectManager" TEXT NOT NULL,
+    "status" TEXT NOT NULL,
+    "priority" TEXT NOT NULL DEFAULT 'medium',
+    "progress" INTEGER NOT NULL DEFAULT 0,
+    "budget" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "spent" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "startDate" TEXT NOT NULL,
+    "dueDate" TEXT NOT NULL,
+    "team" TEXT[],
+    "tasksTotal" INTEGER NOT NULL DEFAULT 0,
+    "tasksCompleted" INTEGER NOT NULL DEFAULT 0,
+    "category" TEXT NOT NULL DEFAULT '',
+    "briefLink" TEXT,
+    "driveLink" TEXT,
+    "researchLink" TEXT,
+    "billingType" TEXT NOT NULL DEFAULT 'one-time',
+    "recurringInterval" TEXT,
+    "nextBillingDate" TEXT,
+    "monthlyRate" DOUBLE PRECISION,
+    "totalBilled" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "paymentStatus" TEXT NOT NULL DEFAULT 'pending',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Project_pkey" PRIMARY KEY ("id")
+);

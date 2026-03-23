@@ -1,8 +1,9 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { generateId, generateBulkIds } from "@/lib/id-generator"
+import { getLeads, createLead, updateLead, deleteLead, addLeadActivity, addLeadNote, bulkDeleteLeads } from "@/app/actions/leads"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { AnimatedCard } from "@/components/animated-card"
 import { employees } from "@/lib/data/hr"
@@ -418,7 +419,18 @@ const getTimeAgo = (dateString: string): string => {
 }
 
 export default function LeadsPage() {
-  const [leads, setLeads] = useState<Lead[]>(initialLeads)
+  const [leads, setLeads] = useState<Lead[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    async function loadLeads() {
+      const data = await getLeads()
+      setLeads(data)
+      setIsLoading(false)
+    }
+    loadLeads()
+  }, [])
+
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [sourceFilter, setSourceFilter] = useState<string>("all")
@@ -482,100 +494,89 @@ export default function LeadsPage() {
   const uniqueSources = [...new Set(leads.map((l) => l.source))]
   const uniqueAssignees = [...new Set(leads.map((l) => l.assignedTo))]
 
-  const handleAddLead = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAddLead = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
-    const newLead: Lead = {
-      id: generateId("LD", leads),
-      name: formData.get("name") as string,
-      email: formData.get("email") as string,
-      phone: formData.get("phone") as string,
-      company: formData.get("company") as string,
-      status: formData.get("status") as "hot" | "warm" | "cold",
-      stage: formData.get("stage") as Stage,
-      source: formData.get("source") as string,
-      value: Number(formData.get("value")),
-      probability: Number(formData.get("probability")) || 50,
-      createdAt: new Date().toISOString().split("T")[0],
-      lastContact: new Date().toISOString().split("T")[0],
-      nextFollowUp: (formData.get("nextFollowUp") as string) || "",
-      notes: formData.get("notes") as string,
-      tags:
-        (formData.get("tags") as string)
-          ?.split(",")
-          .map((t) => t.trim())
-          .filter(Boolean) || [],
-      assignedTo: (formData.get("assignedTo") as string) || "Unassigned",
-      priority: formData.get("priority") as "high" | "medium" | "low",
-      category: (formData.get("category") as LeadCategory) || "other",
-      starred: false,
-      activities: 0,
-      noteHistory: formData.get("notes") ? [
-        {
-          id: Date.now().toString(),
-          content: formData.get("notes") as string,
-          createdAt: new Date().toISOString(),
-          createdBy: "Current User",
-        },
-      ] : [],
-      activityHistory: [
-        {
-          id: Date.now().toString(),
-          type: "created",
-          description: "Lead created",
-          timestamp: new Date().toISOString(),
-          changedBy: "Current User",
-        },
-      ],
+    try {
+      const createdData = await createLead({
+        name: formData.get("name") as string,
+        email: formData.get("email") as string,
+        phone: formData.get("phone") as string,
+        company: formData.get("company") as string,
+        status: formData.get("status") as "hot" | "warm" | "cold",
+        stage: formData.get("stage") as Stage,
+        source: formData.get("source") as string,
+        value: Number(formData.get("value")),
+        probability: Number(formData.get("probability")) || 50,
+        nextFollowUp: (formData.get("nextFollowUp") as string) || "",
+        notes: formData.get("notes") as string,
+        tags:
+          (formData.get("tags") as string)
+            ?.split(",")
+            .map((t) => t.trim())
+            .filter(Boolean) || [],
+        assignedTo: (formData.get("assignedTo") as string) || "Unassigned",
+        priority: formData.get("priority") as "high" | "medium" | "low",
+        category: (formData.get("category") as LeadCategory) || "other",
+        starred: false,
+      })
+      
+      setLeads([createdData, ...leads])
+      
+      if (formData.get("notes")) {
+        await addLeadNote(createdData.id, formData.get("notes") as string, "Current User")
+      }
+      
+      await addLeadActivity(createdData.id, {
+        type: "created",
+        description: "Lead created",
+        changedBy: "Current User",
+      })
+      
+      // Need to reload to get populated data since notes/activity added
+      const freshLeads = await getLeads()
+      setLeads(freshLeads)
+      
+      setIsAddDialogOpen(false)
+    } catch (err) {
+      console.error(err)
     }
-    setLeads([newLead, ...leads])
-    setIsAddDialogOpen(false)
   }
 
-  const addActivityHistory = (
+  const addActivityHistory = async (
     leadId: string,
-    type: Lead["activityHistory"][0]["type"],
+    type: any,
     description: string,
     changes?: Record<string, { old: string | number; new: string | number }>,
   ) => {
-    setLeads((prev) =>
-      prev.map((lead) => {
-        if (lead.id === leadId) {
-          return {
-            ...lead,
-            activityHistory: [
-              {
-                id: Date.now().toString(),
-                type,
-                description,
-                timestamp: new Date().toISOString(),
-                changedBy: "Current User",
-                changes,
-              },
-              ...lead.activityHistory,
-            ],
-          }
-        }
-        return lead
-      }),
-    )
+    try {
+      await addLeadActivity(leadId, {
+        type,
+        description,
+        changedBy: "Current User",
+        changes: changes as any,
+      })
+      const data = await getLeads()
+      setLeads(data)
+    } catch (e) {
+      console.error(e)
+    }
   }
 
-  const handleDeleteLead = (id: string) => {
+  const handleDeleteLead = async (id: string) => {
+    await deleteLead(id)
     setLeads((prev) => prev.filter((l) => l.id !== id))
     setSelectedLeads((prev) => prev.filter((sid) => sid !== id))
-    setIsViewDialogOpen(false) // Close the view dialog if the lead being viewed is deleted
+    setIsViewDialogOpen(false)
   }
 
-  const handleUpdateLead = (updatedData: Partial<Lead>) => {
+  const handleUpdateLead = async (updatedData: Partial<Lead>) => {
     if (!selectedLead) return
 
     const oldLead = leads.find((l) => l.id === selectedLead.id)
     if (!oldLead) return
 
-    // Track changes
     const changes: Record<string, { old: string | number; new: string | number }> = {}
-    // Only compare fields that are potentially editable and relevant for history tracking
     if (oldLead.name !== updatedData.name) changes["name"] = { old: oldLead.name, new: updatedData.name! }
     if (oldLead.email !== updatedData.email) changes["email"] = { old: oldLead.email, new: updatedData.email! }
     if (oldLead.phone !== updatedData.phone) changes["phone"] = { old: oldLead.phone, new: updatedData.phone! }
@@ -594,97 +595,96 @@ export default function LeadsPage() {
     if (oldLead.notes !== updatedData.notes)
       changes["notes"] = { old: oldLead.notes || "", new: updatedData.notes || "" }
 
-    setLeads((prev) =>
-      prev.map((lead) =>
-        lead.id === selectedLead.id
-          ? {
-            ...lead,
-            ...updatedData,
-            lastContact: new Date().toISOString(), // Update lastContact on any edit
-          }
-          : lead,
-      ),
-    )
+    try {
+      const cleanData = { ...updatedData }
+      delete (cleanData as any).id
+      delete (cleanData as any).noteHistory
+      delete (cleanData as any).activityHistory
+      delete (cleanData as any).createdAt
+      cleanData.lastContact = new Date().toISOString()
+      
+      const updated = await updateLead(selectedLead.id, cleanData as any)
+      
+      setLeads((prev) =>
+        prev.map((lead) =>
+          lead.id === selectedLead.id
+            ? updated
+            : lead,
+        ),
+      )
+      
+      setSelectedLead(updated)
 
-    const updatedLead = { ...selectedLead, ...updatedData, lastContact: new Date().toISOString() }
-    setSelectedLead(updatedLead)
-
-    // Add to activity history only if there were actual changes detected
-    if (Object.keys(changes).length > 0) {
-      addActivityHistory(selectedLead.id, "updated", "Lead information updated", changes)
-    } else if (updatedData.notes && oldLead.notes !== updatedData.notes) {
-      // Special case for notes, even if other fields didn't change, if notes were added/changed
-      addActivityHistory(selectedLead.id, "note_added", "Note added", {
-        notes: { old: oldLead.notes || "", new: updatedData.notes },
-      })
+      if (Object.keys(changes).length > 0) {
+        await addActivityHistory(selectedLead.id, "updated", "Lead information updated", changes)
+      } else if (updatedData.notes && oldLead.notes !== updatedData.notes) {
+        await addActivityHistory(selectedLead.id, "note_added", "Note added", {
+          notes: { old: oldLead.notes || "", new: updatedData.notes },
+        })
+      }
+      setIsEditDialogOpen(false)
+    } catch (e) {
+      console.error(e)
     }
-
-    setIsEditDialogOpen(false)
   }
 
-  const handleStatusChange = (id: string, newStatus: "hot" | "warm" | "cold") => {
+  const handleStatusChange = async (id: string, newStatus: "hot" | "warm" | "cold") => {
     const oldLead = leads.find((l) => l.id === id)
     if (!oldLead) return
 
-    setLeads((prev) =>
-      prev.map((l) =>
-        l.id === id
-          ? {
-            ...l,
-            status: newStatus,
-            lastContact: new Date().toISOString(),
-          }
-          : l,
-      ),
-    )
-    addActivityHistory(id, "status_changed", `Status changed to ${newStatus}`, {
-      status: { old: oldLead.status, new: newStatus },
-    })
+    try {
+      const updated = await updateLead(id, { status: newStatus, lastContact: new Date().toISOString() })
+      setLeads((prev) => prev.map((l) => (l.id === id ? updated : l)))
+      await addActivityHistory(id, "status_changed", `Status changed to ${newStatus}`, {
+        status: { old: oldLead.status, new: newStatus },
+      })
+    } catch(e) { console.error(e) }
   }
 
-  const handleStageChange = (id: string, newStage: Stage) => {
+  const handleStageChange = async (id: string, newStage: Stage) => {
     const oldLead = leads.find((l) => l.id === id)
     if (!oldLead) return
 
-    setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, stage: newStage, lastContact: new Date().toISOString() } : l)))
-    addActivityHistory(id, "stage_changed", `Stage changed to ${newStage}`, {
-      stage: { old: oldLead.stage, new: newStage },
-    })
+    try {
+      const updated = await updateLead(id, { stage: newStage, lastContact: new Date().toISOString() })
+      setLeads((prev) => prev.map((l) => (l.id === id ? updated : l)))
+      await addActivityHistory(id, "stage_changed", `Stage changed to ${newStage}`, {
+        stage: { old: oldLead.stage, new: newStage },
+      })
+    } catch(e) { console.error(e) }
   }
 
   // Handle Next Follow-Up date change
-  const handleFollowUpChange = (id: string, newDate: string) => {
+  const handleFollowUpChange = async (id: string, newDate: string) => {
     const oldLead = leads.find((l) => l.id === id)
     if (!oldLead) return
 
     const oldDate = oldLead.nextFollowUp || "Not set"
 
-    setLeads((prev) =>
-      prev.map((l) =>
-        l.id === id
-          ? { ...l, nextFollowUp: newDate }
-          : l,
-      ),
-    )
+    try {
+      const updated = await updateLead(id, { nextFollowUp: newDate })
+      setLeads((prev) => prev.map((l) => (l.id === id ? updated : l)))
 
-    // Update selectedLead if it's the same lead
-    if (selectedLead && selectedLead.id === id) {
-      setSelectedLead({
-        ...selectedLead,
-        nextFollowUp: newDate,
+      if (selectedLead && selectedLead.id === id) {
+        setSelectedLead(updated)
+      }
+
+      await addActivityHistory(id, "updated", `Next follow-up date changed`, {
+        "next follow-up": {
+          old: oldDate ? new Date(oldDate).toLocaleDateString() : "Not set",
+          new: newDate ? new Date(newDate).toLocaleDateString() : "Not set",
+        },
       })
-    }
-
-    addActivityHistory(id, "updated", `Next follow-up date changed`, {
-      "next follow-up": {
-        old: oldDate ? new Date(oldDate).toLocaleDateString() : "Not set",
-        new: newDate ? new Date(newDate).toLocaleDateString() : "Not set",
-      },
-    })
+    } catch(e) { console.error(e) }
   }
 
-  const handleToggleStar = (id: string) => {
-    setLeads(leads.map((l) => (l.id === id ? { ...l, starred: !l.starred } : l)))
+  const handleToggleStar = async (id: string) => {
+    const lead = leads.find(l => l.id === id)
+    if(!lead) return
+    try {
+      const updated = await updateLead(id, { starred: !lead.starred })
+      setLeads(leads.map((l) => (l.id === id ? updated : l)))
+    } catch(e) {}
   }
 
   const handleSelectLead = (id: string) => {
@@ -778,102 +778,87 @@ export default function LeadsPage() {
       const file = (e.target as HTMLInputElement).files?.[0]
       if (!file) return
       const reader = new FileReader()
-      reader.onload = (ev) => {
+      reader.onload = async (ev) => {
         const text = ev.target?.result as string
         const lines = text.split("\n").filter(l => l.trim())
         if (lines.length < 2) return
-        const newLeads: Lead[] = lines.slice(1).map((line, i) => {
-          const cols = line.split(",").map(c => c.replace(/^"|"$/g, "").trim())
-          const importIds = generateBulkIds("LD", leads, lines.length - 1)
-          return {
-            id: importIds[i],
-            name: cols[0] || "Unknown",
-            company: cols[1] || "",
-            email: cols[2] || "",
-            phone: cols[3] || "",
-            status: (cols[4] as "hot" | "warm" | "cold") || "warm",
-            stage: (cols[5] as Stage) || "new",
-            priority: (cols[6] as "high" | "medium" | "low") || "medium",
-            category: (cols[7] as LeadCategory) || "other",
-            source: cols[8] || "Website",
-            assignedTo: cols[9] || "Unassigned",
-            value: Number(cols[10]) || 0,
-            probability: Number(cols[11]) || 50,
-            tags: cols[12] ? cols[12].split(";").map(t => t.trim()).filter(Boolean) : [],
-            nextFollowUp: cols[13] || "",
-            notes: cols[14] || "",
-            createdAt: cols[15] || new Date().toISOString().split("T")[0],
-            lastContact: new Date().toISOString().split("T")[0],
-            starred: false,
-            activities: 0,
-            noteHistory: [],
-            activityHistory: [{
-              id: Date.now().toString(),
-              type: "created",
-              description: "Lead imported from CSV",
-              timestamp: new Date().toISOString(),
-              changedBy: "Current User",
-            }],
+
+        try {
+          for (const line of lines.slice(1)) {
+            const cols = line.split(",").map(c => c.replace(/^"|"$/g, "").trim())
+            await createLead({
+              name: cols[0] || "Unknown",
+              company: cols[1] || "",
+              email: cols[2] || "",
+              phone: cols[3] || "",
+              status: (cols[4] as "hot" | "warm" | "cold") || "warm",
+              stage: (cols[5] as Stage) || "new",
+              priority: (cols[6] as "high" | "medium" | "low") || "medium",
+              category: (cols[7] as LeadCategory) || "other",
+              source: cols[8] || "Website",
+              assignedTo: cols[9] || "Unassigned",
+              value: Number(cols[10]) || 0,
+              probability: Number(cols[11]) || 50,
+              tags: cols[12] ? cols[12].split(";").map(t => t.trim()).filter(Boolean) : [],
+              nextFollowUp: cols[13] || "",
+              notes: cols[14] || "",
+              starred: false,
+            })
           }
-        })
-        setLeads(prev => [...newLeads, ...prev])
+
+          const freshLeads = await getLeads()
+          setLeads(freshLeads)
+        } catch (err) {
+          console.error("Failed to import leads:", err)
+        }
       }
       reader.readAsText(file)
     }
     input.click()
   }
 
-  // Bulk delete function (added to fix the lint error)
-  const handleBulkDelete = () => {
-    setLeads(leads.filter((lead) => !selectedLeads.includes(lead.id)))
-    setSelectedLeads([])
+  // Bulk delete function
+  const handleBulkDelete = async () => {
+    try {
+      await bulkDeleteLeads(selectedLeads)
+      const freshLeads = await getLeads()
+      setLeads(freshLeads)
+      setSelectedLeads([])
+    } catch (e) {
+      console.error("Failed to bulk delete:", e)
+    }
   }
 
   // Add note to lead
-  const handleAddNote = (leadId: string, noteContent: string) => {
+  const handleAddNote = async (leadId: string, noteContent: string) => {
     if (!noteContent.trim()) return
 
-    const newNote = {
-      id: Date.now().toString(),
-      content: noteContent.trim(),
-      createdAt: new Date().toISOString(),
-      createdBy: "Current User",
-    }
-
-    setLeads(
-      leads.map((lead) => {
-        if (lead.id === leadId) {
-          return {
-            ...lead,
-            notes: noteContent.trim(),
-            noteHistory: [newNote, ...lead.noteHistory],
-            lastContact: new Date().toISOString(),
-          }
-        }
-        return lead
-      }),
-    )
-
-    // Update selectedLead if it's the same lead
-    if (selectedLead && selectedLead.id === leadId) {
-      setSelectedLead({
-        ...selectedLead,
-        notes: noteContent.trim(),
-        noteHistory: [newNote, ...selectedLead.noteHistory],
-        lastContact: new Date().toISOString(),
+    try {
+      await addLeadNote(leadId, noteContent.trim(), "Current User")
+      await addLeadActivity(leadId, {
+        type: "note_added",
+        description: "Note added",
+        changedBy: "Current User",
+        changes: { note: { old: "", new: noteContent.trim() } } as any,
       })
+
+      const freshLeads = await getLeads()
+      setLeads(freshLeads)
+
+      // Update selectedLead if it's the same lead
+      if (selectedLead && selectedLead.id === leadId) {
+        const updated = freshLeads.find((l: Lead) => l.id === leadId)
+        if (updated) setSelectedLead(updated)
+      }
+
+      setNewNoteText("")
+    } catch (e) {
+      console.error("Failed to add note:", e)
     }
-
-    // Add to activity history
-    addActivityHistory(leadId, "note_added", "Note added", {
-      note: { old: "", new: noteContent.trim() }
-    })
-
-    setNewNoteText("")
   }
 
   // Add meeting to lead
-  const handleAddMeeting = (leadId: string) => {
+  const handleAddMeeting = async (leadId: string) => {
     if (!meetingDetails.trim()) return
 
     const meetingLabel = meetingType === "online" ? "💻 Online Meeting" : "🏢 Offline Meeting"
@@ -881,54 +866,41 @@ export default function LeadsPage() {
       .filter(tm => meetingAttendees.includes(tm.id))
       .map(tm => ({ id: tm.id, name: tm.name, initials: tm.initials }))
 
-    const meetingEntry = {
-      id: Date.now().toString(),
-      type: "meeting_scheduled" as const,
-      description: `${meetingLabel} scheduled`,
-      timestamp: new Date().toISOString(),
-      changedBy: "Current User",
-      meetingType,
-      meetingDetails: meetingDetails.trim(),
-      meetingDate: meetingDate || new Date().toISOString().split("T")[0],
-      meetingTime: meetingTime || "",
-      meetingLocation: meetingType === "offline" ? meetingLocation : "",
-      meetingLink: meetingType === "online" ? meetingLink : "",
-      meetingAttendees: selectedAttendees,
-    }
-
-    setLeads(
-      leads.map((lead) => {
-        if (lead.id === leadId) {
-          return {
-            ...lead,
-            activityHistory: [meetingEntry, ...lead.activityHistory],
-            lastContact: new Date().toISOString(),
-            activities: lead.activities + 1,
-          }
-        }
-        return lead
-      }),
-    )
-
-    // Update selectedLead if it's the same lead
-    if (selectedLead && selectedLead.id === leadId) {
-      setSelectedLead({
-        ...selectedLead,
-        activityHistory: [meetingEntry, ...selectedLead.activityHistory],
-        lastContact: new Date().toISOString(),
-        activities: selectedLead.activities + 1,
+    try {
+      await addLeadActivity(leadId, {
+        type: "meeting_scheduled",
+        description: `${meetingLabel} scheduled`,
+        changedBy: "Current User",
+        meetingType,
+        meetingDetails: meetingDetails.trim(),
+        meetingDate: meetingDate || new Date().toISOString().split("T")[0],
+        meetingTime: meetingTime || "",
+        meetingLocation: meetingType === "offline" ? meetingLocation : "",
+        meetingLink: meetingType === "online" ? meetingLink : "",
+        meetingAttendees: selectedAttendees as any,
       })
-    }
 
-    // Reset form
-    setMeetingType("online")
-    setMeetingDetails("")
-    setMeetingDate("")
-    setMeetingTime("")
-    setMeetingLocation("")
-    setMeetingLink("")
-    setMeetingAttendees([])
-    setIsAddMeetingOpen(false)
+      const freshLeads = await getLeads()
+      setLeads(freshLeads)
+
+      // Update selectedLead if it's the same lead
+      if (selectedLead && selectedLead.id === leadId) {
+        const updated = freshLeads.find((l: Lead) => l.id === leadId)
+        if (updated) setSelectedLead(updated)
+      }
+
+      // Reset form
+      setMeetingType("online")
+      setMeetingDetails("")
+      setMeetingDate("")
+      setMeetingTime("")
+      setMeetingLocation("")
+      setMeetingLink("")
+      setMeetingAttendees([])
+      setIsAddMeetingOpen(false)
+    } catch (e) {
+      console.error("Failed to add meeting:", e)
+    }
   }
 
   return (

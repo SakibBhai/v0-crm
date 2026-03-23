@@ -1,8 +1,8 @@
-﻿"use client"
+"use client"
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { generateId, generateBulkIds } from "@/lib/id-generator"
 import { useRouter } from "next/navigation"
 import { DashboardLayout } from "@/components/dashboard-layout"
@@ -48,11 +48,13 @@ import {
 import Link from "next/link"
 
 import type { Project } from "@/lib/types/project"
-import { initialProjects, statusConfig, priorityConfig, uniqueClients, uniqueManagers } from "@/lib/data/projects"
+import { statusConfig, priorityConfig } from "@/lib/data/projects"
+import { getProjects, createProject, updateProject, deleteProject } from "@/app/actions/projects"
 
 export default function ProjectsPage() {
   const router = useRouter()
-  const [projects, setProjects] = useState<Project[]>(initialProjects)
+  const [projects, setProjects] = useState<Project[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [clientFilter, setClientFilter] = useState<string>("all")
@@ -66,6 +68,28 @@ export default function ProjectsPage() {
   // Drag and drop state
   const [draggedProject, setDraggedProject] = useState<Project | null>(null)
   const [dragOverStatus, setDragOverStatus] = useState<string | null>(null)
+
+  // Load projects on mount
+  useEffect(() => {
+    async function loadProjects() {
+      try {
+        const data = await getProjects()
+        // Map DB fields to match frontend Project interface
+        setProjects(data.map((p: any) => ({
+          ...p,
+          tasks: { total: p.tasksTotal || 0, completed: p.tasksCompleted || 0 },
+        })))
+      } catch (error) {
+        console.error("Failed to load projects:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    loadProjects()
+  }, [])
+
+  const uniqueClients = [...new Set(projects.map((p) => p.client))]
+  const uniqueManagers = [...new Set(projects.map((p) => p.projectManager))]
 
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
@@ -86,13 +110,12 @@ export default function ProjectsPage() {
     totalSpent: projects.reduce((sum, p) => sum + p.spent, 0),
   }
 
-  const handleAddProject = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAddProject = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const billingType = formData.get("billingType") as "one-time" | "recurring"
     const recurringInterval = formData.get("recurringInterval") as "7-days" | "15-days" | "30-days" | "monthly" | undefined
 
-    // Calculate next billing date for recurring projects
     let nextBillingDate: string | undefined
     if (billingType === "recurring" && recurringInterval) {
       const startDate = new Date(formData.get("startDate") as string)
@@ -101,35 +124,41 @@ export default function ProjectsPage() {
       nextBillingDate = nextDate.toISOString().split("T")[0]
     }
 
-    const newProject: Project = {
-      id: generateId("PJ", projects),
-      name: formData.get("name") as string,
-      description: formData.get("description") as string,
-      client: formData.get("client") as string,
-      projectManager: formData.get("projectManager") as string,
-      status: "planning",
-      priority: formData.get("priority") as "low" | "medium" | "high",
-      progress: 0,
-      budget: Number(formData.get("budget")),
-      spent: 0,
-      startDate: formData.get("startDate") as string,
-      dueDate: formData.get("dueDate") as string,
-      team: [],
-      tasks: { total: 0, completed: 0 },
-      category: formData.get("category") as string,
-      // Key Links
-      briefLink: formData.get("briefLink") as string || undefined,
-      driveLink: formData.get("driveLink") as string || undefined,
-      researchLink: formData.get("researchLink") as string || undefined,
-      // Billing
-      billingType,
-      recurringInterval: billingType === "recurring" ? recurringInterval : undefined,
-      nextBillingDate,
-      totalBilled: 0,
-      paymentStatus: "pending",
+    try {
+      await createProject({
+        name: formData.get("name") as string,
+        description: formData.get("description") as string || "",
+        client: formData.get("client") as string,
+        projectManager: formData.get("projectManager") as string,
+        status: "planning",
+        priority: formData.get("priority") as "low" | "medium" | "high",
+        progress: 0,
+        budget: Number(formData.get("budget")),
+        spent: 0,
+        startDate: formData.get("startDate") as string,
+        dueDate: formData.get("dueDate") as string,
+        team: [],
+        tasksTotal: 0,
+        tasksCompleted: 0,
+        category: formData.get("category") as string,
+        briefLink: formData.get("briefLink") as string || undefined,
+        driveLink: formData.get("driveLink") as string || undefined,
+        researchLink: formData.get("researchLink") as string || undefined,
+        billingType,
+        recurringInterval: billingType === "recurring" ? recurringInterval : undefined,
+        nextBillingDate,
+        totalBilled: 0,
+        paymentStatus: "pending",
+      })
+      const freshProjects = await getProjects()
+      setProjects(freshProjects.map((p: any) => ({
+        ...p,
+        tasks: { total: p.tasksTotal || 0, completed: p.tasksCompleted || 0 },
+      })))
+      setIsAddDialogOpen(false)
+    } catch (err) {
+      console.error("Failed to create project:", err)
     }
-    setProjects((prev) => [newProject, ...prev])
-    setIsAddDialogOpen(false)
   }
 
   // Drag handlers for Kanban
@@ -150,20 +179,34 @@ export default function ProjectsPage() {
     }
   }
 
-  const handleDrop = (e: React.DragEvent, newStatus: string) => {
+  const handleDrop = async (e: React.DragEvent, newStatus: string) => {
     e.preventDefault()
     if (draggedProject && draggedProject.status !== newStatus) {
       setProjects((prev) => prev.map((p) => (p.id === draggedProject.id ? { ...p, status: newStatus as Project["status"] } : p)))
+      try {
+        await updateProject(draggedProject.id, { status: newStatus })
+      } catch (err) {
+        console.error("Failed to update project status:", err)
+        const data = await getProjects()
+        setProjects(data.map((p: any) => ({ ...p, tasks: { total: p.tasksTotal || 0, completed: p.tasksCompleted || 0 } })))
+      }
     }
     setDraggedProject(null)
     setDragOverStatus(null)
   }
 
-  const handleDeleteProject = (projectId: string) => {
+  const handleDeleteProject = async (projectId: string) => {
     if (!window.confirm("Are you sure you want to delete this project? This action cannot be undone.")) return
     setProjects((prev) => prev.filter((p) => p.id !== projectId))
     if (selectedProject?.id === projectId) {
       setSelectedProject(null)
+    }
+    try {
+      await deleteProject(projectId)
+    } catch (err) {
+      console.error("Failed to delete project:", err)
+      const data = await getProjects()
+      setProjects(data.map((p: any) => ({ ...p, tasks: { total: p.tasksTotal || 0, completed: p.tasksCompleted || 0 } })))
     }
   }
 
@@ -191,35 +234,43 @@ export default function ProjectsPage() {
       const file = (e.target as HTMLInputElement).files?.[0]
       if (!file) return
       const reader = new FileReader()
-      reader.onload = (ev) => {
+      reader.onload = async (ev) => {
         const text = ev.target?.result as string
         const lines = text.split("\n").filter(l => l.trim())
         if (lines.length < 2) return
-        const importIds = generateBulkIds("PJ", projects, lines.length - 1)
-        const newProjects: Project[] = lines.slice(1).map((line, i) => {
-          const cols = line.split(",").map(c => c.replace(/^"|"$/g, "").trim())
-          return {
-            id: importIds[i],
-            name: cols[0] || "Untitled",
-            client: cols[1] || "",
-            category: cols[2] || "Web Design",
-            status: (cols[3] as Project["status"]) || "planning",
-            priority: (cols[4] as Project["priority"]) || "medium",
-            progress: Number(cols[5]) || 0,
-            budget: Number(cols[6]) || 0,
-            spent: Number(cols[7]) || 0,
-            startDate: cols[8] || new Date().toISOString().split("T")[0],
-            dueDate: cols[9] || "",
-            billingType: (cols[10] as "one-time" | "recurring") || "one-time",
-            projectManager: cols[11] || "John Smith",
-            paymentStatus: (cols[12] as Project["paymentStatus"]) || "pending",
-            description: "",
-            team: [],
-            tasks: { total: 0, completed: 0 },
-            totalBilled: 0,
+
+        try {
+          for (const line of lines.slice(1)) {
+            const cols = line.split(",").map(c => c.replace(/^"|"$/g, "").trim())
+            await createProject({
+              name: cols[0] || "Untitled",
+              client: cols[1] || "",
+              category: cols[2] || "Web Design",
+              status: (cols[3] as Project["status"]) || "planning",
+              priority: (cols[4] as Project["priority"]) || "medium",
+              progress: Number(cols[5]) || 0,
+              budget: Number(cols[6]) || 0,
+              spent: Number(cols[7]) || 0,
+              startDate: cols[8] || new Date().toISOString().split("T")[0],
+              dueDate: cols[9] || "",
+              billingType: (cols[10] as "one-time" | "recurring") || "one-time",
+              projectManager: cols[11] || "John Smith",
+              paymentStatus: (cols[12] as Project["paymentStatus"]) || "pending",
+              description: "",
+              team: [],
+              tasksTotal: 0,
+              tasksCompleted: 0,
+              totalBilled: 0,
+            })
           }
-        })
-        setProjects(prev => [...newProjects, ...prev])
+          const freshProjects = await getProjects()
+          setProjects(freshProjects.map((p: any) => ({
+            ...p,
+            tasks: { total: p.tasksTotal || 0, completed: p.tasksCompleted || 0 },
+          })))
+        } catch (err) {
+          console.error("Failed to import projects:", err)
+        }
       }
       reader.readAsText(file)
     }
@@ -231,29 +282,34 @@ export default function ProjectsPage() {
     setIsEditDialogOpen(true)
   }
 
-  const handleEditProject = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleEditProject = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!editingProject) return
     const formData = new FormData(e.currentTarget)
-    const updatedProject: Project = {
-      ...editingProject,
-      name: formData.get("name") as string || editingProject.name,
-      description: formData.get("description") as string || editingProject.description,
-      client: formData.get("client") as string || editingProject.client,
-      category: formData.get("category") as string || editingProject.category,
-      projectManager: formData.get("projectManager") as string || editingProject.projectManager,
-      priority: formData.get("priority") as Project["priority"] || editingProject.priority,
-      status: formData.get("status") as Project["status"] || editingProject.status,
-      budget: Number(formData.get("budget")) || editingProject.budget,
-      billingType: formData.get("billingType") as "one-time" | "recurring" || editingProject.billingType,
-      recurringInterval: formData.get("recurringInterval") as Project["recurringInterval"] || editingProject.recurringInterval,
-      briefLink: formData.get("briefLink") as string || editingProject.briefLink,
-      driveLink: formData.get("driveLink") as string || editingProject.driveLink,
-      researchLink: formData.get("researchLink") as string || editingProject.researchLink,
+
+    try {
+      const updateData = {
+        name: formData.get("name") as string || editingProject.name,
+        description: formData.get("description") as string || editingProject.description,
+        client: formData.get("client") as string || editingProject.client,
+        category: formData.get("category") as string || editingProject.category,
+        projectManager: formData.get("projectManager") as string || editingProject.projectManager,
+        priority: formData.get("priority") as Project["priority"] || editingProject.priority,
+        status: formData.get("status") as Project["status"] || editingProject.status,
+        budget: Number(formData.get("budget")) || editingProject.budget,
+        billingType: formData.get("billingType") as "one-time" | "recurring" || editingProject.billingType,
+        recurringInterval: formData.get("recurringInterval") as Project["recurringInterval"] || editingProject.recurringInterval,
+        briefLink: formData.get("briefLink") as string || editingProject.briefLink,
+        driveLink: formData.get("driveLink") as string || editingProject.driveLink,
+        researchLink: formData.get("researchLink") as string || editingProject.researchLink,
+      }
+      const updated = await updateProject(editingProject.id, updateData)
+      setProjects((prev) => prev.map((p) => (p.id === editingProject.id ? { ...updated, tasks: { total: updated.tasksTotal || 0, completed: updated.tasksCompleted || 0 } } : p)))
+      setIsEditDialogOpen(false)
+      setEditingProject(null)
+    } catch (err) {
+      console.error("Failed to update project:", err)
     }
-    setProjects((prev) => prev.map((p) => (p.id === editingProject.id ? updatedProject : p)))
-    setIsEditDialogOpen(false)
-    setEditingProject(null)
   }
 
   const kanbanStatuses = ["planning", "in-progress", "review", "completed", "on-hold"] as const

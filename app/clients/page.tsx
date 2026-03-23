@@ -3,7 +3,7 @@
 import { TabsContent } from "@/components/ui/tabs"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { generateId, generateBulkIds } from "@/lib/id-generator"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -64,6 +64,7 @@ import {
   AlertTriangle,
   Heart,
   Sparkles,
+  Info,
 } from "lucide-react"
 
 // Enhanced Client Interface with more details
@@ -478,8 +479,12 @@ const industries = [
 ]
 const accountManagers = ["All Managers", "Alex Johnson", "Emily Davis", "Chris Wilson"]
 
+import { getClients, createClient, updateClient, deleteClient, bulkDeleteClients } from "@/app/actions/clients"
+import { Prisma } from "@prisma/client"
+
 export default function ClientsPage() {
-  const [clients, setClients] = useState<Client[]>(initialClients)
+  const [clients, setClients] = useState<Client[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
@@ -577,8 +582,35 @@ export default function ClientsPage() {
     setPaymentFilter("all")
   }
 
-  const toggleStarred = (clientId: string) => {
+  // Load clients on mount
+  useEffect(() => {
+    async function loadClients() {
+      try {
+        const data = await getClients()
+        setClients(data)
+      } catch (error) {
+        console.error("Failed to load clients:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    loadClients()
+  }, [])
+
+  const toggleStarred = async (clientId: string) => {
+    const client = clients.find((c) => c.id === clientId)
+    if (!client) return
+
+    // Optimistic update
     setClients((prev) => prev.map((c) => (c.id === clientId ? { ...c, starred: !c.starred } : c)))
+
+    try {
+      await updateClient(clientId, { starred: !client.starred })
+    } catch (error) {
+      console.error("Failed to toggle star:", error)
+      // Revert optimistic update on error
+      setClients((prev) => prev.map((c) => (c.id === clientId ? { ...c, starred: client.starred } : c)))
+    }
   }
 
   const toggleSelectClient = (clientId: string) => {
@@ -611,27 +643,37 @@ export default function ClientsPage() {
     }
   }
 
-  const handleDrop = (e: React.DragEvent, newStatus: string) => {
+  const handleDrop = async (e: React.DragEvent, newStatus: string) => {
     e.preventDefault()
     if (draggedClient && draggedClient.status !== newStatus) {
+      // Optimistic update
+      const oldStatus = draggedClient.status
       setClients((prev) => prev.map((c) => (c.id === draggedClient.id ? { ...c, status: newStatus as Client["status"] } : c)))
+      
+      try {
+        await updateClient(draggedClient.id, { status: newStatus })
+      } catch (error) {
+        console.error("Failed to update status:", error)
+        // Revert 
+        setClients((prev) => prev.map((c) => (c.id === draggedClient.id ? { ...c, status: oldStatus } : c)))
+      }
     }
     setDraggedClient(null)
     setDragOverStatus(null)
   }
 
-  const handleAddClient = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAddClient = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
-    const newClient: Client = {
-      id: generateId("CL", clients),
+    
+    const newClientData = {
       name: formData.get("name") as string,
       email: formData.get("email") as string,
       phone: (formData.get("phone") as string) || "",
       company: formData.get("company") as string,
       website: (formData.get("website") as string) || "",
       address: (formData.get("address") as string) || "",
-      status: (formData.get("status") as Client["status"]) || "prospect",
+      status: (formData.get("status") as string) || "prospect",
       industry: (formData.get("industry") as string) || "Technology",
       totalRevenue: 0,
       monthlyRevenue: Number(formData.get("monthlyRevenue")) || 0,
@@ -648,7 +690,7 @@ export default function ClientsPage() {
       paymentStatus: "pending",
       tags: newClientTags,
       accountManager: (formData.get("accountManager") as string) || "Alex Johnson",
-      tier: (formData.get("tier") as Client["tier"]) || "starter",
+      tier: (formData.get("tier") as string) || "starter",
       engagementScore: 50,
       lifetimeValue: 0,
       openTickets: 0,
@@ -656,10 +698,17 @@ export default function ClientsPage() {
       revenueGrowth: 0,
       activeCampaigns: 0,
     }
-    setClients([newClient, ...clients])
-    setNewClientTags([])
-    setTagInput("")
-    setIsAddDialogOpen(false)
+    
+    try {
+      const createdClient = await createClient(newClientData)
+      setClients([createdClient, ...clients])
+      setNewClientTags([])
+      setTagInput("")
+      setIsAddDialogOpen(false)
+    } catch (error) {
+      console.error("Failed to create client:", error)
+      alert("Failed to create client. Please try again.")
+    }
   }
 
   const getHealthColor = (score: number) => {
@@ -675,21 +724,21 @@ export default function ClientsPage() {
     setIsEditDialogOpen(true)
   }
 
-  const handleEditClient = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleEditClient = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!editingClient) return
     const formData = new FormData(e.currentTarget)
-    const updatedClient: Client = {
-      ...editingClient,
+    
+    const updateData = {
       name: formData.get("name") as string,
       email: formData.get("email") as string,
       phone: (formData.get("phone") as string) || "",
       company: formData.get("company") as string,
       website: (formData.get("website") as string) || "",
       address: (formData.get("address") as string) || "",
-      status: (formData.get("status") as Client["status"]) || editingClient.status,
+      status: (formData.get("status") as string) || editingClient.status,
       industry: (formData.get("industry") as string) || editingClient.industry,
-      tier: (formData.get("tier") as Client["tier"]) || editingClient.tier,
+      tier: (formData.get("tier") as string) || editingClient.tier,
       accountManager: (formData.get("accountManager") as string) || editingClient.accountManager,
       monthlyRevenue: Number(formData.get("monthlyRevenue")) || 0,
       contractValue: Number(formData.get("contractValue")) || 0,
@@ -703,47 +752,82 @@ export default function ClientsPage() {
       npsScore: Math.min(10, Math.max(0, Number(formData.get("npsScore")) || 0)),
       revenueGrowth: Number(formData.get("revenueGrowth")) || 0,
       lifetimeValue: Number(formData.get("lifetimeValue")) || 0,
-      paymentStatus: (formData.get("paymentStatus") as Client["paymentStatus"]) || editingClient.paymentStatus,
+      paymentStatus: (formData.get("paymentStatus") as string) || editingClient.paymentStatus,
       joinedDate: (formData.get("joinedDate") as string) || editingClient.joinedDate,
       activeProjects: Number(formData.get("activeProjects")) || 0,
       completedProjects: Number(formData.get("completedProjects")) || 0,
       activeCampaigns: Number(formData.get("activeCampaigns")) || 0,
       openTickets: Number(formData.get("openTickets")) || 0,
     }
-    setClients((prev) => prev.map((c) => (c.id === editingClient.id ? updatedClient : c)))
-    if (selectedClient?.id === editingClient.id) {
-      setSelectedClient(updatedClient)
+    
+    try {
+      const updatedClient = await updateClient(editingClient.id, updateData)
+      setClients((prev) => prev.map((c) => (c.id === editingClient.id ? updatedClient : c)))
+      if (selectedClient?.id === editingClient.id) {
+        setSelectedClient(updatedClient)
+      }
+      setIsEditDialogOpen(false)
+      setEditingClient(null)
+      setEditClientTags([])
+      setEditTagInput("")
+    } catch (error) {
+      console.error("Failed to update client:", error)
+      alert("Failed to update client. Please try again.")
     }
-    setIsEditDialogOpen(false)
-    setEditingClient(null)
-    setEditClientTags([])
-    setEditTagInput("")
   }
 
-  const handleDeleteClient = (clientId: string) => {
+  const handleDeleteClient = async (clientId: string) => {
     if (!window.confirm("Are you sure you want to delete this client? This action cannot be undone.")) return
+    
+    // Optimistic UI updates
     setClients((prev) => prev.filter((c) => c.id !== clientId))
     setSelectedClients((prev) => prev.filter((id) => id !== clientId))
     if (selectedClient?.id === clientId) {
       setSelectedClient(null)
     }
+    
+    try {
+      await deleteClient(clientId)
+    } catch (error) {
+      console.error("Failed to delete client:", error)
+      // Refetch clients to restore state since optimistic delete failed
+      const data = await getClients()
+      setClients(data)
+    }
   }
 
-  const handleSaveNote = () => {
+  const handleSaveNote = async () => {
     if (!selectedClient || !noteInput.trim()) return
     const updatedNotes = selectedClient.notes
       ? `${selectedClient.notes}\n\n---\n${new Date().toLocaleDateString()}: ${noteInput.trim()}`
       : `${new Date().toLocaleDateString()}: ${noteInput.trim()}`
-    setClients((prev) => prev.map((c) => (c.id === selectedClient.id ? { ...c, notes: updatedNotes } : c)))
-    setSelectedClient({ ...selectedClient, notes: updatedNotes })
-    setNoteInput("")
+      
+    try {
+      const updatedClient = await updateClient(selectedClient.id, { notes: updatedNotes })
+      setClients((prev) => prev.map((c) => (c.id === selectedClient.id ? updatedClient : c)))
+      setSelectedClient(updatedClient)
+      setNoteInput("")
+    } catch (error) {
+      console.error("Failed to save note:", error)
+      alert("Failed to save note. Please try again.")
+    }
   }
 
-  const handleBulkDelete = () => {
+  const handleBulkDelete = async () => {
     if (selectedClients.length === 0) return
     if (!window.confirm(`Are you sure you want to delete ${selectedClients.length} client(s)? This action cannot be undone.`)) return
-    setClients((prev) => prev.filter((c) => !selectedClients.includes(c.id)))
-    setSelectedClients([])
+    
+    try {
+      await bulkDeleteClients(selectedClients)
+      const freshClients = await getClients()
+      setClients(freshClients)
+      setSelectedClients([])
+    } catch (error) {
+      console.error("Failed to perform bulk delete:", error)
+      alert("Failed to delete some or all clients. Please try again.")
+      const data = await getClients()
+      setClients(data)
+    }
   }
 
   const handleBulkEmail = () => {
@@ -777,48 +861,54 @@ export default function ClientsPage() {
       const file = (e.target as HTMLInputElement).files?.[0]
       if (!file) return
       const reader = new FileReader()
-      reader.onload = (ev) => {
+      reader.onload = async (ev) => {
         const text = ev.target?.result as string
         const lines = text.split("\n").filter(l => l.trim())
         if (lines.length < 2) return
-        const importIds = generateBulkIds("CL", clients, lines.length - 1)
-        const newClients: Client[] = lines.slice(1).map((line, i) => {
-          const cols = line.split(",").map(c => c.replace(/^"|"$/g, "").trim())
-          return {
-            id: importIds[i],
-            name: cols[0] || "Unknown",
-            company: cols[1] || "",
-            email: cols[2] || "",
-            phone: cols[3] || "",
-            status: (cols[4] as Client["status"]) || "prospect",
-            industry: cols[5] || "Technology",
-            tier: (cols[6] as Client["tier"]) || "starter",
-            accountManager: cols[7] || "Alex Johnson",
-            monthlyRevenue: Number(cols[8]) || 0,
-            totalRevenue: Number(cols[9]) || 0,
-            contractValue: Number(cols[10]) || 0,
-            contractEnd: cols[11] || "",
-            healthScore: Number(cols[12]) || 50,
-            tags: cols[13] ? cols[13].split(";").map(t => t.trim()).filter(Boolean) : [],
-            joinedDate: cols[14] || new Date().toISOString().split("T")[0],
-            lastContact: new Date().toISOString().split("T")[0],
-            notes: "",
-            starred: false,
-            satisfaction: 50,
-            paymentStatus: "pending" as const,
-            engagementScore: 50,
-            lifetimeValue: 0,
-            openTickets: 0,
-            npsScore: 0,
-            revenueGrowth: 0,
-            activeCampaigns: 0,
-            activeProjects: 0,
-            completedProjects: 0,
-            address: "",
-            website: "",
+
+        try {
+          for (const line of lines.slice(1)) {
+            const cols = line.split(",").map(c => c.replace(/^"|"$/g, "").trim())
+            await createClient({
+              name: cols[0] || "Unknown",
+              company: cols[1] || "",
+              email: cols[2] || "",
+              phone: cols[3] || "",
+              status: (cols[4] as Client["status"]) || "prospect",
+              industry: cols[5] || "Technology",
+              tier: (cols[6] as Client["tier"]) || "starter",
+              accountManager: cols[7] || "Alex Johnson",
+              monthlyRevenue: Number(cols[8]) || 0,
+              totalRevenue: Number(cols[9]) || 0,
+              contractValue: Number(cols[10]) || 0,
+              contractEnd: cols[11] || "",
+              healthScore: Number(cols[12]) || 50,
+              tags: cols[13] ? cols[13].split(";").map(t => t.trim()).filter(Boolean) : [],
+              joinedDate: cols[14] || new Date().toISOString().split("T")[0],
+              lastContact: new Date().toISOString().split("T")[0],
+              notes: "",
+              starred: false,
+              satisfaction: 50,
+              paymentStatus: "pending",
+              engagementScore: 50,
+              lifetimeValue: 0,
+              openTickets: 0,
+              npsScore: 0,
+              revenueGrowth: 0,
+              activeCampaigns: 0,
+              activeProjects: 0,
+              completedProjects: 0,
+              address: "",
+              website: "",
+            })
           }
-        })
-        setClients(prev => [...newClients, ...prev])
+
+          const freshClients = await getClients()
+          setClients(freshClients)
+        } catch (err) {
+          console.error("Failed to import clients:", err)
+          alert("Failed to import some or all clients. Please try again.")
+        }
       }
       reader.readAsText(file)
     }
@@ -832,6 +922,16 @@ export default function ClientsPage() {
   }
 
   const kanbanStatuses = ["prospect", "active", "paused", "inactive", "churned"] as const
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </DashboardLayout>
+    )
+  }
 
   return (
     <DashboardLayout>
@@ -1419,7 +1519,7 @@ export default function ClientsPage() {
                                 <AvatarFallback className="bg-primary/20 text-primary text-xs">
                                   {client.name
                                     .split(" ")
-                                    .map((n) => n[0])
+                                    .map((n: string) => n[0])
                                     .join("")}
                                 </AvatarFallback>
                               </Avatar>
@@ -1451,8 +1551,8 @@ export default function ClientsPage() {
 
                           {/* Tier Badge */}
                           <div className="mt-2 flex items-center gap-2">
-                            <Badge className={`text-[10px] px-1.5 py-0 ${tierConfig[client.tier].color}`}>
-                              {tierConfig[client.tier].label}
+                            <Badge className={`text-[10px] px-1.5 py-0 ${(tierConfig as any)[client.tier]?.color || ''}`}>
+                              {(tierConfig as any)[client.tier]?.label || client.tier}
                             </Badge>
                             <span className="text-[10px] text-muted-foreground">{client.industry}</span>
                           </div>
@@ -1490,7 +1590,7 @@ export default function ClientsPage() {
                           {/* Tags */}
                           {client.tags.length > 0 && (
                             <div className="mt-2 flex flex-wrap gap-1">
-                              {client.tags.slice(0, 3).map((tag) => (
+                              {client.tags.slice(0, 3).map((tag: string) => (
                                 <span
                                   key={tag}
                                   className="px-1.5 py-0.5 text-[9px] bg-secondary rounded text-muted-foreground"
@@ -1520,10 +1620,10 @@ export default function ClientsPage() {
                               <span>{client.accountManager.split(" ")[0]}</span>
                             </div>
                             <div
-                              className={`flex items-center gap-1 text-[10px] ${paymentConfig[client.paymentStatus].color}`}
+                              className={`flex items-center gap-1 text-[10px] ${(paymentConfig as any)[client.paymentStatus]?.color || ''}`}
                             >
                               {client.paymentStatus === "overdue" && <AlertTriangle className="w-3 h-3" />}
-                              {paymentConfig[client.paymentStatus].label}
+                              {(paymentConfig as any)[client.paymentStatus]?.label || client.paymentStatus}
                             </div>
                           </div>
                         </div>
@@ -1546,7 +1646,7 @@ export default function ClientsPage() {
         {viewMode === "grid" && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredClients.map((client, i) => {
-              const StatusIcon = statusConfig[client.status].icon
+              const StatusIcon = (statusConfig as any)[client.status]?.icon || Info
               return (
                 <AnimatedCard
                   key={client.id}
@@ -1563,12 +1663,12 @@ export default function ClientsPage() {
                             <AvatarFallback className="bg-primary/20 text-primary">
                               {client.name
                                 .split(" ")
-                                .map((n) => n[0])
+                                .map((n: string) => n[0])
                                 .join("")}
                             </AvatarFallback>
                           </Avatar>
                           <div
-                            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card ${statusConfig[client.status].dotColor}`}
+                            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card ${(statusConfig as any)[client.status]?.dotColor || ''}`}
                           />
                         </div>
                         <div>
@@ -1580,8 +1680,8 @@ export default function ClientsPage() {
                           <p className="text-sm text-muted-foreground">{client.name}</p>
                         </div>
                       </div>
-                      <Badge className={`${tierConfig[client.tier].color} text-[10px]`}>
-                        {tierConfig[client.tier].label}
+                      <Badge className={`${(tierConfig as any)[client.tier]?.color || ''} text-[10px]`}>
+                        {(tierConfig as any)[client.tier]?.label || client.tier}
                       </Badge>
                     </div>
 
@@ -1660,12 +1760,12 @@ export default function ClientsPage() {
 
                     {/* Footer */}
                     <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between">
-                      <Badge className={`${statusConfig[client.status].color} border-0`}>
+                      <Badge className={`${(statusConfig as any)[client.status]?.color || ''} border-0`}>
                         <StatusIcon className="w-3 h-3 mr-1" />
-                        {statusConfig[client.status].label}
+                        {(statusConfig as any)[client.status]?.label || client.status}
                       </Badge>
-                      <span className={`text-xs ${paymentConfig[client.paymentStatus].color}`}>
-                        {paymentConfig[client.paymentStatus].label}
+                      <span className={`text-xs ${(paymentConfig as any)[client.paymentStatus]?.color || ''}`}>
+                        {(paymentConfig as any)[client.paymentStatus]?.label || client.paymentStatus}
                       </span>
                     </div>
                   </CardContent>

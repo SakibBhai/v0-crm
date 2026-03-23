@@ -1,4 +1,65 @@
 {
-  "node": {},
+  "node": {
+    "001a23e0f9d2056b38987fabc63b20f0adef645076": {
+      "workers": {
+        "app/projects/page": {
+          "moduleId": 23127,
+          "async": false,
+          "exportedName": "getProjects",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/page": "action-browser"
+      },
+      "exportedName": "getProjects",
+      "filename": "app/actions/projects.ts"
+    },
+    "4097650b4be6cce66f50ddc606f3dac3a2295aa526": {
+      "workers": {
+        "app/projects/page": {
+          "moduleId": 23127,
+          "async": false,
+          "exportedName": "createProject",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/page": "action-browser"
+      },
+      "exportedName": "createProject",
+      "filename": "app/actions/projects.ts"
+    },
+    "60eed84bd24d0bf994a10592af8dbc7963a0808e03": {
+      "workers": {
+        "app/projects/page": {
+          "moduleId": 23127,
+          "async": false,
+          "exportedName": "updateProject",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/page": "action-browser"
+      },
+      "exportedName": "updateProject",
+      "filename": "app/actions/projects.ts"
+    },
+    "400e5da203de1421f5b692a9fb9882d61f79ebf971": {
+      "workers": {
+        "app/projects/page": {
+          "moduleId": 23127,
+          "async": false,
+          "exportedName": "deleteProject",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/page": "action-browser"
+      },
+      "exportedName": "deleteProject",
+      "filename": "app/actions/projects.ts"
+    }
+  },
   "edge": {}
 }

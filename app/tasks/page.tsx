@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { generateId } from "@/lib/id-generator"
 import type { Task, TaskStatus, TaskPriority, TaskType, SwimlaneType, TaskTemplate, AutomationRule } from "@/lib/types/task"
 import { DEFAULT_COLUMNS, PRIORITY_CONFIG, STATUS_CONFIG, TASK_TYPE_CONFIG } from "@/lib/types/task"
 import { sampleTasks, teamMembers, projects, taskTemplates, automationRules } from "@/lib/data/tasks"
+import { getTasks as fetchTasks, createTask as createTaskAction, updateTask as updateTaskAction, deleteTask as deleteTaskAction } from "@/app/actions/tasks"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { KanbanBoard } from "@/components/tasks/kanban-board"
 import { TaskListView } from "@/components/tasks/task-list-view"
@@ -73,9 +74,25 @@ const QUICK_FILTERS = [
 
 export default function TasksPage() {
   // State
-  const [tasks, setTasks] = useState<Task[]>(sampleTasks)
+  const [tasks, setTasks] = useState<Task[]>([])
   const [templates, setTemplates] = useState<TaskTemplate[]>(taskTemplates)
   const [rules, setRules] = useState<AutomationRule[]>(automationRules)
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Load tasks from DB on mount
+  useEffect(() => {
+    async function loadTasks() {
+      try {
+        const data = await fetchTasks()
+        setTasks(data || [])
+      } catch (error) {
+        console.error("Failed to load tasks:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    loadTasks()
+  }, [])
   const [viewMode, setViewMode] = useState<ViewMode>("kanban")
   const [activeTab, setActiveTab] = useState<TabMode>("board")
   const [swimlane, setSwimlane] = useState<SwimlaneType>("none")
@@ -137,39 +154,67 @@ export default function TasksPage() {
     setIsTaskPanelOpen(true)
   }
 
-  const handleStatusChange = (taskId: string, newStatus: TaskStatus) => {
+  const handleStatusChange = async (taskId: string, newStatus: TaskStatus) => {
     setTasks((prev) => prev.map((t) => t.id === taskId ? { ...t, status: newStatus, updatedAt: new Date().toISOString() } : t))
+    try {
+      const res = await updateTaskAction(taskId, { status: newStatus })
+      if (res?.error) console.error("Task status update returned error:", res.error)
+    } catch (err) {
+      console.error("Failed to update task status:", err)
+    }
   }
 
-  const handlePriorityChange = (taskId: string, newPriority: TaskPriority) => {
+  const handlePriorityChange = async (taskId: string, newPriority: TaskPriority) => {
     setTasks((prev) => prev.map((t) => t.id === taskId ? { ...t, priority: newPriority, updatedAt: new Date().toISOString() } : t))
+    try {
+      const res = await updateTaskAction(taskId, { priority: newPriority })
+      if (res?.error) console.error("Task priority update returned error:", res.error)
+    } catch (err) {
+      console.error("Failed to update task priority:", err)
+    }
   }
 
-  const handleUpdateTask = (updatedTask: Task) => {
+  const handleUpdateTask = async (updatedTask: Task) => {
     setTasks((prev) => prev.map((t) => t.id === updatedTask.id ? updatedTask : t))
     setSelectedTask(updatedTask)
+    try {
+      const { id, createdAt, updatedAt, ...updateData } = updatedTask
+      const res = await updateTaskAction(id, { ...updateData, updatedAt: new Date().toISOString() } as any)
+      if (res?.error) console.error("Task update returned error:", res.error)
+    } catch (err) {
+      console.error("Failed to update task:", err)
+    }
   }
 
-  const handleDeleteTask = (taskId: string) => {
+  const handleDeleteTask = async (taskId: string) => {
     setTasks((prev) => prev.filter((t) => t.id !== taskId))
     setIsTaskPanelOpen(false)
     setSelectedTask(null)
+    try {
+      const res = await deleteTaskAction(taskId)
+      if (res?.error) console.error("Task deletion returned error:", res.error)
+    } catch (err) {
+      console.error("Failed to delete task:", err)
+    }
   }
 
-  const handleCloneTask = (task: Task) => {
-    const clonedTask: Task = {
-      ...task,
-      id: generateId("TSK", tasks),
-      title: `${task.title} (Copy)`,
-      status: "todo",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      activityLog: [],
-      comments: [],
-      timeEntries: [],
-      actualHours: 0,
+  const handleCloneTask = async (task: Task) => {
+    try {
+      const { id, createdAt, updatedAt, ...cloneData } = task
+      const created = await createTaskAction({
+        ...cloneData,
+        title: `${task.title} (Copy)`,
+        status: "todo",
+        activityLog: [],
+        comments: [],
+        timeEntries: [],
+        actualHours: 0,
+      } as any)
+      if (created?.error) throw new Error(created.error)
+      setTasks((prev) => [created, ...prev])
+    } catch (err) {
+      console.error("Failed to clone task:", err)
     }
-    setTasks((prev) => [clonedTask, ...prev])
   }
 
   const handleAddTask = (status: TaskStatus) => {
@@ -177,9 +222,9 @@ export default function TasksPage() {
     setIsAddDialogOpen(true)
   }
 
-  const handleCreateTask = (formData: FormData) => {
-    const newTask: Task = {
-      id: generateId("TSK", tasks),
+  const handleCreateTask = async (formData: FormData) => {
+    const assignee = teamMembers.find((m) => m.id === formData.get("assignee")) || teamMembers[0]
+    const taskData = {
       title: formData.get("title") as string,
       description: formData.get("description") as string || "",
       status: formData.get("status") as TaskStatus || initialStatus,
@@ -187,7 +232,7 @@ export default function TasksPage() {
       taskType: formData.get("taskType") as TaskType || "general",
       projectId: formData.get("project") as string || "1",
       projectName: projects.find((p) => p.id === formData.get("project"))?.name || projects[0].name,
-      assignees: [teamMembers.find((m) => m.id === formData.get("assignee")) || teamMembers[0]],
+      assignees: [assignee],
       assignedById: "2",
       assignedByName: "Ali Hasan",
       reporterId: "2",
@@ -203,13 +248,18 @@ export default function TasksPage() {
       referenceLinks: [],
       estimatedHours: Number(formData.get("estimatedHours")) || 0,
       actualHours: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
       activityLog: [{ id: "1", timestamp: new Date().toISOString(), userId: "2", userName: "Ali Hasan", action: "created task" }],
       isBlocked: false,
       isRecurring: false,
     }
-    setTasks((prev) => [newTask, ...prev])
+
+    try {
+      const created = await createTaskAction(taskData as any)
+      if (created?.error) throw new Error(created.error)
+      setTasks((prev) => [created, ...prev])
+    } catch (err) {
+      console.error("Failed to create task:", err)
+    }
     setIsAddDialogOpen(false)
   }
 
@@ -217,9 +267,8 @@ export default function TasksPage() {
     setSelectedTasks((prev) => selected ? [...prev, taskId] : prev.filter((id) => id !== taskId))
   }
 
-  const handleUseTemplate = (template: TaskTemplate) => {
-    const newTask: Task = {
-      id: generateId("TSK", tasks),
+  const handleUseTemplate = async (template: TaskTemplate) => {
+    const taskData = {
       title: template.name,
       description: template.description,
       status: "todo",
@@ -243,13 +292,17 @@ export default function TasksPage() {
       referenceLinks: [],
       estimatedHours: template.estimatedHours,
       actualHours: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
       activityLog: [],
       isBlocked: false,
       isRecurring: false,
     }
-    setTasks((prev) => [newTask, ...prev])
+    try {
+      const created = await createTaskAction(taskData as any)
+      if (created?.error) throw new Error(created.error)
+      setTasks((prev) => [created, ...prev])
+    } catch (err) {
+      console.error("Failed to create task from template:", err)
+    }
   }
 
   const clearFilters = () => {

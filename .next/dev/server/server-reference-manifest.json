@@ -1,5 +1,306 @@
 {
-  "node": {},
+  "node": {
+    "00d34068e0881a00d1d0cf6dc1c99d65b6086ccdf2": {
+      "workers": {
+        "app/leads/page": {
+          "moduleId": "[project]/.next-internal/server/app/leads/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/leads.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getLeads",
+          "filename": "app/actions/leads.ts"
+        }
+      },
+      "layer": {
+        "app/leads/page": "action-browser"
+      },
+      "filename": "app/actions/leads.ts",
+      "exportedName": "getLeads"
+    },
+    "407363a46899da33ae41660787e0764038749a4d97": {
+      "workers": {
+        "app/leads/page": {
+          "moduleId": "[project]/.next-internal/server/app/leads/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/leads.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createLead",
+          "filename": "app/actions/leads.ts"
+        }
+      },
+      "layer": {
+        "app/leads/page": "action-browser"
+      },
+      "filename": "app/actions/leads.ts",
+      "exportedName": "createLead"
+    },
+    "60121c85583a558d41c8b89313bac9e72b730a4922": {
+      "workers": {
+        "app/leads/page": {
+          "moduleId": "[project]/.next-internal/server/app/leads/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/leads.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "updateLead",
+          "filename": "app/actions/leads.ts"
+        }
+      },
+      "layer": {
+        "app/leads/page": "action-browser"
+      },
+      "filename": "app/actions/leads.ts",
+      "exportedName": "updateLead"
+    },
+    "40eaa25aa89a845326d17f418cee2b31e6ac2e7bc1": {
+      "workers": {
+        "app/leads/page": {
+          "moduleId": "[project]/.next-internal/server/app/leads/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/leads.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteLead",
+          "filename": "app/actions/leads.ts"
+        }
+      },
+      "layer": {
+        "app/leads/page": "action-browser"
+      },
+      "filename": "app/actions/leads.ts",
+      "exportedName": "deleteLead"
+    },
+    "60a3c805951cbbef0ebddb6822842070aa5eabc938": {
+      "workers": {
+        "app/leads/page": {
+          "moduleId": "[project]/.next-internal/server/app/leads/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/leads.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "addLeadActivity",
+          "filename": "app/actions/leads.ts"
+        }
+      },
+      "layer": {
+        "app/leads/page": "action-browser"
+      },
+      "filename": "app/actions/leads.ts",
+      "exportedName": "addLeadActivity"
+    },
+    "70b9793eda0d1301ea624f6a2b15955e59b94de083": {
+      "workers": {
+        "app/leads/page": {
+          "moduleId": "[project]/.next-internal/server/app/leads/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/leads.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "addLeadNote",
+          "filename": "app/actions/leads.ts"
+        }
+      },
+      "layer": {
+        "app/leads/page": "action-browser"
+      },
+      "filename": "app/actions/leads.ts",
+      "exportedName": "addLeadNote"
+    },
+    "40cc163f9b9a1db703c888ff62500a2e30f494569b": {
+      "workers": {
+        "app/leads/page": {
+          "moduleId": "[project]/.next-internal/server/app/leads/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/leads.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "bulkDeleteLeads",
+          "filename": "app/actions/leads.ts"
+        }
+      },
+      "layer": {
+        "app/leads/page": "action-browser"
+      },
+      "filename": "app/actions/leads.ts",
+      "exportedName": "bulkDeleteLeads"
+    },
+    "002dbf582cc1e34ef4ac7a83acd031f79086fb0078": {
+      "workers": {
+        "app/clients/page": {
+          "moduleId": "[project]/.next-internal/server/app/clients/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/clients.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getClients",
+          "filename": "app/actions/clients.ts"
+        }
+      },
+      "layer": {
+        "app/clients/page": "action-browser"
+      },
+      "filename": "app/actions/clients.ts",
+      "exportedName": "getClients"
+    },
+    "40c20dfbb2dc747f92fd269ebbcc33919ab96c0ea9": {
+      "workers": {
+        "app/clients/page": {
+          "moduleId": "[project]/.next-internal/server/app/clients/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/clients.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createClient",
+          "filename": "app/actions/clients.ts"
+        }
+      },
+      "layer": {
+        "app/clients/page": "action-browser"
+      },
+      "filename": "app/actions/clients.ts",
+      "exportedName": "createClient"
+    },
+    "60ee5ffd8b2ddd8d4fc62f4b199919010d8c31bc54": {
+      "workers": {
+        "app/clients/page": {
+          "moduleId": "[project]/.next-internal/server/app/clients/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/clients.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "updateClient",
+          "filename": "app/actions/clients.ts"
+        }
+      },
+      "layer": {
+        "app/clients/page": "action-browser"
+      },
+      "filename": "app/actions/clients.ts",
+      "exportedName": "updateClient"
+    },
+    "40c39266f6155d8a0169ed1f2cf139c59a5167fc56": {
+      "workers": {
+        "app/clients/page": {
+          "moduleId": "[project]/.next-internal/server/app/clients/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/clients.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteClient",
+          "filename": "app/actions/clients.ts"
+        }
+      },
+      "layer": {
+        "app/clients/page": "action-browser"
+      },
+      "filename": "app/actions/clients.ts",
+      "exportedName": "deleteClient"
+    },
+    "40219880355c4cb0f102e8bba898b7fbd3b15fc695": {
+      "workers": {
+        "app/clients/page": {
+          "moduleId": "[project]/.next-internal/server/app/clients/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/clients.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "bulkDeleteClients",
+          "filename": "app/actions/clients.ts"
+        }
+      },
+      "layer": {
+        "app/clients/page": "action-browser"
+      },
+      "filename": "app/actions/clients.ts",
+      "exportedName": "bulkDeleteClients"
+    },
+    "00ca5fb9019c64372e9fd1c6ce16cad263c4bcd650": {
+      "workers": {
+        "app/projects/page": {
+          "moduleId": "[project]/.next-internal/server/app/projects/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getProjects",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/page": "action-browser"
+      },
+      "filename": "app/actions/projects.ts",
+      "exportedName": "getProjects"
+    },
+    "40bb8c4071328aa3d8945f8ad7066beb977ba50cef": {
+      "workers": {
+        "app/projects/page": {
+          "moduleId": "[project]/.next-internal/server/app/projects/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createProject",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/page": "action-browser"
+      },
+      "filename": "app/actions/projects.ts",
+      "exportedName": "createProject"
+    },
+    "6099eb38ef3b56fc04e683cc0027e389211fd21c0e": {
+      "workers": {
+        "app/projects/page": {
+          "moduleId": "[project]/.next-internal/server/app/projects/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "updateProject",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/page": "action-browser"
+      },
+      "filename": "app/actions/projects.ts",
+      "exportedName": "updateProject"
+    },
+    "403c8bb14036cd90e61d07470b3149ecf6fac20fd5": {
+      "workers": {
+        "app/projects/page": {
+          "moduleId": "[project]/.next-internal/server/app/projects/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteProject",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/page": "action-browser"
+      },
+      "filename": "app/actions/projects.ts",
+      "exportedName": "deleteProject"
+    },
+    "00b906c5b8fca4fd82edd2300c7b371b79adae16f2": {
+      "workers": {
+        "app/tasks/page": {
+          "moduleId": "[project]/.next-internal/server/app/tasks/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/tasks.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getTasks",
+          "filename": "app/actions/tasks.ts"
+        }
+      },
+      "layer": {
+        "app/tasks/page": "action-browser"
+      },
+      "filename": "app/actions/tasks.ts",
+      "exportedName": "getTasks"
+    },
+    "40eb34762a6feb09c61300e3d7662d333ef1470260": {
+      "workers": {
+        "app/tasks/page": {
+          "moduleId": "[project]/.next-internal/server/app/tasks/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/tasks.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createTask",
+          "filename": "app/actions/tasks.ts"
+        }
+      },
+      "layer": {
+        "app/tasks/page": "action-browser"
+      },
+      "filename": "app/actions/tasks.ts",
+      "exportedName": "createTask"
+    },
+    "606be36b08b84fa448ca7f711cc85c550a988423b6": {
+      "workers": {
+        "app/tasks/page": {
+          "moduleId": "[project]/.next-internal/server/app/tasks/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/tasks.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "updateTask",
+          "filename": "app/actions/tasks.ts"
+        }
+      },
+      "layer": {
+        "app/tasks/page": "action-browser"
+      },
+      "filename": "app/actions/tasks.ts",
+      "exportedName": "updateTask"
+    },
+    "402f16d151d8473424fcb194a44bae5e0d56b76f50": {
+      "workers": {
+        "app/tasks/page": {
+          "moduleId": "[project]/.next-internal/server/app/tasks/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/tasks.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteTask",
+          "filename": "app/actions/tasks.ts"
+        }
+      },
+      "layer": {
+        "app/tasks/page": "action-browser"
+      },
+      "filename": "app/actions/tasks.ts",
+      "exportedName": "deleteTask"
+    }
+  },
   "edge": {},
   "encryptionKey": "XMPWW3s+qpGf6lRymwqkff/rdvx/45dr4/B/s7jfFf0="
 }

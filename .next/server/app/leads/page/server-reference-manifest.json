@@ -1,4 +1,110 @@
 {
-  "node": {},
+  "node": {
+    "000768fb77e6a7bfd2dec1d148f36a992e4e155efa": {
+      "workers": {
+        "app/leads/page": {
+          "moduleId": 17576,
+          "async": false,
+          "exportedName": "getLeads",
+          "filename": "app/actions/leads.ts"
+        }
+      },
+      "layer": {
+        "app/leads/page": "action-browser"
+      },
+      "exportedName": "getLeads",
+      "filename": "app/actions/leads.ts"
+    },
+    "40624edd45aaa0adeab7defd7d8c1b5cb795b86390": {
+      "workers": {
+        "app/leads/page": {
+          "moduleId": 17576,
+          "async": false,
+          "exportedName": "createLead",
+          "filename": "app/actions/leads.ts"
+        }
+      },
+      "layer": {
+        "app/leads/page": "action-browser"
+      },
+      "exportedName": "createLead",
+      "filename": "app/actions/leads.ts"
+    },
+    "60811413934c017c9a5a0a8da2a6d947a06dd7deb8": {
+      "workers": {
+        "app/leads/page": {
+          "moduleId": 17576,
+          "async": false,
+          "exportedName": "updateLead",
+          "filename": "app/actions/leads.ts"
+        }
+      },
+      "layer": {
+        "app/leads/page": "action-browser"
+      },
+      "exportedName": "updateLead",
+      "filename": "app/actions/leads.ts"
+    },
+    "409296d4e9f988da973a62b542ceb01fef6494375e": {
+      "workers": {
+        "app/leads/page": {
+          "moduleId": 17576,
+          "async": false,
+          "exportedName": "deleteLead",
+          "filename": "app/actions/leads.ts"
+        }
+      },
+      "layer": {
+        "app/leads/page": "action-browser"
+      },
+      "exportedName": "deleteLead",
+      "filename": "app/actions/leads.ts"
+    },
+    "60039898f83d705940b80d13c50d4fa8a73bf73331": {
+      "workers": {
+        "app/leads/page": {
+          "moduleId": 17576,
+          "async": false,
+          "exportedName": "addLeadActivity",
+          "filename": "app/actions/leads.ts"
+        }
+      },
+      "layer": {
+        "app/leads/page": "action-browser"
+      },
+      "exportedName": "addLeadActivity",
+      "filename": "app/actions/leads.ts"
+    },
+    "704024342e47495650f26f19e764151d94a68320b1": {
+      "workers": {
+        "app/leads/page": {
+          "moduleId": 17576,
+          "async": false,
+          "exportedName": "addLeadNote",
+          "filename": "app/actions/leads.ts"
+        }
+      },
+      "layer": {
+        "app/leads/page": "action-browser"
+      },
+      "exportedName": "addLeadNote",
+      "filename": "app/actions/leads.ts"
+    },
+    "407217a9aa29a6466583c4afca4ffea7ad129959d4": {
+      "workers": {
+        "app/leads/page": {
+          "moduleId": 17576,
+          "async": false,
+          "exportedName": "bulkDeleteLeads",
+          "filename": "app/actions/leads.ts"
+        }
+      },
+      "layer": {
+        "app/leads/page": "action-browser"
+      },
+      "exportedName": "bulkDeleteLeads",
+      "filename": "app/actions/leads.ts"
+    }
+  },
   "edge": {}
 }

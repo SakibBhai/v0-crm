@@ -1,4 +1,35 @@
 {
-  "node": {},
+  "node": {
+    "405f4f95c287fdc8503f30beacbf393e785a4a2b71": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": 59121,
+          "async": false,
+          "exportedName": "getProjectById",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "getProjectById",
+      "filename": "app/actions/projects.ts"
+    },
+    "60eed84bd24d0bf994a10592af8dbc7963a0808e03": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": 59121,
+          "async": false,
+          "exportedName": "updateProject",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "updateProject",
+      "filename": "app/actions/projects.ts"
+    }
+  },
   "edge": {}
 }
