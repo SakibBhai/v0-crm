@@ -1032,7 +1032,7 @@ export default function LeadsPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="value">Deal Value ($) *</Label>
+                      <Label htmlFor="value">Deal Value (৳) *</Label>
                       <Input id="value" name="value" type="number" placeholder="10000" required />
                     </div>
                     <div className="space-y-2">
@@ -1090,14 +1090,14 @@ export default function LeadsPage() {
             { label: "Cold", value: stats.cold, icon: Snowflake, color: "text-blue-400", bg: "bg-blue-500/10" },
             {
               label: "Pipeline",
-              value: `$${(stats.totalValue / 1000).toFixed(0)}k`,
+              value: `৳${(stats.totalValue / 1000).toFixed(0)}k`,
               icon: DollarSign,
               color: "text-emerald-400",
               bg: "bg-emerald-500/10",
             },
             {
               label: "Weighted",
-              value: `$${(stats.weightedValue / 1000).toFixed(0)}k`,
+              value: `৳${(stats.weightedValue / 1000).toFixed(0)}k`,
               icon: TrendingUp,
               color: "text-violet-400",
               bg: "bg-violet-500/10",
@@ -2610,7 +2610,7 @@ function EditLeadForm({
           </select>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="value">Deal Value ($)</Label>
+          <Label htmlFor="value">Deal Value (৳)</Label>
           <Input
             id="value"
             type="number"

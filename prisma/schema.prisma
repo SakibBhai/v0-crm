@@ -168,3 +168,177 @@ model Task {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }
+
+model FinanceInvoice {
+  id                String   @id @default(cuid())
+  invoiceNumber     String   @unique
+  client            String
+  clientEmail       String   @default("")
+  project           String
+  projectId         String   @default("")
+  amount            Float    @default(0)
+  paid              Float    @default(0)
+  tax               Float    @default(0)
+  discount          Float    @default(0)
+  status            String   // draft | sent | pending | partial | paid | overdue
+  dueDate           String
+  issueDate         String
+  paidDate          String?
+  paymentMethod     String   @default("Bank Transfer")
+  paymentTerms      String   @default("Net 30")
+  currency          String   @default("BDT")
+  items             Json     @default("[]")
+  notes             String   @default("")
+  internalNotes     String   @default("")
+  category          String   @default("development")
+  recurringInvoice  Boolean  @default(false)
+  attachments       Json     @default("[]")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model FinanceIncome {
+  id                  String   @id @default(cuid())
+  description         String
+  category            String
+  subCategory         String   @default("")
+  amount              Float
+  date                String
+  client              String   @default("")
+  project             String   @default("")
+  status              String   @default("received")
+  entityStatus        String   @default("active")
+  invoiceId           String?
+  paymentMethod       String   @default("Bank Transfer")
+  recurring           Boolean  @default(false)
+  recurringFrequency  String?
+  taxAmount           Float    @default(0)
+  notes               String   @default("")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model FinanceExpense {
+  id                  String   @id @default(cuid())
+  description         String
+  category            String
+  subCategory         String   @default("")
+  amount              Float
+  date                String
+  vendor              String
+  status              String   @default("pending")
+  entityStatus        String   @default("active")
+  recurring           Boolean  @default(false)
+  recurringFrequency  String?
+  approvalStatus      String   @default("pending")
+  approvedBy          String?
+  paymentMethod       String   @default("Bank Transfer")
+  receiptUrl          String?
+  taxDeductible       Boolean  @default(true)
+  notes               String   @default("")
+  department          String   @default("general")
+  project             String?
+  sourceType          String   @default("office")
+  clientId            String?
+  clientName          String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model TeamEmployee {
+  id                String   @id @default(cuid())
+  firstName         String
+  lastName          String
+  email             String
+  phone             String   @default("")
+  employeeId        String   @unique
+  jobTitle          String
+  department        String
+  employmentType    String   @default("full-time")
+  status            String   @default("active")
+  managerId         String?
+  managerName       String?
+  startDate         String
+  endDate           String?
+  workLocation      String   @default("Remote")
+  salary            Float    @default(0)
+  currency          String   @default("BDT")
+  payFrequency      String   @default("monthly")
+  skills            Json     @default("[]")
+  yearsOfExperience Int      @default(0)
+  certifications    Json     @default("[]")
+  performanceRating Float    @default(0)
+  documents         Json     @default("[]")
+  careerHistory     Json     @default("[]")
+  emergencyContacts Json     @default("[]")
+  leaveBalance      Json     @default("{}")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model TeamCandidate {
+  id             String   @id @default(cuid())
+  firstName      String
+  lastName       String
+  email          String
+  phone          String   @default("")
+  position       String
+  department     String
+  stage          String   @default("applied")
+  source         String   @default("")
+  appliedAt      String
+  notes          Json     @default("[]")
+  interviews     Json     @default("[]")
+  rating         Float    @default(0)
+  expectedSalary Float?
+  availableFrom  String?
+  skills         Json     @default("[]")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model TeamLeaveRequest {
+  id              String   @id @default(cuid())
+  employeeId      String
+  employeeName    String
+  leaveType       String
+  startDate       String
+  endDate         String
+  totalDays       Int
+  reason          String
+  status          String   @default("pending")
+  approverId      String?
+  approverName    String?
+  approvedAt      String?
+  rejectionReason String?
+  createdAt       DateTime @default(now())
+}
+
+model TeamAttendanceRecord {
+  id           String   @id @default(cuid())
+  employeeId   String
+  employeeName String
+  date         String
+  status       String
+  clockIn      String?
+  clockOut     String?
+  breakMinutes Int?
+  totalHours   Float?
+  workLocation String?
+  notes        String?
+  markedAt     DateTime @default(now())
+}
+
+model TeamOKR {
+  id              String   @id @default(cuid())
+  employeeId      String
+  title           String
+  description     String   @default("")
+  quarter         String
+  keyResults      Json     @default("[]")
+  overallProgress Float    @default(0)
+  status          String   @default("on-track")
+  parentOKRId     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

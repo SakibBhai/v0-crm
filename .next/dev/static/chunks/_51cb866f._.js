@@ -3208,7 +3208,7 @@ function ReportsPage() {
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                     className: "text-2xl font-bold text-green-500 mt-1",
-                                                    children: "$792,000"
+                                                    children: "৳792,000"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/reports/page.tsx",
                                                     lineNumber: 521,
@@ -3234,7 +3234,7 @@ function ReportsPage() {
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                     className: "text-2xl font-bold text-red-400 mt-1",
-                                                    children: "$495,000"
+                                                    children: "৳495,000"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/reports/page.tsx",
                                                     lineNumber: 525,
@@ -3260,7 +3260,7 @@ function ReportsPage() {
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                     className: "text-2xl font-bold mt-1",
-                                                    children: "$297,000"
+                                                    children: "৳297,000"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/reports/page.tsx",
                                                     lineNumber: 529,
@@ -3286,7 +3286,7 @@ function ReportsPage() {
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                     className: "text-2xl font-bold text-primary mt-1",
-                                                    children: "$65,340"
+                                                    children: "৳65,340"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/reports/page.tsx",
                                                     lineNumber: 533,
@@ -3479,7 +3479,7 @@ function ReportsPage() {
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                                             className: "py-3 px-4 text-right text-green-500",
-                                                                            children: "$792,000"
+                                                                            children: "৳792,000"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/reports/page.tsx",
                                                                             lineNumber: 573,
@@ -3487,7 +3487,7 @@ function ReportsPage() {
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                                             className: "py-3 px-4 text-right text-red-400",
-                                                                            children: "$495,000"
+                                                                            children: "৳495,000"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/reports/page.tsx",
                                                                             lineNumber: 574,
@@ -3495,7 +3495,7 @@ function ReportsPage() {
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                                             className: "py-3 px-4 text-right",
-                                                                            children: "$297,000"
+                                                                            children: "৳297,000"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/reports/page.tsx",
                                                                             lineNumber: 575,
@@ -3503,7 +3503,7 @@ function ReportsPage() {
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                                             className: "py-3 px-4 text-right text-primary",
-                                                                            children: "$65,340"
+                                                                            children: "৳65,340"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/reports/page.tsx",
                                                                             lineNumber: 576,
@@ -3571,7 +3571,7 @@ function ReportsPage() {
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                             className: "text-xl font-bold text-blue-400 mt-1",
-                                                            children: "$53,460"
+                                                            children: "৳53,460"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/reports/page.tsx",
                                                             lineNumber: 590,
@@ -3596,7 +3596,7 @@ function ReportsPage() {
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                             className: "text-xl font-bold text-green-400 mt-1",
-                                                            children: "$14,850"
+                                                            children: "৳14,850"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/reports/page.tsx",
                                                             lineNumber: 594,
@@ -3621,7 +3621,7 @@ function ReportsPage() {
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                             className: "text-xl font-bold text-yellow-400 mt-1",
-                                                            children: "$8,910"
+                                                            children: "৳8,910"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/reports/page.tsx",
                                                             lineNumber: 598,

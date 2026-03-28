@@ -4590,7 +4590,7 @@ function LeadsPage() {
                                                                     children: [
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Label"], {
                                                                             htmlFor: "value",
-                                                                            children: "Deal Value ($) *"
+                                                                            children: "Deal Value (৳) *"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/leads/page.tsx",
                                                                             lineNumber: 1035,
@@ -4879,14 +4879,14 @@ function LeadsPage() {
                         },
                         {
                             label: "Pipeline",
-                            value: `$${(stats.totalValue / 1000).toFixed(0)}k`,
+                            value: `৳${(stats.totalValue / 1000).toFixed(0)}k`,
                             icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$dollar$2d$sign$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__DollarSign$3e$__["DollarSign"],
                             color: "text-emerald-400",
                             bg: "bg-emerald-500/10"
                         },
                         {
                             label: "Weighted",
-                            value: `$${(stats.weightedValue / 1000).toFixed(0)}k`,
+                            value: `৳${(stats.weightedValue / 1000).toFixed(0)}k`,
                             icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trending$2d$up$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__TrendingUp$3e$__["TrendingUp"],
                             color: "text-violet-400",
                             bg: "bg-violet-500/10"
@@ -9622,7 +9622,7 @@ function EditLeadForm({ lead, onSave, onCancel }) {
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Label"], {
                                 htmlFor: "value",
-                                children: "Deal Value ($)"
+                                children: "Deal Value (৳)"
                             }, void 0, false, {
                                 fileName: "[project]/app/leads/page.tsx",
                                 lineNumber: 2613,

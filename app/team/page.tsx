@@ -1,9 +1,16 @@
 "use client"
 
-import { useState } from "react"
-import type { Employee, Candidate, LeaveRequest, OKR, AttendanceRecord, PerformanceReview } from "@/lib/types/hr"
-import { employees as initialEmployees, candidates as initialCandidates, leaveRequests as initialLeaveRequests, okrs as initialOkrs, skillDefinitions, trainingCourses, courseEnrollments as initialEnrollments, hrMetrics, attendanceRecords as initialAttendanceRecords } from "@/lib/data/hr"
+import { useState, useEffect } from "react"
+import type { Employee, Candidate, LeaveRequest, OKR, AttendanceRecord, PerformanceReview, CourseEnrollment } from "@/lib/types/hr"
+import { skillDefinitions, trainingCourses, hrMetrics } from "@/lib/data/hr"
 import { DEPARTMENT_CONFIG } from "@/lib/types/hr"
+import {
+  getEmployees, createEmployee as createEmployeeAction, updateEmployee as updateEmployeeAction, deleteEmployee as deleteEmployeeAction,
+  getCandidates as getCandidatesAction, createCandidate as createCandidateAction, updateCandidate as updateCandidateAction,
+  getLeaveRequests, createLeaveRequest as createLeaveRequestAction, updateLeaveRequest as updateLeaveRequestAction,
+  getAttendanceRecords, createAttendanceRecord as createAttendanceRecordAction, updateAttendanceRecord as updateAttendanceRecordAction,
+  getOKRs, createOKR as createOKRAction,
+} from "@/app/actions/team"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { EmployeeProfile } from "@/components/team/employee-profile"
 import { OrgChart } from "@/components/team/org-chart"
@@ -32,6 +39,7 @@ import {
 import {
   Users,
   UserPlus,
+  UserCheck,
   Search,
   Filter,
   LayoutGrid,
@@ -57,53 +65,32 @@ type ViewMode = "grid" | "list"
 
 export default function TeamPage() {
   // Data state
-  const [employees, setEmployees] = useState<Employee[]>(initialEmployees as Employee[])
-  const [candidates, setCandidates] = useState<Candidate[]>(initialCandidates)
-  const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>(initialLeaveRequests)
-  const [okrs, setOkrs] = useState<OKR[]>(initialOkrs)
-  const [enrollments, setEnrollments] = useState(initialEnrollments)
-  const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>(initialAttendanceRecords)
-  const [reviews] = useState<PerformanceReview[]>([
-    {
-      id: "PR001",
-      employeeId: "EMP001",
-      employeeName: "Alex Johnson",
-      reviewerId: "EMP003",
-      reviewerName: "Sarah Williams",
-      period: "H2 2025",
-      scheduledDate: "2026-01-15",
-      status: "completed",
-      overallRating: 4.5,
-      competencyRatings: [
-        { competency: "Technical Skills", rating: 5, comments: "Exceptional coding ability" },
-        { competency: "Communication", rating: 4, comments: "Clear and concise" },
-        { competency: "Leadership", rating: 4.5, comments: "Great team mentoring" },
-      ],
-      strengths: ["Problem solving", "Code quality", "Team collaboration", "Initiative"],
-      areasForImprovement: ["Documentation", "Delegation"],
-      goals: ["Lead a major project", "Mentor 2 juniors"],
-      promotionRecommended: true,
-      pipRequired: false,
-      completedAt: "2026-01-20",
-    },
-    {
-      id: "PR002",
-      employeeId: "EMP002",
-      employeeName: "Emma Davis",
-      reviewerId: "EMP001",
-      reviewerName: "Alex Johnson",
-      period: "H2 2025",
-      scheduledDate: "2026-02-01",
-      status: "scheduled",
-      overallRating: 0,
-      competencyRatings: [],
-      strengths: [],
-      areasForImprovement: [],
-      goals: [],
-      promotionRecommended: false,
-      pipRequired: false,
-    },
-  ])
+  const [employees, setEmployees] = useState<Employee[]>([])
+  const [candidates, setCandidates] = useState<Candidate[]>([])
+  const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([])
+  const [okrs, setOkrs] = useState<OKR[]>([])
+  const [enrollments, setEnrollments] = useState<CourseEnrollment[]>([])
+  const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([])
+
+  // Load data from database on mount
+  useEffect(() => {
+    async function loadTeamData() {
+      try {
+        const [empRes, candRes, leaveRes, attRes, okrRes] = await Promise.all([
+          getEmployees(), getCandidatesAction(), getLeaveRequests(), getAttendanceRecords(), getOKRs(),
+        ])
+        if (Array.isArray(empRes)) setEmployees(empRes as Employee[])
+        if (Array.isArray(candRes)) setCandidates(candRes as Candidate[])
+        if (Array.isArray(leaveRes)) setLeaveRequests(leaveRes as LeaveRequest[])
+        if (Array.isArray(attRes)) setAttendanceRecords(attRes as AttendanceRecord[])
+        if (Array.isArray(okrRes)) setOkrs(okrRes as OKR[])
+      } catch (err) {
+        console.error("Failed to load team data:", err)
+      }
+    }
+    loadTeamData()
+  }, [])
+  const [reviews] = useState<PerformanceReview[]>([])
 
   // UI state
   const [activeTab, setActiveTab] = useState<TabMode>("directory")
@@ -114,8 +101,11 @@ export default function TeamPage() {
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [editEmployeeId, setEditEmployeeId] = useState<string | null>(null)
 
   const currentUserId = "EMP001" // Simulated logged-in user
+
+  const editingEmployee = editEmployeeId ? employees.find(e => e.id === editEmployeeId) : null
 
   // Stats
   const stats = {
@@ -144,11 +134,28 @@ export default function TeamPage() {
     setIsProfileOpen(true)
   }
 
-  const handleAddEmployee = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleEditEmployee = (employee: Employee) => {
+    setEditEmployeeId(employee.id)
+    setIsAddDialogOpen(true)
+    setIsProfileOpen(false)
+  }
+
+  const handleDeleteEmployee = async (id: string) => {
+    if (confirm("Are you sure you want to delete this employee?")) {
+      setEmployees(prev => prev.filter(e => e.id !== id))
+      setIsProfileOpen(false)
+      try {
+        await deleteEmployeeAction(id)
+      } catch (err) {
+        console.error("Failed to delete employee", err)
+      }
+    }
+  }
+
+  const handleSaveEmployee = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
 
-    // Parse skills from comma-separated string
     const skillsInput = formData.get("skills") as string || ""
     const parsedSkills = skillsInput
       .split(",")
@@ -163,91 +170,118 @@ export default function TeamPage() {
         isVerified: false,
       }))
 
-    // Get manager info
     const managerIdRaw = formData.get("managerId") as string
     const managerId = managerIdRaw && managerIdRaw !== "none" ? managerIdRaw : undefined
     const manager = managerId ? employees.find(emp => emp.id === managerId) : undefined
+    
+    // Existing employee data if editing
+    const empId = editingEmployee?.employeeId || `EMP${Date.now()}`
 
-    const newEmployee: Employee = {
-      id: `EMP${Date.now()}`,
+    const employeeData = {
       firstName: formData.get("firstName") as string,
       lastName: formData.get("lastName") as string,
       email: formData.get("email") as string,
       phone: formData.get("phone") as string || "",
-      employeeId: `EMP${Date.now()}`,
+      employeeId: empId,
       jobTitle: formData.get("jobTitle") as string,
-      department: formData.get("department") as any,
-      employmentType: formData.get("employmentType") as any || "full-time",
-      status: "active",
-      managerId: managerId || undefined,
+      department: formData.get("department") as string || "development",
+      employmentType: formData.get("employmentType") as string || "full-time",
+      status: formData.get("status") as string || (editingEmployee?.status || "active"),
+      managerId: managerId,
       managerName: manager ? `${manager.firstName} ${manager.lastName}` : undefined,
-      startDate: formData.get("startDate") as string || new Date().toISOString().split("T")[0],
+      startDate: formData.get("startDate") as string || (editingEmployee?.startDate || new Date().toISOString().split("T")[0]),
       workLocation: formData.get("location") as string || formData.get("locationType") as string || "Remote",
       salary: Number(formData.get("salary")) || 0,
-      currency: formData.get("currency") as string || "USD",
-      payFrequency: formData.get("payFrequency") as any || "monthly",
-      skills: parsedSkills,
-      yearsOfExperience: Number(formData.get("experience")) || 0,
-      certifications: [],
-      performanceRating: 0,
-      documents: [],
-      careerHistory: [{
-        id: "1",
-        date: new Date().toISOString(),
-        type: "hired",
-        title: "Hired",
-        details: `Joined as ${formData.get("jobTitle")}`
-      }],
-      emergencyContacts: [],
-      leaveBalance: {
-        vacation: { total: 20, used: 0, pending: 0 },
-        sick: { total: 10, used: 0, pending: 0 },
-        personal: { total: 5, used: 0, pending: 0 },
-        unpaid: { used: 0 },
-      },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      currency: formData.get("currency") as string || "BDT",
+      payFrequency: formData.get("payFrequency") as string || "monthly",
+      skills: parsedSkills.length > 0 ? parsedSkills : (editingEmployee?.skills || []),
+      yearsOfExperience: Number(formData.get("experience")) || (editingEmployee?.yearsOfExperience || 0),
+      certifications: editingEmployee?.certifications || [] as string[],
+      performanceRating: editingEmployee?.performanceRating || 0,
+      documents: editingEmployee?.documents || [] as any[],
+      careerHistory: editingEmployee?.careerHistory || [{ id: "1", date: new Date().toISOString(), type: "hired", title: "Hired", details: `Joined as ${formData.get("jobTitle")}` }],
+      emergencyContacts: editingEmployee?.emergencyContacts || [] as any[],
+      leaveBalance: editingEmployee?.leaveBalance || { vacation: { total: 20, used: 0, pending: 0 }, sick: { total: 10, used: 0, pending: 0 }, personal: { total: 5, used: 0, pending: 0 }, unpaid: { used: 0 } },
     }
-    setEmployees(prev => [newEmployee, ...prev])
+
+    try {
+      if (editEmployeeId) {
+        const res = await updateEmployeeAction(editEmployeeId, employeeData)
+        if ('error' in res) { console.error(res.error); return }
+        setEmployees(prev => prev.map(e => e.id === editEmployeeId ? (res as Employee) : e))
+      } else {
+        const res = await createEmployeeAction(employeeData)
+        if ('error' in res) { console.error(res.error); return }
+        setEmployees(prev => [res as Employee, ...prev])
+      }
+    } catch {
+      if (editEmployeeId) {
+        setEmployees(prev => prev.map(e => e.id === editEmployeeId ? { ...employeeData, id: editEmployeeId, createdAt: e.createdAt, updatedAt: new Date().toISOString() } as Employee : e))
+      } else {
+        const newEmployee: Employee = { ...employeeData, id: empId, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() } as Employee
+        setEmployees(prev => [newEmployee, ...prev])
+      }
+    }
     setIsAddDialogOpen(false)
+    setEditEmployeeId(null)
   }
 
   const handleUpdateCandidate = (candidate: Candidate) => {
     setCandidates(prev => prev.map(c => c.id === candidate.id ? candidate : c))
+    // Persist to DB
+    const { id, ...rest } = candidate as any
+    updateCandidateAction(id, {
+      firstName: rest.firstName, lastName: rest.lastName, email: rest.email,
+      phone: rest.phone, position: rest.position, department: rest.department,
+      stage: rest.stage, source: rest.source, notes: rest.notes as any,
+      interviews: rest.interviews as any, rating: rest.rating,
+      skills: rest.skills as any,
+    }).catch(console.error)
   }
 
-  const handleAddCandidate = (data: Omit<Candidate, "id" | "appliedAt" | "interviews" | "notes" | "rating">) => {
-    const newCandidate: Candidate = {
-      ...data,
-      id: `CAN${Date.now()}`,
-      appliedAt: new Date().toISOString().split("T")[0],
-      interviews: [],
-      notes: [],
-      rating: 0,
+  const handleAddCandidate = async (data: Omit<Candidate, "id" | "appliedAt" | "interviews" | "notes" | "rating">) => {
+    try {
+      const res = await createCandidateAction({
+        firstName: data.firstName, lastName: data.lastName, email: data.email,
+        phone: data.phone, position: data.position, department: data.department,
+        stage: data.stage, source: data.source, appliedAt: new Date().toISOString().split("T")[0],
+        skills: data.skills as string[],
+      })
+      if ('error' in res) { console.error(res.error); return }
+      setCandidates(prev => [res as Candidate, ...prev])
+    } catch {
+      const newCandidate: Candidate = { ...data, id: `CAN${Date.now()}`, appliedAt: new Date().toISOString().split("T")[0], interviews: [], notes: [], rating: 0 }
+      setCandidates(prev => [newCandidate, ...prev])
     }
-    setCandidates(prev => [newCandidate, ...prev])
   }
 
-  const handleLeaveSubmit = (request: Omit<LeaveRequest, "id" | "status" | "createdAt">) => {
-    const newRequest: LeaveRequest = {
-      ...request,
-      id: `LR${Date.now()}`,
-      status: "pending",
-      createdAt: new Date().toISOString(),
+  const handleLeaveSubmit = async (request: Omit<LeaveRequest, "id" | "status" | "createdAt">) => {
+    try {
+      const res = await createLeaveRequestAction({
+        employeeId: request.employeeId, employeeName: request.employeeName,
+        leaveType: request.leaveType, startDate: request.startDate, endDate: request.endDate,
+        totalDays: request.totalDays, reason: request.reason,
+      })
+      if ('error' in res) { console.error(res.error); return }
+      setLeaveRequests(prev => [res as LeaveRequest, ...prev])
+    } catch {
+      const newRequest: LeaveRequest = { ...request, id: `LR${Date.now()}`, status: "pending", createdAt: new Date().toISOString() }
+      setLeaveRequests(prev => [newRequest, ...prev])
     }
-    setLeaveRequests(prev => [newRequest, ...prev])
   }
 
   const handleLeaveApprove = (id: string) => {
     setLeaveRequests(prev => prev.map(r =>
       r.id === id ? { ...r, status: "approved", approverId: currentUserId, approverName: "Current User", approvedAt: new Date().toISOString() } : r
     ))
+    updateLeaveRequestAction(id, { status: "approved", approverId: currentUserId, approverName: "Current User", approvedAt: new Date().toISOString() }).catch(console.error)
   }
 
   const handleLeaveReject = (id: string, reason: string) => {
     setLeaveRequests(prev => prev.map(r =>
       r.id === id ? { ...r, status: "rejected", rejectionReason: reason } : r
     ))
+    updateLeaveRequestAction(id, { status: "rejected", rejectionReason: reason }).catch(console.error)
   }
 
   const handleEnroll = (courseId: string) => {
@@ -266,27 +300,43 @@ export default function TeamPage() {
   }
 
   // Attendance handlers
-  const handleMarkAttendance = (record: Omit<AttendanceRecord, "id" | "markedAt">) => {
-    const newRecord: AttendanceRecord = {
-      ...record,
-      id: `ATT_${Date.now()}`,
-      markedAt: new Date().toISOString(),
+  const handleMarkAttendance = async (record: Omit<AttendanceRecord, "id" | "markedAt">) => {
+    try {
+      const res = await createAttendanceRecordAction({
+        employeeId: record.employeeId, employeeName: record.employeeName,
+        date: record.date, status: record.status,
+        clockIn: record.clockIn, clockOut: record.clockOut,
+        breakMinutes: record.breakMinutes, totalHours: record.totalHours,
+        workLocation: record.workLocation, notes: record.notes,
+      })
+      if ('error' in res) { console.error(res.error); return }
+      setAttendanceRecords(prev => [...prev, res as AttendanceRecord])
+    } catch {
+      const newRecord: AttendanceRecord = { ...record, id: `ATT_${Date.now()}`, markedAt: new Date().toISOString() }
+      setAttendanceRecords(prev => [...prev, newRecord])
     }
-    setAttendanceRecords(prev => [...prev, newRecord])
   }
 
   const handleUpdateAttendance = (id: string, updates: Partial<AttendanceRecord>) => {
     setAttendanceRecords(prev => prev.map(r =>
       r.id === id ? { ...r, ...updates, markedAt: new Date().toISOString() } : r
     ))
+    updateAttendanceRecordAction(id, { ...updates, markedAt: new Date().toISOString() } as any).catch(console.error)
   }
 
-  const handleAddOkr = (okr: Omit<OKR, "id">) => {
-    const newOkr: OKR = {
-      ...okr,
-      id: `OKR_${Date.now()}`,
+  const handleAddOkr = async (okr: Omit<OKR, "id">) => {
+    try {
+      const res = await createOKRAction({
+        employeeId: okr.employeeId, title: okr.title, description: okr.description,
+        quarter: okr.quarter, keyResults: okr.keyResults,
+        overallProgress: okr.overallProgress, status: okr.status,
+      })
+      if ('error' in res) { console.error(res.error); return }
+      setOkrs(prev => [res as OKR, ...prev])
+    } catch {
+      const newOkr: OKR = { ...okr, id: `OKR_${Date.now()}` }
+      setOkrs(prev => [newOkr, ...prev])
     }
-    setOkrs(prev => [newOkr, ...prev])
   }
 
   const tabs = [
@@ -593,25 +643,30 @@ export default function TeamPage() {
           employee={selectedEmployee}
           isOpen={isProfileOpen}
           onClose={() => setIsProfileOpen(false)}
+          onEditEmployee={handleEditEmployee}
+          onDeleteEmployee={handleDeleteEmployee}
         />
       )}
 
-      {/* Add Employee Dialog - Professional Multi-Step Wizard */}
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+      {/* Add/Edit Employee Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
+        setIsAddDialogOpen(open)
+        if (!open) setEditEmployeeId(null)
+      }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader className="pb-4 border-b border-border">
             <DialogTitle className="flex items-center gap-3 text-xl">
               <div className="p-2 rounded-lg bg-primary/20">
                 <UserPlus className="w-5 h-5 text-primary" />
               </div>
-              Add New Employee
+              {editEmployeeId ? "Edit Employee" : "Add New Employee"}
             </DialogTitle>
             <p className="text-sm text-muted-foreground mt-1">
-              Fill in the details to onboard a new team member
+              {editEmployeeId ? "Update details for this team member" : "Fill in the details to onboard a new team member"}
             </p>
           </DialogHeader>
 
-          <form onSubmit={handleAddEmployee} className="space-y-6 pt-4">
+          <form onSubmit={handleSaveEmployee} className="space-y-6 pt-4">
             {/* Personal Information Section */}
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-sm font-medium text-primary">
@@ -628,6 +683,7 @@ export default function TeamPage() {
                     name="firstName"
                     placeholder="John"
                     required
+                    defaultValue={editingEmployee?.firstName}
                     className="bg-secondary/50 border-border"
                   />
                 </div>
@@ -640,6 +696,7 @@ export default function TeamPage() {
                     name="lastName"
                     placeholder="Doe"
                     required
+                    defaultValue={editingEmployee?.lastName}
                     className="bg-secondary/50 border-border"
                   />
                 </div>
@@ -655,6 +712,7 @@ export default function TeamPage() {
                     type="email"
                     placeholder="john.doe@company.com"
                     required
+                    defaultValue={editingEmployee?.email}
                     className="bg-secondary/50 border-border"
                   />
                 </div>
@@ -665,6 +723,7 @@ export default function TeamPage() {
                     name="phone"
                     type="tel"
                     placeholder="+1 (555) 123-4567"
+                    defaultValue={editingEmployee?.phone}
                     className="bg-secondary/50 border-border"
                   />
                 </div>
@@ -687,6 +746,7 @@ export default function TeamPage() {
                     name="jobTitle"
                     placeholder="Senior Developer"
                     required
+                    defaultValue={editingEmployee?.jobTitle}
                     className="bg-secondary/50 border-border"
                   />
                 </div>
@@ -694,7 +754,7 @@ export default function TeamPage() {
                   <Label htmlFor="department" className="text-sm">
                     Department <span className="text-destructive">*</span>
                   </Label>
-                  <Select name="department" defaultValue="development">
+                  <Select name="department" defaultValue={editingEmployee?.department || "development"}>
                     <SelectTrigger className="bg-secondary/50 border-border">
                       <SelectValue placeholder="Select department" />
                     </SelectTrigger>
@@ -708,10 +768,10 @@ export default function TeamPage() {
                   </Select>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="employmentType" className="text-sm">Employment Type</Label>
-                  <Select name="employmentType" defaultValue="full-time">
+                  <Select name="employmentType" defaultValue={editingEmployee?.employmentType || "full-time"}>
                     <SelectTrigger className="bg-secondary/50 border-border">
                       <SelectValue />
                     </SelectTrigger>
@@ -725,8 +785,21 @@ export default function TeamPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
+                  <Label htmlFor="status" className="text-sm">Status</Label>
+                  <Select name="status" defaultValue={editingEmployee?.status || "active"}>
+                    <SelectTrigger className="bg-secondary/50 border-border">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="on-leave">On Leave</SelectItem>
+                      <SelectItem value="terminated">Terminated</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="managerId" className="text-sm">Reports To</Label>
-                  <Select name="managerId">
+                  <Select name="managerId" defaultValue={editingEmployee?.managerId || "none"}>
                     <SelectTrigger className="bg-secondary/50 border-border">
                       <SelectValue placeholder="Select manager" />
                     </SelectTrigger>
@@ -749,13 +822,13 @@ export default function TeamPage() {
                   <DatePicker
                     name="startDate"
                     placeholder="Select start date"
-                    date={new Date()}
+                    date={editingEmployee?.startDate ? new Date(editingEmployee.startDate) : new Date()}
                     required
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="location" className="text-sm">Work Location</Label>
-                  <Select name="locationType" defaultValue="remote">
+                  <Select name="locationType" defaultValue={editingEmployee?.workLocation?.toLowerCase().includes("remote") ? "remote" : "onsite"}>
                     <SelectTrigger className="bg-secondary/50 border-border">
                       <SelectValue />
                     </SelectTrigger>
@@ -766,15 +839,6 @@ export default function TeamPage() {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="location" className="text-sm">Office/City Location</Label>
-                <Input
-                  id="location"
-                  name="location"
-                  placeholder="e.g., San Francisco, CA or Remote - EST"
-                  className="bg-secondary/50 border-border"
-                />
               </div>
             </div>
 
@@ -794,13 +858,14 @@ export default function TeamPage() {
                       name="salary"
                       type="number"
                       placeholder="75000"
+                      defaultValue={editingEmployee?.salary}
                       className="pl-9 bg-secondary/50 border-border"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="currency" className="text-sm">Currency</Label>
-                  <Select name="currency" defaultValue="USD">
+                  <Select name="currency" defaultValue={editingEmployee?.currency || "BDT"}>
                     <SelectTrigger className="bg-secondary/50 border-border">
                       <SelectValue />
                     </SelectTrigger>
@@ -814,7 +879,7 @@ export default function TeamPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="payFrequency" className="text-sm">Pay Frequency</Label>
-                  <Select name="payFrequency" defaultValue="monthly">
+                  <Select name="payFrequency" defaultValue={editingEmployee?.payFrequency || "monthly"}>
                     <SelectTrigger className="bg-secondary/50 border-border">
                       <SelectValue />
                     </SelectTrigger>
@@ -841,6 +906,7 @@ export default function TeamPage() {
                     id="skills"
                     name="skills"
                     placeholder="React, TypeScript, Node.js"
+                    defaultValue={editingEmployee?.skills?.map((s: any) => s.skillName).join(", ") || ""}
                     className="bg-secondary/50 border-border"
                   />
                 </div>
@@ -852,6 +918,7 @@ export default function TeamPage() {
                     type="number"
                     min="0"
                     placeholder="5"
+                    defaultValue={editingEmployee?.yearsOfExperience || ""}
                     className="bg-secondary/50 border-border"
                   />
                 </div>
@@ -869,8 +936,8 @@ export default function TeamPage() {
                 Cancel
               </Button>
               <Button type="submit" className="gap-2 min-w-[140px]">
-                <UserPlus className="w-4 h-4" />
-                Add Employee
+                {editEmployeeId ? <UserCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+                {editEmployeeId ? "Save Changes" : "Add Employee"}
               </Button>
             </DialogFooter>
           </form>

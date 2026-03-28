@@ -2,7 +2,9 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { jsPDF } from "jspdf"
+import html2canvas from "html2canvas"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { AnimatedCard } from "@/components/animated-card"
 import { Button } from "@/components/ui/button"
@@ -85,6 +87,12 @@ import {
 } from "recharts"
 
 import { invoicesData, incomeData, ExpenseDataType, expensesData, revenueData, incomeCategoryData, categoryData, paymentMethodData, expenseCategoryData, cashFlowData, profitMarginData, budgetData } from "@/lib/data/finance-data";
+import {
+  getInvoices, createInvoice as createInvoiceAction, updateInvoice as updateInvoiceAction, deleteInvoice as deleteInvoiceAction,
+  getIncomeEntries, createIncome as createIncomeAction, updateIncome as updateIncomeAction,
+  getExpenses as getExpensesAction, createExpense as createExpenseAction, updateExpense as updateExpenseAction,
+} from "@/app/actions/finances"
+
 // Invoice kanban columns
 const invoiceColumns = [
   { id: "draft", title: "Draft", color: "bg-muted-foreground" },
@@ -186,6 +194,48 @@ export default function FinancesPage() {
   const [neutralizeTarget, setNeutralizeTarget] = useState<{ type: "expense" | "income"; id: number } | null>(null)
   const [deleteInvoiceTarget, setDeleteInvoiceTarget] = useState<string | null>(null)
   const [selectedIncome, setSelectedIncome] = useState<(typeof incomeData)[0] | null>(null)
+
+  // Load data from database on mount
+  useEffect(() => {
+    async function loadFinanceData() {
+      try {
+        const [invoiceRes, incomeRes, expenseRes] = await Promise.all([
+          getInvoices(),
+          getIncomeEntries(),
+          getExpensesAction(),
+        ])
+        if (Array.isArray(invoiceRes) && invoiceRes.length > 0) {
+          setInvoices(invoiceRes as typeof invoicesData)
+        }
+        if (Array.isArray(incomeRes) && incomeRes.length > 0) {
+          setIncome(incomeRes as any)
+        }
+        if (Array.isArray(expenseRes) && expenseRes.length > 0) {
+          setExpenses(expenseRes as any)
+        }
+      } catch (err) {
+        console.error("Failed to load finance data, using fallback:", err)
+      }
+    }
+    loadFinanceData()
+  }, [])
+
+  const handleDownloadInvoice = async (invoiceId: string) => {
+    const element = document.getElementById(`invoice-content-${invoiceId}`);
+    if (!element) return;
+    
+    try {
+        const canvas = await html2canvas(element, { scale: 2 });
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF("p", "mm", "a4");
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`Invoice_${invoiceId}.pdf`);
+    } catch (error) {
+        console.error("Error generating PDF:", error);
+    }
+  }
 
   const [expenseFormData, setExpenseFormData] = useState({
     vendor: "",
@@ -1288,7 +1338,7 @@ export default function FinancesPage() {
               <CardContent>
                 <div className="space-y-3">
                   {[...invoices, ...expenses.map((e) => ({ ...e, type: "expense" }))]
-                    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                    .sort((a, b) => new Date((b as any).date || (b as any).issueDate).getTime() - new Date((a as any).date || (a as any).issueDate).getTime())
                     .slice(0, 8)
                     .map((item) => {
                       const isExpense = "vendor" in item
@@ -1308,7 +1358,7 @@ export default function FinancesPage() {
                             <div>
                               <p className="font-medium">{isExpense ? item.description : (item as any).client}</p>
                               <p className="text-sm text-muted-foreground">
-                                {isExpense ? (item as any).vendor : (item as any).project} • {formatDate(item.date)}
+                                {isExpense ? (item as any).vendor : (item as any).project} • {formatDate((item as any).date || (item as any).issueDate)}
                               </p>
                             </div>
                           </div>
@@ -1529,6 +1579,7 @@ export default function FinancesPage() {
                                 draggedInvoice === invoice.id && "opacity-50",
                                 invoice.status === "overdue" && "ring-1 ring-red-500/30",
                               )}
+                              // @ts-expect-error
                               draggable
                               onDragStart={() => handleDragStart(invoice.id)}
                             >
@@ -1573,7 +1624,7 @@ export default function FinancesPage() {
                                         <DialogTitle>Invoice Details - {selectedInvoice?.invoiceNumber}</DialogTitle>
                                       </DialogHeader>
                                       {selectedInvoice && (
-                                        <div className="space-y-6 py-4">
+                                        <div className="space-y-6 py-4 bg-background p-6" id={`invoice-content-${selectedInvoice.id}`}>
                                           <div className="grid grid-cols-2 gap-6">
                                             <div className="space-y-4">
                                               <div>
@@ -1779,7 +1830,7 @@ export default function FinancesPage() {
                                               <Printer className="mr-2 h-4 w-4" />
                                               Print
                                             </Button>
-                                            <Button variant="outline" className="flex-1 bg-transparent">
+                                            <Button variant="outline" className="flex-1 bg-transparent" onClick={() => handleDownloadInvoice(selectedInvoice.id)}>
                                               <Download className="mr-2 h-4 w-4" />
                                               Download PDF
                                             </Button>
@@ -2312,7 +2363,7 @@ export default function FinancesPage() {
                                         <DialogTitle>Invoice Details - {selectedInvoice?.invoiceNumber}</DialogTitle>
                                       </DialogHeader>
                                       {selectedInvoice && (
-                                        <div className="space-y-6 py-4">
+                                        <div className="space-y-6 py-4 bg-background p-6" id={`invoice-content-${selectedInvoice.id}`}>
                                           <div className="grid grid-cols-2 gap-6">
                                             <div className="space-y-4">
                                               <div>
@@ -2518,7 +2569,7 @@ export default function FinancesPage() {
                                               <Printer className="mr-2 h-4 w-4" />
                                               Print
                                             </Button>
-                                            <Button variant="outline" className="flex-1 bg-transparent">
+                                            <Button variant="outline" className="flex-1 bg-transparent" onClick={() => handleDownloadInvoice(selectedInvoice.id)}>
                                               <Download className="mr-2 h-4 w-4" />
                                               Download PDF
                                             </Button>

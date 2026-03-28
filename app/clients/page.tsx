@@ -1193,14 +1193,14 @@ export default function ClientsPage() {
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="contractValue">Contract Value ($)</Label>
+                        <Label htmlFor="contractValue">Contract Value (৳)</Label>
                         <div className="relative">
                           <Input id="contractValue" name="contractValue" type="number" placeholder="50000" className="pl-9" />
                           <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="monthlyRevenue">Monthly Revenue ($)</Label>
+                        <Label htmlFor="monthlyRevenue">Monthly Revenue (৳)</Label>
                         <div className="relative">
                           <Input id="monthlyRevenue" name="monthlyRevenue" type="number" placeholder="5000" className="pl-9" />
                           <TrendingUp className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -1275,7 +1275,7 @@ export default function ClientsPage() {
             },
             {
               label: "Monthly Revenue",
-              value: `$${(stats.monthlyRecurring / 1000).toFixed(0)}K`,
+              value: `৳${(stats.monthlyRecurring / 1000).toFixed(0)}K`,
               icon: DollarSign,
               color: "text-primary",
               subValue: "Recurring",
@@ -1290,7 +1290,7 @@ export default function ClientsPage() {
             { label: "Avg NPS", value: stats.avgNPS, icon: Target, color: "text-violet-400", subValue: "Score" },
             {
               label: "Lifetime Value",
-              value: `$${(stats.totalLTV / 1000000).toFixed(1)}M`,
+              value: `৳${(stats.totalLTV / 1000000).toFixed(1)}M`,
               icon: TrendingUp,
               color: "text-cyan-400",
               subValue: "Total LTV",
@@ -2266,28 +2266,28 @@ export default function ClientsPage() {
                   </div>
                   <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="edit-totalRevenue">Total Revenue ($)</Label>
+                      <Label htmlFor="edit-totalRevenue">Total Revenue (৳)</Label>
                       <div className="relative">
                         <Input id="edit-totalRevenue" name="totalRevenue" type="number" defaultValue={editingClient.totalRevenue} className="pl-9" />
                         <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="edit-contractValue">Contract Value ($)</Label>
+                      <Label htmlFor="edit-contractValue">Contract Value (৳)</Label>
                       <div className="relative">
                         <Input id="edit-contractValue" name="contractValue" type="number" defaultValue={editingClient.contractValue} className="pl-9" />
                         <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="edit-monthlyRevenue">Monthly Revenue ($)</Label>
+                      <Label htmlFor="edit-monthlyRevenue">Monthly Revenue (৳)</Label>
                       <div className="relative">
                         <Input id="edit-monthlyRevenue" name="monthlyRevenue" type="number" defaultValue={editingClient.monthlyRevenue} className="pl-9" />
                         <TrendingUp className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="edit-lifetimeValue">Lifetime Value ($)</Label>
+                      <Label htmlFor="edit-lifetimeValue">Lifetime Value (৳)</Label>
                       <div className="relative">
                         <Input id="edit-lifetimeValue" name="lifetimeValue" type="number" defaultValue={editingClient.lifetimeValue} className="pl-9" />
                         <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />

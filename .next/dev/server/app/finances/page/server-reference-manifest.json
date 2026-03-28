@@ -1,4 +1,50 @@
 {
-  "node": {},
+  "node": {
+    "00b806c86277ae81385d10ff10374701aad193c9e0": {
+      "workers": {
+        "app/finances/page": {
+          "moduleId": "[project]/.next-internal/server/app/finances/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/finances.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getInvoices",
+          "filename": "app/actions/finances.ts"
+        }
+      },
+      "layer": {
+        "app/finances/page": "action-browser"
+      },
+      "exportedName": "getInvoices",
+      "filename": "app/actions/finances.ts"
+    },
+    "00c11516774ac473894006350ff1c548435ad069a8": {
+      "workers": {
+        "app/finances/page": {
+          "moduleId": "[project]/.next-internal/server/app/finances/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/finances.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getIncomeEntries",
+          "filename": "app/actions/finances.ts"
+        }
+      },
+      "layer": {
+        "app/finances/page": "action-browser"
+      },
+      "exportedName": "getIncomeEntries",
+      "filename": "app/actions/finances.ts"
+    },
+    "0019334007d7b5b350d792d4b65968f865740e1fac": {
+      "workers": {
+        "app/finances/page": {
+          "moduleId": "[project]/.next-internal/server/app/finances/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/finances.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getExpenses",
+          "filename": "app/actions/finances.ts"
+        }
+      },
+      "layer": {
+        "app/finances/page": "action-browser"
+      },
+      "exportedName": "getExpenses",
+      "filename": "app/actions/finances.ts"
+    }
+  },
   "edge": {}
 }

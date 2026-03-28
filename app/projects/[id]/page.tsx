@@ -869,7 +869,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                                                         )}
                                                         <div className="flex items-center justify-between mt-3">
                                                             <div className="flex items-center gap-2">
-                                                                <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 border-0", PRIORITY_CONFIG[task.priority].color.replace("text-", "bg-") / 10, PRIORITY_CONFIG[task.priority].color)}>
+                                                                <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 border-0", PRIORITY_CONFIG[task.priority].color.replace("text-", "bg-") + "/10", PRIORITY_CONFIG[task.priority].color)}>
                                                                     {PRIORITY_CONFIG[task.priority].label}
                                                                 </Badge>
                                                                 {task.taskType && TASK_TYPE_CONFIG[task.taskType] && (
@@ -946,7 +946,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                                                             </Badge>
                                                         </td>
                                                         <td className="py-3 px-4">
-                                                            <Badge variant="outline" className={cn("border-0 gap-1.5", PRIORITY_CONFIG[task.priority].color.replace("text-", "bg-") / 10, PRIORITY_CONFIG[task.priority].color)}>
+                                                            <Badge variant="outline" className={cn("border-0 gap-1.5", PRIORITY_CONFIG[task.priority].color.replace("text-", "bg-") + "/10", PRIORITY_CONFIG[task.priority].color)}>
                                                                 <span className={cn("w-1.5 h-1.5 rounded-full", PRIORITY_CONFIG[task.priority].color.replace("text-", "bg-"))} />
                                                                 {PRIORITY_CONFIG[task.priority].label}
                                                             </Badge>
@@ -1444,11 +1444,11 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                                     <Input id="progress" name="progress" type="number" min="0" max="100" defaultValue={project.progress} />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="budget">Budget ($)</Label>
+                                    <Label htmlFor="budget">Budget (৳)</Label>
                                     <Input id="budget" name="budget" type="number" defaultValue={project.budget} required />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="spent">Spent ($)</Label>
+                                    <Label htmlFor="spent">Spent (৳)</Label>
                                     <Input id="spent" name="spent" type="number" defaultValue={project.spent} />
                                 </div>
                                 <div className="space-y-2">
@@ -1522,7 +1522,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label>Amount ($)</Label>
+                                    <Label>Amount (৳)</Label>
                                     <Input
                                         type="number"
                                         placeholder="0.00"
@@ -1683,7 +1683,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
 
                             <div className="flex justify-between items-start">
                                 <div className="space-y-2 flex-1 mr-8">
-                                    <Label>Discount ($)</Label>
+                                    <Label>Discount (৳)</Label>
                                     <Input
                                         type="number"
                                         className="w-32"

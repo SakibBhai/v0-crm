@@ -370,7 +370,7 @@ export default function SettingsPage() {
                           <SelectValue placeholder="Select currency" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="usd">USD ($)</SelectItem>
+                          <SelectItem value="usd">USD (৳)</SelectItem>
                           <SelectItem value="eur">EUR (€)</SelectItem>
                           <SelectItem value="gbp">GBP (£)</SelectItem>
                           <SelectItem value="bdt">BDT (৳)</SelectItem>
@@ -766,7 +766,7 @@ export default function SettingsPage() {
                             <span className="font-medium">{tier.name}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-sm text-muted-foreground">Min Value: $</span>
+                            <span className="text-sm text-muted-foreground">Min Value: ৳</span>
                             <Input
                               type="number"
                               defaultValue={tier.minValue}

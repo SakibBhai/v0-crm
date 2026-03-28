@@ -671,13 +671,13 @@ export default function ProjectsPage() {
             { label: "Completed", value: stats.completed, icon: CheckCircle, color: "text-success" },
             {
               label: "Total Budget",
-              value: `$${(stats.totalBudget / 1000).toFixed(0)}K`,
+              value: `৳${(stats.totalBudget / 1000).toFixed(0)}K`,
               icon: DollarSign,
               color: "text-chart-4",
             },
             {
               label: "Total Spent",
-              value: `$${(stats.totalSpent / 1000).toFixed(0)}K`,
+              value: `৳${(stats.totalSpent / 1000).toFixed(0)}K`,
               icon: BarChart3,
               color: "text-warning",
             },
@@ -1238,7 +1238,7 @@ export default function ProjectsPage() {
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-sm">Budget ($)</Label>
+                    <Label className="text-sm">Budget (৳)</Label>
                     <Input name="budget" type="number" defaultValue={editingProject.budget} className="bg-secondary/50 border-border" />
                   </div>
                   <div className="space-y-2">

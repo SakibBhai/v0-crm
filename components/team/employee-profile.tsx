@@ -43,6 +43,8 @@ import {
     Heart,
     GraduationCap,
     CheckCircle2,
+    Edit,
+    Trash2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -51,9 +53,11 @@ interface EmployeeProfileProps {
     isOpen: boolean
     onClose: () => void
     onUpdateEmployee?: (employee: Employee) => void
+    onEditEmployee?: (employee: Employee) => void
+    onDeleteEmployee?: (id: string) => void
 }
 
-export function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee }: EmployeeProfileProps) {
+export function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEmployee, onDeleteEmployee }: EmployeeProfileProps) {
     const [activeTab, setActiveTab] = useState("overview")
     const [isUploadOpen, setIsUploadOpen] = useState(false)
     const [localEmployee, setLocalEmployee] = useState(employee)
@@ -151,9 +155,21 @@ export function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee }:
                                             </div>
                                         </div>
                                     </div>
-                                    <Button variant="ghost" size="icon" onClick={onClose}>
-                                        <X className="w-5 h-5" />
-                                    </Button>
+                                    <div className="flex items-center gap-2">
+                                        {onEditEmployee && (
+                                            <Button variant="ghost" size="icon" onClick={() => onEditEmployee(employee)} title="Edit Employee">
+                                                <Edit className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+                                            </Button>
+                                        )}
+                                        {onDeleteEmployee && (
+                                            <Button variant="ghost" size="icon" onClick={() => onDeleteEmployee(employee.id)} title="Delete Employee" className="hover:bg-destructive/10 hover:text-destructive">
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        )}
+                                        <Button variant="ghost" size="icon" onClick={onClose} title="Close">
+                                            <X className="w-5 h-5" />
+                                        </Button>
+                                    </div>
                                 </div>
 
                                 {/* Quick Stats */}

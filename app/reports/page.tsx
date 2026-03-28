@@ -518,19 +518,19 @@ export default function ReportsPage() {
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                             <AnimatedCard className="p-4">
                                 <p className="text-sm text-muted-foreground">Total Revenue</p>
-                                <p className="text-2xl font-bold text-green-500 mt-1">$792,000</p>
+                                <p className="text-2xl font-bold text-green-500 mt-1">৳792,000</p>
                             </AnimatedCard>
                             <AnimatedCard className="p-4" delay={50}>
                                 <p className="text-sm text-muted-foreground">Total Expenses</p>
-                                <p className="text-2xl font-bold text-red-400 mt-1">$495,000</p>
+                                <p className="text-2xl font-bold text-red-400 mt-1">৳495,000</p>
                             </AnimatedCard>
                             <AnimatedCard className="p-4" delay={100}>
                                 <p className="text-sm text-muted-foreground">Taxable Income</p>
-                                <p className="text-2xl font-bold mt-1">$297,000</p>
+                                <p className="text-2xl font-bold mt-1">৳297,000</p>
                             </AnimatedCard>
                             <AnimatedCard className="p-4" delay={150}>
                                 <p className="text-sm text-muted-foreground">Est. Tax (22%)</p>
-                                <p className="text-2xl font-bold text-primary mt-1">$65,340</p>
+                                <p className="text-2xl font-bold text-primary mt-1">৳65,340</p>
                             </AnimatedCard>
                         </div>
 
@@ -570,10 +570,10 @@ export default function ReportsPage() {
                                             ))}
                                             <tr className="bg-primary/5 font-semibold">
                                                 <td className="py-3 px-4">Total</td>
-                                                <td className="py-3 px-4 text-right text-green-500">$792,000</td>
-                                                <td className="py-3 px-4 text-right text-red-400">$495,000</td>
-                                                <td className="py-3 px-4 text-right">$297,000</td>
-                                                <td className="py-3 px-4 text-right text-primary">$65,340</td>
+                                                <td className="py-3 px-4 text-right text-green-500">৳792,000</td>
+                                                <td className="py-3 px-4 text-right text-red-400">৳495,000</td>
+                                                <td className="py-3 px-4 text-right">৳297,000</td>
+                                                <td className="py-3 px-4 text-right text-primary">৳65,340</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -587,15 +587,15 @@ export default function ReportsPage() {
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
                                     <p className="text-sm text-muted-foreground">Service Tax (18%)</p>
-                                    <p className="text-xl font-bold text-blue-400 mt-1">$53,460</p>
+                                    <p className="text-xl font-bold text-blue-400 mt-1">৳53,460</p>
                                 </div>
                                 <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
                                     <p className="text-sm text-muted-foreground">GST (5%)</p>
-                                    <p className="text-xl font-bold text-green-400 mt-1">$14,850</p>
+                                    <p className="text-xl font-bold text-green-400 mt-1">৳14,850</p>
                                 </div>
                                 <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
                                     <p className="text-sm text-muted-foreground">Withholding Tax</p>
-                                    <p className="text-xl font-bold text-yellow-400 mt-1">$8,910</p>
+                                    <p className="text-xl font-bold text-yellow-400 mt-1">৳8,910</p>
                                 </div>
                             </div>
                         </AnimatedCard>

@@ -67,10 +67,10 @@ const projectStatusData = [
 ]
 
 const recentLeads = [
-  { name: "Sarah Mitchell", company: "TechStart Inc", status: "Hot", value: "$15,000", avatar: "SM" },
-  { name: "James Wilson", company: "GrowthCo", status: "Warm", value: "$8,500", avatar: "JW" },
-  { name: "Emily Chen", company: "InnovateLab", status: "Hot", value: "$22,000", avatar: "EC" },
-  { name: "Michael Brown", company: "ScaleUp Ltd", status: "Cold", value: "$5,000", avatar: "MB" },
+  { name: "Sarah Mitchell", company: "TechStart Inc", status: "Hot", value: "৳15,000", avatar: "SM" },
+  { name: "James Wilson", company: "GrowthCo", status: "Warm", value: "৳8,500", avatar: "JW" },
+  { name: "Emily Chen", company: "InnovateLab", status: "Hot", value: "৳22,000", avatar: "EC" },
+  { name: "Michael Brown", company: "ScaleUp Ltd", status: "Cold", value: "৳5,000", avatar: "MB" },
 ]
 
 const activeProjects = initialProjects
@@ -122,7 +122,7 @@ const recentActivities = [
   { id: 2, type: "project", action: "Project Completed", detail: "E-commerce Redesign for TechMart", time: "5 hours ago", icon: CheckCircle },
   { id: 3, type: "task", action: "Task Created", detail: "SEO Optimization for GreenLife", time: "1 day ago", icon: Target },
   { id: 4, type: "meeting", action: "Client Meeting", detail: "Strategy discussion with AutoDeal", time: "1 day ago", icon: Calendar },
-  { id: 5, type: "alert", action: "Overdue Invoice", detail: "Invoice #2024-001 - $5,200", time: "2 days ago", icon: AlertCircle },
+  { id: 5, type: "alert", action: "Overdue Invoice", detail: "Invoice #2024-001 - ৳5,200", time: "2 days ago", icon: AlertCircle },
 ]
 
 const quickActions = [
@@ -136,7 +136,7 @@ const quickActions = [
 
 const kpis = [
   { label: "Conversion Rate", value: "31.8%", trend: "+2.3%", color: "text-green-400" },
-  { label: "Avg Deal Value", value: "$18,750", trend: "+8.5%", color: "text-green-400" },
+  { label: "Avg Deal Value", value: "৳18,750", trend: "+8.5%", color: "text-green-400" },
   { label: "Client Retention", value: "94.2%", trend: "+1.2%", color: "text-green-400" },
   { label: "Project ROI", value: "285%", trend: "-3.1%", color: "text-red-400" },
 ]
@@ -166,13 +166,13 @@ const pendingInvoices = invoicesData.filter(i => i.status === 'pending' || i.sta
 const totalPending = pendingInvoices.reduce((sum, inv) => sum + (inv.amount - inv.paid), 0)
 
 const financialSummary = {
-  mrr: `$${(totalMRR / 1000).toFixed(1)}k`,
+  mrr: `৳${(totalMRR / 1000).toFixed(1)}k`,
   mrrGrowth: "+3.2%",
-  outstanding: `$${(totalPending / 1000).toFixed(1)}k`,
+  outstanding: `৳${(totalPending / 1000).toFixed(1)}k`,
   invoicesPending: pendingInvoices.length,
-  overdue: `$${(totalOverdue / 1000).toFixed(1)}k`,
+  overdue: `৳${(totalOverdue / 1000).toFixed(1)}k`,
   invoicesOverdue: overdueInvoices.length,
-  netProfitYTD: "$142,500",
+  netProfitYTD: "৳142,500",
 }
 
 const todayDateStr = new Date().toISOString().split('T')[0]
@@ -202,7 +202,7 @@ export default function DashboardPage() {
     newLeads: 12, // Based on mock data since Leads module isn't connected
     meetings: 3,
     tasksCompleted: tasksCompletedToday,
-    revenue: `$${(totalRevenuePaid / 1000).toFixed(1)}k`,
+    revenue: `৳${(totalRevenuePaid / 1000).toFixed(1)}k`,
   }
 
   return (
@@ -382,7 +382,7 @@ export default function DashboardPage() {
               <StatCard title="Total Leads" value="1,284" change={12.5} icon={Users} delay={100} iconColor="text-chart-1" />
               <StatCard title="Active Clients" value="86" change={8.2} icon={UserCheck} delay={200} iconColor="text-chart-2" />
               <StatCard title="Projects" value="28" change={-3.1} icon={FolderKanban} delay={300} iconColor="text-chart-3" />
-              <StatCard title="Revenue" value="$342K" change={15.3} icon={DollarSign} delay={400} iconColor="text-chart-4" />
+              <StatCard title="Revenue" value="৳342K" change={15.3} icon={DollarSign} delay={400} iconColor="text-chart-4" />
             </div>
 
             {/* 3. Financial Overview (CRUCIAL FOR OWNERS) */}
@@ -439,10 +439,10 @@ export default function DashboardPage() {
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
                         <XAxis dataKey="month" stroke="#666" fontSize={11} tickLine={false} axisLine={false} />
-                        <YAxis stroke="#666" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v / 1000}k`} width={40} />
+                        <YAxis stroke="#666" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `৳${v / 1000}k`} width={40} />
                         <Tooltip
                           contentStyle={{ backgroundColor: "#1a1a2e", border: "1px solid #333", borderRadius: "8px", fontSize: "12px" }}
-                          formatter={(value: number) => `$${value.toLocaleString()}`}
+                          formatter={(value: number) => `৳${value.toLocaleString()}`}
                         />
                         <Bar dataKey="target" fill="#666" opacity={0.3} name="Target" radius={[4, 4, 0, 0]} maxBarSize={40} />
                         <Bar dataKey="actual" fill="#60a5fa" name="Actual Revenue" radius={[4, 4, 0, 0]} maxBarSize={40} />

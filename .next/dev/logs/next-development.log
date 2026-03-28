@@ -1,105 +1,233 @@
-[00:00:00.994] Server  LOG      ✓ Ready in 621ms
-[00:00:08.273] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:08.968] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:00:08.968] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:00:08.968] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774264893322} /_vercel/insights/view
-[00:00:21.498] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774264905849} /_vercel/insights/view
-[00:00:23.838] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3000/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774264908186} /_vercel/insights/view
-[00:00:26.592] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774264910937} /_vercel/insights/view
-[00:00:29.477] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/tasks color: rgb(120, 120, 120) color: inherit {"dp":"/tasks","o":"http://localhost:3000/tasks","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774264913827} /_vercel/insights/view
-[00:00:32.581] Server  ERROR   D:\Antigravity\crmV0\.next\dev\server\chunks\ssr\[root-of-the-server]__ed133136._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.602] Server  ERROR   D:\Antigravity\crmV0\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.633] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.639] Server  ERROR   D:\Antigravity\crmV0\.next\dev\server\chunks\ssr\node_modules_next_dist_cb94e314._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.643] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.645] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.647] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.647] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.649] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.649] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.652] Server  ERROR   Error deleting task: PrismaClientKnownRequestError: 
-Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].task.delete()` invocation in
-D:\Antigravity\crmV0\.next\dev\server\chunks\ssr\[root-of-the-server]__ed133136._.js:100:146
+[00:00:00.836] Server  LOG      ✓ Ready in 552ms
+[00:00:07.809] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:08.389] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:08.389] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:00:08.389] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774636781950} /_vercel/insights/view
+[00:00:12.780] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774636786462} /_vercel/insights/view
+[00:00:22.552] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:00:22.552] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774636796175} /_vercel/insights/view
+[00:00:24.388] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3000/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774636798074} /_vercel/insights/view
+[00:00:27.024] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774636800715} /_vercel/insights/view
+[00:00:28.404] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774636802083} /_vercel/insights/view
+[00:00:36.231] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:00:36.231] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:04:23.760] Browser ERROR   uncaughtError: ReferenceError: handleAddEmployee is not defined
+[00:05:08.938] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:05:09.424] Server  ERROR   D:\Antigravity\crmV0\.next\dev\server\chunks\ssr\app_64021af1._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:05:09.427] Server  ERROR    ⨯ ReferenceError: editingEmployee is not defined
+[00:05:09.437] Server  LOG      ✓ Compiled in 110ms
+[00:05:10.011] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:05:11.073] Browser ERROR   uncaughtError: Error: Switched to client rendering because the server rendering errored:
 
-   97 }
-   98 async function deleteTask(id) {
-   99     try {
-→ 100         await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].task.delete(
-An operation failed because it depends on one or more records that were required but not found. No record was found for a delete.
-[00:00:32.656] Server  ERROR   D:\Antigravity\crmV0\.next\dev\server\chunks\ssr\[root-of-the-server]__ed133136._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.657] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.657] Server  ERROR   D:\Antigravity\crmV0\.next\dev\server\chunks\ssr\node_modules_next_dist_cb94e314._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.658] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.658] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.659] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.659] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.659] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.660] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:32.660] Server  ERROR    ⨯ Error: Failed to delete task
-[00:00:32.773] Browser ERROR   Failed to delete task: {"digest":"1386828278","environmentName":"Server","name":"Error"}
-[00:00:34.473] Server  ERROR   D:\Antigravity\crmV0\.next\dev\server\chunks\ssr\[root-of-the-server]__ed133136._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.474] Server  ERROR   D:\Antigravity\crmV0\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.475] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.476] Server  ERROR   D:\Antigravity\crmV0\.next\dev\server\chunks\ssr\node_modules_next_dist_cb94e314._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.476] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.477] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.477] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.477] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.478] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.478] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.479] Server  ERROR   Error deleting task: PrismaClientKnownRequestError: 
-Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].task.delete()` invocation in
-D:\Antigravity\crmV0\.next\dev\server\chunks\ssr\[root-of-the-server]__ed133136._.js:100:146
+editingEmployee is not defined
+[00:05:11.073] Browser ERROR   uncaughtError: ReferenceError: editingEmployee is not defined
+[00:05:11.073] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:05:11.073] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/team","route":"/team"}
+[00:05:11.073] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774637083993} /_vercel/insights/view
+[00:05:33.782] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:05:34.016] Server  ERROR   D:\Antigravity\crmV0\.next\dev\server\chunks\ssr\app_64021af1._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:05:34.017] Server  ERROR    ⨯ ReferenceError: editingEmployee is not defined
+[00:05:34.020] Server  LOG      ✓ Compiled in 88ms
+[00:05:34.297] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:05:35.395] Browser ERROR   uncaughtError: Error: Switched to client rendering because the server rendering errored:
 
-   97 }
-   98 async function deleteTask(id) {
-   99     try {
-→ 100         await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].task.delete(
+editingEmployee is not defined
+[00:05:35.757] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:05:35.757] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/team","route":"/team"}
+[00:05:35.757] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774637109261} /_vercel/insights/view
+[00:05:35.757] Browser ERROR   uncaughtError: ReferenceError: editingEmployee is not defined
+[00:05:53.482] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:05:53.760] Server  LOG      ✓ Compiled in 82ms
+[00:05:54.113] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:05:54.754] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:05:54.754] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/team","route":"/team"}
+[00:05:54.754] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774637127931} /_vercel/insights/view
+[00:06:13.383] Server  LOG      ✓ Compiled in 105ms
+[00:06:38.631] Server  LOG      ✓ Compiled in 235ms
+[00:08:38.037] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:08:38.037] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774637291576} /_vercel/insights/view
+[00:08:39.660] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774637293344} /_vercel/insights/view
+[00:08:47.497] Server  ERROR   D:\Antigravity\crmV0\.next\dev\server\chunks\ssr\[root-of-the-server]__ac167b45._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:08:47.516] Server  ERROR   D:\Antigravity\crmV0\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:08:47.519] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:08:47.532] Server  ERROR   D:\Antigravity\crmV0\.next\dev\server\chunks\ssr\node_modules_next_dist_56983682._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:08:47.536] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:08:47.539] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:08:47.541] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:08:47.545] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:08:47.546] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:08:47.547] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:08:47.551] Server  ERROR   Error deleting employee: PrismaClientKnownRequestError: 
+Invalid `prisma.teamEmployee.delete()` invocation in
+D:\Antigravity\crmV0\.next\dev\server\chunks\ssr\[root-of-the-server]__ac167b45._.js:175:41
+
+  172 }
+  173 async function deleteEmployee(id) {
+  174     try {
+→ 175         await prisma.teamEmployee.delete(
 An operation failed because it depends on one or more records that were required but not found. No record was found for a delete.
-[00:00:34.481] Server  ERROR   D:\Antigravity\crmV0\.next\dev\server\chunks\ssr\[root-of-the-server]__ed133136._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.482] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.483] Server  ERROR   D:\Antigravity\crmV0\.next\dev\server\chunks\ssr\node_modules_next_dist_cb94e314._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.483] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.483] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.484] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.484] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.485] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.485] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:34.485] Server  ERROR    ⨯ Error: Failed to delete task
-[00:00:34.591] Browser ERROR   Failed to delete task: {"digest":"1386828278","environmentName":"Server","name":"Error"}
-[00:01:18.908] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
-[00:01:18.908] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3000/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774264963258} /_vercel/insights/view
-[00:01:20.722] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:01:20.722] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:01:30.317] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:01:30.317] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:01:43.216] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774264987558} /_vercel/insights/view
-[00:01:54.673] Server  LOG      ✓ Compiled in 97ms
-[00:02:25.089] Server  LOG      ✓ Compiled in 79ms
-[00:03:17.346] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/tasks color: rgb(120, 120, 120) color: inherit {"dp":"/tasks","o":"http://localhost:3000/tasks","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774265081702} /_vercel/insights/view
-[00:03:20.823] Server  ERROR   Error deleting task: "\nInvalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__[\"prisma\"].task.delete()` invocation in\nD:\\Antigravity\\crmV0\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__ed133136._.js:104:146\n\n  101 }\n  102 async function deleteTask(id) {\n  103     try {\n→ 104         await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__[\"prisma\"].task.delete(\nAn operation failed because it depends on one or more records that were required but not found. No record was found for a delete."
-[00:03:20.929] Browser ERROR   Task deletion returned error: Failed to delete task
-[00:03:23.758] Server  ERROR   Error deleting task: "\nInvalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__[\"prisma\"].task.delete()` invocation in\nD:\\Antigravity\\crmV0\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__ed133136._.js:104:146\n\n  101 }\n  102 async function deleteTask(id) {\n  103     try {\n→ 104         await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__[\"prisma\"].task.delete(\nAn operation failed because it depends on one or more records that were required but not found. No record was found for a delete."
-[00:03:23.866] Browser ERROR   Task deletion returned error: Failed to delete task
-[00:03:25.544] Server  ERROR   Error deleting task: "\nInvalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__[\"prisma\"].task.delete()` invocation in\nD:\\Antigravity\\crmV0\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__ed133136._.js:104:146\n\n  101 }\n  102 async function deleteTask(id) {\n  103     try {\n→ 104         await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__[\"prisma\"].task.delete(\nAn operation failed because it depends on one or more records that were required but not found. No record was found for a delete."
-[00:03:25.654] Browser ERROR   Task deletion returned error: Failed to delete task
-[00:03:26.844] Server  ERROR   Error deleting task: "\nInvalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__[\"prisma\"].task.delete()` invocation in\nD:\\Antigravity\\crmV0\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__ed133136._.js:104:146\n\n  101 }\n  102 async function deleteTask(id) {\n  103     try {\n→ 104         await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__[\"prisma\"].task.delete(\nAn operation failed because it depends on one or more records that were required but not found. No record was found for a delete."
-[00:03:26.955] Browser ERROR   Task deletion returned error: Failed to delete task
-[00:03:28.208] Server  ERROR   Error deleting task: "\nInvalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__[\"prisma\"].task.delete()` invocation in\nD:\\Antigravity\\crmV0\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__ed133136._.js:104:146\n\n  101 }\n  102 async function deleteTask(id) {\n  103     try {\n→ 104         await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__[\"prisma\"].task.delete(\nAn operation failed because it depends on one or more records that were required but not found. No record was found for a delete."
-[00:03:28.321] Browser ERROR   Task deletion returned error: Failed to delete task
-[00:03:29.799] Server  ERROR   Error deleting task: "\nInvalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__[\"prisma\"].task.delete()` invocation in\nD:\\Antigravity\\crmV0\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__ed133136._.js:104:146\n\n  101 }\n  102 async function deleteTask(id) {\n  103     try {\n→ 104         await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__[\"prisma\"].task.delete(\nAn operation failed because it depends on one or more records that were required but not found. No record was found for a delete."
-[00:03:29.909] Browser ERROR   Task deletion returned error: Failed to delete task
-[00:03:31.524] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:03:31.524] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:03:39.617] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774265103960} /_vercel/insights/view
-[00:03:41.351] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:03:41.351] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:04:28.199] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774265152489} /_vercel/insights/view
-[00:04:45.046] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774265169400} /_vercel/insights/view
-[00:05:14.040] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774265198404} /_vercel/insights/view
-[00:05:19.601] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:05:19.601] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:06:49.509] Server  LOG      ✓ Compiled in 122ms
-[00:07:48.052] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/tasks color: rgb(120, 120, 120) color: inherit {"dp":"/tasks","o":"http://localhost:3000/tasks","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774265352413} /_vercel/insights/view
-[00:07:53.208] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:07:53.208] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:08:49.638] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:08:49.638] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:09:24.981] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:09:25.522] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:09:25.522] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/team","route":"/team"}
+[00:09:25.522] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774637339206} /_vercel/insights/view
+[00:09:43.798] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:09:43.798] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:12:11.800] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:12:12.407] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:12:12.407] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/team","route":"/team"}
+[00:12:12.407] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774637506088} /_vercel/insights/view
+[00:14:59.715] Server  LOG      ✓ Compiled in 598ms
+[09:09:26.816] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:09:26.818] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:09:36.172] Server  LOG      ○ Compiling /finances ...
+[09:09:37.324] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/finances color: rgb(120, 120, 120) color: inherit {"dp":"/finances","o":"http://localhost:3000/finances","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774669750245} /_vercel/insights/view
+[09:09:51.180] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:09:51.180] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:12:57.178] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[09:12:57.178] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/reports color: rgb(120, 120, 120) color: inherit {"dp":"/reports","o":"http://localhost:3000/reports","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774669950062} /_vercel/insights/view
+[09:13:03.998] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/reports/builder color: rgb(120, 120, 120) color: inherit {"dp":"/reports/builder","o":"http://localhost:3000/reports/builder","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774669956946} /_vercel/insights/view
+[09:13:39.513] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/reports color: rgb(120, 120, 120) color: inherit {"dp":"/reports","o":"http://localhost:3000/reports","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774669992420} /_vercel/insights/view
+[09:13:41.679] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/reports/planner color: rgb(120, 120, 120) color: inherit {"dp":"/reports/planner","o":"http://localhost:3000/reports/planner","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774669994624} /_vercel/insights/view
+[09:13:59.200] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/calendar color: rgb(120, 120, 120) color: inherit {"dp":"/calendar","o":"http://localhost:3000/calendar","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774670012133} /_vercel/insights/view
+[09:20:16.325] Server  LOG      ✓ Compiled in 180ms
+[09:20:16.752] Browser ERROR   ./app/finances/page.tsx:221:9
+Parsing ecmascript source code failed
+  219 |     loadFinanceData()
+  220 |     amount: "",
+> 221 |     date: new Date().toISOString().split("T")[0],
+      |         ^
+  222 |     description: "",
+  223 |     paymentMethod: "bank-transfer",
+  224 |     status: "pending",
+
+Expected ';', '}' or <eof>
+
+Import traces:
+  Client Component Browser:
+    ./app/finances/page.tsx [Client Component Browser]
+    ./app/finances/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/finances/page.tsx [Client Component SSR]
+    ./app/finances/page.tsx [Server Component]
+[09:20:50.751] Browser ERROR   ./app/finances/page.tsx:221:11
+Parsing ecmascript source code failed
+  219 |     loadFinanceData()
+  220 |     subCategory: "",
+> 221 |     amount: "",
+      |           ^
+  222 |     date: new Date().toISOString().split("T")[0],
+  223 |     description: "",
+  224 |     paymentMethod: "bank-transfer",
+
+Expected ';', '}' or <eof>
+
+Import traces:
+  Client Component Browser:
+    ./app/finances/page.tsx [Client Component Browser]
+    ./app/finances/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/finances/page.tsx [Client Component SSR]
+    ./app/finances/page.tsx [Server Component]
+[09:21:26.235] Browser ERROR   ./app/finances/page.tsx:221:11
+Parsing ecmascript source code failed
+  219 |     loadFinanceData()
+  220 |     subCategory: "",
+> 221 |     amount: "",
+      |           ^
+  222 |     date: new Date().toISOString().split("T")[0],
+  223 |     description: "",
+  224 |     paymentMethod: "bank-transfer",
+
+Expected ';', '}' or <eof>
+
+Import traces:
+  Client Component Browser:
+    ./app/finances/page.tsx [Client Component Browser]
+    ./app/finances/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/finances/page.tsx [Client Component SSR]
+    ./app/finances/page.tsx [Server Component]
+[09:21:52.339] Server  LOG      ✓ Compiled in 614ms
+[09:22:33.867] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/finances color: rgb(120, 120, 120) color: inherit {"dp":"/finances","o":"http://localhost:3000/finances","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774670526607} /_vercel/insights/view
+[09:22:34.056] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[09:22:34.069] Server  WARN    Error: Failed to find Server Action "00b806c86277ae81385d10ff10374701aad193c9e0". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+[09:22:34.091] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[09:22:34.092] Server  WARN    Error: Failed to find Server Action "00c11516774ac473894006350ff1c548435ad069a8". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+[09:22:34.120] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[09:22:34.122] Server  WARN    Error: Failed to find Server Action "0019334007d7b5b350d792d4b65968f865740e1fac". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+[09:22:34.147] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[09:22:34.149] Server  WARN    Error: Failed to find Server Action "00b806c86277ae81385d10ff10374701aad193c9e0". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+[09:22:34.186] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[09:22:34.187] Server  WARN    Error: Failed to find Server Action "00c11516774ac473894006350ff1c548435ad069a8". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+[09:22:34.213] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[09:22:34.214] Server  WARN    Error: Failed to find Server Action "0019334007d7b5b350d792d4b65968f865740e1fac". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+[09:22:34.273] Browser ERROR   Failed to load finance data, using fallback: {"name":"UnrecognizedActionError"}
+[09:22:34.273] Browser ERROR   Failed to load finance data, using fallback: {"name":"UnrecognizedActionError"}
+[09:22:39.186] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:22:39.186] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:23:20.495] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:23:20.495] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:24:05.336] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:24:05.336] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:24:35.662] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774670648555} /_vercel/insights/view
+[09:24:37.606] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774670650539} /_vercel/insights/view
+[09:24:42.639] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:24:42.639] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:24:54.135] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3000/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774670667063} /_vercel/insights/view
+[09:24:56.643] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774670669572} /_vercel/insights/view
+[09:24:58.823] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:24:58.824] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:26:01.134] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[09:26:01.135] Server  WARN    Error: Failed to find Server Action "00b806c86277ae81385d10ff10374701aad193c9e0". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+[09:26:01.152] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[09:26:01.152] Server  WARN    Error: Failed to find Server Action "00c11516774ac473894006350ff1c548435ad069a8". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+[09:26:01.163] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[09:26:01.164] Server  WARN    Error: Failed to find Server Action "0019334007d7b5b350d792d4b65968f865740e1fac". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+[09:26:01.173] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[09:26:01.174] Server  WARN    Error: Failed to find Server Action "00b806c86277ae81385d10ff10374701aad193c9e0". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+[09:26:01.184] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[09:26:01.185] Server  WARN    Error: Failed to find Server Action "00c11516774ac473894006350ff1c548435ad069a8". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+[09:26:01.195] Server  ERROR   D:\Antigravity\crmV0\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[09:26:01.195] Server  WARN    Error: Failed to find Server Action "0019334007d7b5b350d792d4b65968f865740e1fac". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+[09:26:01.280] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/finances color: rgb(120, 120, 120) color: inherit {"dp":"/finances","o":"http://localhost:3000/finances","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774670734067} /_vercel/insights/view
+[09:26:01.280] Browser ERROR   Failed to load finance data, using fallback: {"name":"UnrecognizedActionError"}
+[09:26:01.280] Browser ERROR   Failed to load finance data, using fallback: {"name":"UnrecognizedActionError"}
+[09:26:42.800] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774670775719} /_vercel/insights/view
+[09:27:02.850] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:27:02.850] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:27:50.450] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:27:50.450] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:28:38.269] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/tasks color: rgb(120, 120, 120) color: inherit {"dp":"/tasks","o":"http://localhost:3000/tasks","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774670891186} /_vercel/insights/view
+[09:30:24.710] Server  LOG      ✓ Compiled in 2.2s
+[09:35:32.829] Server  LOG      ✓ Compiled in 341ms
+[09:36:04.368] Server  LOG      ✓ Compiled in 199ms
+[09:37:14.260] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/finances color: rgb(120, 120, 120) color: inherit {"dp":"/finances","o":"http://localhost:3000/finances","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774671407158} /_vercel/insights/view
+[09:37:19.999] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:37:19.999] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:37:22.074] Browser DEBUG   #1 1ms Starting document clone with size 1920x911 scrolled to 0,-100
+[09:37:22.233] Browser ERROR   Error generating PDF: {}
+[09:37:32.864] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:37:32.864] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:37:36.515] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:37:36.515] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:38:01.792] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:38:01.792] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[09:38:03.969] Browser DEBUG   #2 0ms Starting document clone with size 1920x911 scrolled to 0,0
+[09:38:04.129] Browser ERROR   Error generating PDF: {}
