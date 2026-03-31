@@ -1,6 +1,6 @@
 {
   "node": {
-    "00ca5fb9019c64372e9fd1c6ce16cad263c4bcd650": {
+    "00016feec3aa411b560a38ac6505f767c8da47ad6f": {
       "workers": {
         "app/projects/page": {
           "moduleId": "[project]/.next-internal/server/app/projects/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/clients.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -15,7 +15,7 @@
       "exportedName": "getProjects",
       "filename": "app/actions/projects.ts"
     },
-    "40bb8c4071328aa3d8945f8ad7066beb977ba50cef": {
+    "405c23688ed41644e729ce3ae654dc959b1785e2cd": {
       "workers": {
         "app/projects/page": {
           "moduleId": "[project]/.next-internal/server/app/projects/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/clients.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -30,7 +30,7 @@
       "exportedName": "createProject",
       "filename": "app/actions/projects.ts"
     },
-    "6099eb38ef3b56fc04e683cc0027e389211fd21c0e": {
+    "6074d34a50e17037421fda7232dfcfec7209b88e1a": {
       "workers": {
         "app/projects/page": {
           "moduleId": "[project]/.next-internal/server/app/projects/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/clients.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -45,7 +45,7 @@
       "exportedName": "updateProject",
       "filename": "app/actions/projects.ts"
     },
-    "403c8bb14036cd90e61d07470b3149ecf6fac20fd5": {
+    "4029a65e8656258e3895bc792175e718ba15779300": {
       "workers": {
         "app/projects/page": {
           "moduleId": "[project]/.next-internal/server/app/projects/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/clients.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -60,7 +60,7 @@
       "exportedName": "deleteProject",
       "filename": "app/actions/projects.ts"
     },
-    "002dbf582cc1e34ef4ac7a83acd031f79086fb0078": {
+    "00a55ce15f923cbae7e6b921d9ac2260a6daa10829": {
       "workers": {
         "app/projects/page": {
           "moduleId": "[project]/.next-internal/server/app/projects/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/clients.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",

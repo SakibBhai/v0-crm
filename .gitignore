@@ -1,3 +1,11 @@
 node_modules
-
+.next
+.env
+.env.local
+.env.production
 /lib/generated/prisma
+build_output.txt
+prisma_err.txt
+test-output.txt
+ts_errors.txt
+ts_errors_utf8.txt

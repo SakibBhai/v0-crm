@@ -1,22 +1,9 @@
-[00:00:00.787] Server  LOG      ✓ Ready in 501ms
-[00:00:09.181] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:10.421] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:00:10.421] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:00:10.421] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774965903715} /_vercel/insights/view
-[00:00:12.756] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774965906088} /_vercel/insights/view
-[00:00:20.970] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774965914310} /_vercel/insights/view
-[00:00:41.324] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
-[00:00:41.324] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774965934633} /_vercel/insights/view
-[00:00:43.273] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:00:43.274] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:00:54.591] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:55.490] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:00:55.490] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/team","route":"/team"}
-[00:00:55.490] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774965948824} /_vercel/insights/view
-[00:01:00.961] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:01:01.964] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:01:02.111] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:01:02.111] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/team","route":"/team"}
-[00:01:02.111] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774965955443} /_vercel/insights/view
-[00:01:03.613] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-[00:01:03.613] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:00:00.851] Server  LOG      ✓ Ready in 543ms
+[00:00:31.113] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:31.587] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:31.587] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/projects","route":"/projects"}
+[00:00:31.587] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774972722955} /_vercel/insights/view
+[00:00:48.081] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:48.498] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:48.498] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/team","route":"/team"}
+[00:00:48.498] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1774972739925} /_vercel/insights/view
