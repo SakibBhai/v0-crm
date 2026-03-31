@@ -9,6 +9,7 @@ datasource db {
 
 model Lead {
   id              String            @id @default(cuid())
+  uid             String?           @unique
   name            String
   company         String
   email           String
@@ -67,6 +68,7 @@ model ActivityHistory {
 
 model Client {
   id                String   @id @default(cuid())
+  uid               String?  @unique
   name              String
   email             String
   phone             String
@@ -106,6 +108,7 @@ model Client {
 
 model Project {
   id                String   @id @default(cuid())
+  uid               String?  @unique
   name              String
   description       String   @default("")
   client            String
@@ -131,6 +134,8 @@ model Project {
   monthlyRate       Float?
   totalBilled       Float    @default(0)
   paymentStatus     String   @default("pending") // pending | partial | paid | overdue
+  files             Json     @default("[]")
+  discussions       Json     @default("[]")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
@@ -339,6 +344,57 @@ model TeamOKR {
   overallProgress Float    @default(0)
   status          String   @default("on-track")
   parentOKRId     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model TeamPerformanceReview {
+  id                    String   @id @default(cuid())
+  employeeId            String
+  employeeName          String
+  reviewerId            String
+  reviewerName          String
+  period                String
+  scheduledDate         String
+  status                String   @default("scheduled") // scheduled | in-progress | completed
+  overallRating         Float    @default(0)
+  competencyRatings     Json     @default("[]")
+  strengths             Json     @default("[]")
+  areasForImprovement   Json     @default("[]")
+  goals                 Json     @default("[]")
+  salaryChange          Float?
+  promotionRecommended  Boolean  @default(false)
+  pipRequired           Boolean  @default(false)
+  completedAt           String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model TeamTrainingCourse {
+  id                  String   @id @default(cuid())
+  title               String
+  description         String   @default("")
+  type                String   @default("optional") // mandatory | optional | certification
+  category            String   @default("technical")
+  duration            Float    @default(0)
+  provider            String   @default("")
+  format              String   @default("online") // online | in-person | hybrid
+  certificationExpiry Int?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model TeamCourseEnrollment {
+  id             String   @id @default(cuid())
+  courseId        String
+  courseName      String
+  employeeId      String
+  status          String   @default("enrolled") // enrolled | in-progress | completed | failed
+  progress        Float    @default(0)
+  enrolledAt      String
+  completedAt     String?
+  score           Float?
+  certificateUrl  String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

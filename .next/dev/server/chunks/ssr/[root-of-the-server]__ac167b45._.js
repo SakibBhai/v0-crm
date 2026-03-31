@@ -8,37 +8,55 @@ module.exports = mod;
 "[project]/app/actions/team.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"001eb6bca3fe26cfa507c721d4988d8545cd76b54a":"getAttendanceRecords","003090f33386efbc9b35406ee46985800622c5a9cc":"getOKRs","00dc2e0adff16d4fbae5327cd83c3cf844682cf8b6":"getLeaveRequests","00e1fc28bcb7a8112c9d933a07b5a8c66ee9290bb4":"getCandidates","00fb1974db4910a06692cbc98c72389e0904392988":"getEmployees","4048ae624aa9b12a0f67b84b737237c49c7685fe2a":"createOKR","4060db35365d63a10b9c769a3f01c2f388de115747":"createLeaveRequest","4093e6c5cf141aa941dfcff860cebc24eb426aa30b":"createEmployee","40a0695c274b90f3d9cf08b050c3786b4cf9cbb47b":"createCandidate","40a899116b81aa2134ce96a9399d3961d4bdf4a215":"createAttendanceRecord","40d6976aaa715341c70456c90e8b9acbe93016cd3e":"deleteEmployee","607b8d404ac3abe5234d085dbdb52643a850610e12":"updateCandidate","60b39255d922d286c5dab5d9cf5a8cdb28f839eaf2":"updateAttendanceRecord","60e93eed9653369b98a34a18eb809d1fac7d22e109":"updateEmployee","60f05a7c69416d8ca83debee53eb30c2d45e2ae0ed":"updateLeaveRequest"},"",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"001eb6bca3fe26cfa507c721d4988d8545cd76b54a":"getAttendanceRecords","003090f33386efbc9b35406ee46985800622c5a9cc":"getOKRs","005aa7cc608575b728a9bc2d666e13fef7ae343d97":"getPerformanceReviews","006aba431ffd5229044bda542a8cbeae3c5af3d714":"getCourseEnrollments","00dc2e0adff16d4fbae5327cd83c3cf844682cf8b6":"getLeaveRequests","00e1fc28bcb7a8112c9d933a07b5a8c66ee9290bb4":"getCandidates","00f6488e3213e8c364bd2d4ecfd34a04b0f421768b":"getTrainingCourses","00fb1974db4910a06692cbc98c72389e0904392988":"getEmployees","4048ae624aa9b12a0f67b84b737237c49c7685fe2a":"createOKR","4060db35365d63a10b9c769a3f01c2f388de115747":"createLeaveRequest","40664ce3edfb6267564998cc453c448183645a10f1":"createPerformanceReview","4092568684207374bdda6cb3a9b7ebfb457c0b7032":"createCourseEnrollment","4093e6c5cf141aa941dfcff860cebc24eb426aa30b":"createEmployee","40a0695c274b90f3d9cf08b050c3786b4cf9cbb47b":"createCandidate","40a899116b81aa2134ce96a9399d3961d4bdf4a215":"createAttendanceRecord","40b3c02fa5575a66657ca61e2a002fc653ff960ba5":"createTrainingCourse","40d6976aaa715341c70456c90e8b9acbe93016cd3e":"deleteEmployee","6026f54bfd35c04c6e66fb34f54b5980539f734a69":"updateOKR","607b8d404ac3abe5234d085dbdb52643a850610e12":"updateCandidate","60b39255d922d286c5dab5d9cf5a8cdb28f839eaf2":"updateAttendanceRecord","60e4f8c233decf5f0c7d3512023fd2b7daf0eeac9c":"updatePerformanceReview","60e67d9e029593640440ce323ec9eef8aa1c64598c":"updateCourseEnrollment","60e93eed9653369b98a34a18eb809d1fac7d22e109":"updateEmployee","60f05a7c69416d8ca83debee53eb30c2d45e2ae0ed":"updateLeaveRequest"},"",""] */ __turbopack_context__.s([
     "createAttendanceRecord",
     ()=>createAttendanceRecord,
     "createCandidate",
     ()=>createCandidate,
+    "createCourseEnrollment",
+    ()=>createCourseEnrollment,
     "createEmployee",
     ()=>createEmployee,
     "createLeaveRequest",
     ()=>createLeaveRequest,
     "createOKR",
     ()=>createOKR,
+    "createPerformanceReview",
+    ()=>createPerformanceReview,
+    "createTrainingCourse",
+    ()=>createTrainingCourse,
     "deleteEmployee",
     ()=>deleteEmployee,
     "getAttendanceRecords",
     ()=>getAttendanceRecords,
     "getCandidates",
     ()=>getCandidates,
+    "getCourseEnrollments",
+    ()=>getCourseEnrollments,
     "getEmployees",
     ()=>getEmployees,
     "getLeaveRequests",
     ()=>getLeaveRequests,
     "getOKRs",
     ()=>getOKRs,
+    "getPerformanceReviews",
+    ()=>getPerformanceReviews,
+    "getTrainingCourses",
+    ()=>getTrainingCourses,
     "updateAttendanceRecord",
     ()=>updateAttendanceRecord,
     "updateCandidate",
     ()=>updateCandidate,
+    "updateCourseEnrollment",
+    ()=>updateCourseEnrollment,
     "updateEmployee",
     ()=>updateEmployee,
     "updateLeaveRequest",
-    ()=>updateLeaveRequest
+    ()=>updateLeaveRequest,
+    "updateOKR",
+    ()=>updateOKR,
+    "updatePerformanceReview",
+    ()=>updatePerformanceReview
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/build/webpack/loaders/next-flight-loader/server-reference.js [app-rsc] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$externals$5d2f40$prisma$2f$client__$5b$external$5d$__$2840$prisma$2f$client$2c$__cjs$29$__ = __turbopack_context__.i("[externals]/@prisma/client [external] (@prisma/client, cjs)");
@@ -505,6 +523,251 @@ async function createOKR(data) {
         };
     }
 }
+async function updateOKR(id, data) {
+    try {
+        const okr = await prisma.teamOKR.update({
+            where: {
+                id
+            },
+            data
+        });
+        return {
+            ...okr,
+            keyResults: okr.keyResults,
+            status: okr.status,
+            parentOKRId: okr.parentOKRId || undefined,
+            createdAt: okr.createdAt.toISOString(),
+            updatedAt: okr.updatedAt.toISOString()
+        };
+    } catch (error) {
+        console.error("Error updating OKR:", error);
+        return {
+            error: "Failed to update OKR"
+        };
+    }
+}
+async function getPerformanceReviews() {
+    try {
+        const reviews = await prisma.teamPerformanceReview.findMany({
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+        return reviews.map((r)=>({
+                id: r.id,
+                employeeId: r.employeeId,
+                employeeName: r.employeeName,
+                reviewerId: r.reviewerId,
+                reviewerName: r.reviewerName,
+                period: r.period,
+                scheduledDate: r.scheduledDate,
+                status: r.status,
+                overallRating: r.overallRating,
+                competencyRatings: r.competencyRatings,
+                strengths: r.strengths,
+                areasForImprovement: r.areasForImprovement,
+                goals: r.goals,
+                salaryChange: r.salaryChange || undefined,
+                promotionRecommended: r.promotionRecommended,
+                pipRequired: r.pipRequired,
+                completedAt: r.completedAt || undefined
+            }));
+    } catch (error) {
+        console.error("Error fetching performance reviews:", error);
+        return {
+            error: "Failed to fetch performance reviews"
+        };
+    }
+}
+async function createPerformanceReview(data) {
+    try {
+        const review = await prisma.teamPerformanceReview.create({
+            data: {
+                employeeId: data.employeeId,
+                employeeName: data.employeeName,
+                reviewerId: data.reviewerId,
+                reviewerName: data.reviewerName,
+                period: data.period,
+                scheduledDate: data.scheduledDate,
+                status: data.status || "scheduled",
+                overallRating: data.overallRating || 0,
+                competencyRatings: data.competencyRatings || [],
+                strengths: data.strengths || [],
+                areasForImprovement: data.areasForImprovement || [],
+                goals: data.goals || [],
+                salaryChange: data.salaryChange || null,
+                promotionRecommended: data.promotionRecommended || false,
+                pipRequired: data.pipRequired || false,
+                completedAt: data.completedAt || null
+            }
+        });
+        return {
+            ...review,
+            competencyRatings: review.competencyRatings,
+            strengths: review.strengths,
+            areasForImprovement: review.areasForImprovement,
+            goals: review.goals,
+            salaryChange: review.salaryChange || undefined,
+            completedAt: review.completedAt || undefined
+        };
+    } catch (error) {
+        console.error("Error creating performance review:", error);
+        return {
+            error: "Failed to create performance review"
+        };
+    }
+}
+async function updatePerformanceReview(id, data) {
+    try {
+        const review = await prisma.teamPerformanceReview.update({
+            where: {
+                id
+            },
+            data
+        });
+        return {
+            ...review,
+            competencyRatings: review.competencyRatings,
+            strengths: review.strengths,
+            areasForImprovement: review.areasForImprovement,
+            goals: review.goals,
+            salaryChange: review.salaryChange || undefined,
+            completedAt: review.completedAt || undefined
+        };
+    } catch (error) {
+        console.error("Error updating performance review:", error);
+        return {
+            error: "Failed to update performance review"
+        };
+    }
+}
+async function getTrainingCourses() {
+    try {
+        const courses = await prisma.teamTrainingCourse.findMany({
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+        return courses.map((c)=>({
+                id: c.id,
+                title: c.title,
+                description: c.description,
+                type: c.type,
+                category: c.category,
+                duration: c.duration,
+                provider: c.provider,
+                format: c.format,
+                certificationExpiry: c.certificationExpiry || undefined
+            }));
+    } catch (error) {
+        console.error("Error fetching training courses:", error);
+        return {
+            error: "Failed to fetch training courses"
+        };
+    }
+}
+async function createTrainingCourse(data) {
+    try {
+        const course = await prisma.teamTrainingCourse.create({
+            data: {
+                title: data.title,
+                description: data.description || "",
+                type: data.type || "optional",
+                category: data.category || "technical",
+                duration: data.duration || 0,
+                provider: data.provider || "",
+                format: data.format || "online",
+                certificationExpiry: data.certificationExpiry || null
+            }
+        });
+        return {
+            ...course,
+            type: course.type,
+            category: course.category,
+            format: course.format,
+            certificationExpiry: course.certificationExpiry || undefined
+        };
+    } catch (error) {
+        console.error("Error creating training course:", error);
+        return {
+            error: "Failed to create training course"
+        };
+    }
+}
+async function getCourseEnrollments() {
+    try {
+        const enrollments = await prisma.teamCourseEnrollment.findMany({
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+        return enrollments.map((e)=>({
+                id: e.id,
+                courseId: e.courseId,
+                courseName: e.courseName,
+                employeeId: e.employeeId,
+                status: e.status,
+                progress: e.progress,
+                enrolledAt: e.enrolledAt,
+                completedAt: e.completedAt || undefined,
+                score: e.score || undefined,
+                certificateUrl: e.certificateUrl || undefined
+            }));
+    } catch (error) {
+        console.error("Error fetching course enrollments:", error);
+        return {
+            error: "Failed to fetch course enrollments"
+        };
+    }
+}
+async function createCourseEnrollment(data) {
+    try {
+        const enrollment = await prisma.teamCourseEnrollment.create({
+            data: {
+                courseId: data.courseId,
+                courseName: data.courseName,
+                employeeId: data.employeeId,
+                status: data.status || "enrolled",
+                progress: data.progress || 0,
+                enrolledAt: data.enrolledAt
+            }
+        });
+        return {
+            ...enrollment,
+            status: enrollment.status,
+            completedAt: enrollment.completedAt || undefined,
+            score: enrollment.score || undefined,
+            certificateUrl: enrollment.certificateUrl || undefined
+        };
+    } catch (error) {
+        console.error("Error creating course enrollment:", error);
+        return {
+            error: "Failed to create course enrollment"
+        };
+    }
+}
+async function updateCourseEnrollment(id, data) {
+    try {
+        const enrollment = await prisma.teamCourseEnrollment.update({
+            where: {
+                id
+            },
+            data
+        });
+        return {
+            ...enrollment,
+            status: enrollment.status,
+            completedAt: enrollment.completedAt || undefined,
+            score: enrollment.score || undefined,
+            certificateUrl: enrollment.certificateUrl || undefined
+        };
+    } catch (error) {
+        console.error("Error updating course enrollment:", error);
+        return {
+            error: "Failed to update course enrollment"
+        };
+    }
+}
 ;
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
     getEmployees,
@@ -521,7 +784,16 @@ async function createOKR(data) {
     createAttendanceRecord,
     updateAttendanceRecord,
     getOKRs,
-    createOKR
+    createOKR,
+    updateOKR,
+    getPerformanceReviews,
+    createPerformanceReview,
+    updatePerformanceReview,
+    getTrainingCourses,
+    createTrainingCourse,
+    getCourseEnrollments,
+    createCourseEnrollment,
+    updateCourseEnrollment
 ]);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getEmployees, "00fb1974db4910a06692cbc98c72389e0904392988", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createEmployee, "4093e6c5cf141aa941dfcff860cebc24eb426aa30b", null);
@@ -538,12 +810,25 @@ async function createOKR(data) {
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateAttendanceRecord, "60b39255d922d286c5dab5d9cf5a8cdb28f839eaf2", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getOKRs, "003090f33386efbc9b35406ee46985800622c5a9cc", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createOKR, "4048ae624aa9b12a0f67b84b737237c49c7685fe2a", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateOKR, "6026f54bfd35c04c6e66fb34f54b5980539f734a69", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getPerformanceReviews, "005aa7cc608575b728a9bc2d666e13fef7ae343d97", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createPerformanceReview, "40664ce3edfb6267564998cc453c448183645a10f1", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updatePerformanceReview, "60e4f8c233decf5f0c7d3512023fd2b7daf0eeac9c", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getTrainingCourses, "00f6488e3213e8c364bd2d4ecfd34a04b0f421768b", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createTrainingCourse, "40b3c02fa5575a66657ca61e2a002fc653ff960ba5", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getCourseEnrollments, "006aba431ffd5229044bda542a8cbeae3c5af3d714", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createCourseEnrollment, "4092568684207374bdda6cb3a9b7ebfb457c0b7032", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateCourseEnrollment, "60e67d9e029593640440ce323ec9eef8aa1c64598c", null);
 }),
 "[project]/.next-internal/server/app/team/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/team.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript) <locals>", ((__turbopack_context__) => {
 "use strict";
 
 __turbopack_context__.s([]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$team$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/actions/team.ts [app-rsc] (ecmascript)");
+;
+;
+;
+;
 ;
 ;
 ;
@@ -568,16 +853,24 @@ __turbopack_context__.s([
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$team$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getAttendanceRecords"],
     "003090f33386efbc9b35406ee46985800622c5a9cc",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$team$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getOKRs"],
+    "005aa7cc608575b728a9bc2d666e13fef7ae343d97",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$team$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getPerformanceReviews"],
+    "006aba431ffd5229044bda542a8cbeae3c5af3d714",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$team$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getCourseEnrollments"],
     "00dc2e0adff16d4fbae5327cd83c3cf844682cf8b6",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$team$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getLeaveRequests"],
     "00e1fc28bcb7a8112c9d933a07b5a8c66ee9290bb4",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$team$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getCandidates"],
+    "00f6488e3213e8c364bd2d4ecfd34a04b0f421768b",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$team$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getTrainingCourses"],
     "00fb1974db4910a06692cbc98c72389e0904392988",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$team$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getEmployees"],
     "4048ae624aa9b12a0f67b84b737237c49c7685fe2a",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$team$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createOKR"],
     "4060db35365d63a10b9c769a3f01c2f388de115747",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$team$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createLeaveRequest"],
+    "4092568684207374bdda6cb3a9b7ebfb457c0b7032",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$team$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createCourseEnrollment"],
     "4093e6c5cf141aa941dfcff860cebc24eb426aa30b",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$team$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createEmployee"],
     "40a0695c274b90f3d9cf08b050c3786b4cf9cbb47b",

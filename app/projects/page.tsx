@@ -50,6 +50,7 @@ import Link from "next/link"
 import type { Project } from "@/lib/types/project"
 import { statusConfig, priorityConfig } from "@/lib/data/projects"
 import { getProjects, createProject, updateProject, deleteProject } from "@/app/actions/projects"
+import { getClients } from "@/app/actions/clients"
 
 export default function ProjectsPage() {
   const router = useRouter()
@@ -64,28 +65,33 @@ export default function ProjectsPage() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
+  const [allClients, setAllClients] = useState<any[]>([])
 
   // Drag and drop state
   const [draggedProject, setDraggedProject] = useState<Project | null>(null)
   const [dragOverStatus, setDragOverStatus] = useState<string | null>(null)
 
-  // Load projects on mount
+  // Load initial data on mount
   useEffect(() => {
-    async function loadProjects() {
+    async function loadData() {
       try {
-        const data = await getProjects()
+        const [projectsData, clientsData] = await Promise.all([
+          getProjects(),
+          getClients()
+        ])
         // Map DB fields to match frontend Project interface
-        setProjects(data.map((p: any) => ({
+        setProjects(projectsData.map((p: any) => ({
           ...p,
           tasks: { total: p.tasksTotal || 0, completed: p.tasksCompleted || 0 },
         })))
+        setAllClients(clientsData || [])
       } catch (error) {
-        console.error("Failed to load projects:", error)
+        console.error("Failed to load data:", error)
       } finally {
         setIsLoading(false)
       }
     }
-    loadProjects()
+    loadData()
   }, [])
 
   const uniqueClients = [...new Set(projects.map((p) => p.client))]
@@ -113,6 +119,13 @@ export default function ProjectsPage() {
   const handleAddProject = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
+    
+    const client = formData.get("client") as string
+    if (!client || client === "none") {
+      alert("Please select a client")
+      return
+    }
+
     const billingType = formData.get("billingType") as "one-time" | "recurring"
     const recurringInterval = formData.get("recurringInterval") as "7-days" | "15-days" | "30-days" | "monthly" | undefined
 
@@ -386,16 +399,17 @@ export default function ProjectsPage() {
                         <Label htmlFor="client" className="text-sm">
                           Client <span className="text-destructive">*</span>
                         </Label>
-                        <Select name="client" defaultValue="TechMart Solutions">
+                        <Select name="client" required>
                           <SelectTrigger className="bg-secondary/50 border-border">
                             <SelectValue placeholder="Select client" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="TechMart Solutions">TechMart Solutions</SelectItem>
-                            <SelectItem value="GreenLife Organics">GreenLife Organics</SelectItem>
-                            <SelectItem value="FoodieHub">FoodieHub</SelectItem>
-                            <SelectItem value="LuxStay Hotels">LuxStay Hotels</SelectItem>
-                            <SelectItem value="StartupX">StartupX</SelectItem>
+                            {allClients.map((c) => (
+                              <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
+                            ))}
+                            {allClients.length === 0 && (
+                              <SelectItem value="none" disabled>No clients found</SelectItem>
+                            )}
                           </SelectContent>
                         </Select>
                       </div>
@@ -833,7 +847,10 @@ export default function ProjectsPage() {
                               )}
                             </Badge>
                           </div>
-                          <h3 className="font-semibold mt-2">{project.name}</h3>
+                          <h3 className="font-semibold mt-2">
+                            <span className="text-muted-foreground mr-2 font-normal text-xs">{project.uid || `#${project.id.slice(0, 6)}`}</span>
+                            {project.name}
+                          </h3>
                           <p className="text-sm text-muted-foreground mt-1">{project.client}</p>
                         </div>
                         <DropdownMenu>
@@ -930,7 +947,10 @@ export default function ProjectsPage() {
                         >
                           <td className="py-3 px-4">
                             <div>
-                              <p className="font-medium text-sm">{project.name}</p>
+                              <p className="font-medium text-sm">
+                                <span className="text-muted-foreground mr-2 font-normal text-xs">{project.uid || `#${project.id.slice(0, 6)}`}</span>
+                                {project.name}
+                              </p>
                               <Badge variant="outline" className="text-xs font-normal mt-1">
                                 {project.category}
                               </Badge>
@@ -1020,7 +1040,10 @@ export default function ProjectsPage() {
                               <Badge variant="outline" className="text-[10px] font-normal mb-1">
                                 {project.category}
                               </Badge>
-                              <h4 className="font-medium text-sm truncate">{project.name}</h4>
+                              <h4 className="font-medium text-sm truncate">
+                                <span className="text-muted-foreground mr-1 font-normal text-xs">{project.uid || `#${project.id.slice(0, 6)}`}</span>
+                                {project.name}
+                              </h4>
                               <p className="text-xs text-muted-foreground truncate">{project.client}</p>
                             </div>
                             <Badge className={`${priorityConfig[project.priority].color} border-0 text-[10px] shrink-0`}>
@@ -1186,7 +1209,15 @@ export default function ProjectsPage() {
                     <Select name="client" defaultValue={editingProject.client}>
                       <SelectTrigger className="bg-secondary/50 border-border"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        {uniqueClients.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                        {allClients.map((c) => (
+                          <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
+                        ))}
+                        {/* Fallback if the project's client no longer exists in DB */}
+                        {editingProject.client && !allClients.find(c => c.name === editingProject.client) && (
+                          <SelectItem key={editingProject.client} value={editingProject.client}>
+                            {editingProject.client}
+                          </SelectItem>
+                        )}
                       </SelectContent>
                     </Select>
                   </div>

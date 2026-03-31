@@ -1,5 +1,6 @@
 export interface Project {
     id: string
+    uid?: string
     name: string
     description: string
     client: string

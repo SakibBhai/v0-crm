@@ -1,4 +1,185 @@
 {
-  "node": {},
+  "node": {
+    "40cf9b24e8af3ea19b3f4cf9aa0f8a67b469bc0774": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/projects/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/tasks.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/app/actions/team.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/app/actions/finances.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getProjectById",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "getProjectById",
+      "filename": "app/actions/projects.ts"
+    },
+    "6099eb38ef3b56fc04e683cc0027e389211fd21c0e": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/projects/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/tasks.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/app/actions/team.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/app/actions/finances.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "updateProject",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "updateProject",
+      "filename": "app/actions/projects.ts"
+    },
+    "60bc2aee68fab5c1c3d9b81e744dad503832f5667f": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/projects/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/tasks.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/app/actions/team.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/app/actions/finances.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "addProjectFileLink",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "addProjectFileLink",
+      "filename": "app/actions/projects.ts"
+    },
+    "60b5d6cb01dc8d5cd6cab3a30776d8a42069e25958": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/projects/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/tasks.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/app/actions/team.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/app/actions/finances.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "addProjectDiscussionMessage",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "addProjectDiscussionMessage",
+      "filename": "app/actions/projects.ts"
+    },
+    "00b906c5b8fca4fd82edd2300c7b371b79adae16f2": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/projects/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/tasks.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/app/actions/team.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/app/actions/finances.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getTasks",
+          "filename": "app/actions/tasks.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "getTasks",
+      "filename": "app/actions/tasks.ts"
+    },
+    "40eb34762a6feb09c61300e3d7662d333ef1470260": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/projects/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/tasks.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/app/actions/team.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/app/actions/finances.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createTask",
+          "filename": "app/actions/tasks.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "createTask",
+      "filename": "app/actions/tasks.ts"
+    },
+    "00fb1974db4910a06692cbc98c72389e0904392988": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/projects/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/tasks.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/app/actions/team.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/app/actions/finances.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getEmployees",
+          "filename": "app/actions/team.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "getEmployees",
+      "filename": "app/actions/team.ts"
+    },
+    "00b806c86277ae81385d10ff10374701aad193c9e0": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/projects/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/tasks.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/app/actions/team.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/app/actions/finances.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getInvoices",
+          "filename": "app/actions/finances.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "getInvoices",
+      "filename": "app/actions/finances.ts"
+    },
+    "40dde16e1dba04640a7c9eaac96b90c338985f4b12": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/projects/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/tasks.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/app/actions/team.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/app/actions/finances.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createInvoice",
+          "filename": "app/actions/finances.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "createInvoice",
+      "filename": "app/actions/finances.ts"
+    },
+    "60c7e069c36c613e4c72f7b31f213d5b4e59f00a8a": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/projects/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/tasks.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/app/actions/team.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/app/actions/finances.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "updateInvoice",
+          "filename": "app/actions/finances.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "updateInvoice",
+      "filename": "app/actions/finances.ts"
+    },
+    "40fc1248374b3138bf99c0d6eb0f84a2b379efd813": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/projects/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/tasks.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/app/actions/team.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/app/actions/finances.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "createIncome",
+          "filename": "app/actions/finances.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "createIncome",
+      "filename": "app/actions/finances.ts"
+    },
+    "00c11516774ac473894006350ff1c548435ad069a8": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": "[project]/.next-internal/server/app/projects/[id]/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/tasks.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/app/actions/team.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE3 => \"[project]/app/actions/finances.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getIncomeEntries",
+          "filename": "app/actions/finances.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "getIncomeEntries",
+      "filename": "app/actions/finances.ts"
+    }
+  },
   "edge": {}
 }

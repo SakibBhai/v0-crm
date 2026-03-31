@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { Prisma } from "@prisma/client"
+import { generateNextUid } from "@/lib/uid-generator"
 
 export async function getLeads() {
   try {
@@ -27,8 +28,9 @@ export async function getLeads() {
 
 export async function createLead(data: Prisma.LeadCreateInput) {
   try {
+    const uid = await generateNextUid("LD")
     const lead = await prisma.lead.create({
-      data,
+      data: { ...data, uid },
       include: {
         noteHistory: true,
         activityHistory: true,

@@ -37,9 +37,45 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
+// Office timing constants
+const OFFICE_CLOCK_IN = "10:30" // Expected clock-in time
+const OFFICE_CLOCK_OUT = "19:00" // Expected clock-out time
+const GRACE_PERIOD_MINUTES = 30 // Late after 11:00 AM
+
+function isLateEntry(clockInTime: string): boolean {
+    const [hours, minutes] = clockInTime.split(":").map(Number)
+    const [officeH, officeM] = OFFICE_CLOCK_IN.split(":").map(Number)
+    const clockInMinutes = hours * 60 + minutes
+    const deadlineMinutes = officeH * 60 + officeM + GRACE_PERIOD_MINUTES
+    return clockInMinutes > deadlineMinutes
+}
+
+function getClockInLabel(clockInTime: string): { text: string; color: string } {
+    const [hours, minutes] = clockInTime.split(":").map(Number)
+    const [officeH, officeM] = OFFICE_CLOCK_IN.split(":").map(Number)
+    const clockInMinutes = hours * 60 + minutes
+    const officeMinutes = officeH * 60 + officeM
+    const deadlineMinutes = officeMinutes + GRACE_PERIOD_MINUTES
+
+    if (clockInMinutes <= officeMinutes) return { text: "On Time", color: "text-green-500" }
+    if (clockInMinutes <= deadlineMinutes) return { text: "Within Grace", color: "text-yellow-500" }
+    const lateBy = clockInMinutes - officeMinutes
+    const lateHrs = Math.floor(lateBy / 60)
+    const lateMins = lateBy % 60
+    return { text: `Late by ${lateHrs > 0 ? `${lateHrs}h ` : ""}${lateMins}m`, color: "text-red-500" }
+}
+
+function calculateWorkHours(clockIn?: string, clockOut?: string): number {
+    if (!clockIn || !clockOut) return 0
+    const [inH, inM] = clockIn.split(":").map(Number)
+    const [outH, outM] = clockOut.split(":").map(Number)
+    return Math.max(0, (outH * 60 + outM - inH * 60 - inM) / 60)
+}
+
 interface AttendanceTrackerProps {
     employees: Employee[]
     attendanceRecords: AttendanceRecord[]
+    currentUserId: string
     onMarkAttendance: (record: Omit<AttendanceRecord, "id" | "markedAt">) => void
     onUpdateAttendance: (id: string, updates: Partial<AttendanceRecord>) => void
 }
@@ -55,17 +91,23 @@ const STATUS_ICONS = {
 export function AttendanceTracker({
     employees,
     attendanceRecords,
+    currentUserId,
     onMarkAttendance,
     onUpdateAttendance,
 }: AttendanceTrackerProps) {
     const [activeTab, setActiveTab] = useState("today")
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0])
     const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("all")
+    const [reportEmployeeId, setReportEmployeeId] = useState<string>("all")
+    const [reportMonth, setReportMonth] = useState(() => {
+        const now = new Date()
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
+    })
     const [calendarMonth, setCalendarMonth] = useState(new Date())
     const [isMarkDialogOpen, setIsMarkDialogOpen] = useState(false)
     const [markingEmployee, setMarkingEmployee] = useState<Employee | null>(null)
-    const [clockInTime, setClockInTime] = useState("09:00")
-    const [clockOutTime, setClockOutTime] = useState("18:00")
+    const [clockInTime, setClockInTime] = useState("10:30")
+    const [clockOutTime, setClockOutTime] = useState("19:00")
     const [attendanceNotes, setAttendanceNotes] = useState("")
     const [selectedStatus, setSelectedStatus] = useState<AttendanceStatus>("present")
 
@@ -151,14 +193,17 @@ export function AttendanceTracker({
         if (existingRecord) {
             onUpdateAttendance(existingRecord.id, { status })
         } else {
+            const now = new Date()
+            const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
+            const actualStatus = status === "present" && isLateEntry(currentTime) ? "late" : status
             onMarkAttendance({
                 employeeId: employee.id,
                 employeeName: `${employee.firstName} ${employee.lastName}`,
                 date: selectedDate,
-                status,
-                clockIn: status !== "absent" ? "09:00" : undefined,
-                clockOut: status !== "absent" ? "18:00" : undefined,
-                totalHours: status === "half-day" ? 4 : status === "absent" ? 0 : 8,
+                status: actualStatus,
+                clockIn: status !== "absent" ? currentTime : undefined,
+                clockOut: undefined,
+                totalHours: 0,
                 workLocation: status === "remote" ? "remote" : "office",
                 markedBy: "Current User",
                 isAutoMarked: false,
@@ -166,15 +211,65 @@ export function AttendanceTracker({
         }
     }
 
+    // Clock In for current user
+    const handleClockIn = () => {
+        const currentEmployee = employees.find(e => e.id === currentUserId || e.employeeId === currentUserId)
+        if (!currentEmployee) return
+        const existingRecord = getEmployeeRecord(currentEmployee.id)
+        if (existingRecord) return // Already clocked in
+
+        const now = new Date()
+        const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
+        const status: AttendanceStatus = isLateEntry(currentTime) ? "late" : "present"
+
+        onMarkAttendance({
+            employeeId: currentEmployee.id,
+            employeeName: `${currentEmployee.firstName} ${currentEmployee.lastName}`,
+            date: today,
+            status,
+            clockIn: currentTime,
+            clockOut: undefined,
+            totalHours: 0,
+            workLocation: "office",
+            notes: isLateEntry(currentTime) ? `Late entry at ${currentTime}` : undefined,
+            markedBy: currentEmployee.firstName,
+            isAutoMarked: false,
+        })
+    }
+
+    // Clock Out for current user
+    const handleClockOut = () => {
+        const currentEmployee = employees.find(e => e.id === currentUserId || e.employeeId === currentUserId)
+        if (!currentEmployee) return
+        const existingRecord = attendanceRecords.find(r => r.employeeId === currentEmployee.id && r.date === today)
+        if (!existingRecord || existingRecord.clockOut) return // Not clocked in or already out
+
+        const now = new Date()
+        const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
+        const workHrs = calculateWorkHours(existingRecord.clockIn, currentTime)
+
+        onUpdateAttendance(existingRecord.id, {
+            clockOut: currentTime,
+            totalHours: Math.round(workHrs * 10) / 10,
+        })
+    }
+
+    // Current user's today record
+    const currentEmployee = employees.find(e => e.id === currentUserId || e.employeeId === currentUserId)
+    const myTodayRecord = currentEmployee
+        ? attendanceRecords.find(r => r.employeeId === currentEmployee.id && r.date === today)
+        : null
+
     // Handle full attendance mark
     const handleMarkAttendance = () => {
         if (!markingEmployee) return
+        const actualStatus = selectedStatus === "present" && isLateEntry(clockInTime) ? "late" : selectedStatus
 
         onMarkAttendance({
             employeeId: markingEmployee.id,
             employeeName: `${markingEmployee.firstName} ${markingEmployee.lastName}`,
             date: selectedDate,
-            status: selectedStatus,
+            status: actualStatus,
             clockIn: selectedStatus !== "absent" ? clockInTime : undefined,
             clockOut: selectedStatus !== "absent" ? clockOutTime : undefined,
             totalHours: selectedStatus === "half-day" ? 4 : selectedStatus === "absent" ? 0 : 8,
@@ -190,8 +285,8 @@ export function AttendanceTracker({
 
     const resetForm = () => {
         setMarkingEmployee(null)
-        setClockInTime("09:00")
-        setClockOutTime("18:00")
+        setClockInTime("10:30")
+        setClockOutTime("19:00")
         setAttendanceNotes("")
         setSelectedStatus("present")
     }
@@ -242,6 +337,70 @@ export function AttendanceTracker({
 
     return (
         <div className="space-y-6">
+            {/* Clock In/Out Widget */}
+            <Card className="bg-gradient-to-r from-primary/10 via-chart-2/10 to-chart-3/10 border-primary/20 overflow-hidden">
+                <CardContent className="pt-6 pb-6">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3 rounded-2xl bg-primary/20">
+                                <Clock className="w-8 h-8 text-primary" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold">Attendance Clock</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Office: {OFFICE_CLOCK_IN} AM - {OFFICE_CLOCK_OUT.replace("19", "7")} PM · Grace: {GRACE_PERIOD_MINUTES} min
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            {!myTodayRecord ? (
+                                <Button onClick={handleClockIn} className="gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-5 text-base rounded-xl shadow-lg shadow-green-600/20">
+                                    <LogIn className="w-5 h-5" /> Clock In
+                                </Button>
+                            ) : !myTodayRecord.clockOut ? (
+                                <div className="flex items-center gap-4">
+                                    <div className="text-right">
+                                        <p className="text-sm text-muted-foreground">Clocked in at</p>
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-lg font-bold">{myTodayRecord.clockIn}</p>
+                                            {myTodayRecord.clockIn && (
+                                                <Badge className={cn("text-xs", getClockInLabel(myTodayRecord.clockIn).color,
+                                                    getClockInLabel(myTodayRecord.clockIn).color.includes("green") ? "bg-green-500/20" :
+                                                    getClockInLabel(myTodayRecord.clockIn).color.includes("yellow") ? "bg-yellow-500/20" : "bg-red-500/20"
+                                                )}>
+                                                    {getClockInLabel(myTodayRecord.clockIn).text}
+                                                </Badge>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <Button onClick={handleClockOut} className="gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-5 text-base rounded-xl shadow-lg shadow-red-600/20">
+                                        <LogOut className="w-5 h-5" /> Clock Out
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-4">
+                                    <div className="grid grid-cols-3 gap-4 text-center">
+                                        <div>
+                                            <p className="text-xs text-muted-foreground">In</p>
+                                            <p className="font-bold text-green-500">{myTodayRecord.clockIn}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-muted-foreground">Out</p>
+                                            <p className="font-bold text-red-500">{myTodayRecord.clockOut}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-muted-foreground">Hours</p>
+                                            <p className="font-bold text-primary">{myTodayRecord.totalHours || calculateWorkHours(myTodayRecord.clockIn, myTodayRecord.clockOut).toFixed(1)}h</p>
+                                        </div>
+                                    </div>
+                                    <Badge className="bg-green-500/20 text-green-500 px-3 py-1">✓ Day Complete</Badge>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
             {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20">
@@ -584,93 +743,177 @@ export function AttendanceTracker({
 
                 {/* Reports Tab */}
                 <TabsContent value="reports" className="mt-6">
-                    <div className="grid gap-4 md:grid-cols-2">
-                        {employees.map((employee) => {
-                            const stats = getEmployeeStats(employee.id)
-                            const initials = `${employee.firstName[0]}${employee.lastName[0]}`
-                            const deptConfig = DEPARTMENT_CONFIG[employee.department]
-
-                            return (
-                                <Card key={employee.id} className="overflow-hidden">
-                                    <CardHeader className="bg-secondary/30 pb-4">
-                                        <div className="flex items-center gap-4">
-                                            <Avatar className="w-14 h-14">
-                                                <AvatarFallback className="bg-primary/20 text-primary text-lg font-semibold">
-                                                    {initials}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div>
-                                                <CardTitle className="text-lg">{employee.firstName} {employee.lastName}</CardTitle>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <Badge className={cn("text-xs", deptConfig.bgColor, deptConfig.color)}>
-                                                        {deptConfig.label}
-                                                    </Badge>
-                                                    <span className="text-xs text-muted-foreground">{employee.jobTitle}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent className="pt-4">
-                                        {/* Progress Bars */}
-                                        <div className="space-y-4">
-                                            <div>
-                                                <div className="flex items-center justify-between text-sm mb-1">
-                                                    <span className="text-muted-foreground">Attendance Rate</span>
-                                                    <span className="font-medium text-green-500">{stats.attendance}%</span>
-                                                </div>
-                                                <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                                                    <div
-                                                        className="h-full bg-green-500 rounded-full transition-all duration-500"
-                                                        style={{ width: `${stats.attendance}%` }}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div className="flex items-center justify-between text-sm mb-1">
-                                                    <span className="text-muted-foreground">On-Time Rate</span>
-                                                    <span className="font-medium text-blue-500">{stats.onTime}%</span>
-                                                </div>
-                                                <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                                                    <div
-                                                        className="h-full bg-blue-500 rounded-full transition-all duration-500"
-                                                        style={{ width: `${stats.onTime}%` }}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div className="flex items-center justify-between text-sm mb-1">
-                                                    <span className="text-muted-foreground">Remote Days</span>
-                                                    <span className="font-medium text-purple-500">{stats.remote}%</span>
-                                                </div>
-                                                <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                                                    <div
-                                                        className="h-full bg-purple-500 rounded-full transition-all duration-500"
-                                                        style={{ width: `${stats.remote}%` }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Status Breakdown */}
-                                        <div className="grid grid-cols-5 gap-2 mt-6 pt-4 border-t border-border">
-                                            {[
-                                                { label: "Present", value: stats.present, color: "text-green-500" },
-                                                { label: "Absent", value: stats.absent, color: "text-red-500" },
-                                                { label: "Late", value: stats.late, color: "text-yellow-500" },
-                                                { label: "Half", value: stats.halfDay, color: "text-orange-500" },
-                                                { label: "Remote", value: stats.remote, color: "text-blue-500" },
-                                            ].map((item) => (
-                                                <div key={item.label} className="text-center">
-                                                    <p className={cn("text-lg font-bold", item.color)}>{item.value}</p>
-                                                    <p className="text-[10px] text-muted-foreground">{item.label}</p>
-                                                </div>
+                    {/* Report Filters */}
+                    <Card className="mb-4">
+                        <CardContent className="pt-4 pb-4">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                <div className="flex items-center gap-2">
+                                    <Label className="text-sm whitespace-nowrap">Employee:</Label>
+                                    <Select value={reportEmployeeId} onValueChange={setReportEmployeeId}>
+                                        <SelectTrigger className="w-[200px]">
+                                            <SelectValue placeholder="Select employee" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All Employees</SelectItem>
+                                            {employees.map((emp) => (
+                                                <SelectItem key={emp.id} value={emp.id}>
+                                                    {emp.firstName} {emp.lastName}
+                                                </SelectItem>
                                             ))}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )
-                        })}
-                    </div>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Label className="text-sm whitespace-nowrap">Month:</Label>
+                                    <Input
+                                        type="month"
+                                        value={reportMonth}
+                                        onChange={(e) => setReportMonth(e.target.value)}
+                                        className="w-auto"
+                                    />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Monthly Summary for selected employee(s) */}
+                    {(() => {
+                        const [rYear, rMonth] = reportMonth.split("-").map(Number)
+                        const filteredEmps = reportEmployeeId === "all" ? employees : employees.filter(e => e.id === reportEmployeeId)
+
+                        return (
+                            <div className="space-y-4">
+                                {filteredEmps.map((employee) => {
+                                    const empMonthRecords = attendanceRecords.filter(r => {
+                                        const d = new Date(r.date)
+                                        return r.employeeId === employee.id && d.getMonth() + 1 === rMonth && d.getFullYear() === rYear
+                                    }).sort((a, b) => a.date.localeCompare(b.date))
+
+                                    const stats = {
+                                        present: empMonthRecords.filter(r => r.status === "present").length,
+                                        absent: empMonthRecords.filter(r => r.status === "absent").length,
+                                        late: empMonthRecords.filter(r => r.status === "late").length,
+                                        halfDay: empMonthRecords.filter(r => r.status === "half-day").length,
+                                        remote: empMonthRecords.filter(r => r.status === "remote").length,
+                                        totalDays: empMonthRecords.length,
+                                        totalHours: empMonthRecords.reduce((sum, r) => sum + (r.totalHours || calculateWorkHours(r.clockIn, r.clockOut)), 0),
+                                    }
+                                    const initials = `${employee.firstName[0]}${employee.lastName[0]}`
+                                    const deptConfig = DEPARTMENT_CONFIG[employee.department]
+
+                                    return (
+                                        <Card key={employee.id} className="overflow-hidden">
+                                            <CardHeader className="bg-secondary/30 pb-4">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-4">
+                                                        <Avatar className="w-14 h-14">
+                                                            <AvatarFallback className="bg-primary/20 text-primary text-lg font-semibold">
+                                                                {initials}
+                                                            </AvatarFallback>
+                                                        </Avatar>
+                                                        <div>
+                                                            <CardTitle className="text-lg">{employee.firstName} {employee.lastName}</CardTitle>
+                                                            <div className="flex items-center gap-2 mt-1">
+                                                                <Badge className={cn("text-xs", deptConfig.bgColor, deptConfig.color)}>
+                                                                    {deptConfig.label}
+                                                                </Badge>
+                                                                <span className="text-xs text-muted-foreground">{employee.jobTitle}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {new Date(rYear, rMonth - 1).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                                                        </p>
+                                                        <p className="text-lg font-bold text-primary">{stats.totalHours.toFixed(1)} hrs</p>
+                                                    </div>
+                                                </div>
+                                            </CardHeader>
+                                            <CardContent className="pt-4">
+                                                {/* Summary Stats */}
+                                                <div className="grid grid-cols-5 gap-2 mb-4">
+                                                    {[
+                                                        { label: "Present", value: stats.present, color: "text-green-500", bg: "bg-green-500/10" },
+                                                        { label: "Late", value: stats.late, color: "text-yellow-500", bg: "bg-yellow-500/10" },
+                                                        { label: "Absent", value: stats.absent, color: "text-red-500", bg: "bg-red-500/10" },
+                                                        { label: "Half Day", value: stats.halfDay, color: "text-orange-500", bg: "bg-orange-500/10" },
+                                                        { label: "Remote", value: stats.remote, color: "text-blue-500", bg: "bg-blue-500/10" },
+                                                    ].map(item => (
+                                                        <div key={item.label} className={cn("text-center p-2 rounded-lg", item.bg)}>
+                                                            <p className={cn("text-xl font-bold", item.color)}>{item.value}</p>
+                                                            <p className="text-[10px] text-muted-foreground">{item.label}</p>
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                {/* Day-by-day breakdown table */}
+                                                {empMonthRecords.length > 0 ? (
+                                                    <div className="border rounded-lg overflow-hidden">
+                                                        <div className="grid grid-cols-6 gap-0 text-xs font-medium text-muted-foreground bg-secondary/50 p-2">
+                                                            <span>Date</span>
+                                                            <span>Status</span>
+                                                            <span>Clock In</span>
+                                                            <span>Clock Out</span>
+                                                            <span>Hours</span>
+                                                            <span>Entry Status</span>
+                                                        </div>
+                                                        <div className="divide-y divide-border max-h-[300px] overflow-y-auto">
+                                                            {empMonthRecords.map((record) => {
+                                                                const statusConfig = ATTENDANCE_STATUS_CONFIG[record.status]
+                                                                const clockLabel = record.clockIn ? getClockInLabel(record.clockIn) : null
+                                                                const hrs = record.totalHours || calculateWorkHours(record.clockIn, record.clockOut)
+                                                                return (
+                                                                    <div key={record.id} className="grid grid-cols-6 gap-0 text-sm p-2 hover:bg-secondary/30 transition-colors">
+                                                                        <span className="text-muted-foreground">
+                                                                            {new Date(record.date).toLocaleDateString("en-US", { month: "short", day: "numeric", weekday: "short" })}
+                                                                        </span>
+                                                                        <span>
+                                                                            <Badge className={cn("text-[10px]", statusConfig.bgColor, statusConfig.color)}>
+                                                                                {statusConfig.label}
+                                                                            </Badge>
+                                                                        </span>
+                                                                        <span className="font-mono">{record.clockIn || "—"}</span>
+                                                                        <span className="font-mono">{record.clockOut || "—"}</span>
+                                                                        <span className="font-medium">{hrs > 0 ? `${hrs.toFixed(1)}h` : "—"}</span>
+                                                                        <span>
+                                                                            {clockLabel ? (
+                                                                                <span className={cn("text-xs font-medium", clockLabel.color)}>{clockLabel.text}</span>
+                                                                            ) : "—"}
+                                                                        </span>
+                                                                    </div>
+                                                                )
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-center py-8 text-muted-foreground">
+                                                        <Calendar className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                                                        <p className="text-sm">No attendance records for this month</p>
+                                                    </div>
+                                                )}
+
+                                                {/* Attendance Rate Bar */}
+                                                <div className="mt-4 pt-4 border-t border-border">
+                                                    <div className="flex items-center justify-between text-sm mb-1">
+                                                        <span className="text-muted-foreground">Overall Attendance Rate</span>
+                                                        <span className="font-medium text-green-500">
+                                                            {stats.totalDays > 0 ? Math.round(((stats.present + stats.remote) / stats.totalDays) * 100) : 0}%
+                                                        </span>
+                                                    </div>
+                                                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                                                        <div
+                                                            className="h-full bg-green-500 rounded-full transition-all duration-500"
+                                                            style={{ width: `${stats.totalDays > 0 ? Math.round(((stats.present + stats.remote) / stats.totalDays) * 100) : 0}%` }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    )
+                                })}
+                            </div>
+                        )
+                    })()}
                 </TabsContent>
             </Tabs>
 

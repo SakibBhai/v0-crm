@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { Prisma } from "@prisma/client"
+import { generateNextUid } from "@/lib/uid-generator"
 
 export async function getClients() {
   try {
@@ -21,8 +22,9 @@ export async function getClients() {
 
 export async function createClient(data: Prisma.ClientCreateInput) {
   try {
+    const uid = await generateNextUid("CL")
     const client = await prisma.client.create({
-      data,
+      data: { ...data, uid },
     })
     revalidatePath("/clients")
     return JSON.parse(JSON.stringify(client))

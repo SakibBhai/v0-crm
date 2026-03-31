@@ -70,6 +70,7 @@ import {
 // Enhanced Client Interface with more details
 interface Client {
   id: string
+  uid?: string
   name: string
   email: string
   phone: string
@@ -1525,7 +1526,7 @@ export default function ClientsPage() {
                               </Avatar>
                               <div className="min-w-0">
                                 <div className="flex items-center gap-1.5">
-                                  <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded shrink-0">{client.id}</span>
+                                  <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded shrink-0">{client.uid || client.id.slice(0, 6)}</span>
                                   <h4 className="font-medium text-sm truncate">{client.company}</h4>
                                 </div>
                                 <p className="text-xs text-muted-foreground truncate">{client.name}</p>
@@ -1672,7 +1673,7 @@ export default function ClientsPage() {
                           />
                         </div>
                         <div>
-                          <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded mb-1 inline-block">{client.id}</span>
+                          <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded mb-1 inline-block">{client.uid || client.id.slice(0, 6)}</span>
                           <div className="flex items-center gap-2">
                             <h3 className="font-semibold">{client.company}</h3>
                             {client.starred && <Star className="w-4 h-4 text-amber-400 fill-amber-400" />}
@@ -1834,7 +1835,7 @@ export default function ClientsPage() {
                               </div>
                               <div>
                                 <div className="flex items-center gap-1.5">
-                                  <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">{client.id}</span>
+                                  <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">{client.uid || client.id.slice(0, 6)}</span>
                                   <p className="font-medium text-sm">{client.company}</p>
                                 </div>
                                 <p className="text-xs text-muted-foreground">{client.name}</p>

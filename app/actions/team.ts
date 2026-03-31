@@ -477,3 +477,251 @@ export async function createOKR(data: {
     return { error: "Failed to create OKR" }
   }
 }
+
+export async function updateOKR(id: string, data: Record<string, any>) {
+  try {
+    const okr = await prisma.teamOKR.update({ where: { id }, data })
+    return {
+      ...okr,
+      keyResults: okr.keyResults as any[],
+      status: okr.status as any,
+      parentOKRId: okr.parentOKRId || undefined,
+      createdAt: okr.createdAt.toISOString(),
+      updatedAt: okr.updatedAt.toISOString(),
+    }
+  } catch (error) {
+    console.error("Error updating OKR:", error)
+    return { error: "Failed to update OKR" }
+  }
+}
+
+// ==================== PERFORMANCE REVIEW ACTIONS ====================
+
+export async function getPerformanceReviews() {
+  try {
+    const reviews = await prisma.teamPerformanceReview.findMany({ orderBy: { createdAt: "desc" } })
+    return reviews.map((r) => ({
+      id: r.id,
+      employeeId: r.employeeId,
+      employeeName: r.employeeName,
+      reviewerId: r.reviewerId,
+      reviewerName: r.reviewerName,
+      period: r.period,
+      scheduledDate: r.scheduledDate,
+      status: r.status as any,
+      overallRating: r.overallRating,
+      competencyRatings: r.competencyRatings as any[],
+      strengths: r.strengths as string[],
+      areasForImprovement: r.areasForImprovement as string[],
+      goals: r.goals as string[],
+      salaryChange: r.salaryChange || undefined,
+      promotionRecommended: r.promotionRecommended,
+      pipRequired: r.pipRequired,
+      completedAt: r.completedAt || undefined,
+    }))
+  } catch (error) {
+    console.error("Error fetching performance reviews:", error)
+    return { error: "Failed to fetch performance reviews" }
+  }
+}
+
+export async function createPerformanceReview(data: {
+  employeeId: string
+  employeeName: string
+  reviewerId: string
+  reviewerName: string
+  period: string
+  scheduledDate: string
+  status?: string
+  overallRating?: number
+  competencyRatings?: any[]
+  strengths?: string[]
+  areasForImprovement?: string[]
+  goals?: string[]
+  salaryChange?: number
+  promotionRecommended?: boolean
+  pipRequired?: boolean
+  completedAt?: string
+}) {
+  try {
+    const review = await prisma.teamPerformanceReview.create({
+      data: {
+        employeeId: data.employeeId,
+        employeeName: data.employeeName,
+        reviewerId: data.reviewerId,
+        reviewerName: data.reviewerName,
+        period: data.period,
+        scheduledDate: data.scheduledDate,
+        status: data.status || "scheduled",
+        overallRating: data.overallRating || 0,
+        competencyRatings: (data.competencyRatings || []) as any,
+        strengths: (data.strengths || []) as any,
+        areasForImprovement: (data.areasForImprovement || []) as any,
+        goals: (data.goals || []) as any,
+        salaryChange: data.salaryChange || null,
+        promotionRecommended: data.promotionRecommended || false,
+        pipRequired: data.pipRequired || false,
+        completedAt: data.completedAt || null,
+      },
+    })
+    return {
+      ...review,
+      competencyRatings: review.competencyRatings as any[],
+      strengths: review.strengths as string[],
+      areasForImprovement: review.areasForImprovement as string[],
+      goals: review.goals as string[],
+      salaryChange: review.salaryChange || undefined,
+      completedAt: review.completedAt || undefined,
+    }
+  } catch (error) {
+    console.error("Error creating performance review:", error)
+    return { error: "Failed to create performance review" }
+  }
+}
+
+export async function updatePerformanceReview(id: string, data: Record<string, any>) {
+  try {
+    const review = await prisma.teamPerformanceReview.update({ where: { id }, data })
+    return {
+      ...review,
+      competencyRatings: review.competencyRatings as any[],
+      strengths: review.strengths as string[],
+      areasForImprovement: review.areasForImprovement as string[],
+      goals: review.goals as string[],
+      salaryChange: review.salaryChange || undefined,
+      completedAt: review.completedAt || undefined,
+    }
+  } catch (error) {
+    console.error("Error updating performance review:", error)
+    return { error: "Failed to update performance review" }
+  }
+}
+
+// ==================== TRAINING COURSE ACTIONS ====================
+
+export async function getTrainingCourses() {
+  try {
+    const courses = await prisma.teamTrainingCourse.findMany({ orderBy: { createdAt: "desc" } })
+    return courses.map((c) => ({
+      id: c.id,
+      title: c.title,
+      description: c.description,
+      type: c.type as any,
+      category: c.category as any,
+      duration: c.duration,
+      provider: c.provider,
+      format: c.format as any,
+      certificationExpiry: c.certificationExpiry || undefined,
+    }))
+  } catch (error) {
+    console.error("Error fetching training courses:", error)
+    return { error: "Failed to fetch training courses" }
+  }
+}
+
+export async function createTrainingCourse(data: {
+  title: string
+  description?: string
+  type?: string
+  category?: string
+  duration?: number
+  provider?: string
+  format?: string
+  certificationExpiry?: number
+}) {
+  try {
+    const course = await prisma.teamTrainingCourse.create({
+      data: {
+        title: data.title,
+        description: data.description || "",
+        type: data.type || "optional",
+        category: data.category || "technical",
+        duration: data.duration || 0,
+        provider: data.provider || "",
+        format: data.format || "online",
+        certificationExpiry: data.certificationExpiry || null,
+      },
+    })
+    return {
+      ...course,
+      type: course.type as any,
+      category: course.category as any,
+      format: course.format as any,
+      certificationExpiry: course.certificationExpiry || undefined,
+    }
+  } catch (error) {
+    console.error("Error creating training course:", error)
+    return { error: "Failed to create training course" }
+  }
+}
+
+// ==================== COURSE ENROLLMENT ACTIONS ====================
+
+export async function getCourseEnrollments() {
+  try {
+    const enrollments = await prisma.teamCourseEnrollment.findMany({ orderBy: { createdAt: "desc" } })
+    return enrollments.map((e) => ({
+      id: e.id,
+      courseId: e.courseId,
+      courseName: e.courseName,
+      employeeId: e.employeeId,
+      status: e.status as any,
+      progress: e.progress,
+      enrolledAt: e.enrolledAt,
+      completedAt: e.completedAt || undefined,
+      score: e.score || undefined,
+      certificateUrl: e.certificateUrl || undefined,
+    }))
+  } catch (error) {
+    console.error("Error fetching course enrollments:", error)
+    return { error: "Failed to fetch course enrollments" }
+  }
+}
+
+export async function createCourseEnrollment(data: {
+  courseId: string
+  courseName: string
+  employeeId: string
+  status?: string
+  progress?: number
+  enrolledAt: string
+}) {
+  try {
+    const enrollment = await prisma.teamCourseEnrollment.create({
+      data: {
+        courseId: data.courseId,
+        courseName: data.courseName,
+        employeeId: data.employeeId,
+        status: data.status || "enrolled",
+        progress: data.progress || 0,
+        enrolledAt: data.enrolledAt,
+      },
+    })
+    return {
+      ...enrollment,
+      status: enrollment.status as any,
+      completedAt: enrollment.completedAt || undefined,
+      score: enrollment.score || undefined,
+      certificateUrl: enrollment.certificateUrl || undefined,
+    }
+  } catch (error) {
+    console.error("Error creating course enrollment:", error)
+    return { error: "Failed to create course enrollment" }
+  }
+}
+
+export async function updateCourseEnrollment(id: string, data: Record<string, any>) {
+  try {
+    const enrollment = await prisma.teamCourseEnrollment.update({ where: { id }, data })
+    return {
+      ...enrollment,
+      status: enrollment.status as any,
+      completedAt: enrollment.completedAt || undefined,
+      score: enrollment.score || undefined,
+      certificateUrl: enrollment.certificateUrl || undefined,
+    }
+  } catch (error) {
+    console.error("Error updating course enrollment:", error)
+    return { error: "Failed to update course enrollment" }
+  }
+}

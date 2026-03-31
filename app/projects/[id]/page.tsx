@@ -64,7 +64,10 @@ import { sampleTasks, teamMembers } from "@/lib/data/tasks"
 import { generateId } from "@/lib/id-generator"
 import { DatePicker } from "@/components/ui/date-picker"
 import { cn } from "@/lib/utils"
-import { getProjectById, updateProject as updateProjectAction } from "@/app/actions/projects"
+import { getProjectById, updateProject as updateProjectAction, addProjectFileLink, addProjectDiscussionMessage } from "@/app/actions/projects"
+import { getTasks, createTask } from "@/app/actions/tasks"
+import { getEmployees } from "@/app/actions/team"
+import { getInvoices, createInvoice as createInvoiceAction, updateInvoice as updateInvoiceAction, createIncome, getIncomeEntries } from "@/app/actions/finances"
 
 interface TeamMember {
     id: string
@@ -232,16 +235,6 @@ const projectsMap: Record<string, Project> = {
 
 const getProjectByIdLocal = (id: string): Project => projectsMap[id] || projectsMap["PJ-0001"]
 
-// Gantt chart data
-const ganttData = [
-    { name: "Design System", start: 0, duration: 5, status: "done" },
-    { name: "Wireframes", start: 3, duration: 7, status: "done" },
-    { name: "UI Design", start: 8, duration: 10, status: "done" },
-    { name: "Frontend Dev", start: 15, duration: 20, status: "in-progress" },
-    { name: "Backend Dev", start: 18, duration: 18, status: "in-progress" },
-    { name: "Testing", start: 30, duration: 10, status: "todo" },
-    { name: "Launch", start: 38, duration: 5, status: "todo" },
-]
 
 const statusConfig = {
     planning: { label: "Planning", icon: Target, color: "bg-chart-3/20 text-chart-3", barColor: "#a78bfa" },
@@ -276,7 +269,8 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     const resolvedParams = use(params)
     const [project, setProject] = useState<Project>(getProjectByIdLocal(resolvedParams.id))
     const [isDbLoaded, setIsDbLoaded] = useState(false)
-    const [projectTasks, setProjectTasks] = useState<Task[]>(sampleTasks.filter(t => t.projectId === resolvedParams.id))
+    const [projectTasks, setProjectTasks] = useState<Task[]>([])
+    const [allEmployees, setAllEmployees] = useState<any[]>([])
     const [activeTab, setActiveTab] = useState("overview")
     const [isAddTaskOpen, setIsAddTaskOpen] = useState(false)
     const [initialStatus, setInitialStatus] = useState<TaskStatus>("todo")
@@ -286,9 +280,14 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     const [newMessage, setNewMessage] = useState("")
     const [taskViewMode, setTaskViewMode] = useState<"list" | "kanban">("kanban")
 
+    // File Link state
+    const [isAddFileOpen, setIsAddFileOpen] = useState(false)
+    const [newFileName, setNewFileName] = useState("")
+    const [newFileURL, setNewFileURL] = useState("")
+    const [isFileAdding, setIsFileAdding] = useState(false)
     // Invoice state
-    const [invoices, setInvoices] = useState<Invoice[]>(sampleInvoices.filter(inv => inv.projectId === resolvedParams.id || inv.projectId === "1"))
-    const [payments, setPayments] = useState<Payment[]>(samplePayments)
+    const [invoices, setInvoices] = useState<Invoice[]>([])
+    const [payments, setPayments] = useState<Payment[]>([])
     const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
     const [isInvoiceDetailOpen, setIsInvoiceDetailOpen] = useState(false)
 
@@ -304,24 +303,58 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     const [recordPaymentAmount, setRecordPaymentAmount] = useState("")
     const [recordPaymentMethod, setRecordPaymentMethod] = useState("bank_transfer")
 
-    // Load project from DB
+    // Load data from DB
     useEffect(() => {
         async function loadProject() {
             try {
-                const dbProject = await getProjectById(resolvedParams.id)
+                const [dbProject, dbTasks, dbEmployees, dbInvoices, dbIncome] = await Promise.all([
+                    getProjectById(resolvedParams.id),
+                    getTasks(),
+                    getEmployees(),
+                    getInvoices(),
+                    getIncomeEntries(),
+                ])
+
                 if (dbProject) {
                     setProject({
-                        ...getProjectByIdLocal(resolvedParams.id), // fallback for team/files/discussions
+                        ...getProjectByIdLocal(resolvedParams.id), // fallback if needed
                         ...dbProject,
                         deadline: dbProject.dueDate || dbProject.deadline || getProjectByIdLocal(resolvedParams.id).deadline,
-                        team: getProjectByIdLocal(resolvedParams.id).team,
-                        files: getProjectByIdLocal(resolvedParams.id).files,
-                        discussions: getProjectByIdLocal(resolvedParams.id).discussions,
+                        team: Array.isArray(dbProject.team) ? dbProject.team : getProjectByIdLocal(resolvedParams.id).team,
+                        files: Array.isArray(dbProject.files) && dbProject.files.length > 0 ? dbProject.files : getProjectByIdLocal(resolvedParams.id).files,
+                        discussions: Array.isArray(dbProject.discussions) && dbProject.discussions.length > 0 ? dbProject.discussions : getProjectByIdLocal(resolvedParams.id).discussions,
                     })
+
+                    if (Array.isArray(dbTasks)) {
+                        setProjectTasks(dbTasks.filter(t => t.projectId === resolvedParams.id))
+                    }
+                    if (Array.isArray(dbEmployees)) {
+                        setAllEmployees(dbEmployees)
+                    }
+                    if (Array.isArray(dbInvoices)) {
+                        // Ensure it fits the `Invoice` type properly, though they mostly match
+                        setInvoices(dbInvoices.filter(i => i.projectId === resolvedParams.id) as any[])
+                    }
+                    if (Array.isArray(dbIncome)) {
+                        const relatedIncomes: Payment[] = dbIncome.filter(i => i.project === resolvedParams.id || invoices.some(inv => inv.id === i.invoiceId)).map(i => ({
+                            id: i.id,
+                            invoiceId: i.invoiceId || "",
+                            invoiceNumber: "", // Can lookup if necessary
+                            projectId: resolvedParams.id,
+                            projectName: project?.name || "",
+                            clientName: i.client || "",
+                            amount: i.amount,
+                            paymentDate: i.date,
+                            paymentMethod: (i.paymentMethod as "other" | "bank_transfer" | "credit_card" | "cash" | "check") || "bank_transfer",
+                            createdAt: i.createdAt
+                        }))
+                        setPayments(relatedIncomes)
+                    }
+
                     setIsDbLoaded(true)
                 }
             } catch (err) {
-                console.error("Failed to load project from DB:", err)
+                console.error("Failed to load project complete data from DB:", err)
             }
         }
         loadProject()
@@ -414,10 +447,34 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     const taskCompletionRate = projectTasks.length > 0 ? Math.round((completedTasks / projectTasks.length) * 100) : 0
     const budgetUsedPercent = Math.round((project.spent / project.budget) * 100)
 
-    const handleSendMessage = () => {
+    const handleSendMessage = async () => {
         if (newMessage.trim()) {
-            // Handle sending message
+            const currentDiscussions = Array.isArray(project.discussions) ? project.discussions : []
+            const newDiscussionEntry = {
+                id: `msg-${Date.now()}`,
+                author: "Current User",
+                user: "Current User", // Keep user in case other parts of code need it or slowly phasing out
+                avatar: "/placeholder.svg?height=32&width=32",
+                content: newMessage.trim(),
+                timestamp: new Date().toISOString(),
+                time: "Just now",
+                mentions: [],
+            }
+            const updatedDiscussions = [...currentDiscussions, newDiscussionEntry]
+            setProject(prev => ({ ...prev, discussions: updatedDiscussions as any }))
             setNewMessage("")
+
+            try {
+                // Ensure db is updated with the dedicated action
+                await addProjectDiscussionMessage(project.id, {
+                    id: newDiscussionEntry.id,
+                    content: newDiscussionEntry.content,
+                    author: newDiscussionEntry.author,
+                    timestamp: newDiscussionEntry.timestamp
+                })
+            } catch (err) {
+                console.error("Failed to post message", err)
+            }
         }
     }
 
@@ -469,43 +526,109 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
         setSelectedInvoice(updatedInvoice)
     }
 
-    const handleRecordPaymentForInvoice = (invoiceId: string, amount: number) => {
+    const handleRecordPaymentForInvoice = async (invoiceId: string, amount: number) => {
         const invoice = invoices.find(inv => inv.id === invoiceId)
         if (!invoice) return
 
-        const newPayment: Payment = {
-            id: `pay-${Date.now()}`,
-            invoiceId,
-            invoiceNumber: invoice.invoiceNumber,
-            projectId: invoice.projectId,
-            projectName: invoice.projectName,
-            clientName: invoice.clientName,
-            amount,
-            paymentDate: new Date().toISOString().split('T')[0],
-            paymentMethod: 'bank_transfer',
-            createdAt: new Date().toISOString(),
-        }
-        setPayments(prev => [...prev, newPayment])
-
-        // Update invoice
-        setInvoices(prev => prev.map(inv => {
-            if (inv.id === invoiceId) {
-                const newAmountPaid = inv.amountPaid + amount
-                const newAmountDue = inv.totalAmount - newAmountPaid
-                const newStatus = newAmountDue <= 0 ? 'paid' : 'partial'
-                const updatedInvoice = {
-                    ...inv,
-                    amountPaid: newAmountPaid,
-                    amountDue: Math.max(0, newAmountDue),
-                    status: newStatus as Invoice['status'],
-                    paidDate: newAmountDue <= 0 ? new Date().toISOString().split('T')[0] : undefined,
-                }
-                setSelectedInvoice(updatedInvoice)
-                return updatedInvoice
+        try {
+            const newIncomeData = {
+                description: `Payment for Invoice #${invoice.invoiceNumber}`,
+                category: "services",
+                amount: amount,
+                date: new Date().toISOString().split('T')[0],
+                client: invoice.clientName || "",
+                project: project.id,
+                status: "received",
+                invoiceId: invoiceId,
+                paymentMethod: "Bank Transfer",
             }
-            return inv
-        }))
+            const savedIncome = await createIncome(newIncomeData)
+
+            const newAmountPaid = invoice.amountPaid + amount
+            const newAmountDue = invoice.totalAmount - newAmountPaid
+            const newStatus = newAmountDue <= 0 ? 'paid' : 'partial'
+            
+            const updateInvoiceData = {
+                amountPaid: newAmountPaid,
+                amountDue: Math.max(0, newAmountDue),
+                status: newStatus as Invoice['status'],
+                paidDate: newAmountDue <= 0 ? new Date().toISOString().split('T')[0] : null,
+            }
+            
+            await updateInvoiceAction(invoiceId, updateInvoiceData)
+
+            // Update local state
+            const newPayment: Payment = {
+                id: ("id" in savedIncome ? savedIncome.id : "") || `pay-${Date.now()}`,
+                invoiceId,
+                invoiceNumber: invoice.invoiceNumber,
+                projectId: invoice.projectId,
+                projectName: invoice.projectName,
+                clientName: invoice.clientName,
+                amount,
+                paymentDate: new Date().toISOString().split('T')[0],
+                paymentMethod: 'bank_transfer',
+                createdAt: new Date().toISOString(),
+            }
+            setPayments(prev => [...prev, newPayment])
+
+            setInvoices(prev => prev.map(inv => {
+                if (inv.id === invoiceId) {
+                    const updatedInvoice = {
+                        ...inv,
+                        ...updateInvoiceData
+                    }
+                    setSelectedInvoice(updatedInvoice as Invoice)
+                    return updatedInvoice as Invoice
+                }
+                return inv
+            }))
+        } catch (error) {
+            console.error("Error recording payment:", error)
+        }
     }
+
+    // File uploading handler
+    const handleAddFileLink = async () => {
+        if (!newFileName.trim() || !newFileURL.trim()) return
+        setIsFileAdding(true)
+        try {
+            const newFile = {
+                id: `file-${Date.now()}`,
+                name: newFileName,
+                url: newFileURL,
+                type: "document" as "document",
+                size: "Link",
+                uploadedBy: "Current User",
+                uploadedAt: new Date().toISOString(),
+                version: 1,
+            }
+
+            setProject(prev => ({
+                ...prev,
+                files: [newFile, ...(Array.isArray(prev.files) ? prev.files : [])]
+            }))
+
+            await addProjectFileLink(project.id, {
+                id: newFile.id,
+                name: newFile.name,
+                url: newFile.url,
+                type: newFile.type,
+                size: newFile.size,
+                addedBy: newFile.uploadedBy,
+                addedAt: newFile.uploadedAt
+            })
+
+            setNewFileName("")
+            setNewFileURL("")
+            setIsAddFileOpen(false)
+        } catch (error) {
+            console.error("Failed to add file link:", error)
+        } finally {
+            setIsFileAdding(false)
+        }
+    }
+
 
     // Invoice stats
     const totalBilled = invoices.reduce((sum, inv) => sum + inv.totalAmount, 0)
@@ -519,16 +642,52 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     const unpaidInvoices = invoices.filter(inv => inv.status !== "paid" && inv.status !== "cancelled" && inv.status !== "draft")
 
     // Generate Invoice form submit
-    const handleGenerateInvoice = (e: React.FormEvent) => {
+    const handleGenerateInvoice = async (e: React.FormEvent) => {
         e.preventDefault()
         if (invoiceLineItems.every(item => item.amount === 0)) return
-        const newInvoice = createInvoiceFromData(invoiceLineItems.filter(item => item.amount > 0))
-        setInvoices(prev => [newInvoice, ...prev])
-        setIsGenerateInvoiceOpen(false)
-        // Reset form
-        setInvoiceLineItems([{ id: `item-new-${Date.now()}`, description: "", quantity: 1, unitPrice: 0, amount: 0 }])
-        setInvoiceDiscount(0)
-        setInvoiceNotes("")
+        
+        try {
+            const newInvoiceLocal = createInvoiceFromData(invoiceLineItems.filter(item => item.amount > 0))
+            
+            const createData = {
+                invoiceNumber: newInvoiceLocal.invoiceNumber,
+                client: newInvoiceLocal.clientName,
+                clientEmail: newInvoiceLocal.clientEmail,
+                project: project.name,
+                projectId: project.id,
+                amount: newInvoiceLocal.subtotal,
+                paid: newInvoiceLocal.amountPaid,
+                tax: newInvoiceLocal.taxAmount,
+                discount: newInvoiceLocal.discount,
+                status: newInvoiceLocal.status,
+                dueDate: newInvoiceLocal.dueDate,
+                issueDate: newInvoiceLocal.issueDate,
+                items: newInvoiceLocal.items,
+                notes: newInvoiceLocal.notes,
+                terms: newInvoiceLocal.terms,
+                createdAt: newInvoiceLocal.createdAt,
+            }
+            
+            const savedInvoice = await createInvoiceAction(createData)
+            
+            if (!("error" in savedInvoice)) {
+                const standardizedInvoice: Invoice = {
+                    ...newInvoiceLocal,
+                    id: savedInvoice.id,
+                }
+                setInvoices(prev => [standardizedInvoice, ...prev])
+            } else {
+                setInvoices(prev => [newInvoiceLocal, ...prev])
+            }
+            
+            setIsGenerateInvoiceOpen(false)
+            // Reset form
+            setInvoiceLineItems([{ id: `item-new-${Date.now()}`, description: "", quantity: 1, unitPrice: 0, amount: 0 }])
+            setInvoiceDiscount(0)
+            setInvoiceNotes("")
+        } catch (error) {
+            console.error("Failed to generate invoice:", error)
+        }
     }
 
     // Record Payment form submit
@@ -562,39 +721,35 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
 
     const taskStatuses: Array<"todo" | "in-progress" | "in-review" | "done"> = ["todo", "in-progress", "in-review", "done"]
 
-    const handleCreateTask = (formData: FormData) => {
-        const newTask: Task = {
-            id: generateId("TSK", projectTasks),
-            title: formData.get("title") as string,
-            description: formData.get("description") as string || "",
-            status: formData.get("status") as TaskStatus || initialStatus,
-            priority: formData.get("priority") as TaskPriority || "medium",
-            taskType: formData.get("taskType") as TaskType || "general",
-            projectId: project.id,
-            projectName: project.name,
-            assignees: [teamMembers.find((m) => m.id === formData.get("assignee")) || teamMembers[0]],
-            assignedById: "2",
-            assignedByName: "Ali Hasan",
-            reporterId: "2",
-            reporterName: "Ali Hasan",
-            dueDate: formData.get("dueDate") as string || new Date().toISOString().split("T")[0],
-            startDate: formData.get("startDate") as string || new Date().toISOString().split("T")[0],
-            tags: (formData.get("tags") as string || "").split(",").map((t) => t.trim()).filter(Boolean),
-            subtasks: [],
-            comments: [],
-            attachments: [],
-            dependencies: [],
-            timeEntries: [],
-            referenceLinks: [],
-            estimatedHours: Number(formData.get("estimatedHours")) || 0,
-            actualHours: 0,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            activityLog: [{ id: "1", timestamp: new Date().toISOString(), userId: "2", userName: "Ali Hasan", action: "created task" }],
-            isBlocked: false,
-            isRecurring: false,
+    const handleCreateTask = async (formData: FormData) => {
+        try {
+            const assignees = JSON.stringify([teamMembers.find((m) => m.id === formData.get("assignee")) || teamMembers[0]])
+            const newTaskData = {
+                title: formData.get("title") as string,
+                description: formData.get("description") as string || "",
+                status: formData.get("status") as TaskStatus || initialStatus,
+                priority: formData.get("priority") as TaskPriority || "medium",
+                taskType: formData.get("taskType") as TaskType || "general",
+                projectId: project.id,
+                projectName: project.name,
+                assignees: assignees,
+                assignedById: "current-user-id",
+                assignedByName: "Current User",
+                reporterId: "current-user-id",
+                reporterName: "Current User",
+                dueDate: formData.get("dueDate") as string || new Date().toISOString().split("T")[0],
+                startDate: formData.get("startDate") as string || new Date().toISOString().split("T")[0],
+                tags: (formData.get("tags") as string || "").split(",").map((t) => t.trim()).filter(Boolean),
+                estimatedHours: Number(formData.get("estimatedHours")) || 0,
+            }
+            
+            const savedTask = await createTask(newTaskData)
+            if (!savedTask.error) {
+                setProjectTasks((prev) => [savedTask, ...prev])
+            }
+        } catch (error) {
+            console.error("Failed to create task", error)
         }
-        setProjectTasks((prev) => [newTask, ...prev])
         setIsAddTaskOpen(false)
     }
 
@@ -986,18 +1141,18 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                     {/* Team Tab */}
                     <TabsContent value="team" className="space-y-4 mt-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            {project.team.map((member, i) => (
-                                <AnimatedCard key={member.id} delay={i * 50} className="p-5">
+                            {(allEmployees.length > 0 ? allEmployees.slice(0, 4) : (Array.isArray(project.team) && typeof project.team[0] === "object" ? project.team : [])).map((member: any, i: number) => (
+                                <AnimatedCard key={member.id || i} delay={i * 50} className="p-5">
                                     <div className="flex items-start justify-between">
                                         <div className="flex items-center gap-3">
                                             <Avatar className="w-12 h-12">
                                                 <AvatarFallback className="bg-primary/20 text-primary">
-                                                    {member.name.split(' ').map(n => n[0]).join('')}
+                                                    {(member.name || member.fullName || member.firstName || "U").split(' ').map((n: string) => n[0]).join('')}
                                                 </AvatarFallback>
                                             </Avatar>
                                             <div>
-                                                <p className="font-semibold">{member.name}</p>
-                                                <p className="text-sm text-muted-foreground">{member.role}</p>
+                                                <p className="font-semibold">{member.name || member.fullName || `${member.firstName} ${member.lastName}`}</p>
+                                                <p className="text-sm text-muted-foreground">{member.role || member.jobTitle || member.position || "Member"}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -1025,39 +1180,53 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                     <TabsContent value="timeline" className="mt-6">
                         <AnimatedCard className="p-6">
                             <h3 className="font-semibold mb-6">Project Timeline</h3>
-                            <div className="space-y-3">
-                                {ganttData.map((item, index) => (
-                                    <div key={index} className="flex items-center gap-4">
-                                        <div className="w-32 text-sm font-medium truncate">{item.name}</div>
-                                        <div className="flex-1 h-8 bg-secondary rounded-lg relative">
-                                            <div
-                                                className={`absolute h-full rounded-lg transition-all ${item.status === 'done' ? 'bg-success' :
-                                                    item.status === 'in-progress' ? 'bg-primary' :
-                                                        'bg-muted-foreground/50'
-                                                    }`}
-                                                style={{
-                                                    left: `${(item.start / 45) * 100}%`,
-                                                    width: `${(item.duration / 45) * 100}%`
-                                                }}
-                                            />
+                            {(() => {
+                                const projectStart = new Date(project.startDate || Date.now())
+                                const timeSpanDays = 60 // View window of 60 days
+                                const dynamicGanttData = projectTasks.map(t => {
+                                    const taskStart = t.startDate ? new Date(t.startDate) : projectStart
+                                    const taskEnd = t.dueDate ? new Date(t.dueDate) : taskStart
+                                    const startDiff = Math.max(0, Math.floor((taskStart.getTime() - projectStart.getTime()) / (1000 * 60 * 60 * 24)))
+                                    const duration = Math.max(1, Math.floor((taskEnd.getTime() - taskStart.getTime()) / (1000 * 60 * 60 * 24)))
+                                    return { name: t.title, start: startDiff, duration, status: t.status }
+                                })
+                                return (
+                                    <>
+                                        <div className="space-y-3">
+                                            {dynamicGanttData.length > 0 ? dynamicGanttData.map((item, index) => (
+                                                <div key={index} className="flex items-center gap-4">
+                                                    <div className="w-32 text-sm font-medium truncate">{item.name}</div>
+                                                    <div className="flex-1 h-8 bg-secondary rounded-lg relative">
+                                                        <div
+                                                            className={`absolute h-full rounded-lg transition-all ${item.status === 'done' ? 'bg-success' :
+                                                                item.status === 'in-progress' ? 'bg-primary' :
+                                                                    'bg-muted-foreground/50'
+                                                                }`}
+                                                            style={{
+                                                                left: `${Math.min(100, (item.start / timeSpanDays) * 100)}%`,
+                                                                width: `${Math.min(100 - Math.min(100, (item.start / timeSpanDays) * 100), (item.duration / timeSpanDays) * 100)}%`
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <Badge className={`w-24 justify-center ${item.status === 'done' ? 'bg-success/20 text-success' :
+                                                        item.status === 'in-progress' ? 'bg-primary/20 text-primary' :
+                                                            'bg-muted text-muted-foreground'
+                                                        }`}>
+                                                        {item.status}
+                                                    </Badge>
+                                                </div>
+                                            )) : (
+                                                <div className="text-center text-muted-foreground py-8">No scheduled tasks available.</div>
+                                            )}
                                         </div>
-                                        <Badge className={`w-24 justify-center ${item.status === 'done' ? 'bg-success/20 text-success' :
-                                            item.status === 'in-progress' ? 'bg-primary/20 text-primary' :
-                                                'bg-muted text-muted-foreground'
-                                            } border-0`}>
-                                            {item.status === 'in-progress' ? 'In Progress' : item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-                                        </Badge>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="flex justify-between mt-6 text-xs text-muted-foreground">
-                                <span>Week 1</span>
-                                <span>Week 2</span>
-                                <span>Week 3</span>
-                                <span>Week 4</span>
-                                <span>Week 5</span>
-                                <span>Week 6</span>
-                            </div>
+                                        <div className="flex justify-between mt-6 text-xs text-muted-foreground">
+                                            <span>{projectStart.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                                            <span>{new Date(projectStart.getTime() + (timeSpanDays / 2) * 24 * 60 * 60 * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                                            <span>{new Date(projectStart.getTime() + timeSpanDays * 24 * 60 * 60 * 1000).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                                        </div>
+                                    </>
+                                )
+                            })()}
                         </AnimatedCard>
                     </TabsContent>
 
@@ -1065,9 +1234,9 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                     <TabsContent value="files" className="space-y-4 mt-6">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <Input placeholder="Search files..." className="max-w-xs" />
-                            <Button className="gap-2">
-                                <Upload className="w-4 h-4" />
-                                Upload File
+                            <Button className="gap-2" onClick={() => setIsAddFileOpen(true)}>
+                                <Link2 className="w-4 h-4" />
+                                Add File Link
                             </Button>
                         </div>
 
@@ -1105,9 +1274,17 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                                                             <Badge variant="outline">v{file.version}</Badge>
                                                         </td>
                                                         <td className="py-3 px-4 text-right">
-                                                            <Button variant="ghost" size="sm">
-                                                                <Download className="w-4 h-4" />
-                                                            </Button>
+                                                            {(file as any).url ? (
+                                                                <Button variant="ghost" size="sm" asChild>
+                                                                    <a href={(file as any).url} target="_blank" rel="noopener noreferrer">
+                                                                        <ExternalLink className="w-4 h-4" />
+                                                                    </a>
+                                                                </Button>
+                                                            ) : (
+                                                                <Button variant="ghost" size="sm">
+                                                                    <Download className="w-4 h-4" />
+                                                                </Button>
+                                                            )}
                                                         </td>
                                                     </tr>
                                                 )
@@ -1980,6 +2157,48 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                     </DialogContent>
                 </Dialog>
             </div>
+
+            <Dialog open={isAddFileOpen} onOpenChange={setIsAddFileOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Add File Link</DialogTitle>
+                        <DialogDescription>
+                            Link a file from Google Drive, Dropbox, Notion, or any external service.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="fileName">File Name</Label>
+                            <Input
+                                id="fileName"
+                                placeholder="e.g. Q3 Marketing Strategy"
+                                value={newFileName}
+                                onChange={(e) => setNewFileName(e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="fileURL">URL</Label>
+                            <Input
+                                id="fileURL"
+                                placeholder="https://drive.google.com/..."
+                                type="url"
+                                value={newFileURL}
+                                onChange={(e) => setNewFileURL(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsAddFileOpen(false)}>Cancel</Button>
+                        <Button 
+                            onClick={handleAddFileLink} 
+                            disabled={isFileAdding || !newFileName.trim() || !newFileURL.trim()}
+                        >
+                            {isFileAdding ? "Adding..." : "Add Link"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
         </DashboardLayout>
     )
 }

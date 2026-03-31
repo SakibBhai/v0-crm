@@ -94,6 +94,7 @@ const categoryConfig: Record<LeadCategory, { label: string; color: string }> = {
 
 interface Lead {
   id: string
+  uid?: string
   name: string
   company: string
   email: string
@@ -1357,7 +1358,7 @@ export default function LeadsPage() {
                                 </Avatar>
                                 <div className="min-w-0">
                                   <div className="flex items-center gap-1.5">
-                                    <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded shrink-0">{lead.id}</span>
+                                    <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded shrink-0">{lead.uid || lead.id.slice(0, 6)}</span>
                                     <p className="font-medium text-sm truncate">{lead.name}</p>
                                   </div>
                                   <p className="text-xs text-muted-foreground truncate">{lead.company}</p>
@@ -1563,7 +1564,7 @@ export default function LeadsPage() {
                               </Avatar>
                               <div>
                                 <div className="flex items-center gap-1.5">
-                                  <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">{lead.id}</span>
+                                  <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">{lead.uid || lead.id.slice(0, 6)}</span>
                                   <p className="font-medium text-sm">{lead.name}</p>
                                 </div>
                                 <p className="text-xs text-muted-foreground">{lead.email}</p>
@@ -1740,7 +1741,7 @@ export default function LeadsPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded mb-1 inline-block">{lead.id}</span>
+                        <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded mb-1 inline-block">{lead.uid || lead.id.slice(0, 6)}</span>
                         <div className="flex items-center gap-2">
                           <p className="font-semibold">{lead.name}</p>
                           <button onClick={() => handleToggleStar(lead.id)}>

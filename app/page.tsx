@@ -43,11 +43,19 @@ import {
   Line,
   ComposedChart,
 } from "recharts"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { sampleTasks } from "@/lib/data/tasks"
 import { initialProjects } from "@/lib/data/projects"
 import { invoicesData } from "@/lib/data/finance-data"
 import { employees, leaveRequests, attendanceRecords } from "@/lib/data/hr"
+import {
+  getEmployees, getAttendanceRecords as getAttendanceRecordsDB,
+  createAttendanceRecord as createAttendanceRecordAction,
+  updateAttendanceRecord as updateAttendanceRecordAction,
+} from "@/app/actions/team"
+import type { Employee, AttendanceRecord } from "@/lib/types/hr"
+import { LogIn, LogOut } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 const revenueData = [
   { month: "Jan", revenue: 45000, leads: 120 },
@@ -196,10 +204,73 @@ const uniqueClientsCount = [...new Set(initialProjects.map(p => p.client))].leng
 const totalRevenuePaid = invoicesData.filter(i => i.status === 'paid').reduce((acc, i) => acc + i.paid, 0)
 
 export default function DashboardPage() {
+  const today = new Date().toISOString().split("T")[0]
+  const [dbEmployees, setDbEmployees] = useState<Employee[]>([])
+  const [dbAttendance, setDbAttendance] = useState<AttendanceRecord[]>([])
+  const [clockLoading, setClockLoading] = useState(false)
+
+  useEffect(() => {
+    async function loadData() {
+      const [empRes, attRes] = await Promise.all([getEmployees(), getAttendanceRecordsDB()])
+      if (Array.isArray(empRes)) setDbEmployees(empRes as Employee[])
+      if (Array.isArray(attRes)) setDbAttendance(attRes as AttendanceRecord[])
+    }
+    loadData()
+  }, [])
+
+  // Office timing
+  const OFFICE_IN = "10:30"
+  const GRACE = 30
+  const currentUserId = "EMP001"
+  const currentEmp = dbEmployees.find(e => e.id === currentUserId || e.employeeId === currentUserId)
+  const myRecord = currentEmp ? dbAttendance.find(r => r.employeeId === currentEmp.id && r.date === today) : null
+
+  const isLate = (time: string) => {
+    const [h, m] = time.split(":").map(Number)
+    const [oh, om] = OFFICE_IN.split(":").map(Number)
+    return h * 60 + m > oh * 60 + om + GRACE
+  }
+  const getLabel = (time: string) => {
+    const [h, m] = time.split(":").map(Number)
+    const [oh, om] = OFFICE_IN.split(":").map(Number)
+    const mins = h * 60 + m, offMins = oh * 60 + om
+    if (mins <= offMins) return { text: "On Time", color: "text-green-500" }
+    if (mins <= offMins + GRACE) return { text: "Within Grace", color: "text-yellow-500" }
+    const late = mins - offMins
+    return { text: `Late by ${Math.floor(late / 60) > 0 ? `${Math.floor(late / 60)}h ` : ""}${late % 60}m`, color: "text-red-500" }
+  }
+
+  const handleDashClockIn = async () => {
+    if (!currentEmp || myRecord) return
+    setClockLoading(true)
+    const now = new Date()
+    const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
+    const status = isLate(time) ? "late" : "present"
+    const result = await createAttendanceRecordAction({
+      employeeId: currentEmp.id,
+      employeeName: `${currentEmp.firstName} ${currentEmp.lastName}`,
+      date: today, status, clockIn: time, totalHours: 0,
+      workLocation: "office",
+    })
+    if (!('error' in result)) setDbAttendance(prev => [...prev, result as AttendanceRecord])
+    setClockLoading(false)
+  }
+
+  const handleDashClockOut = async () => {
+    if (!myRecord || myRecord.clockOut) return
+    setClockLoading(true)
+    const now = new Date()
+    const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
+    const [inH, inM] = (myRecord.clockIn || "10:30").split(":").map(Number)
+    const hrs = Math.round(((now.getHours() * 60 + now.getMinutes() - inH * 60 - inM) / 60) * 10) / 10
+    const result = await updateAttendanceRecordAction(myRecord.id, { clockOut: time, totalHours: Math.max(0, hrs) })
+    if (!('error' in result)) setDbAttendance(prev => prev.map(r => r.id === myRecord.id ? { ...r, clockOut: time, totalHours: Math.max(0, hrs) } : r))
+    setClockLoading(false)
+  }
 
   // Calculate totals for hero section
   const todayStats = {
-    newLeads: 12, // Based on mock data since Leads module isn't connected
+    newLeads: 12,
     meetings: 3,
     tasksCompleted: tasksCompletedToday,
     revenue: `৳${(totalRevenuePaid / 1000).toFixed(1)}k`,
@@ -264,6 +335,52 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Clock In/Out Widget */}
+        <AnimatedCard delay={50} className="border-primary/20 bg-gradient-to-r from-primary/5 via-chart-2/5 to-chart-3/5">
+          <CardContent className="py-5">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-primary/20">
+                  <Clock className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Attendance Clock</h3>
+                  <p className="text-xs text-muted-foreground">Office: 10:30 AM - 7:00 PM · 30 min grace</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                {!myRecord ? (
+                  <Button onClick={handleDashClockIn} disabled={clockLoading || !currentEmp} className="gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-4 rounded-xl shadow-lg shadow-green-600/20">
+                    <LogIn className="w-4 h-4" /> Clock In
+                  </Button>
+                ) : !myRecord.clockOut ? (
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className="text-xs text-muted-foreground">In at</p>
+                      <p className="font-bold">{myRecord.clockIn}</p>
+                      {myRecord.clockIn && (
+                        <span className={`text-[10px] font-medium ${getLabel(myRecord.clockIn).color}`}>{getLabel(myRecord.clockIn).text}</span>
+                      )}
+                    </div>
+                    <Button onClick={handleDashClockOut} disabled={clockLoading} className="gap-2 bg-red-600 hover:bg-red-700 text-white px-5 py-4 rounded-xl shadow-lg shadow-red-600/20">
+                      <LogOut className="w-4 h-4" /> Clock Out
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-4">
+                    <div className="flex gap-4 text-center">
+                      <div><p className="text-[10px] text-muted-foreground">In</p><p className="font-bold text-green-500">{myRecord.clockIn}</p></div>
+                      <div><p className="text-[10px] text-muted-foreground">Out</p><p className="font-bold text-red-500">{myRecord.clockOut}</p></div>
+                      <div><p className="text-[10px] text-muted-foreground">Hrs</p><p className="font-bold text-primary">{myRecord.totalHours}h</p></div>
+                    </div>
+                    <Badge className="bg-green-500/20 text-green-500 text-xs px-2 py-1">✓ Done</Badge>
+                  </div>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </AnimatedCard>
 
         {/* Main Dashboard Layout - 2 Columns */}
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
