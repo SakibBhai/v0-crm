@@ -91,6 +91,7 @@ import {
   getInvoices, createInvoice as createInvoiceAction, updateInvoice as updateInvoiceAction, deleteInvoice as deleteInvoiceAction,
   getIncomeEntries, createIncome as createIncomeAction, updateIncome as updateIncomeAction,
   getExpenses as getExpensesAction, createExpense as createExpenseAction, updateExpense as updateExpenseAction,
+  generateNextInvoiceNumber,
 } from "@/app/actions/finances"
 
 // Invoice kanban columns
@@ -793,7 +794,7 @@ export default function FinancesPage() {
 
   // ==================== Create Invoice ====================
 
-  const handleCreateInvoice = (asDraft: boolean) => {
+  const handleCreateInvoice = async (asDraft: boolean) => {
     if (!invoiceFormData.client || !invoiceFormData.project) {
       alert("Please fill in client and project fields")
       return
@@ -803,59 +804,65 @@ export default function FinancesPage() {
       return
     }
 
-    const year = new Date().getFullYear()
-    const existingCount = invoices.filter(inv => inv.invoiceNumber.includes(year.toString())).length
-    const invoiceNumber = `INV-${year}-${(existingCount + 1).toString().padStart(3, "0")}`
+    try {
+      // Auto-generate invoice number from database
+      const invoiceNumber = await generateNextInvoiceNumber()
 
-    const newInvoice = {
-      id: invoiceNumber,
-      invoiceNumber,
-      client: invoiceFormData.client,
-      clientEmail: invoiceFormData.clientEmail,
-      clientLogo: "/placeholder.svg?height=40&width=40",
-      project: invoiceFormData.project,
-      projectId: invoiceFormData.projectId || `PRJ-${Date.now()}`,
-      amount: invoiceTotal,
-      paid: 0,
-      tax: invoiceTaxAmount,
-      discount: invoiceFormData.discount,
-      status: asDraft ? "draft" : "sent",
-      dueDate: invoiceFormData.dueDate,
-      issueDate: invoiceFormData.issueDate,
-      paidDate: null as string | null,
-      paymentMethod: invoiceFormData.paymentMethod,
-      paymentTerms: invoiceFormData.paymentTerms,
-      currency: "USD",
-      items: invoiceLineItems.filter(i => i.description).map(item => ({
-        id: item.id,
-        description: item.description,
-        quantity: item.quantity,
-        rate: item.rate,
-        amount: item.amount,
-        taxable: item.taxable,
-      })),
-      notes: invoiceFormData.notes,
-      internalNotes: invoiceFormData.internalNotes,
-      category: invoiceFormData.category,
-      recurringInvoice: invoiceFormData.recurringInvoice,
-      attachments: [] as string[],
+      const invoiceData = {
+        invoiceNumber,
+        client: invoiceFormData.client,
+        clientEmail: invoiceFormData.clientEmail,
+        project: invoiceFormData.project,
+        projectId: invoiceFormData.projectId || "",
+        amount: invoiceTotal,
+        paid: 0,
+        tax: invoiceTaxAmount,
+        discount: invoiceFormData.discount,
+        status: asDraft ? "draft" : "sent",
+        dueDate: invoiceFormData.dueDate,
+        issueDate: invoiceFormData.issueDate,
+        paidDate: null as string | null,
+        paymentMethod: invoiceFormData.paymentMethod,
+        paymentTerms: invoiceFormData.paymentTerms,
+        currency: "BDT",
+        items: invoiceLineItems.filter(i => i.description).map(item => ({
+          id: item.id,
+          description: item.description,
+          quantity: item.quantity,
+          rate: item.rate,
+          amount: item.amount,
+          taxable: item.taxable,
+        })),
+        notes: invoiceFormData.notes,
+        internalNotes: invoiceFormData.internalNotes,
+        category: invoiceFormData.category,
+        recurringInvoice: invoiceFormData.recurringInvoice,
+        attachments: [] as string[],
+      }
+
+      // Persist to database
+      const created = await createInvoiceAction(invoiceData)
+      if (created && !('error' in created)) {
+        setInvoices(prev => [created as typeof prev[0], ...prev])
+      }
+
+      logActivity({
+        entityType: "invoice",
+        entityId: invoiceNumber,
+        entityDescription: `Invoice #${invoiceNumber} - ${invoiceFormData.client}`,
+        action: "created",
+        performedBy: "Current User",
+        performedAt: new Date().toISOString(),
+      })
+
+      // Reset form
+      setInvoiceFormData(defaultInvoiceFormData)
+      setInvoiceLineItems([{ id: 1, description: "", quantity: 1, rate: 0, amount: 0, taxable: true }])
+      setShowCreateInvoiceDialog(false)
+    } catch (error) {
+      console.error("Error creating invoice:", error)
+      alert("Failed to create invoice. Please try again.")
     }
-
-    setInvoices(prev => [newInvoice, ...prev])
-
-    logActivity({
-      entityType: "invoice",
-      entityId: invoiceNumber,
-      entityDescription: `Invoice #${invoiceNumber} - ${invoiceFormData.client}`,
-      action: "created",
-      performedBy: "Current User",
-      performedAt: new Date().toISOString(),
-    })
-
-    // Reset form
-    setInvoiceFormData(defaultInvoiceFormData)
-    setInvoiceLineItems([{ id: 1, description: "", quantity: 1, rate: 0, amount: 0, taxable: true }])
-    setShowCreateInvoiceDialog(false)
   }
 
   // ==================== Edit Invoice ====================

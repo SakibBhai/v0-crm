@@ -4,6 +4,39 @@ import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
+// ==================== INVOICE NUMBER GENERATION ====================
+
+export async function generateNextInvoiceNumber(): Promise<string> {
+  const year = new Date().getFullYear()
+  const prefix = `INV-${year}-`
+
+  const lastInvoice = await prisma.financeInvoice.findFirst({
+    where: {
+      invoiceNumber: {
+        startsWith: prefix,
+      },
+    },
+    orderBy: {
+      invoiceNumber: "desc",
+    },
+    select: {
+      invoiceNumber: true,
+    },
+  })
+
+  if (!lastInvoice) {
+    return `${prefix}001`
+  }
+
+  const numberPart = lastInvoice.invoiceNumber.split("-")[2]
+  if (!numberPart || isNaN(parseInt(numberPart, 10))) {
+    return `${prefix}001`
+  }
+
+  const nextNumber = parseInt(numberPart, 10) + 1
+  return `${prefix}${nextNumber.toString().padStart(3, "0")}`
+}
+
 // ==================== INVOICE ACTIONS ====================
 
 export async function getInvoices() {

@@ -2,10 +2,12 @@
 
 import { useState, useMemo, useEffect } from "react"
 import { generateId } from "@/lib/id-generator"
-import type { Task, TaskStatus, TaskPriority, TaskType, SwimlaneType, TaskTemplate, AutomationRule } from "@/lib/types/task"
+import type { Task, TaskStatus, TaskPriority, TaskType, SwimlaneType, TaskTemplate, AutomationRule, TeamMember } from "@/lib/types/task"
 import { DEFAULT_COLUMNS, PRIORITY_CONFIG, STATUS_CONFIG, TASK_TYPE_CONFIG } from "@/lib/types/task"
-import { sampleTasks, teamMembers, projects, taskTemplates, automationRules } from "@/lib/data/tasks"
+import { teamMembers as fallbackTeamMembers, projects as fallbackProjects, taskTemplates, automationRules } from "@/lib/data/tasks"
 import { getTasks as fetchTasks, createTask as createTaskAction, updateTask as updateTaskAction, deleteTask as deleteTaskAction } from "@/app/actions/tasks"
+import { getProjects } from "@/app/actions/projects"
+import { getEmployees } from "@/app/actions/team"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { KanbanBoard } from "@/components/tasks/kanban-board"
 import { TaskListView } from "@/components/tasks/task-list-view"
@@ -79,19 +81,52 @@ export default function TasksPage() {
   const [rules, setRules] = useState<AutomationRule[]>(automationRules)
   const [isLoading, setIsLoading] = useState(true)
 
-  // Load tasks from DB on mount
+  // Dynamic data from DB
+  const [dbProjects, setDbProjects] = useState<{ id: string; name: string; uid?: string }[]>([])
+  const [dbTeamMembers, setDbTeamMembers] = useState<TeamMember[]>([])
+
+  // Computed: use DB data if available, else fallback
+  const projects = dbProjects.length > 0 ? dbProjects : fallbackProjects
+  const teamMembers = dbTeamMembers.length > 0 ? dbTeamMembers : fallbackTeamMembers
+
+  // Load tasks, projects, and team from DB on mount
   useEffect(() => {
-    async function loadTasks() {
+    async function loadData() {
       try {
-        const data = await fetchTasks()
-        setTasks(data || [])
+        const [taskData, projectData, employeeData] = await Promise.all([
+          fetchTasks(),
+          getProjects(),
+          getEmployees(),
+        ])
+        setTasks(taskData || [])
+
+        // Map projects to { id, name } shape
+        if (Array.isArray(projectData) && projectData.length > 0) {
+          setDbProjects(projectData.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            uid: p.uid,
+          })))
+        }
+
+        // Map employees to TeamMember shape
+        if (Array.isArray(employeeData) && employeeData.length > 0) {
+          setDbTeamMembers(employeeData.map((e: any) => ({
+            id: e.id,
+            name: `${e.firstName} ${e.lastName}`,
+            initials: `${e.firstName[0]}${e.lastName[0]}`,
+            email: e.email,
+            role: e.jobTitle,
+            isAvailable: e.status === "active",
+          })))
+        }
       } catch (error) {
-        console.error("Failed to load tasks:", error)
+        console.error("Failed to load data:", error)
       } finally {
         setIsLoading(false)
       }
     }
-    loadTasks()
+    loadData()
   }, [])
   const [viewMode, setViewMode] = useState<ViewMode>("kanban")
   const [activeTab, setActiveTab] = useState<TabMode>("board")
@@ -224,19 +259,21 @@ export default function TasksPage() {
 
   const handleCreateTask = async (formData: FormData) => {
     const assignee = teamMembers.find((m) => m.id === formData.get("assignee")) || teamMembers[0]
+    const assignedBy = teamMembers.find((m) => m.id === formData.get("assignedBy")) || teamMembers[0]
+    const selectedProject = projects.find((p) => p.id === formData.get("project"))
     const taskData = {
       title: formData.get("title") as string,
       description: formData.get("description") as string || "",
       status: formData.get("status") as TaskStatus || initialStatus,
       priority: formData.get("priority") as TaskPriority || "medium",
       taskType: formData.get("taskType") as TaskType || "general",
-      projectId: formData.get("project") as string || "1",
-      projectName: projects.find((p) => p.id === formData.get("project"))?.name || projects[0].name,
+      projectId: selectedProject?.id || projects[0]?.id || "",
+      projectName: selectedProject?.name || projects[0]?.name || "",
       assignees: [assignee],
-      assignedById: "2",
-      assignedByName: "Ali Hasan",
-      reporterId: "2",
-      reporterName: "Ali Hasan",
+      assignedById: assignedBy.id,
+      assignedByName: assignedBy.name,
+      reporterId: assignedBy.id,
+      reporterName: assignedBy.name,
       dueDate: formData.get("dueDate") as string || new Date().toISOString().split("T")[0],
       startDate: formData.get("startDate") as string || new Date().toISOString().split("T")[0],
       tags: (formData.get("tags") as string || "").split(",").map((t) => t.trim()).filter(Boolean),
@@ -248,7 +285,7 @@ export default function TasksPage() {
       referenceLinks: [],
       estimatedHours: Number(formData.get("estimatedHours")) || 0,
       actualHours: 0,
-      activityLog: [{ id: "1", timestamp: new Date().toISOString(), userId: "2", userName: "Ali Hasan", action: "created task" }],
+      activityLog: [{ id: "1", timestamp: new Date().toISOString(), userId: assignedBy.id, userName: assignedBy.name, action: `created task and assigned to ${assignee.name}` }],
       isBlocked: false,
       isRecurring: false,
     }
@@ -268,19 +305,20 @@ export default function TasksPage() {
   }
 
   const handleUseTemplate = async (template: TaskTemplate) => {
+    const defaultAssignee = teamMembers[0]
     const taskData = {
       title: template.name,
       description: template.description,
       status: "todo",
       priority: template.priority,
       taskType: "general",
-      projectId: "1",
-      projectName: projects[0].name,
-      assignees: [teamMembers[0]],
-      assignedById: "2",
-      assignedByName: "Ali Hasan",
-      reporterId: "2",
-      reporterName: "Ali Hasan",
+      projectId: projects[0]?.id || "",
+      projectName: projects[0]?.name || "",
+      assignees: defaultAssignee ? [defaultAssignee] : [],
+      assignedById: defaultAssignee?.id || "",
+      assignedByName: defaultAssignee?.name || "",
+      reporterId: defaultAssignee?.id || "",
+      reporterName: defaultAssignee?.name || "",
       dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
       startDate: new Date().toISOString().split("T")[0],
       tags: template.tags,
@@ -378,14 +416,17 @@ export default function TasksPage() {
                       <Label htmlFor="project" className="text-sm">
                         Project <span className="text-destructive">*</span>
                       </Label>
-                      <Select name="project" defaultValue="1">
+                      <Select name="project" defaultValue={projects[0]?.id || ""}>
                         <SelectTrigger className="bg-secondary/50 border-border">
                           <SelectValue placeholder="Select project" />
                         </SelectTrigger>
                         <SelectContent>
                           {projects.map((p) => (
                             <SelectItem key={p.id} value={p.id}>
-                              {p.name}
+                              <span className="flex items-center gap-2">
+                                {(p as any).uid && <span className="text-[10px] text-muted-foreground font-mono">{(p as any).uid}</span>}
+                                {p.name}
+                              </span>
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -438,8 +479,10 @@ export default function TasksPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="assignee" className="text-sm">Assignee</Label>
-                      <Select name="assignee" defaultValue="1">
+                      <Label htmlFor="assignee" className="text-sm">
+                        Assign To <span className="text-destructive">*</span>
+                      </Label>
+                      <Select name="assignee" defaultValue={teamMembers[0]?.id || ""}>
                         <SelectTrigger className="bg-secondary/50 border-border">
                           <SelectValue placeholder="Select assignee" />
                         </SelectTrigger>
@@ -451,12 +494,38 @@ export default function TasksPage() {
                                   {m.name.split(" ").map(n => n[0]).join("")}
                                 </span>
                                 {m.name}
+                                <span className="text-[10px] text-muted-foreground">({m.role})</span>
                               </span>
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="assignedBy" className="text-sm">
+                        Assigned By <span className="text-destructive">*</span>
+                      </Label>
+                      <Select name="assignedBy" defaultValue={teamMembers[0]?.id || ""}>
+                        <SelectTrigger className="bg-secondary/50 border-border">
+                          <SelectValue placeholder="Who is assigning?" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {teamMembers.map((m) => (
+                            <SelectItem key={m.id} value={m.id}>
+                              <span className="flex items-center gap-2">
+                                <span className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-[10px] font-medium text-emerald-400">
+                                  {m.name.split(" ").map(n => n[0]).join("")}
+                                </span>
+                                {m.name}
+                                <span className="text-[10px] text-muted-foreground">({m.role})</span>
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="priority" className="text-sm">Priority</Label>
                       <Select name="priority" defaultValue="medium">
@@ -475,6 +544,7 @@ export default function TasksPage() {
                         </SelectContent>
                       </Select>
                     </div>
+                    <div />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
