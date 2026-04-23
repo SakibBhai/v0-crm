@@ -6,7 +6,7 @@ import { generateId, generateBulkIds } from "@/lib/id-generator"
 import { getLeads, createLead, updateLead, deleteLead, addLeadActivity, addLeadNote, bulkDeleteLeads } from "@/app/actions/leads"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { AnimatedCard } from "@/components/animated-card"
-import { employees } from "@/lib/data/hr"
+import { getEmployees } from "@/app/actions/team"
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -423,10 +423,13 @@ export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
+  const [employees, setEmployees] = useState<any[]>([])
+
   useEffect(() => {
     async function loadLeads() {
-      const data = await getLeads()
+      const [data, emps] = await Promise.all([getLeads(), getEmployees()])
       setLeads(data)
+      setEmployees(emps)
       setIsLoading(false)
     }
     loadLeads()
@@ -493,7 +496,7 @@ export default function LeadsPage() {
   }
 
   const uniqueSources = [...new Set(leads.map((l) => l.source))]
-  const uniqueAssignees = [...new Set(leads.map((l) => l.assignedTo))]
+  const uniqueAssignees = [...new Set(leads.map((l) => l.assignedTo)), ...teamMembers.map(t => t.name)]
 
   const handleAddLead = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -1024,9 +1027,11 @@ export default function LeadsPage() {
                           <SelectValue placeholder="Select assignee" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="John Smith">John Smith</SelectItem>
-                          <SelectItem value="Emma Davis">Emma Davis</SelectItem>
-                          <SelectItem value="Alex Johnson">Alex Johnson</SelectItem>
+                          {teamMembers.map((tm) => (
+                            <SelectItem key={tm.id} value={tm.name}>
+                              {tm.name}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>

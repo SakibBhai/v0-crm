@@ -51,6 +51,7 @@ import type { Project } from "@/lib/types/project"
 import { statusConfig, priorityConfig } from "@/lib/data/projects"
 import { getProjects, createProject, updateProject, deleteProject } from "@/app/actions/projects"
 import { getClients } from "@/app/actions/clients"
+import { getEmployees } from "@/app/actions/team"
 
 export default function ProjectsPage() {
   const router = useRouter()
@@ -66,6 +67,7 @@ export default function ProjectsPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
   const [allClients, setAllClients] = useState<any[]>([])
+  const [employees, setEmployees] = useState<any[]>([])
 
   // Drag and drop state
   const [draggedProject, setDraggedProject] = useState<Project | null>(null)
@@ -75,9 +77,10 @@ export default function ProjectsPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [projectsData, clientsData] = await Promise.all([
+        const [projectsData, clientsData, emps] = await Promise.all([
           getProjects(),
-          getClients()
+          getClients(),
+          getEmployees()
         ])
         // Map DB fields to match frontend Project interface
         setProjects(projectsData.map((p: any) => ({
@@ -85,6 +88,7 @@ export default function ProjectsPage() {
           tasks: { total: p.tasksTotal || 0, completed: p.tasksCompleted || 0 },
         })))
         setAllClients(clientsData || [])
+        setEmployees(emps || [])
       } catch (error) {
         console.error("Failed to load data:", error)
       } finally {
@@ -97,6 +101,10 @@ export default function ProjectsPage() {
   const uniqueClients = [...new Set(projects.map((p) => p.client))]
   const uniqueManagers = [...new Set(projects.map((p) => p.projectManager))]
   const uniqueClientsList = Array.from(new Map(allClients.map(c => [c.name, c])).values())
+  const teamMembers = employees.map(emp => ({
+    id: emp.id,
+    name: `${emp.firstName} ${emp.lastName}`,
+  }))
 
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
@@ -450,13 +458,13 @@ export default function ProjectsPage() {
                             <SelectValue placeholder="Select manager" />
                           </SelectTrigger>
                           <SelectContent>
-                            {uniqueManagers.map((manager) => (
-                              <SelectItem key={manager} value={manager}>
+                            {teamMembers.map((member) => (
+                              <SelectItem key={member.id} value={member.name}>
                                 <span className="flex items-center gap-2">
                                   <span className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-medium">
-                                    {manager.split(" ").map(n => n[0]).join("")}
+                                    {member.name.split(" ").map((n: string) => n[0]).join("")}
                                   </span>
-                                  {manager}
+                                  {member.name}
                                 </span>
                               </SelectItem>
                             ))}
@@ -1316,7 +1324,12 @@ export default function ProjectsPage() {
                     <Select name="projectManager" defaultValue={editingProject.projectManager}>
                       <SelectTrigger className="bg-secondary/50 border-border"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        {uniqueManagers.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                        {teamMembers.map(m => <SelectItem key={m.id} value={m.name}>{m.name}</SelectItem>)}
+                        {editingProject.projectManager && !teamMembers.find(m => m.name === editingProject.projectManager) && (
+                          <SelectItem key={editingProject.projectManager} value={editingProject.projectManager}>
+                            {editingProject.projectManager}
+                          </SelectItem>
+                        )}
                       </SelectContent>
                     </Select>
                   </div>

@@ -5,6 +5,7 @@
   "/page": "app/page.js",
   "/projects/[id]/page": "app/projects/[id]/page.js",
   "/projects/page": "app/projects/page.js",
+  "/settings/page": "app/settings/page.js",
   "/tasks/page": "app/tasks/page.js",
   "/team/page": "app/team/page.js"
 }

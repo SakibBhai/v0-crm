@@ -13,6 +13,7 @@ import {
   getPerformanceReviews, createPerformanceReview as createPerformanceReviewAction,
   getTrainingCourses as getTrainingCoursesAction, createTrainingCourse as createTrainingCourseAction,
   getCourseEnrollments as getCourseEnrollmentsAction, createCourseEnrollment as createCourseEnrollmentAction,
+  getHolidays, createHoliday, deleteHoliday,
 } from "@/app/actions/team"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { EmployeeProfile } from "@/components/team/employee-profile"
@@ -76,14 +77,15 @@ export default function TeamPage() {
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([])
   const [reviews, setReviews] = useState<PerformanceReview[]>([])
   const [dbCourses, setDbCourses] = useState<TrainingCourse[]>([])
+  const [holidays, setHolidays] = useState<any[]>([])
 
   // Load data from database on mount
   useEffect(() => {
     async function loadTeamData() {
       try {
-        const [empRes, candRes, leaveRes, attRes, okrRes, reviewRes, coursesRes, enrollRes] = await Promise.all([
+        const [empRes, candRes, leaveRes, attRes, okrRes, reviewRes, coursesRes, enrollRes, holRes] = await Promise.all([
           getEmployees(), getCandidatesAction(), getLeaveRequests(), getAttendanceRecords(), getOKRs(),
-          getPerformanceReviews(), getTrainingCoursesAction(), getCourseEnrollmentsAction(),
+          getPerformanceReviews(), getTrainingCoursesAction(), getCourseEnrollmentsAction(), getHolidays(),
         ])
         if (Array.isArray(empRes)) setEmployees(empRes as Employee[])
         if (Array.isArray(candRes)) setCandidates(candRes as Candidate[])
@@ -93,6 +95,7 @@ export default function TeamPage() {
         if (Array.isArray(reviewRes)) setReviews(reviewRes as PerformanceReview[])
         if (Array.isArray(coursesRes)) setDbCourses(coursesRes as TrainingCourse[])
         if (Array.isArray(enrollRes)) setEnrollments(enrollRes as CourseEnrollment[])
+        if (Array.isArray(holRes)) setHolidays(holRes)
       } catch (err) {
         console.error("Failed to load team data:", err)
       }
@@ -389,11 +392,25 @@ export default function TeamPage() {
     }
   }
 
+  const handleCreateHoliday = async (data: { date: string; name: string; description?: string }) => {
+    const res = await createHoliday(data)
+    if (!res.error) {
+      setHolidays(prev => [...prev, res].sort((a, b) => a.date.localeCompare(b.date)))
+    }
+  }
+
+  const handleDeleteHoliday = async (id: string) => {
+    const res = await deleteHoliday(id)
+    if (!res.error) {
+      setHolidays(prev => prev.filter(h => h.id !== id))
+    }
+  }
+
   const tabs = [
     { id: "directory", label: "Directory", icon: Users },
     { id: "org-chart", label: "Org Chart", icon: Building2 },
     { id: "recruitment", label: "Recruitment", icon: UserPlus, badge: candidates.filter(c => c.stage === "applied").length },
-    { id: "attendance", label: "Attendance", icon: Calendar, badge: stats.pendingLeave },
+    { id: "attendance", label: "Attendance", icon: Calendar, badge: leaveRequests.filter(r => r.status === "pending").length },
     { id: "performance", label: "Performance", icon: Target },
     { id: "skills", label: "Skills", icon: Zap },
     { id: "learning", label: "Learning", icon: GraduationCap },
@@ -632,9 +649,12 @@ export default function TeamPage() {
             <AttendanceTracker
               employees={employees}
               attendanceRecords={attendanceRecords}
+              holidays={holidays}
               currentUserId={currentUserId}
               onMarkAttendance={handleMarkAttendance}
               onUpdateAttendance={handleUpdateAttendance}
+              onCreateHoliday={handleCreateHoliday}
+              onDeleteHoliday={handleDeleteHoliday}
             />
 
             {/* Leave Management Section */}

@@ -364,8 +364,24 @@ export async function createAttendanceRecord(data: {
   notes?: string
 }) {
   try {
-    const record = await prisma.teamAttendanceRecord.create({
-      data: {
+    const record = await prisma.teamAttendanceRecord.upsert({
+      where: {
+        employeeId_date: {
+          employeeId: data.employeeId,
+          date: data.date,
+        }
+      },
+      update: {
+        status: data.status,
+        clockIn: data.clockIn || null,
+        clockOut: data.clockOut || null,
+        breakMinutes: data.breakMinutes || null,
+        totalHours: data.totalHours || null,
+        workLocation: data.workLocation || null,
+        notes: data.notes || null,
+        markedAt: new Date(),
+      },
+      create: {
         employeeId: data.employeeId,
         employeeName: data.employeeName,
         date: data.date,
@@ -721,5 +737,49 @@ export async function updateCourseEnrollment(id: string, data: Record<string, an
   } catch (error) {
     console.error("Error updating course enrollment:", error)
     return { error: "Failed to update course enrollment" }
+  }
+}
+
+// ==================== HOLIDAY ACTIONS ====================
+
+export async function getHolidays() {
+  try {
+    const holidays = await prisma.teamHoliday.findMany({ orderBy: { date: "asc" } })
+    return holidays.map(h => ({
+      ...h,
+      createdAt: h.createdAt.toISOString()
+    }))
+  } catch (error) {
+    console.error("Error fetching holidays:", error)
+    return { error: "Failed to fetch holidays" }
+  }
+}
+
+export async function createHoliday(data: { date: string; name: string; description?: string }) {
+  try {
+    const holiday = await prisma.teamHoliday.create({
+      data: {
+        date: data.date,
+        name: data.name,
+        description: data.description || null,
+      }
+    })
+    return {
+      ...holiday,
+      createdAt: holiday.createdAt.toISOString()
+    }
+  } catch (error) {
+    console.error("Error creating holiday:", error)
+    return { error: "Failed to create holiday" }
+  }
+}
+
+export async function deleteHoliday(id: string) {
+  try {
+    await prisma.teamHoliday.delete({ where: { id } })
+    return { success: true }
+  } catch (error) {
+    console.error("Error deleting holiday:", error)
+    return { error: "Failed to delete holiday" }
   }
 }

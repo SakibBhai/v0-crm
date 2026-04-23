@@ -87,7 +87,7 @@ async function generateNextUid(prefix) {
 "[project]/app/actions/projects.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"00016feec3aa411b560a38ac6505f767c8da47ad6f":"getProjects","401ff9b2a3563298533f98ba54d20cab0647aa537a":"getProjectById","4029a65e8656258e3895bc792175e718ba15779300":"deleteProject","4029e8a0d3bc9fce9d47723a6518ed2f486fb99c4c":"bulkDeleteProjects","405c23688ed41644e729ce3ae654dc959b1785e2cd":"createProject","6005ae568f7d4d1c78693a639fbca7701fc1387ed0":"addProjectDiscussionMessage","6074d34a50e17037421fda7232dfcfec7209b88e1a":"updateProject","60de5829172f253f88ef6937295a226ef81b505321":"addProjectFileLink"},"",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"00557496f3cb69a888ce2c209034093fe201211a90":"getProjects","407aa6bfb1c8906b938481be455d8d657fddcb7831":"bulkDeleteProjects","4094b512d7cfac1dc947cd23d90172a1f36ef81309":"getProjectById","40960faf18c05523008ea39fda1c0f66f67675ec17":"deleteProject","40c6caadc2919a99a584a7daf3f4f81f74e7cee4cd":"createProject","6082883b426169117ca3914c978c32ec5c281bffe5":"addProjectDiscussionMessage","60b73bb2002adf0cb4f24778553e415d5797b372b6":"updateProject","60c66677724509665d01447422a5abaed25f4762d7":"addProjectFileLink"},"",""] */ __turbopack_context__.s([
     "addProjectDiscussionMessage",
     ()=>addProjectDiscussionMessage,
     "addProjectFileLink",
@@ -275,19 +275,19 @@ async function addProjectDiscussionMessage(projectId, messageData) {
     addProjectFileLink,
     addProjectDiscussionMessage
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getProjects, "00016feec3aa411b560a38ac6505f767c8da47ad6f", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getProjectById, "401ff9b2a3563298533f98ba54d20cab0647aa537a", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createProject, "405c23688ed41644e729ce3ae654dc959b1785e2cd", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateProject, "6074d34a50e17037421fda7232dfcfec7209b88e1a", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteProject, "4029a65e8656258e3895bc792175e718ba15779300", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(bulkDeleteProjects, "4029e8a0d3bc9fce9d47723a6518ed2f486fb99c4c", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(addProjectFileLink, "60de5829172f253f88ef6937295a226ef81b505321", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(addProjectDiscussionMessage, "6005ae568f7d4d1c78693a639fbca7701fc1387ed0", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getProjects, "00557496f3cb69a888ce2c209034093fe201211a90", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getProjectById, "4094b512d7cfac1dc947cd23d90172a1f36ef81309", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createProject, "40c6caadc2919a99a584a7daf3f4f81f74e7cee4cd", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateProject, "60b73bb2002adf0cb4f24778553e415d5797b372b6", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteProject, "40960faf18c05523008ea39fda1c0f66f67675ec17", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(bulkDeleteProjects, "407aa6bfb1c8906b938481be455d8d657fddcb7831", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(addProjectFileLink, "60c66677724509665d01447422a5abaed25f4762d7", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(addProjectDiscussionMessage, "6082883b426169117ca3914c978c32ec5c281bffe5", null);
 }),
 "[project]/app/actions/clients.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"00a55ce15f923cbae7e6b921d9ac2260a6daa10829":"getClients","405c394b233127aeaffd27be89a5dbc1103e79e664":"createClient","408c43a445d4e1e8d197342a4bbd6ae1d6950dd4f2":"bulkDeleteClients","40cca5dffad2cbfdce8e6e3aec900fcdd56ead03f8":"deleteClient","609d7cb1481ef2d045c40e4e91be2c1558b97dfbc7":"updateClient"},"",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"000d2f1e4ec12ffe903b1011f46faa293fa4e84ff8":"getClients","4006757e3793eb3ce983fae506df64065c8af650fc":"deleteClient","408d2c163c7c25de018bd6dde9955396ca8c71b9e0":"createClient","40a820835daf4998f870a2e9f6b648ddf595280dd2":"bulkDeleteClients","6069ed6f887d1c6fa33ac6df8765e5f67cce88fd2d":"updateClient"},"",""] */ __turbopack_context__.s([
     "bulkDeleteClients",
     ()=>bulkDeleteClients,
     "createClient",
@@ -397,11 +397,11 @@ async function bulkDeleteClients(ids) {
     deleteClient,
     bulkDeleteClients
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getClients, "00a55ce15f923cbae7e6b921d9ac2260a6daa10829", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createClient, "405c394b233127aeaffd27be89a5dbc1103e79e664", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateClient, "609d7cb1481ef2d045c40e4e91be2c1558b97dfbc7", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteClient, "40cca5dffad2cbfdce8e6e3aec900fcdd56ead03f8", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(bulkDeleteClients, "408c43a445d4e1e8d197342a4bbd6ae1d6950dd4f2", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getClients, "000d2f1e4ec12ffe903b1011f46faa293fa4e84ff8", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createClient, "408d2c163c7c25de018bd6dde9955396ca8c71b9e0", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateClient, "6069ed6f887d1c6fa33ac6df8765e5f67cce88fd2d", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteClient, "4006757e3793eb3ce983fae506df64065c8af650fc", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(bulkDeleteClients, "40a820835daf4998f870a2e9f6b648ddf595280dd2", null);
 }),
 "[project]/.next-internal/server/app/projects/page/actions.js { ACTIONS_MODULE0 => \"[project]/app/actions/projects.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/app/actions/clients.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript) <locals>", ((__turbopack_context__) => {
 "use strict";
@@ -419,15 +419,15 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$clients$2e
 "use strict";
 
 __turbopack_context__.s([
-    "00016feec3aa411b560a38ac6505f767c8da47ad6f",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$projects$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getProjects"],
-    "00a55ce15f923cbae7e6b921d9ac2260a6daa10829",
+    "000d2f1e4ec12ffe903b1011f46faa293fa4e84ff8",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$clients$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getClients"],
-    "4029a65e8656258e3895bc792175e718ba15779300",
+    "00557496f3cb69a888ce2c209034093fe201211a90",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$projects$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getProjects"],
+    "40960faf18c05523008ea39fda1c0f66f67675ec17",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$projects$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteProject"],
-    "405c23688ed41644e729ce3ae654dc959b1785e2cd",
+    "40c6caadc2919a99a584a7daf3f4f81f74e7cee4cd",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$projects$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createProject"],
-    "6074d34a50e17037421fda7232dfcfec7209b88e1a",
+    "60b73bb2002adf0cb4f24778553e415d5797b372b6",
     ()=>__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$actions$2f$projects$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["updateProject"]
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$projects$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$app$2f$actions$2f$projects$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE1__$3d3e$__$225b$project$5d2f$app$2f$actions$2f$clients$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i('[project]/.next-internal/server/app/projects/page/actions.js { ACTIONS_MODULE0 => "[project]/app/actions/projects.ts [app-rsc] (ecmascript)", ACTIONS_MODULE1 => "[project]/app/actions/clients.ts [app-rsc] (ecmascript)" } [app-rsc] (server actions loader, ecmascript) <locals>');

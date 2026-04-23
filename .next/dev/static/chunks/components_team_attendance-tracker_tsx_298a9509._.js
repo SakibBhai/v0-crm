@@ -100,10 +100,16 @@ const STATUS_ICONS = {
     "half-day": __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$sun$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Sun$3e$__["Sun"],
     remote: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$house$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Home$3e$__["Home"]
 };
-function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMarkAttendance, onUpdateAttendance }) {
+function formatLocalDate(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+}
+function AttendanceTracker({ employees, attendanceRecords, holidays = [], currentUserId, onMarkAttendance, onUpdateAttendance, onCreateHoliday, onDeleteHoliday }) {
     _s();
     const [activeTab, setActiveTab] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("today");
-    const [selectedDate, setSelectedDate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(new Date().toISOString().split("T")[0]);
+    const [selectedDate, setSelectedDate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(formatLocalDate(new Date()));
     const [selectedEmployeeId, setSelectedEmployeeId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("all");
     const [reportEmployeeId, setReportEmployeeId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("all");
     const [reportMonth, setReportMonth] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
@@ -119,8 +125,29 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
     const [clockOutTime, setClockOutTime] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("19:00");
     const [attendanceNotes, setAttendanceNotes] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [selectedStatus, setSelectedStatus] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("present");
+    const [newHolidayDate, setNewHolidayDate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
+    const [newHolidayName, setNewHolidayName] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
+    const [newHolidayDesc, setNewHolidayDesc] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     // Get today's date
-    const today = new Date().toISOString().split("T")[0];
+    const today = formatLocalDate(new Date());
+    // Helper to check if a date is a weekend (Friday/Saturday) or a holiday
+    const getOffDayStatus = (dateStr)=>{
+        const dateObj = new Date(dateStr);
+        const day = dateObj.getDay();
+        if (day === 5 || day === 6) return {
+            isOffDay: true,
+            type: "Weekend"
+        };
+        const holiday = holidays.find((h)=>h.date === dateStr);
+        if (holiday) return {
+            isOffDay: true,
+            type: "Holiday",
+            name: holiday.name
+        };
+        return {
+            isOffDay: false
+        };
+    };
     // Get records for selected date
     const dateRecords = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "AttendanceTracker.useMemo[dateRecords]": ()=>{
@@ -211,7 +238,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
             // Add month days
             for(let day = 1; day <= lastDay.getDate(); day++){
                 const date = new Date(year, month, day);
-                const dateStr = date.toISOString().split("T")[0];
+                const dateStr = formatLocalDate(date);
                 const records = attendanceRecords.filter({
                     "AttendanceTracker.useMemo[calendarDays].records": (r)=>{
                         if (selectedEmployeeId === "all") return r.date === dateStr;
@@ -303,19 +330,31 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
     const handleMarkAttendance = ()=>{
         if (!markingEmployee) return;
         const actualStatus = selectedStatus === "present" && isLateEntry(clockInTime) ? "late" : selectedStatus;
-        onMarkAttendance({
-            employeeId: markingEmployee.id,
-            employeeName: `${markingEmployee.firstName} ${markingEmployee.lastName}`,
-            date: selectedDate,
-            status: actualStatus,
-            clockIn: selectedStatus !== "absent" ? clockInTime : undefined,
-            clockOut: selectedStatus !== "absent" ? clockOutTime : undefined,
-            totalHours: selectedStatus === "half-day" ? 4 : selectedStatus === "absent" ? 0 : 8,
-            workLocation: selectedStatus === "remote" ? "remote" : "office",
-            notes: attendanceNotes || undefined,
-            markedBy: "Current User",
-            isAutoMarked: false
-        });
+        const existingRecord = getEmployeeRecord(markingEmployee.id);
+        if (existingRecord) {
+            onUpdateAttendance(existingRecord.id, {
+                status: actualStatus,
+                clockIn: selectedStatus !== "absent" ? clockInTime : undefined,
+                clockOut: selectedStatus !== "absent" ? clockOutTime : undefined,
+                totalHours: selectedStatus === "half-day" ? 4 : selectedStatus === "absent" ? 0 : 8,
+                workLocation: selectedStatus === "remote" ? "remote" : "office",
+                notes: attendanceNotes || undefined
+            });
+        } else {
+            onMarkAttendance({
+                employeeId: markingEmployee.id,
+                employeeName: `${markingEmployee.firstName} ${markingEmployee.lastName}`,
+                date: selectedDate,
+                status: actualStatus,
+                clockIn: selectedStatus !== "absent" ? clockInTime : undefined,
+                clockOut: selectedStatus !== "absent" ? clockOutTime : undefined,
+                totalHours: selectedStatus === "half-day" ? 4 : selectedStatus === "absent" ? 0 : 8,
+                workLocation: selectedStatus === "remote" ? "remote" : "office",
+                notes: attendanceNotes || undefined,
+                markedBy: "Current User",
+                isAutoMarked: false
+            });
+        }
         setIsMarkDialogOpen(false);
         resetForm();
     };
@@ -390,12 +429,12 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                             className: "w-8 h-8 text-primary"
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 346,
+                                            lineNumber: 385,
                                             columnNumber: 33
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                        lineNumber: 345,
+                                        lineNumber: 384,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -405,7 +444,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                 children: "Attendance Clock"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                lineNumber: 349,
+                                                lineNumber: 388,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -421,19 +460,19 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                lineNumber: 350,
+                                                lineNumber: 389,
                                                 columnNumber: 33
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                        lineNumber: 348,
+                                        lineNumber: 387,
                                         columnNumber: 29
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                lineNumber: 344,
+                                lineNumber: 383,
                                 columnNumber: 25
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -446,14 +485,14 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                             className: "w-5 h-5"
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 358,
+                                            lineNumber: 397,
                                             columnNumber: 37
                                         }, this),
                                         " Clock In"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 357,
+                                    lineNumber: 396,
                                     columnNumber: 33
                                 }, this) : !myTodayRecord.clockOut ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "flex items-center gap-4",
@@ -466,7 +505,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                     children: "Clocked in at"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 363,
+                                                    lineNumber: 402,
                                                     columnNumber: 41
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -477,7 +516,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             children: myTodayRecord.clockIn
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 365,
+                                                            lineNumber: 404,
                                                             columnNumber: 45
                                                         }, this),
                                                         myTodayRecord.clockIn && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Badge"], {
@@ -485,19 +524,19 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             children: getClockInLabel(myTodayRecord.clockIn).text
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 367,
+                                                            lineNumber: 406,
                                                             columnNumber: 49
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 364,
+                                                    lineNumber: 403,
                                                     columnNumber: 41
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 362,
+                                            lineNumber: 401,
                                             columnNumber: 37
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -508,20 +547,20 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                     className: "w-5 h-5"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 377,
+                                                    lineNumber: 416,
                                                     columnNumber: 41
                                                 }, this),
                                                 " Clock Out"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 376,
+                                            lineNumber: 415,
                                             columnNumber: 37
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 361,
+                                    lineNumber: 400,
                                     columnNumber: 33
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "flex items-center gap-4",
@@ -536,7 +575,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             children: "In"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 384,
+                                                            lineNumber: 423,
                                                             columnNumber: 45
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -544,13 +583,13 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             children: myTodayRecord.clockIn
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 385,
+                                                            lineNumber: 424,
                                                             columnNumber: 45
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 383,
+                                                    lineNumber: 422,
                                                     columnNumber: 41
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -560,7 +599,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             children: "Out"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 388,
+                                                            lineNumber: 427,
                                                             columnNumber: 45
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -568,13 +607,13 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             children: myTodayRecord.clockOut
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 389,
+                                                            lineNumber: 428,
                                                             columnNumber: 45
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 387,
+                                                    lineNumber: 426,
                                                     columnNumber: 41
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -584,7 +623,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             children: "Hours"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 392,
+                                                            lineNumber: 431,
                                                             columnNumber: 45
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -595,19 +634,19 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 393,
+                                                            lineNumber: 432,
                                                             columnNumber: 45
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 391,
+                                                    lineNumber: 430,
                                                     columnNumber: 41
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 382,
+                                            lineNumber: 421,
                                             columnNumber: 37
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Badge"], {
@@ -615,34 +654,34 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                             children: "✓ Day Complete"
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 396,
+                                            lineNumber: 435,
                                             columnNumber: 37
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 381,
+                                    lineNumber: 420,
                                     columnNumber: 33
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                lineNumber: 355,
+                                lineNumber: 394,
                                 columnNumber: 25
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                        lineNumber: 343,
+                        lineNumber: 382,
                         columnNumber: 21
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                    lineNumber: 342,
+                    lineNumber: 381,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                lineNumber: 341,
+                lineNumber: 380,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -663,7 +702,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                     children: "Present Today"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 410,
+                                                    lineNumber: 449,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -671,13 +710,13 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                     children: todayStats.present
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 411,
+                                                    lineNumber: 450,
                                                     columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 409,
+                                            lineNumber: 448,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -686,18 +725,18 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                 className: "w-6 h-6 text-green-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                lineNumber: 414,
+                                                lineNumber: 453,
                                                 columnNumber: 33
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 413,
+                                            lineNumber: 452,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 408,
+                                    lineNumber: 447,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -710,18 +749,18 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 417,
+                                    lineNumber: 456,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                            lineNumber: 407,
+                            lineNumber: 446,
                             columnNumber: 21
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                        lineNumber: 406,
+                        lineNumber: 445,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -739,7 +778,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                     children: "Remote Today"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 427,
+                                                    lineNumber: 466,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -747,13 +786,13 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                     children: todayStats.remote
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 428,
+                                                    lineNumber: 467,
                                                     columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 426,
+                                            lineNumber: 465,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -762,18 +801,18 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                 className: "w-6 h-6 text-blue-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                lineNumber: 431,
+                                                lineNumber: 470,
                                                 columnNumber: 33
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 430,
+                                            lineNumber: 469,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 425,
+                                    lineNumber: 464,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -784,18 +823,18 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 434,
+                                    lineNumber: 473,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                            lineNumber: 424,
+                            lineNumber: 463,
                             columnNumber: 21
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                        lineNumber: 423,
+                        lineNumber: 462,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -813,7 +852,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                     children: "Monthly Rate"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 444,
+                                                    lineNumber: 483,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -824,13 +863,13 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 445,
+                                                    lineNumber: 484,
                                                     columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 443,
+                                            lineNumber: 482,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -839,18 +878,18 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                 className: "w-6 h-6 text-purple-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                lineNumber: 448,
+                                                lineNumber: 487,
                                                 columnNumber: 33
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 447,
+                                            lineNumber: 486,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 442,
+                                    lineNumber: 481,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -858,18 +897,18 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                     children: "Attendance this month"
                                 }, void 0, false, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 451,
+                                    lineNumber: 490,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                            lineNumber: 441,
+                            lineNumber: 480,
                             columnNumber: 21
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                        lineNumber: 440,
+                        lineNumber: 479,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -887,7 +926,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                     children: "On-Time Rate"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 461,
+                                                    lineNumber: 500,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -898,13 +937,13 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 462,
+                                                    lineNumber: 501,
                                                     columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 460,
+                                            lineNumber: 499,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -913,18 +952,18 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                 className: "w-6 h-6 text-yellow-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                lineNumber: 465,
+                                                lineNumber: 504,
                                                 columnNumber: 33
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 464,
+                                            lineNumber: 503,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 459,
+                                    lineNumber: 498,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -935,24 +974,24 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 468,
+                                    lineNumber: 507,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                            lineNumber: 458,
+                            lineNumber: 497,
                             columnNumber: 21
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                        lineNumber: 457,
+                        lineNumber: 496,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                lineNumber: 405,
+                lineNumber: 444,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Tabs"], {
@@ -972,14 +1011,14 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                 className: "w-4 h-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                lineNumber: 480,
+                                                lineNumber: 519,
                                                 columnNumber: 29
                                             }, this),
                                             "Daily Attendance"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                        lineNumber: 479,
+                                        lineNumber: 518,
                                         columnNumber: 25
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsTrigger"], {
@@ -990,14 +1029,14 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                 className: "w-4 h-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                lineNumber: 484,
+                                                lineNumber: 523,
                                                 columnNumber: 29
                                             }, this),
                                             "Calendar View"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                        lineNumber: 483,
+                                        lineNumber: 522,
                                         columnNumber: 25
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsTrigger"], {
@@ -1008,20 +1047,38 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                 className: "w-4 h-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                lineNumber: 488,
+                                                lineNumber: 527,
                                                 columnNumber: 29
                                             }, this),
                                             "Reports"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                        lineNumber: 487,
+                                        lineNumber: 526,
+                                        columnNumber: 25
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsTrigger"], {
+                                        value: "holidays",
+                                        className: "gap-2",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$sun$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Sun$3e$__["Sun"], {
+                                                className: "w-4 h-4"
+                                            }, void 0, false, {
+                                                fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                lineNumber: 531,
+                                                columnNumber: 29
+                                            }, this),
+                                            "Holidays"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/components/team/attendance-tracker.tsx",
+                                        lineNumber: 530,
                                         columnNumber: 25
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                lineNumber: 478,
+                                lineNumber: 517,
                                 columnNumber: 21
                             }, this),
                             activeTab === "today" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1033,18 +1090,18 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                     className: "w-auto"
                                 }, void 0, false, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 495,
+                                    lineNumber: 538,
                                     columnNumber: 29
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                lineNumber: 494,
+                                lineNumber: 537,
                                 columnNumber: 25
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                        lineNumber: 477,
+                        lineNumber: 516,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsContent"], {
@@ -1055,7 +1112,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardHeader"], {
                                     className: "border-b border-border pb-4",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "flex items-center justify-between",
+                                        className: "flex flex-col md:flex-row items-center justify-between gap-4",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardTitle"], {
                                                 className: "text-lg",
@@ -1070,49 +1127,64 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                lineNumber: 510,
+                                                lineNumber: 553,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "flex items-center gap-2",
-                                                children: Object.entries(__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$types$2f$hr$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ATTENDANCE_STATUS_CONFIG"]).map(([key, config])=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "flex items-center gap-1 text-xs",
+                                                className: "flex items-center gap-2 flex-wrap",
+                                                children: [
+                                                    getOffDayStatus(selectedDate).isOffDay && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Badge"], {
+                                                        variant: "secondary",
+                                                        className: "bg-yellow-500/20 text-yellow-600 mr-4",
                                                         children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("w-2 h-2 rounded-full", config.bgColor.replace("/20", ""))
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                lineNumber: 516,
-                                                                columnNumber: 45
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "text-muted-foreground",
-                                                                children: config.label
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                lineNumber: 517,
-                                                                columnNumber: 45
-                                                            }, this)
+                                                            getOffDayStatus(selectedDate).type,
+                                                            ": ",
+                                                            getOffDayStatus(selectedDate).name || 'Off Day'
                                                         ]
-                                                    }, key, true, {
+                                                    }, void 0, true, {
                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                        lineNumber: 515,
+                                                        lineNumber: 558,
                                                         columnNumber: 41
-                                                    }, this))
-                                            }, void 0, false, {
+                                                    }, this),
+                                                    Object.entries(__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$types$2f$hr$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ATTENDANCE_STATUS_CONFIG"]).map(([key, config])=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "flex items-center gap-1 text-xs",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("w-2 h-2 rounded-full", config.bgColor.replace("/20", ""))
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                    lineNumber: 564,
+                                                                    columnNumber: 45
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    className: "text-muted-foreground",
+                                                                    children: config.label
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                    lineNumber: 565,
+                                                                    columnNumber: 45
+                                                                }, this)
+                                                            ]
+                                                        }, key, true, {
+                                                            fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                            lineNumber: 563,
+                                                            columnNumber: 41
+                                                        }, this))
+                                                ]
+                                            }, void 0, true, {
                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                lineNumber: 513,
+                                                lineNumber: 556,
                                                 columnNumber: 33
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                        lineNumber: 509,
+                                        lineNumber: 552,
                                         columnNumber: 29
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 508,
+                                    lineNumber: 551,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1136,12 +1208,12 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                     children: initials
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                    lineNumber: 537,
+                                                                    lineNumber: 585,
                                                                     columnNumber: 53
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                lineNumber: 536,
+                                                                lineNumber: 584,
                                                                 columnNumber: 49
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1155,7 +1227,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                        lineNumber: 542,
+                                                                        lineNumber: 590,
                                                                         columnNumber: 53
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1166,7 +1238,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                                 children: deptConfig.label
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                lineNumber: 544,
+                                                                                lineNumber: 592,
                                                                                 columnNumber: 57
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1174,25 +1246,25 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                                 children: employee.jobTitle
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                lineNumber: 547,
+                                                                                lineNumber: 595,
                                                                                 columnNumber: 57
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                        lineNumber: 543,
+                                                                        lineNumber: 591,
                                                                         columnNumber: 53
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                lineNumber: 541,
+                                                                lineNumber: 589,
                                                                 columnNumber: 49
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                        lineNumber: 535,
+                                                        lineNumber: 583,
                                                         columnNumber: 45
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1208,20 +1280,20 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                                 className: "w-3.5 h-3.5"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                lineNumber: 557,
+                                                                                lineNumber: 605,
                                                                                 columnNumber: 65
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                 children: record.clockIn
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                lineNumber: 558,
+                                                                                lineNumber: 606,
                                                                                 columnNumber: 65
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                        lineNumber: 556,
+                                                                        lineNumber: 604,
                                                                         columnNumber: 61
                                                                     }, this),
                                                                     record.clockOut && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1231,26 +1303,26 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                                 className: "w-3.5 h-3.5"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                lineNumber: 563,
+                                                                                lineNumber: 611,
                                                                                 columnNumber: 65
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                 children: record.clockOut
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                lineNumber: 564,
+                                                                                lineNumber: 612,
                                                                                 columnNumber: 65
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                        lineNumber: 562,
+                                                                        lineNumber: 610,
                                                                         columnNumber: 61
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                lineNumber: 554,
+                                                                lineNumber: 602,
                                                                 columnNumber: 53
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1266,18 +1338,18 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                             className: "w-4 h-4"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                            lineNumber: 587,
+                                                                            lineNumber: 635,
                                                                             columnNumber: 65
                                                                         }, this)
                                                                     }, status, false, {
                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                        lineNumber: 576,
+                                                                        lineNumber: 624,
                                                                         columnNumber: 61
                                                                     }, this);
                                                                 })
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                lineNumber: 571,
+                                                                lineNumber: 619,
                                                                 columnNumber: 49
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1288,41 +1360,41 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                 children: "Details"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                lineNumber: 593,
+                                                                lineNumber: 641,
                                                                 columnNumber: 49
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                        lineNumber: 552,
+                                                        lineNumber: 600,
                                                         columnNumber: 45
                                                     }, this)
                                                 ]
                                             }, employee.id, true, {
                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                lineNumber: 531,
+                                                lineNumber: 579,
                                                 columnNumber: 41
                                             }, this);
                                         })
                                     }, void 0, false, {
                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                        lineNumber: 524,
+                                        lineNumber: 572,
                                         columnNumber: 29
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 523,
+                                    lineNumber: 571,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                            lineNumber: 507,
+                            lineNumber: 550,
                             columnNumber: 21
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                        lineNumber: 506,
+                        lineNumber: 549,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsContent"], {
@@ -1346,12 +1418,12 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             className: "w-4 h-4"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 617,
+                                                            lineNumber: 665,
                                                             columnNumber: 41
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                        lineNumber: 616,
+                                                        lineNumber: 664,
                                                         columnNumber: 37
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardTitle"], {
@@ -1359,7 +1431,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                         children: formatMonth(calendarMonth)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                        lineNumber: 619,
+                                                        lineNumber: 667,
                                                         columnNumber: 37
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1370,18 +1442,18 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             className: "w-4 h-4"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 623,
+                                                            lineNumber: 671,
                                                             columnNumber: 41
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                        lineNumber: 622,
+                                                        lineNumber: 670,
                                                         columnNumber: 37
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                lineNumber: 615,
+                                                lineNumber: 663,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Select"], {
@@ -1395,20 +1467,20 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                 className: "w-4 h-4 mr-2"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                lineNumber: 628,
+                                                                lineNumber: 676,
                                                                 columnNumber: 41
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectValue"], {
                                                                 placeholder: "Filter by employee"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                lineNumber: 629,
+                                                                lineNumber: 677,
                                                                 columnNumber: 41
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                        lineNumber: 627,
+                                                        lineNumber: 675,
                                                         columnNumber: 37
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -1418,7 +1490,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                 children: "All Employees"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                lineNumber: 632,
+                                                                lineNumber: 680,
                                                                 columnNumber: 41
                                                             }, this),
                                                             employees.map((emp)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -1430,30 +1502,30 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                     ]
                                                                 }, emp.id, true, {
                                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                    lineNumber: 634,
+                                                                    lineNumber: 682,
                                                                     columnNumber: 45
                                                                 }, this))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                        lineNumber: 631,
+                                                        lineNumber: 679,
                                                         columnNumber: 37
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                lineNumber: 626,
+                                                lineNumber: 674,
                                                 columnNumber: 33
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                        lineNumber: 614,
+                                        lineNumber: 662,
                                         columnNumber: 29
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 613,
+                                    lineNumber: 661,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1475,13 +1547,15 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                         children: day
                                                     }, day, false, {
                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                        lineNumber: 647,
+                                                        lineNumber: 695,
                                                         columnNumber: 37
                                                     }, this)),
                                                 calendarDays.map(({ date, records }, idx)=>{
                                                     const isCurrentMonth = date.getMonth() === calendarMonth.getMonth();
-                                                    const isToday = date.toISOString().split("T")[0] === today;
-                                                    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                                                    const dateStr = formatLocalDate(date);
+                                                    const isToday = dateStr === today;
+                                                    const offDayStatus = getOffDayStatus(dateStr);
+                                                    const isWeekendOrHoliday = offDayStatus.isOffDay;
                                                     // Get dominant status for the day
                                                     const statusCounts = records.reduce((acc, r)=>{
                                                         acc[r.status] = (acc[r.status] || 0) + 1;
@@ -1489,8 +1563,16 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                     }, {});
                                                     const dominantStatus = Object.entries(statusCounts).sort((a, b)=>b[1] - a[1])[0]?.[0];
                                                     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("min-h-[80px] p-2 rounded-lg border transition-colors", isCurrentMonth ? "bg-card" : "bg-secondary/30 opacity-50", isToday && "ring-2 ring-primary", isWeekend && "bg-secondary/50"),
+                                                        className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("min-h-[80px] p-2 rounded-lg border transition-colors relative overflow-hidden", isCurrentMonth ? "bg-card" : "bg-secondary/30 opacity-50", isToday && "ring-2 ring-primary", isWeekendOrHoliday && "bg-secondary/50"),
                                                         children: [
+                                                            isWeekendOrHoliday && isCurrentMonth && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "absolute top-0 right-0 p-1 text-[10px] text-yellow-600 bg-yellow-500/10 rounded-bl-lg font-medium",
+                                                                children: offDayStatus.type === "Holiday" ? '★' : 'W'
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                lineNumber: 726,
+                                                                columnNumber: 49
+                                                            }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                 className: "flex items-center justify-between mb-1",
                                                                 children: [
@@ -1499,23 +1581,23 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                         children: date.getDate()
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                        lineNumber: 676,
+                                                                        lineNumber: 731,
                                                                         columnNumber: 49
                                                                     }, this),
                                                                     records.length > 0 && dominantStatus && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                         className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("w-2 h-2 rounded-full", __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$types$2f$hr$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ATTENDANCE_STATUS_CONFIG"][dominantStatus].bgColor.replace("/20", ""))
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                        lineNumber: 683,
+                                                                        lineNumber: 738,
                                                                         columnNumber: 53
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                lineNumber: 675,
+                                                                lineNumber: 730,
                                                                 columnNumber: 45
                                                             }, this),
-                                                            records.length > 0 && isCurrentMonth && !isWeekend && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            records.length > 0 && isCurrentMonth && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                 className: "space-y-1",
                                                                 children: selectedEmployeeId === "all" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                     className: "flex flex-wrap gap-0.5",
@@ -1528,7 +1610,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                                 children: r.employeeName.split(" ").map((n)=>n[0]).join("")
                                                                             }, i, false, {
                                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                lineNumber: 696,
+                                                                                lineNumber: 751,
                                                                                 columnNumber: 69
                                                                             }, this);
                                                                         }),
@@ -1540,13 +1622,13 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                            lineNumber: 706,
+                                                                            lineNumber: 761,
                                                                             columnNumber: 65
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                    lineNumber: 692,
+                                                                    lineNumber: 747,
                                                                     columnNumber: 57
                                                                 }, this) : records.map((r, i)=>{
                                                                     const config = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$types$2f$hr$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ATTENDANCE_STATUS_CONFIG"][r.status];
@@ -1555,26 +1637,26 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                         children: config.label
                                                                     }, i, false, {
                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                        lineNumber: 715,
+                                                                        lineNumber: 770,
                                                                         columnNumber: 65
                                                                     }, this);
                                                                 })
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                lineNumber: 690,
+                                                                lineNumber: 745,
                                                                 columnNumber: 49
                                                             }, this)
                                                         ]
                                                     }, idx, true, {
                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                        lineNumber: 666,
+                                                        lineNumber: 716,
                                                         columnNumber: 41
                                                     }, this);
                                                 })
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 644,
+                                            lineNumber: 692,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1586,7 +1668,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("w-3 h-3 rounded", config.bgColor.replace("/20", ""))
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 735,
+                                                            lineNumber: 790,
                                                             columnNumber: 41
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1594,35 +1676,35 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             children: config.label
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 736,
+                                                            lineNumber: 791,
                                                             columnNumber: 41
                                                         }, this)
                                                     ]
                                                 }, key, true, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 734,
+                                                    lineNumber: 789,
                                                     columnNumber: 37
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 732,
+                                            lineNumber: 787,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 642,
+                                    lineNumber: 690,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                            lineNumber: 612,
+                            lineNumber: 660,
                             columnNumber: 21
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                        lineNumber: 611,
+                        lineNumber: 659,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsContent"], {
@@ -1644,7 +1726,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                         children: "Employee:"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                        lineNumber: 751,
+                                                        lineNumber: 806,
                                                         columnNumber: 37
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Select"], {
@@ -1657,12 +1739,12 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                     placeholder: "Select employee"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                    lineNumber: 754,
+                                                                    lineNumber: 809,
                                                                     columnNumber: 45
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                lineNumber: 753,
+                                                                lineNumber: 808,
                                                                 columnNumber: 41
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -1672,7 +1754,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                         children: "All Employees"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                        lineNumber: 757,
+                                                                        lineNumber: 812,
                                                                         columnNumber: 45
                                                                     }, this),
                                                                     employees.map((emp)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -1684,25 +1766,25 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                             ]
                                                                         }, emp.id, true, {
                                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                            lineNumber: 759,
+                                                                            lineNumber: 814,
                                                                             columnNumber: 49
                                                                         }, this))
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                lineNumber: 756,
+                                                                lineNumber: 811,
                                                                 columnNumber: 41
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                        lineNumber: 752,
+                                                        lineNumber: 807,
                                                         columnNumber: 37
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                lineNumber: 750,
+                                                lineNumber: 805,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1713,7 +1795,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                         children: "Month:"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                        lineNumber: 767,
+                                                        lineNumber: 822,
                                                         columnNumber: 37
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -1723,29 +1805,29 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                         className: "w-auto"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                        lineNumber: 768,
+                                                        lineNumber: 823,
                                                         columnNumber: 37
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                lineNumber: 766,
+                                                lineNumber: 821,
                                                 columnNumber: 33
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                        lineNumber: 749,
+                                        lineNumber: 804,
                                         columnNumber: 29
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 748,
+                                    lineNumber: 803,
                                     columnNumber: 25
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                lineNumber: 747,
+                                lineNumber: 802,
                                 columnNumber: 21
                             }, this),
                             (()=>{
@@ -1787,12 +1869,12 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                             children: initials
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                            lineNumber: 810,
+                                                                            lineNumber: 865,
                                                                             columnNumber: 61
                                                                         }, this)
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                        lineNumber: 809,
+                                                                        lineNumber: 864,
                                                                         columnNumber: 57
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1806,7 +1888,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                lineNumber: 815,
+                                                                                lineNumber: 870,
                                                                                 columnNumber: 61
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1817,7 +1899,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                                         children: deptConfig.label
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                        lineNumber: 817,
+                                                                                        lineNumber: 872,
                                                                                         columnNumber: 65
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1825,25 +1907,25 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                                         children: employee.jobTitle
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                        lineNumber: 820,
+                                                                                        lineNumber: 875,
                                                                                         columnNumber: 65
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                lineNumber: 816,
+                                                                                lineNumber: 871,
                                                                                 columnNumber: 61
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                        lineNumber: 814,
+                                                                        lineNumber: 869,
                                                                         columnNumber: 57
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                lineNumber: 808,
+                                                                lineNumber: 863,
                                                                 columnNumber: 53
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1857,7 +1939,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                         })
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                        lineNumber: 825,
+                                                                        lineNumber: 880,
                                                                         columnNumber: 57
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1868,24 +1950,24 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                        lineNumber: 828,
+                                                                        lineNumber: 883,
                                                                         columnNumber: 57
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                lineNumber: 824,
+                                                                lineNumber: 879,
                                                                 columnNumber: 53
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                        lineNumber: 807,
+                                                        lineNumber: 862,
                                                         columnNumber: 49
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 806,
+                                                    lineNumber: 861,
                                                     columnNumber: 45
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1932,7 +2014,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                             children: item.value
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                            lineNumber: 843,
+                                                                            lineNumber: 898,
                                                                             columnNumber: 61
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1940,18 +2022,18 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                             children: item.label
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                            lineNumber: 844,
+                                                                            lineNumber: 899,
                                                                             columnNumber: 61
                                                                         }, this)
                                                                     ]
                                                                 }, item.label, true, {
                                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                    lineNumber: 842,
+                                                                    lineNumber: 897,
                                                                     columnNumber: 57
                                                                 }, this))
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 834,
+                                                            lineNumber: 889,
                                                             columnNumber: 49
                                                         }, this),
                                                         empMonthRecords.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1964,48 +2046,48 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                             children: "Date"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                            lineNumber: 853,
+                                                                            lineNumber: 908,
                                                                             columnNumber: 61
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                             children: "Status"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                            lineNumber: 854,
+                                                                            lineNumber: 909,
                                                                             columnNumber: 61
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                             children: "Clock In"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                            lineNumber: 855,
+                                                                            lineNumber: 910,
                                                                             columnNumber: 61
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                             children: "Clock Out"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                            lineNumber: 856,
+                                                                            lineNumber: 911,
                                                                             columnNumber: 61
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                             children: "Hours"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                            lineNumber: 857,
+                                                                            lineNumber: 912,
                                                                             columnNumber: 61
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                             children: "Entry Status"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                            lineNumber: 858,
+                                                                            lineNumber: 913,
                                                                             columnNumber: 61
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                    lineNumber: 852,
+                                                                    lineNumber: 907,
                                                                     columnNumber: 57
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2026,7 +2108,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                                     })
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                    lineNumber: 867,
+                                                                                    lineNumber: 922,
                                                                                     columnNumber: 73
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2035,12 +2117,12 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                                         children: statusConfig.label
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                        lineNumber: 871,
+                                                                                        lineNumber: 926,
                                                                                         columnNumber: 77
                                                                                     }, this)
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                    lineNumber: 870,
+                                                                                    lineNumber: 925,
                                                                                     columnNumber: 73
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2048,7 +2130,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                                     children: record.clockIn || "—"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                    lineNumber: 875,
+                                                                                    lineNumber: 930,
                                                                                     columnNumber: 73
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2056,7 +2138,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                                     children: record.clockOut || "—"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                    lineNumber: 876,
+                                                                                    lineNumber: 931,
                                                                                     columnNumber: 73
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2064,7 +2146,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                                     children: hrs > 0 ? `${hrs.toFixed(1)}h` : "—"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                    lineNumber: 877,
+                                                                                    lineNumber: 932,
                                                                                     columnNumber: 73
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2073,30 +2155,30 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                                         children: clockLabel.text
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                        lineNumber: 880,
+                                                                                        lineNumber: 935,
                                                                                         columnNumber: 81
                                                                                     }, this) : "—"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                                    lineNumber: 878,
+                                                                                    lineNumber: 933,
                                                                                     columnNumber: 73
                                                                                 }, this)
                                                                             ]
                                                                         }, record.id, true, {
                                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                            lineNumber: 866,
+                                                                            lineNumber: 921,
                                                                             columnNumber: 69
                                                                         }, this);
                                                                     })
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                    lineNumber: 860,
+                                                                    lineNumber: 915,
                                                                     columnNumber: 57
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 851,
+                                                            lineNumber: 906,
                                                             columnNumber: 53
                                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                             className: "text-center py-8 text-muted-foreground",
@@ -2105,7 +2187,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                     className: "w-8 h-8 mx-auto mb-2 opacity-50"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                    lineNumber: 890,
+                                                                    lineNumber: 945,
                                                                     columnNumber: 57
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2113,13 +2195,13 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                     children: "No attendance records for this month"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                    lineNumber: 891,
+                                                                    lineNumber: 946,
                                                                     columnNumber: 57
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 889,
+                                                            lineNumber: 944,
                                                             columnNumber: 53
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2133,7 +2215,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                             children: "Overall Attendance Rate"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                            lineNumber: 898,
+                                                                            lineNumber: 953,
                                                                             columnNumber: 57
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2144,13 +2226,13 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                            lineNumber: 899,
+                                                                            lineNumber: 954,
                                                                             columnNumber: 57
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                    lineNumber: 897,
+                                                                    lineNumber: 952,
                                                                     columnNumber: 53
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2162,49 +2244,356 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                                         }
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                        lineNumber: 904,
+                                                                        lineNumber: 959,
                                                                         columnNumber: 57
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                                    lineNumber: 903,
+                                                                    lineNumber: 958,
                                                                     columnNumber: 53
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 896,
+                                                            lineNumber: 951,
                                                             columnNumber: 49
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 832,
+                                                    lineNumber: 887,
                                                     columnNumber: 45
                                                 }, this)
                                             ]
                                         }, employee.id, true, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 805,
+                                            lineNumber: 860,
                                             columnNumber: 41
                                         }, this);
                                     })
                                 }, void 0, false, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 785,
+                                    lineNumber: 840,
                                     columnNumber: 29
                                 }, this);
                             })()
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/team/attendance-tracker.tsx",
-                        lineNumber: 745,
+                        lineNumber: 800,
+                        columnNumber: 17
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsContent"], {
+                        value: "holidays",
+                        className: "mt-6",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardHeader"], {
+                                    className: "border-b border-border pb-4",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardTitle"], {
+                                            className: "text-lg",
+                                            children: "Manage Holidays"
+                                        }, void 0, false, {
+                                            fileName: "[project]/components/team/attendance-tracker.tsx",
+                                            lineNumber: 978,
+                                            columnNumber: 29
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "text-sm text-muted-foreground mt-1",
+                                            children: "Add manual holidays that will be marked as off-days for the entire team."
+                                        }, void 0, false, {
+                                            fileName: "[project]/components/team/attendance-tracker.tsx",
+                                            lineNumber: 979,
+                                            columnNumber: 29
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/components/team/attendance-tracker.tsx",
+                                    lineNumber: 977,
+                                    columnNumber: 25
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
+                                    className: "pt-6",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "grid grid-cols-1 md:grid-cols-3 gap-6",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "md:col-span-1 space-y-4",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "space-y-2",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Label"], {
+                                                                children: "Date"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                lineNumber: 985,
+                                                                columnNumber: 41
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
+                                                                type: "date",
+                                                                value: newHolidayDate,
+                                                                onChange: (e)=>setNewHolidayDate(e.target.value)
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                lineNumber: 986,
+                                                                columnNumber: 41
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                        lineNumber: 984,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "space-y-2",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Label"], {
+                                                                children: "Holiday Name"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                lineNumber: 989,
+                                                                columnNumber: 41
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
+                                                                placeholder: "e.g. Eid ul Fitr",
+                                                                value: newHolidayName,
+                                                                onChange: (e)=>setNewHolidayName(e.target.value)
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                lineNumber: 990,
+                                                                columnNumber: 41
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                        lineNumber: 988,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "space-y-2",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Label"], {
+                                                                children: "Description (Optional)"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                lineNumber: 993,
+                                                                columnNumber: 41
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
+                                                                placeholder: "Optional details...",
+                                                                value: newHolidayDesc,
+                                                                onChange: (e)=>setNewHolidayDesc(e.target.value)
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                lineNumber: 994,
+                                                                columnNumber: 41
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                        lineNumber: 992,
+                                                        columnNumber: 37
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
+                                                        className: "w-full",
+                                                        disabled: !newHolidayDate || !newHolidayName,
+                                                        onClick: ()=>{
+                                                            if (onCreateHoliday) {
+                                                                onCreateHoliday({
+                                                                    date: newHolidayDate,
+                                                                    name: newHolidayName,
+                                                                    description: newHolidayDesc
+                                                                });
+                                                                setNewHolidayDate("");
+                                                                setNewHolidayName("");
+                                                                setNewHolidayDesc("");
+                                                            }
+                                                        },
+                                                        children: "Add Holiday"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                        lineNumber: 996,
+                                                        columnNumber: 37
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                lineNumber: 983,
+                                                columnNumber: 33
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "md:col-span-2",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "border rounded-xl overflow-hidden",
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
+                                                        className: "w-full text-left",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("thead", {
+                                                                className: "bg-secondary/50",
+                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                            className: "p-3 text-sm font-medium",
+                                                                            children: "Date"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                            lineNumber: 1016,
+                                                                            columnNumber: 53
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                            className: "p-3 text-sm font-medium",
+                                                                            children: "Holiday"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                            lineNumber: 1017,
+                                                                            columnNumber: 53
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                            className: "p-3 text-sm font-medium",
+                                                                            children: "Description"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                            lineNumber: 1018,
+                                                                            columnNumber: 53
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                            className: "text-right p-3 text-sm font-medium",
+                                                                            children: "Actions"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                            lineNumber: 1019,
+                                                                            columnNumber: 53
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                    lineNumber: 1015,
+                                                                    columnNumber: 49
+                                                                }, this)
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                lineNumber: 1014,
+                                                                columnNumber: 45
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
+                                                                children: holidays.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                        colSpan: 4,
+                                                                        className: "text-center p-4 text-sm text-muted-foreground",
+                                                                        children: "No custom holidays defined."
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                        lineNumber: 1025,
+                                                                        columnNumber: 57
+                                                                    }, this)
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                    lineNumber: 1024,
+                                                                    columnNumber: 53
+                                                                }, this) : holidays.map((h)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                                                        className: "border-t border-border hover:bg-secondary/30",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                                className: "p-3 text-sm font-medium",
+                                                                                children: new Date(h.date).toLocaleDateString("en-US", {
+                                                                                    month: "short",
+                                                                                    day: "numeric",
+                                                                                    year: "numeric"
+                                                                                })
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                                lineNumber: 1032,
+                                                                                columnNumber: 61
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                                className: "p-3 text-sm",
+                                                                                children: h.name
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                                lineNumber: 1033,
+                                                                                columnNumber: 61
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                                className: "p-3 text-sm text-muted-foreground",
+                                                                                children: h.description || "-"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                                lineNumber: 1034,
+                                                                                columnNumber: 61
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                                className: "p-3 text-right",
+                                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
+                                                                                    variant: "ghost",
+                                                                                    size: "sm",
+                                                                                    className: "text-red-500 hover:text-red-600 hover:bg-red-500/10",
+                                                                                    onClick: ()=>onDeleteHoliday && onDeleteHoliday(h.id),
+                                                                                    children: "Delete"
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                                    lineNumber: 1036,
+                                                                                    columnNumber: 65
+                                                                                }, this)
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                                lineNumber: 1035,
+                                                                                columnNumber: 61
+                                                                            }, this)
+                                                                        ]
+                                                                    }, h.id, true, {
+                                                                        fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                        lineNumber: 1031,
+                                                                        columnNumber: 57
+                                                                    }, this))
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                                lineNumber: 1022,
+                                                                columnNumber: 45
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                        lineNumber: 1013,
+                                                        columnNumber: 41
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                    lineNumber: 1012,
+                                                    columnNumber: 37
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/components/team/attendance-tracker.tsx",
+                                                lineNumber: 1011,
+                                                columnNumber: 33
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/components/team/attendance-tracker.tsx",
+                                        lineNumber: 982,
+                                        columnNumber: 29
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/components/team/attendance-tracker.tsx",
+                                    lineNumber: 981,
+                                    columnNumber: 25
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/components/team/attendance-tracker.tsx",
+                            lineNumber: 976,
+                            columnNumber: 21
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/components/team/attendance-tracker.tsx",
+                        lineNumber: 975,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                lineNumber: 476,
+                lineNumber: 515,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Dialog"], {
@@ -2228,12 +2617,12 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                lineNumber: 928,
+                                                lineNumber: 1066,
                                                 columnNumber: 41
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 927,
+                                            lineNumber: 1065,
                                             columnNumber: 37
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2246,7 +2635,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 933,
+                                                    lineNumber: 1071,
                                                     columnNumber: 41
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2258,25 +2647,25 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                     })
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 934,
+                                                    lineNumber: 1072,
                                                     columnNumber: 41
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 932,
+                                            lineNumber: 1070,
                                             columnNumber: 37
                                         }, this)
                                     ]
                                 }, void 0, true)
                             }, void 0, false, {
                                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                                lineNumber: 924,
+                                lineNumber: 1062,
                                 columnNumber: 25
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                            lineNumber: 923,
+                            lineNumber: 1061,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2289,7 +2678,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                             children: "Attendance Status"
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 946,
+                                            lineNumber: 1084,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2304,7 +2693,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("w-5 h-5", selectedStatus === status ? config.color : "text-muted-foreground")
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 961,
+                                                            lineNumber: 1099,
                                                             columnNumber: 45
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2312,25 +2701,25 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             children: config.label
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 962,
+                                                            lineNumber: 1100,
                                                             columnNumber: 45
                                                         }, this)
                                                     ]
                                                 }, status, true, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 951,
+                                                    lineNumber: 1089,
                                                     columnNumber: 41
                                                 }, this);
                                             })
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 947,
+                                            lineNumber: 1085,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 945,
+                                    lineNumber: 1083,
                                     columnNumber: 25
                                 }, this),
                                 selectedStatus !== "absent" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2343,7 +2732,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                     children: "Clock In"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 973,
+                                                    lineNumber: 1111,
                                                     columnNumber: 37
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2353,7 +2742,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 975,
+                                                            lineNumber: 1113,
                                                             columnNumber: 41
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -2364,19 +2753,19 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             className: "pl-10"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 976,
+                                                            lineNumber: 1114,
                                                             columnNumber: 41
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 974,
+                                                    lineNumber: 1112,
                                                     columnNumber: 37
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 972,
+                                            lineNumber: 1110,
                                             columnNumber: 33
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2386,7 +2775,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                     children: "Clock Out"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 986,
+                                                    lineNumber: 1124,
                                                     columnNumber: 37
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2396,7 +2785,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 988,
+                                                            lineNumber: 1126,
                                                             columnNumber: 41
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -2407,25 +2796,25 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                                             className: "pl-10"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                            lineNumber: 989,
+                                                            lineNumber: 1127,
                                                             columnNumber: 41
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                                    lineNumber: 987,
+                                                    lineNumber: 1125,
                                                     columnNumber: 37
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 985,
+                                            lineNumber: 1123,
                                             columnNumber: 33
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 971,
+                                    lineNumber: 1109,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2435,7 +2824,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                             children: "Notes (Optional)"
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 1003,
+                                            lineNumber: 1141,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$textarea$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Textarea"], {
@@ -2447,19 +2836,19 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                             rows: 3
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                                            lineNumber: 1004,
+                                            lineNumber: 1142,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 1002,
+                                    lineNumber: 1140,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                            lineNumber: 943,
+                            lineNumber: 1081,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DialogFooter"], {
@@ -2470,7 +2859,7 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                     children: "Cancel"
                                 }, void 0, false, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 1016,
+                                    lineNumber: 1154,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -2478,34 +2867,34 @@ function AttendanceTracker({ employees, attendanceRecords, currentUserId, onMark
                                     children: "Save Attendance"
                                 }, void 0, false, {
                                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                                    lineNumber: 1019,
+                                    lineNumber: 1157,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/team/attendance-tracker.tsx",
-                            lineNumber: 1015,
+                            lineNumber: 1153,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/team/attendance-tracker.tsx",
-                    lineNumber: 922,
+                    lineNumber: 1060,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/team/attendance-tracker.tsx",
-                lineNumber: 921,
+                lineNumber: 1059,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/team/attendance-tracker.tsx",
-        lineNumber: 339,
+        lineNumber: 378,
         columnNumber: 9
     }, this);
 }
-_s(AttendanceTracker, "ExNumUPwrR3BrLcREDpauRcPEGg=");
+_s(AttendanceTracker, "aQ8688mtwIOnGkbU+RC6aX9vPCQ=");
 _c = AttendanceTracker;
 var _c;
 __turbopack_context__.k.register(_c, "AttendanceTracker");

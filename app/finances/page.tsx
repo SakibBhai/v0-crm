@@ -240,7 +240,7 @@ export default function FinancesPage() {
   const [showViewInvoiceDialog, setShowViewInvoiceDialog] = useState(false)
   const [showNeutralizeDialog, setShowNeutralizeDialog] = useState(false)
   const [showDeleteInvoiceDialog, setShowDeleteInvoiceDialog] = useState(false)
-  const [neutralizeTarget, setNeutralizeTarget] = useState<{ type: "expense" | "income"; id: number } | null>(null)
+  const [neutralizeTarget, setNeutralizeTarget] = useState<{ type: "expense" | "income"; id: string | number } | null>(null)
   const [deleteInvoiceTarget, setDeleteInvoiceTarget] = useState<string | null>(null)
   const [selectedIncome, setSelectedIncome] = useState<IncomeEntry | null>(null)
 
@@ -800,34 +800,44 @@ export default function FinancesPage() {
   }
 
   // Handle Edit Expense
-  const handleSaveExpenseEdit = (updatedExpense: typeof expenses[0]) => {
+  const handleSaveExpenseEdit = async (updatedExpense: typeof expenses[0]) => {
     const originalExpense = expenses.find(e => e.id === updatedExpense.id)
     if (!originalExpense) return
 
     // Find changes
     const changes: { field: string; oldValue: any; newValue: any }[] = []
+    const updateData: Record<string, any> = {}
     Object.keys(updatedExpense).forEach(key => {
       const k = key as keyof typeof updatedExpense
-      if (originalExpense[k] !== updatedExpense[k] && k !== 'updatedAt') {
+      if (originalExpense[k] !== updatedExpense[k] && k !== 'updatedAt' && k !== 'id') {
         changes.push({
           field: key,
           oldValue: originalExpense[k],
           newValue: updatedExpense[k],
         })
+        updateData[key] = updatedExpense[k]
       }
     })
 
-    // Update expense
-    setExpenses(prev =>
-      prev.map(exp =>
-        exp.id === updatedExpense.id
-          ? { ...updatedExpense, updatedAt: new Date().toISOString() }
-          : exp
-      )
-    )
-
-    // Log activity
     if (changes.length > 0) {
+      try {
+        await updateExpenseAction(String(updatedExpense.id), updateData)
+      } catch (err) {
+        console.error("Failed to update expense:", err)
+        alert("Failed to update expense.")
+        return
+      }
+
+      // Update expense
+      setExpenses(prev =>
+        prev.map(exp =>
+          exp.id === updatedExpense.id
+            ? { ...updatedExpense, updatedAt: new Date().toISOString() }
+            : exp
+        )
+      )
+
+      // Log activity
       logActivity({
         entityType: "expense",
         entityId: updatedExpense.id,
@@ -844,34 +854,44 @@ export default function FinancesPage() {
   }
 
   // Handle Edit Income
-  const handleSaveIncomeEdit = (updatedIncome: typeof income[0]) => {
+  const handleSaveIncomeEdit = async (updatedIncome: typeof income[0]) => {
     const originalIncome = income.find(i => i.id === updatedIncome.id)
     if (!originalIncome) return
 
     // Find changes
     const changes: { field: string; oldValue: any; newValue: any }[] = []
+    const updateData: Record<string, any> = {}
     Object.keys(updatedIncome).forEach(key => {
       const k = key as keyof typeof updatedIncome
-      if (originalIncome[k] !== updatedIncome[k] && k !== 'updatedAt') {
+      if (originalIncome[k] !== updatedIncome[k] && k !== 'updatedAt' && k !== 'id') {
         changes.push({
           field: key,
           oldValue: originalIncome[k],
           newValue: updatedIncome[k],
         })
+        updateData[key] = updatedIncome[k]
       }
     })
 
-    // Update income
-    setIncome(prev =>
-      prev.map(inc =>
-        inc.id === updatedIncome.id
-          ? { ...updatedIncome, updatedAt: new Date().toISOString() }
-          : inc
-      )
-    )
-
-    // Log activity
     if (changes.length > 0) {
+      try {
+        await updateIncomeAction(String(updatedIncome.id), updateData)
+      } catch (err) {
+        console.error("Failed to update income:", err)
+        alert("Failed to update income.")
+        return
+      }
+
+      // Update income
+      setIncome(prev =>
+        prev.map(inc =>
+          inc.id === updatedIncome.id
+            ? { ...updatedIncome, updatedAt: new Date().toISOString() }
+            : inc
+        )
+      )
+
+      // Log activity
       logActivity({
         entityType: "income",
         entityId: updatedIncome.id,
@@ -888,27 +908,34 @@ export default function FinancesPage() {
   }
 
   // Handle Neutralize Expense
-  const handleNeutralizeExpense = (expenseId: number) => {
+  const handleNeutralizeExpense = async (expenseId: string | number) => {
     const expense = expenses.find(e => e.id === expenseId)
     if (!expense) return
 
-    setExpenses(prev =>
-      prev.map(exp =>
-        exp.id === expenseId
-          ? { ...exp, entityStatus: "neutralized" as const, updatedAt: new Date().toISOString() }
-          : exp
-      )
-    )
+    try {
+      await updateExpenseAction(String(expenseId), { entityStatus: "neutralized" })
 
-    logActivity({
-      entityType: "expense",
-      entityId: expenseId,
-      entityDescription: expense.description,
-      action: "neutralized",
-      performedBy: "Current User",
-      performedAt: new Date().toISOString(),
-      notes: "Expense neutralized - excluded from calculations",
-    })
+      setExpenses(prev =>
+        prev.map(exp =>
+          exp.id === expenseId
+            ? { ...exp, entityStatus: "neutralized" as const, updatedAt: new Date().toISOString() }
+            : exp
+        )
+      )
+
+      logActivity({
+        entityType: "expense",
+        entityId: expenseId,
+        entityDescription: expense.description,
+        action: "neutralized",
+        performedBy: "Current User",
+        performedAt: new Date().toISOString(),
+        notes: "Expense neutralized - excluded from calculations",
+      })
+    } catch (err) {
+      console.error("Failed to neutralize expense:", err)
+      alert("Failed to neutralize expense.")
+    }
 
     setShowNeutralizeDialog(false)
     setNeutralizeTarget(null)
@@ -916,27 +943,34 @@ export default function FinancesPage() {
   }
 
   // Handle Neutralize Income
-  const handleNeutralizeIncome = (incomeId: number) => {
+  const handleNeutralizeIncome = async (incomeId: string | number) => {
     const inc = income.find(i => i.id === incomeId)
     if (!inc) return
 
-    setIncome(prev =>
-      prev.map(i =>
-        i.id === incomeId
-          ? { ...i, entityStatus: "neutralized" as const, updatedAt: new Date().toISOString() }
-          : i
-      )
-    )
+    try {
+      await updateIncomeAction(String(incomeId), { entityStatus: "neutralized" })
 
-    logActivity({
-      entityType: "income",
-      entityId: incomeId,
-      entityDescription: inc.description,
-      action: "neutralized",
-      performedBy: "Current User",
-      performedAt: new Date().toISOString(),
-      notes: "Income neutralized - excluded from calculations",
-    })
+      setIncome(prev =>
+        prev.map(i =>
+          i.id === incomeId
+            ? { ...i, entityStatus: "neutralized" as const, updatedAt: new Date().toISOString() }
+            : i
+        )
+      )
+
+      logActivity({
+        entityType: "income",
+        entityId: incomeId,
+        entityDescription: inc.description,
+        action: "neutralized",
+        performedBy: "Current User",
+        performedAt: new Date().toISOString(),
+        notes: "Income neutralized - excluded from calculations",
+      })
+    } catch (err) {
+      console.error("Failed to neutralize income:", err)
+      alert("Failed to neutralize income.")
+    }
 
     setShowNeutralizeDialog(false)
     setNeutralizeTarget(null)
@@ -944,66 +978,87 @@ export default function FinancesPage() {
   }
 
   // Handle Restore Expense
-  const handleRestoreExpense = (expenseId: number) => {
+  const handleRestoreExpense = async (expenseId: string | number) => {
     const expense = expenses.find(e => e.id === expenseId)
     if (!expense) return
 
-    setExpenses(prev =>
-      prev.map(exp =>
-        exp.id === expenseId
-          ? { ...exp, entityStatus: "active" as const, updatedAt: new Date().toISOString() }
-          : exp
-      )
-    )
+    try {
+      await updateExpenseAction(String(expenseId), { entityStatus: "active" })
 
-    logActivity({
-      entityType: "expense",
-      entityId: expenseId,
-      entityDescription: expense.description,
-      action: "restored",
-      performedBy: "Current User",
-      performedAt: new Date().toISOString(),
-    })
+      setExpenses(prev =>
+        prev.map(exp =>
+          exp.id === expenseId
+            ? { ...exp, entityStatus: "active" as const, updatedAt: new Date().toISOString() }
+            : exp
+        )
+      )
+
+      logActivity({
+        entityType: "expense",
+        entityId: expenseId,
+        entityDescription: expense.description,
+        action: "restored",
+        performedBy: "Current User",
+        performedAt: new Date().toISOString(),
+      })
+    } catch (err) {
+      console.error("Failed to restore expense:", err)
+      alert("Failed to restore expense.")
+    }
   }
 
   // Handle Restore Income
-  const handleRestoreIncome = (incomeId: number) => {
+  const handleRestoreIncome = async (incomeId: string | number) => {
     const inc = income.find(i => i.id === incomeId)
     if (!inc) return
 
-    setIncome(prev =>
-      prev.map(i =>
-        i.id === incomeId
-          ? { ...i, entityStatus: "active" as const, updatedAt: new Date().toISOString() }
-          : i
-      )
-    )
+    try {
+      await updateIncomeAction(String(incomeId), { entityStatus: "active" })
 
-    logActivity({
-      entityType: "income",
-      entityId: incomeId,
-      entityDescription: inc.description,
-      action: "restored",
-      performedBy: "Current User",
-      performedAt: new Date().toISOString(),
-    })
+      setIncome(prev =>
+        prev.map(i =>
+          i.id === incomeId
+            ? { ...i, entityStatus: "active" as const, updatedAt: new Date().toISOString() }
+            : i
+        )
+      )
+
+      logActivity({
+        entityType: "income",
+        entityId: incomeId,
+        entityDescription: inc.description,
+        action: "restored",
+        performedBy: "Current User",
+        performedAt: new Date().toISOString(),
+      })
+    } catch (err) {
+      console.error("Failed to restore income:", err)
+      alert("Failed to restore income.")
+    }
   }
 
   // Handle Delete Invoice
-  const handleDeleteInvoice = (invoiceId: string) => {
+  const handleDeleteInvoice = async (invoiceId: string) => {
     const invoice = invoices.find(inv => inv.id === invoiceId)
     if (!invoice) return
 
-    setInvoices(prev => prev.filter(inv => inv.id !== invoiceId))
+    try {
+      await deleteInvoiceAction(invoiceId)
 
-    logActivity({
-      entityType: "invoice",
-      entityId: invoiceId,
-      entityDescription: `Invoice #${invoice.invoiceNumber} - ${invoice.client}`,
-      action: "deleted",
-      performedBy: "Current User",
-      performedAt: new Date().toISOString(),
-    })
+      setInvoices(prev => prev.filter(inv => inv.id !== invoiceId))
+
+      logActivity({
+        entityType: "invoice",
+        entityId: invoiceId,
+        entityDescription: `Invoice #${invoice.invoiceNumber} - ${invoice.client}`,
+        action: "deleted",
+        performedBy: "Current User",
+        performedAt: new Date().toISOString(),
+      })
+    } catch (err) {
+      console.error("Failed to delete invoice:", err)
+      alert("Failed to delete invoice.")
+    }
 
     setShowDeleteInvoiceDialog(false)
     setDeleteInvoiceTarget(null)
@@ -1037,39 +1092,56 @@ export default function FinancesPage() {
     return date.toLocaleDateString()
   }
 
-  const handleAddExpense = () => {
+  const handleAddExpense = async () => {
     if (!expenseFormData.vendor || !expenseFormData.amount) {
       alert("Please fill in all required fields")
       return
     }
 
     const expenseAmount = Number.parseFloat(expenseFormData.amount)
-    const newExpense = {
-      id: `EXP${Date.now()}`,
-      vendor: expenseFormData.vendor,
-      sourceType: expenseFormData.sourceType,
-      category: expenseFormData.category,
-      subCategory: expenseFormData.subCategory,
-      amount: expenseAmount,
-      date: expenseFormData.date,
-      description: expenseFormData.description,
-      paymentMethod: expenseFormData.paymentMethod,
-      status: expenseFormData.status as "pending" | "approved" | "paid",
-      department: expenseFormData.department,
-      clientId: expenseFormData.clientId || null,
-      clientName: expenseFormData.clientName || null,
-      project: expenseFormData.project || null,
-      taxDeductible: expenseFormData.taxDeductible,
-      recurring: expenseFormData.recurring,
-      recurringFrequency: expenseFormData.recurring ? expenseFormData.recurringFrequency : null,
-      notes: expenseFormData.notes,
-      approvalStatus: expenseFormData.status === "approved" ? "approved" : "pending",
-      approvedBy: expenseFormData.status === "approved" ? "Finance Manager" : null,
-      receiptUrl: null,
-      createdAt: new Date().toISOString(),
+    
+    try {
+      const created = await createExpenseAction({
+        vendor: expenseFormData.vendor,
+        sourceType: expenseFormData.sourceType,
+        category: expenseFormData.category,
+        subCategory: expenseFormData.subCategory,
+        amount: expenseAmount,
+        date: expenseFormData.date,
+        description: expenseFormData.description,
+        paymentMethod: expenseFormData.paymentMethod,
+        status: expenseFormData.status as "pending" | "approved" | "paid",
+        department: expenseFormData.department,
+        clientId: expenseFormData.clientId || null,
+        clientName: expenseFormData.clientName || null,
+        project: expenseFormData.project || null,
+        taxDeductible: expenseFormData.taxDeductible,
+        recurring: expenseFormData.recurring,
+        recurringFrequency: expenseFormData.recurring ? expenseFormData.recurringFrequency : null,
+        notes: expenseFormData.notes,
+        approvalStatus: expenseFormData.status === "approved" ? "approved" : "pending",
+        approvedBy: expenseFormData.status === "approved" ? "Finance Manager" : null,
+        receiptUrl: null,
+      })
+
+      if (created && !('error' in created)) {
+        setExpenses([created as any, ...expenses])
+        logActivity({
+          entityType: "expense",
+          entityId: created.id,
+          entityDescription: created.description,
+          action: "created",
+          performedBy: "Current User",
+          performedAt: new Date().toISOString(),
+        })
+      } else {
+        alert("Failed to create expense.")
+      }
+    } catch (err) {
+      console.error("Error creating expense:", err)
+      alert("Failed to create expense. Please try again.")
     }
 
-    setExpenses([newExpense, ...expenses] as typeof expenses)
     setShowAddExpenseDialog(false)
     setExpenseFormData({
       vendor: "",
@@ -1093,7 +1165,7 @@ export default function FinancesPage() {
     })
   }
 
-  const handleAddIncome = () => {
+  const handleAddIncome = async () => {
     if (!incomeFormData.description || !incomeFormData.amount) {
       alert("Please fill in all required fields")
       return
@@ -1102,28 +1174,42 @@ export default function FinancesPage() {
     const incomeAmount = Number.parseFloat(incomeFormData.amount)
     const taxAmount = Math.round(incomeAmount * (incomeFormData.taxRate / 100))
 
-    const newIncome = {
-      id: `INC${Date.now()}`,
-      sourceType: incomeFormData.sourceType,
-      category: incomeFormData.category,
-      subCategory: incomeFormData.subCategory,
-      amount: incomeAmount,
-      taxAmount: taxAmount,
-      date: incomeFormData.date,
-      description: incomeFormData.description,
-      paymentMethod: incomeFormData.paymentMethod,
-      status: incomeFormData.status as "pending" | "received",
-      clientId: incomeFormData.clientId || null,
-      client: incomeFormData.clientName || "Direct",
-      project: incomeFormData.project || null,
-      invoiceId: incomeFormData.linkedInvoiceId || null,
-      recurring: incomeFormData.recurring,
-      recurringFrequency: incomeFormData.recurring ? incomeFormData.recurringFrequency : null,
-      notes: incomeFormData.notes,
-      createdAt: new Date().toISOString(),
+    try {
+      const created = await createIncomeAction({
+        description: incomeFormData.description,
+        category: incomeFormData.category,
+        subCategory: incomeFormData.subCategory,
+        amount: incomeAmount,
+        date: incomeFormData.date,
+        client: incomeFormData.clientName || "Direct",
+        project: incomeFormData.project || undefined,
+        status: incomeFormData.status as "pending" | "received",
+        invoiceId: incomeFormData.linkedInvoiceId || null,
+        paymentMethod: incomeFormData.paymentMethod,
+        recurring: incomeFormData.recurring,
+        recurringFrequency: incomeFormData.recurring ? incomeFormData.recurringFrequency : null,
+        taxAmount: taxAmount,
+        notes: incomeFormData.notes,
+      })
+
+      if (created && !('error' in created)) {
+        setIncome([created as any, ...income])
+        logActivity({
+          entityType: "income",
+          entityId: created.id,
+          entityDescription: created.description,
+          action: "created",
+          performedBy: "Current User",
+          performedAt: new Date().toISOString(),
+        })
+      } else {
+        alert("Failed to create income.")
+      }
+    } catch (err) {
+      console.error("Error creating income:", err)
+      alert("Failed to create income. Please try again.")
     }
 
-    setIncome([newIncome, ...income] as typeof income)
     setShowAddIncomeDialog(false)
     setIncomeFormData({
       sourceType: "client_payment",

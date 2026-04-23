@@ -75,9 +75,12 @@ function calculateWorkHours(clockIn?: string, clockOut?: string): number {
 interface AttendanceTrackerProps {
     employees: Employee[]
     attendanceRecords: AttendanceRecord[]
+    holidays?: any[]
     currentUserId: string
     onMarkAttendance: (record: Omit<AttendanceRecord, "id" | "markedAt">) => void
     onUpdateAttendance: (id: string, updates: Partial<AttendanceRecord>) => void
+    onCreateHoliday?: (data: { date: string; name: string; description?: string }) => void
+    onDeleteHoliday?: (id: string) => void
 }
 
 const STATUS_ICONS = {
@@ -88,15 +91,25 @@ const STATUS_ICONS = {
     remote: Home,
 }
 
+function formatLocalDate(date: Date): string {
+    const y = date.getFullYear()
+    const m = String(date.getMonth() + 1).padStart(2, "0")
+    const d = String(date.getDate()).padStart(2, "0")
+    return `${y}-${m}-${d}`
+}
+
 export function AttendanceTracker({
     employees,
     attendanceRecords,
+    holidays = [],
     currentUserId,
     onMarkAttendance,
     onUpdateAttendance,
+    onCreateHoliday,
+    onDeleteHoliday,
 }: AttendanceTrackerProps) {
     const [activeTab, setActiveTab] = useState("today")
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0])
+    const [selectedDate, setSelectedDate] = useState(formatLocalDate(new Date()))
     const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("all")
     const [reportEmployeeId, setReportEmployeeId] = useState<string>("all")
     const [reportMonth, setReportMonth] = useState(() => {
@@ -111,8 +124,22 @@ export function AttendanceTracker({
     const [attendanceNotes, setAttendanceNotes] = useState("")
     const [selectedStatus, setSelectedStatus] = useState<AttendanceStatus>("present")
 
+    const [newHolidayDate, setNewHolidayDate] = useState("")
+    const [newHolidayName, setNewHolidayName] = useState("")
+    const [newHolidayDesc, setNewHolidayDesc] = useState("")
+
     // Get today's date
-    const today = new Date().toISOString().split("T")[0]
+    const today = formatLocalDate(new Date())
+
+    // Helper to check if a date is a weekend (Friday/Saturday) or a holiday
+    const getOffDayStatus = (dateStr: string) => {
+        const dateObj = new Date(dateStr)
+        const day = dateObj.getDay()
+        if (day === 5 || day === 6) return { isOffDay: true, type: "Weekend" }
+        const holiday = holidays.find(h => h.date === dateStr)
+        if (holiday) return { isOffDay: true, type: "Holiday", name: holiday.name }
+        return { isOffDay: false }
+    }
 
     // Get records for selected date
     const dateRecords = useMemo(() => {
@@ -170,7 +197,7 @@ export function AttendanceTracker({
         // Add month days
         for (let day = 1; day <= lastDay.getDate(); day++) {
             const date = new Date(year, month, day)
-            const dateStr = date.toISOString().split("T")[0]
+            const dateStr = formatLocalDate(date)
             const records = attendanceRecords.filter(r => {
                 if (selectedEmployeeId === "all") return r.date === dateStr
                 return r.date === dateStr && r.employeeId === selectedEmployeeId
@@ -265,19 +292,31 @@ export function AttendanceTracker({
         if (!markingEmployee) return
         const actualStatus = selectedStatus === "present" && isLateEntry(clockInTime) ? "late" : selectedStatus
 
-        onMarkAttendance({
-            employeeId: markingEmployee.id,
-            employeeName: `${markingEmployee.firstName} ${markingEmployee.lastName}`,
-            date: selectedDate,
-            status: actualStatus,
-            clockIn: selectedStatus !== "absent" ? clockInTime : undefined,
-            clockOut: selectedStatus !== "absent" ? clockOutTime : undefined,
-            totalHours: selectedStatus === "half-day" ? 4 : selectedStatus === "absent" ? 0 : 8,
-            workLocation: selectedStatus === "remote" ? "remote" : "office",
-            notes: attendanceNotes || undefined,
-            markedBy: "Current User",
-            isAutoMarked: false,
-        })
+        const existingRecord = getEmployeeRecord(markingEmployee.id)
+        if (existingRecord) {
+            onUpdateAttendance(existingRecord.id, {
+                status: actualStatus,
+                clockIn: selectedStatus !== "absent" ? clockInTime : undefined,
+                clockOut: selectedStatus !== "absent" ? clockOutTime : undefined,
+                totalHours: selectedStatus === "half-day" ? 4 : selectedStatus === "absent" ? 0 : 8,
+                workLocation: selectedStatus === "remote" ? "remote" : "office",
+                notes: attendanceNotes || undefined,
+            })
+        } else {
+            onMarkAttendance({
+                employeeId: markingEmployee.id,
+                employeeName: `${markingEmployee.firstName} ${markingEmployee.lastName}`,
+                date: selectedDate,
+                status: actualStatus,
+                clockIn: selectedStatus !== "absent" ? clockInTime : undefined,
+                clockOut: selectedStatus !== "absent" ? clockOutTime : undefined,
+                totalHours: selectedStatus === "half-day" ? 4 : selectedStatus === "absent" ? 0 : 8,
+                workLocation: selectedStatus === "remote" ? "remote" : "office",
+                notes: attendanceNotes || undefined,
+                markedBy: "Current User",
+                isAutoMarked: false,
+            })
+        }
 
         setIsMarkDialogOpen(false)
         resetForm()
@@ -488,6 +527,10 @@ export function AttendanceTracker({
                             <BarChart3 className="w-4 h-4" />
                             Reports
                         </TabsTrigger>
+                        <TabsTrigger value="holidays" className="gap-2">
+                            <Sun className="w-4 h-4" />
+                            Holidays
+                        </TabsTrigger>
                     </TabsList>
 
                     {activeTab === "today" && (
@@ -506,11 +549,16 @@ export function AttendanceTracker({
                 <TabsContent value="today" className="mt-6">
                     <Card>
                         <CardHeader className="border-b border-border pb-4">
-                            <div className="flex items-center justify-between">
+                            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                                 <CardTitle className="text-lg">
                                     Attendance for {new Date(selectedDate).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
                                 </CardTitle>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    {getOffDayStatus(selectedDate).isOffDay && (
+                                        <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-600 mr-4">
+                                            {getOffDayStatus(selectedDate).type}: {getOffDayStatus(selectedDate).name || 'Off Day'}
+                                        </Badge>
+                                    )}
                                     {Object.entries(ATTENDANCE_STATUS_CONFIG).map(([key, config]) => (
                                         <div key={key} className="flex items-center gap-1 text-xs">
                                             <div className={cn("w-2 h-2 rounded-full", config.bgColor.replace("/20", ""))} />
@@ -652,8 +700,10 @@ export function AttendanceTracker({
                                 {/* Calendar Days */}
                                 {calendarDays.map(({ date, records }, idx) => {
                                     const isCurrentMonth = date.getMonth() === calendarMonth.getMonth()
-                                    const isToday = date.toISOString().split("T")[0] === today
-                                    const isWeekend = date.getDay() === 0 || date.getDay() === 6
+                                    const dateStr = formatLocalDate(date)
+                                    const isToday = dateStr === today
+                                    const offDayStatus = getOffDayStatus(dateStr)
+                                    const isWeekendOrHoliday = offDayStatus.isOffDay
 
                                     // Get dominant status for the day
                                     const statusCounts = records.reduce((acc, r) => {
@@ -666,12 +716,17 @@ export function AttendanceTracker({
                                         <div
                                             key={idx}
                                             className={cn(
-                                                "min-h-[80px] p-2 rounded-lg border transition-colors",
+                                                "min-h-[80px] p-2 rounded-lg border transition-colors relative overflow-hidden",
                                                 isCurrentMonth ? "bg-card" : "bg-secondary/30 opacity-50",
                                                 isToday && "ring-2 ring-primary",
-                                                isWeekend && "bg-secondary/50"
+                                                isWeekendOrHoliday && "bg-secondary/50"
                                             )}
                                         >
+                                            {isWeekendOrHoliday && isCurrentMonth && (
+                                                <div className="absolute top-0 right-0 p-1 text-[10px] text-yellow-600 bg-yellow-500/10 rounded-bl-lg font-medium">
+                                                    {offDayStatus.type === "Holiday" ? '★' : 'W'}
+                                                </div>
+                                            )}
                                             <div className="flex items-center justify-between mb-1">
                                                 <span className={cn(
                                                     "text-sm font-medium",
@@ -686,7 +741,7 @@ export function AttendanceTracker({
                                                     )} />
                                                 )}
                                             </div>
-                                            {records.length > 0 && isCurrentMonth && !isWeekend && (
+                                            {records.length > 0 && isCurrentMonth && (
                                                 <div className="space-y-1">
                                                     {selectedEmployeeId === "all" ? (
                                                         <div className="flex flex-wrap gap-0.5">
@@ -914,6 +969,89 @@ export function AttendanceTracker({
                             </div>
                         )
                     })()}
+                </TabsContent>
+
+                {/* Holidays Tab */}
+                <TabsContent value="holidays" className="mt-6">
+                    <Card>
+                        <CardHeader className="border-b border-border pb-4">
+                            <CardTitle className="text-lg">Manage Holidays</CardTitle>
+                            <p className="text-sm text-muted-foreground mt-1">Add manual holidays that will be marked as off-days for the entire team.</p>
+                        </CardHeader>
+                        <CardContent className="pt-6">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="md:col-span-1 space-y-4">
+                                    <div className="space-y-2">
+                                        <Label>Date</Label>
+                                        <Input type="date" value={newHolidayDate} onChange={e => setNewHolidayDate(e.target.value)} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Holiday Name</Label>
+                                        <Input placeholder="e.g. Eid ul Fitr" value={newHolidayName} onChange={e => setNewHolidayName(e.target.value)} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Description (Optional)</Label>
+                                        <Input placeholder="Optional details..." value={newHolidayDesc} onChange={e => setNewHolidayDesc(e.target.value)} />
+                                    </div>
+                                    <Button 
+                                        className="w-full" 
+                                        disabled={!newHolidayDate || !newHolidayName}
+                                        onClick={() => {
+                                            if (onCreateHoliday) {
+                                                onCreateHoliday({ date: newHolidayDate, name: newHolidayName, description: newHolidayDesc })
+                                                setNewHolidayDate("")
+                                                setNewHolidayName("")
+                                                setNewHolidayDesc("")
+                                            }
+                                        }}
+                                    >
+                                        Add Holiday
+                                    </Button>
+                                </div>
+                                <div className="md:col-span-2">
+                                    <div className="border rounded-xl overflow-hidden">
+                                        <table className="w-full text-left">
+                                            <thead className="bg-secondary/50">
+                                                <tr>
+                                                    <th className="p-3 text-sm font-medium">Date</th>
+                                                    <th className="p-3 text-sm font-medium">Holiday</th>
+                                                    <th className="p-3 text-sm font-medium">Description</th>
+                                                    <th className="text-right p-3 text-sm font-medium">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {holidays.length === 0 ? (
+                                                    <tr>
+                                                        <td colSpan={4} className="text-center p-4 text-sm text-muted-foreground">
+                                                            No custom holidays defined.
+                                                        </td>
+                                                    </tr>
+                                                ) : (
+                                                    holidays.map(h => (
+                                                        <tr key={h.id} className="border-t border-border hover:bg-secondary/30">
+                                                            <td className="p-3 text-sm font-medium">{new Date(h.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</td>
+                                                            <td className="p-3 text-sm">{h.name}</td>
+                                                            <td className="p-3 text-sm text-muted-foreground">{h.description || "-"}</td>
+                                                            <td className="p-3 text-right">
+                                                                <Button 
+                                                                    variant="ghost" 
+                                                                    size="sm" 
+                                                                    className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                                                                    onClick={() => onDeleteHoliday && onDeleteHoliday(h.id)}
+                                                                >
+                                                                    Delete
+                                                                </Button>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </TabsContent>
             </Tabs>
 
