@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { jsPDF } from "jspdf"
-import html2canvas from "html2canvas"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { AnimatedCard } from "@/components/animated-card"
 import { Button } from "@/components/ui/button"
@@ -86,13 +85,62 @@ import {
   ComposedChart,
 } from "recharts"
 
-import { invoicesData, incomeData, ExpenseDataType, expensesData, revenueData, incomeCategoryData, categoryData, paymentMethodData, expenseCategoryData, cashFlowData, profitMarginData, budgetData } from "@/lib/data/finance-data";
+import { ExpenseDataType } from "@/lib/data/finance-data";
+
+// Invoice type for state management
+type InvoiceData = {
+  id: string
+  invoiceNumber: string
+  client: string
+  clientEmail: string
+  clientLogo: string
+  project: string
+  projectId: string
+  amount: number
+  paid: number
+  tax: number
+  discount: number
+  status: string
+  dueDate: string
+  issueDate: string
+  paidDate: string | null
+  paymentMethod: string
+  paymentTerms: string
+  currency: string
+  items: { id: number; description: string; quantity: number; rate: number; amount: number; taxable: boolean }[]
+  notes: string
+  internalNotes: string
+  category: string
+  recurringInvoice: boolean
+  attachments: string[]
+}
+
+type IncomeEntry = {
+  id: number | string
+  description: string
+  category: string
+  amount: number
+  date: string
+  client: string
+  project: string
+  status: string
+  entityStatus: "active" | "neutralized"
+  invoiceId: string
+  paymentMethod: string
+  recurring: boolean
+  taxAmount: number
+  createdAt: string
+  updatedAt: string
+  createdBy: string
+}
 import {
   getInvoices, createInvoice as createInvoiceAction, updateInvoice as updateInvoiceAction, deleteInvoice as deleteInvoiceAction,
   getIncomeEntries, createIncome as createIncomeAction, updateIncome as updateIncomeAction,
   getExpenses as getExpensesAction, createExpense as createExpenseAction, updateExpense as updateExpenseAction,
   generateNextInvoiceNumber,
 } from "@/app/actions/finances"
+import { getClients } from "@/app/actions/clients"
+import { getProjects } from "@/app/actions/projects"
 
 // Invoice kanban columns
 const invoiceColumns = [
@@ -171,12 +219,12 @@ export default function FinancesPage() {
   const [activeTab, setActiveTab] = useState("overview")
   const [viewMode, setViewMode] = useState<"kanban" | "list" | "grid">("kanban")
   const [searchQuery, setSearchQuery] = useState("")
-  const [invoices, setInvoices] = useState(invoicesData)
-  const [expenses, setExpenses] = useState(expensesData)
-  const [income, setIncome] = useState(incomeData)
+  const [invoices, setInvoices] = useState<InvoiceData[]>([])
+  const [expenses, setExpenses] = useState<ExpenseDataType[]>([])
+  const [income, setIncome] = useState<IncomeEntry[]>([])
   const [showFilters, setShowFilters] = useState(false)
-  const [selectedInvoice, setSelectedInvoice] = useState<(typeof invoicesData)[0] | null>(null)
-  const [selectedExpense, setSelectedExpense] = useState<(typeof expensesData)[0] | null>(null)
+  const [selectedInvoice, setSelectedInvoice] = useState<InvoiceData | null>(null)
+  const [selectedExpense, setSelectedExpense] = useState<ExpenseDataType | null>(null)
   const [draggedInvoice, setDraggedInvoice] = useState<string | null>(null)
   const [dropTarget, setDropTarget] = useState<string | null>(null)
   const [showAddExpenseDialog, setShowAddExpenseDialog] = useState(false)
@@ -184,7 +232,7 @@ export default function FinancesPage() {
   const [showCreateInvoiceDialog, setShowCreateInvoiceDialog] = useState(false)
 
   // Activity Log and Edit States
-  const [activityLog, setActivityLog] = useState(initialActivityLog)
+  const [activityLog, setActivityLog] = useState<ActivityLogEntryType[]>([])
   const [showActivityLogDialog, setShowActivityLogDialog] = useState(false)
   const [showEditExpenseDialog, setShowEditExpenseDialog] = useState(false)
   const [showEditIncomeDialog, setShowEditIncomeDialog] = useState(false)
@@ -194,47 +242,223 @@ export default function FinancesPage() {
   const [showDeleteInvoiceDialog, setShowDeleteInvoiceDialog] = useState(false)
   const [neutralizeTarget, setNeutralizeTarget] = useState<{ type: "expense" | "income"; id: number } | null>(null)
   const [deleteInvoiceTarget, setDeleteInvoiceTarget] = useState<string | null>(null)
-  const [selectedIncome, setSelectedIncome] = useState<(typeof incomeData)[0] | null>(null)
+  const [selectedIncome, setSelectedIncome] = useState<IncomeEntry | null>(null)
+
+  // Clients & Projects from DB for invoice form dropdowns
+  const [allClients, setAllClients] = useState<any[]>([])
+  const [allProjects, setAllProjects] = useState<any[]>([])
 
   // Load data from database on mount
   useEffect(() => {
     async function loadFinanceData() {
       try {
-        const [invoiceRes, incomeRes, expenseRes] = await Promise.all([
+        const [invoiceRes, incomeRes, expenseRes, clientsRes, projectsRes] = await Promise.all([
           getInvoices(),
           getIncomeEntries(),
           getExpensesAction(),
+          getClients(),
+          getProjects(),
         ])
-        if (Array.isArray(invoiceRes) && invoiceRes.length > 0) {
-          setInvoices(invoiceRes as typeof invoicesData)
+        if (Array.isArray(invoiceRes)) {
+          setInvoices(invoiceRes as InvoiceData[])
         }
-        if (Array.isArray(incomeRes) && incomeRes.length > 0) {
-          setIncome(incomeRes as any)
+        if (Array.isArray(incomeRes)) {
+          setIncome(incomeRes as unknown as IncomeEntry[])
         }
-        if (Array.isArray(expenseRes) && expenseRes.length > 0) {
-          setExpenses(expenseRes as any)
+        if (Array.isArray(expenseRes)) {
+          setExpenses(expenseRes as unknown as ExpenseDataType[])
+        }
+        if (Array.isArray(clientsRes)) {
+          setAllClients(clientsRes)
+        }
+        if (Array.isArray(projectsRes)) {
+          setAllProjects(projectsRes)
         }
       } catch (err) {
-        console.error("Failed to load finance data, using fallback:", err)
+        console.error("Failed to load finance data:", err)
       }
     }
     loadFinanceData()
   }, [])
 
   const handleDownloadInvoice = async (invoiceId: string) => {
-    const element = document.getElementById(`invoice-content-${invoiceId}`);
-    if (!element) return;
+    const invoice = invoices.find(inv => inv.id === invoiceId);
+    if (!invoice) return;
     
     try {
-        const canvas = await html2canvas(element, { scale: 2 });
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF("p", "mm", "a4");
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-        pdf.save(`Invoice_${invoiceId}.pdf`);
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const margin = 20;
+      const contentWidth = pageWidth - margin * 2;
+      let y = margin;
+
+      // Header
+      pdf.setFontSize(24);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("INVOICE", margin, y);
+      
+      pdf.setFontSize(10);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(100);
+      pdf.text(invoice.invoiceNumber, margin, y + 7);
+      
+      // Issue date & due date on the right
+      pdf.text(`Issue Date: ${formatDate(invoice.issueDate)}`, pageWidth - margin, y, { align: "right" });
+      pdf.text(`Due Date: ${formatDate(invoice.dueDate)}`, pageWidth - margin, y + 5, { align: "right" });
+      
+      y += 20;
+      
+      // Divider
+      pdf.setDrawColor(200);
+      pdf.line(margin, y, pageWidth - margin, y);
+      y += 8;
+      
+      // Bill To / Project info
+      pdf.setFontSize(8);
+      pdf.setTextColor(130);
+      pdf.setFont("helvetica", "normal");
+      pdf.text("BILL TO", margin, y);
+      pdf.text("PROJECT", pageWidth / 2 + 10, y);
+      
+      y += 5;
+      pdf.setFontSize(11);
+      pdf.setTextColor(30);
+      pdf.setFont("helvetica", "bold");
+      pdf.text(invoice.client, margin, y);
+      pdf.text(invoice.project, pageWidth / 2 + 10, y);
+      
+      y += 5;
+      pdf.setFontSize(9);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(100);
+      if (invoice.clientEmail) {
+        pdf.text(invoice.clientEmail, margin, y);
+      }
+      pdf.text(`Payment: ${invoice.paymentMethod || "N/A"}`, pageWidth / 2 + 10, y);
+      
+      y += 12;
+      
+      // Table header
+      pdf.setFillColor(245, 245, 245);
+      pdf.rect(margin, y - 4, contentWidth, 8, "F");
+      pdf.setFontSize(8);
+      pdf.setTextColor(100);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("DESCRIPTION", margin + 2, y);
+      pdf.text("QTY", margin + contentWidth * 0.55, y, { align: "center" });
+      pdf.text("RATE", margin + contentWidth * 0.72, y, { align: "right" });
+      pdf.text("AMOUNT", margin + contentWidth - 2, y, { align: "right" });
+      
+      y += 6;
+      pdf.setDrawColor(180);
+      pdf.line(margin, y, pageWidth - margin, y);
+      y += 5;
+      
+      // Table rows
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(9);
+      pdf.setTextColor(40);
+      
+      invoice.items.forEach((item) => {
+        const qty = Number(item.quantity) || 0;
+        const rate = Number(item.rate) || 0;
+        const amount = Number(item.amount) || 0;
+        
+        pdf.text(item.description || "", margin + 2, y);
+        pdf.text(String(qty), margin + contentWidth * 0.55, y, { align: "center" });
+        pdf.text(`BDT ${rate.toLocaleString()}`, margin + contentWidth * 0.72, y, { align: "right" });
+        pdf.setFont("helvetica", "bold");
+        pdf.text(`BDT ${amount.toLocaleString()}`, margin + contentWidth - 2, y, { align: "right" });
+        pdf.setFont("helvetica", "normal");
+        
+        y += 6;
+        pdf.setDrawColor(230);
+        pdf.line(margin, y, pageWidth - margin, y);
+        y += 5;
+      });
+      
+      y += 5;
+      
+      // Financial summary - right aligned
+      const summaryX = pageWidth - margin - 60;
+      const valueX = pageWidth - margin;
+      
+      const subtotal = invoice.amount - invoice.tax + invoice.discount;
+      const amountDue = invoice.amount - invoice.paid;
+      
+      pdf.setFontSize(9);
+      pdf.setTextColor(100);
+      pdf.text("Subtotal", summaryX, y);
+      pdf.setTextColor(40);
+      pdf.text(`BDT ${subtotal.toLocaleString()}`, valueX, y, { align: "right" });
+      y += 6;
+      
+      if (invoice.discount > 0) {
+        pdf.setTextColor(100);
+        pdf.text("Discount", summaryX, y);
+        pdf.setTextColor(22, 163, 74); // green
+        pdf.text(`-BDT ${invoice.discount.toLocaleString()}`, valueX, y, { align: "right" });
+        y += 6;
+      }
+      
+      pdf.setTextColor(100);
+      pdf.text("Tax", summaryX, y);
+      pdf.setTextColor(40);
+      pdf.text(`BDT ${invoice.tax.toLocaleString()}`, valueX, y, { align: "right" });
+      y += 3;
+      
+      // Total line
+      pdf.setDrawColor(30);
+      pdf.line(summaryX - 5, y, valueX, y);
+      y += 6;
+      
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(30);
+      pdf.text("Total", summaryX, y);
+      pdf.text(`BDT ${invoice.amount.toLocaleString()}`, valueX, y, { align: "right" });
+      y += 7;
+      
+      if (invoice.paid > 0) {
+        pdf.setFontSize(9);
+        pdf.setTextColor(22, 163, 74);
+        pdf.text("Paid", summaryX, y);
+        pdf.text(`BDT ${invoice.paid.toLocaleString()}`, valueX, y, { align: "right" });
+        y += 6;
+      }
+      
+      if (amountDue > 0) {
+        pdf.setFontSize(10);
+        pdf.setFont("helvetica", "bold");
+        pdf.setTextColor(220, 38, 38); // red
+        pdf.text("Amount Due", summaryX, y);
+        pdf.text(`BDT ${amountDue.toLocaleString()}`, valueX, y, { align: "right" });
+        y += 8;
+      }
+      
+      // Notes
+      if (invoice.notes) {
+        y += 5;
+        pdf.setDrawColor(200);
+        pdf.line(margin, y, pageWidth - margin, y);
+        y += 6;
+        
+        pdf.setFontSize(8);
+        pdf.setTextColor(130);
+        pdf.setFont("helvetica", "normal");
+        pdf.text("NOTES", margin, y);
+        y += 4;
+        
+        pdf.setFontSize(9);
+        pdf.setTextColor(60);
+        const noteLines = pdf.splitTextToSize(invoice.notes, contentWidth);
+        pdf.text(noteLines, margin, y);
+      }
+      
+      pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
     } catch (error) {
         console.error("Error generating PDF:", error);
+        alert("Failed to generate PDF. Please try again.")
     }
   }
 
@@ -312,6 +536,20 @@ export default function FinancesPage() {
   const editInvoiceTaxAmount = editInvoiceSubtotal * (editInvoiceFormData.taxRate / 100)
   const editInvoiceTotal = editInvoiceSubtotal + editInvoiceTaxAmount - editInvoiceFormData.discount
 
+  // Derived: projects filtered by selected client for create dialog
+  const clientProjectsForCreate = allProjects.filter(
+    (p) => p.client === invoiceFormData.client
+  )
+  // Derived: projects filtered by selected client for edit dialog
+  const clientProjectsForEdit = allProjects.filter(
+    (p) => p.client === editInvoiceFormData.client
+  )
+
+  // Deduplicate clients by name
+  const uniqueClients = Array.from(
+    new Map(allClients.map((c) => [c.name, c])).values()
+  )
+
   const [filters, setFilters] = useState({
     status: "all",
     client: "all",
@@ -337,6 +575,120 @@ export default function FinancesPage() {
   const totalTax = invoices.reduce((sum, inv) => sum + inv.tax, 0)
   const avgInvoiceValue = invoices.length > 0 ? totalInvoiced / invoices.length : 0
   const recurringRevenue = income.filter((inc) => inc.recurring).reduce((sum, inc) => sum + inc.amount, 0)
+
+  // ==================== Computed Chart Data (from DB) ====================
+  const CHART_COLORS = ["#6366f1", "#22c55e", "#f59e0b", "#ec4899", "#8b5cf6", "#14b8a6", "#f97316", "#a855f7", "#06b6d4", "#ef4444"]
+
+  // Revenue/Expenses/Profit trend by month (last 7 months)
+  const computedRevenueData = (() => {
+    const months: { month: string; revenue: number; expenses: number; profit: number }[] = []
+    const now = new Date()
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
+      const label = d.toLocaleDateString("en-US", { month: "short" })
+      const monthRevenue = invoices
+        .filter(inv => inv.issueDate?.startsWith(key))
+        .reduce((s, inv) => s + inv.paid, 0)
+      const monthExpenses = expenses
+        .filter(exp => exp.date?.startsWith(key) && exp.status === "paid")
+        .reduce((s, exp) => s + exp.amount, 0)
+      months.push({ month: label, revenue: monthRevenue, expenses: monthExpenses, profit: monthRevenue - monthExpenses })
+    }
+    return months
+  })()
+
+  // Income by category pie chart
+  const computedIncomeCategoryData = (() => {
+    const map = new Map<string, number>()
+    income.filter(inc => inc.entityStatus !== "neutralized").forEach(inc => {
+      map.set(inc.category, (map.get(inc.category) || 0) + inc.amount)
+    })
+    return Array.from(map.entries()).map(([name, value], i) => ({
+      name, value, color: CHART_COLORS[i % CHART_COLORS.length]
+    }))
+  })()
+
+  // Expense by category pie chart
+  const computedExpenseCategoryData = (() => {
+    const map = new Map<string, { value: number; count: number }>()
+    expenses.filter(exp => exp.entityStatus !== "neutralized").forEach(exp => {
+      const prev = map.get(exp.category) || { value: 0, count: 0 }
+      map.set(exp.category, { value: prev.value + exp.amount, count: prev.count + 1 })
+    })
+    return Array.from(map.entries()).map(([name, data], i) => ({
+      name, value: data.value, count: data.count, color: CHART_COLORS[i % CHART_COLORS.length]
+    }))
+  })()
+
+  // Cash flow by week (current month)
+  const computedCashFlowData = (() => {
+    const now = new Date()
+    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
+    const weeks = [1, 2, 3, 4].map(w => ({ week: `W${w}`, inflow: 0, outflow: 0, net: 0 }))
+    invoices.filter(inv => inv.issueDate?.startsWith(currentMonth)).forEach(inv => {
+      const day = new Date(inv.issueDate).getDate()
+      const wIdx = Math.min(Math.floor((day - 1) / 7), 3)
+      weeks[wIdx].inflow += inv.paid
+    })
+    expenses.filter(exp => exp.date?.startsWith(currentMonth) && exp.status === "paid").forEach(exp => {
+      const day = new Date(exp.date).getDate()
+      const wIdx = Math.min(Math.floor((day - 1) / 7), 3)
+      weeks[wIdx].outflow += exp.amount
+    })
+    weeks.forEach(w => { w.net = w.inflow - w.outflow })
+    return weeks
+  })()
+
+  // Profit margin trend by month (last 7 months)
+  const computedProfitMarginData = computedRevenueData.map(m => ({
+    month: m.month,
+    margin: m.revenue > 0 ? Number(((m.revenue - m.expenses) / m.revenue * 100).toFixed(1)) : 0,
+  }))
+
+  // Invoice category breakdown (Reports tab bar chart)
+  const computedCategoryData = (() => {
+    const map = new Map<string, number>()
+    invoices.forEach(inv => {
+      const cat = inv.category || "Other"
+      const label = cat.charAt(0).toUpperCase() + cat.slice(1)
+      map.set(label, (map.get(label) || 0) + inv.amount)
+    })
+    return Array.from(map.entries()).map(([name, value], i) => ({
+      name, value, color: CHART_COLORS[i % CHART_COLORS.length]
+    }))
+  })()
+
+  // Payment method distribution (Reports tab pie chart)
+  const computedPaymentMethodData = (() => {
+    const map = new Map<string, number>()
+    invoices.forEach(inv => {
+      const method = inv.paymentMethod || "Other"
+      map.set(method, (map.get(method) || 0) + inv.paid)
+    })
+    return Array.from(map.entries()).map(([name, value], i) => ({
+      name, value, color: CHART_COLORS[i % CHART_COLORS.length]
+    }))
+  })()
+
+  // Expense distribution as budget overview (Reports tab)
+  const computedBudgetData = (() => {
+    const totalExp = expenses.reduce((s, e) => s + e.amount, 0)
+    const map = new Map<string, number>()
+    expenses.forEach(exp => {
+      map.set(exp.category, (map.get(exp.category) || 0) + exp.amount)
+    })
+    return Array.from(map.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([category, spent]) => ({
+        category,
+        budget: totalExp, // total as context
+        spent,
+        remaining: totalExp - spent,
+        percentage: totalExp > 0 ? (spent / totalExp) * 100 : 0,
+      }))
+  })()
 
   // Filter invoices
   const filteredInvoices = invoices.filter((invoice) => {
@@ -389,13 +741,22 @@ export default function FinancesPage() {
     setDropTarget(null)
   }
 
-  const handleDrop = (e: React.DragEvent, newStatus: string) => {
+  const handleDrop = async (e: React.DragEvent, newStatus: string) => {
     e.preventDefault()
     if (draggedInvoice) {
+      const invoice = invoices.find(inv => inv.id === draggedInvoice)
+      if (!invoice) return
+
+      const updateData: Record<string, any> = { status: newStatus }
+      if (newStatus === "paid") {
+        updateData.paid = invoice.amount
+        updateData.paidDate = new Date().toISOString().split("T")[0]
+      }
+
+      // Optimistic local update
       setInvoices((prev) =>
         prev.map((inv) => {
           if (inv.id === draggedInvoice) {
-            // Auto-update paid amount when moving to paid status
             if (newStatus === "paid") {
               return { ...inv, status: newStatus, paid: inv.amount, paidDate: new Date().toISOString().split("T")[0] }
             }
@@ -404,6 +765,25 @@ export default function FinancesPage() {
           return inv
         }),
       )
+
+      // Persist to database
+      try {
+        await updateInvoiceAction(draggedInvoice, updateData)
+      } catch (err) {
+        console.error("Failed to persist invoice status change:", err)
+        // Rollback on failure
+        setInvoices(prev => prev.map(inv => inv.id === draggedInvoice ? { ...inv, status: invoice.status, paid: invoice.paid, paidDate: invoice.paidDate } : inv))
+      }
+
+      logActivity({
+        entityType: "invoice",
+        entityId: draggedInvoice,
+        entityDescription: `Invoice #${invoice.invoiceNumber} - ${invoice.client}`,
+        action: "status_changed",
+        changes: [{ field: "status", oldValue: invoice.status, newValue: newStatus }],
+        performedBy: "Current User",
+        performedAt: new Date().toISOString(),
+      })
     }
     setDraggedInvoice(null)
     setDropTarget(null)
@@ -805,8 +1185,8 @@ export default function FinancesPage() {
     }
 
     try {
-      // Auto-generate invoice number from database
-      const invoiceNumber = await generateNextInvoiceNumber()
+      // Auto-generate invoice number from database using project name
+      const invoiceNumber = await generateNextInvoiceNumber(invoiceFormData.project)
 
       const invoiceData = {
         invoiceNumber,
@@ -943,39 +1323,48 @@ export default function FinancesPage() {
 
   // ==================== Duplicate Invoice ====================
 
-  const handleDuplicateInvoice = (invoice: typeof invoices[0]) => {
-    const year = new Date().getFullYear()
-    const existingCount = invoices.filter(inv => inv.invoiceNumber.includes(year.toString())).length
-    const invoiceNumber = `INV-${year}-${(existingCount + 1).toString().padStart(3, "0")}`
+  const handleDuplicateInvoice = async (invoice: typeof invoices[0]) => {
+    try {
+      const invoiceNumber = await generateNextInvoiceNumber(invoice.project)
 
-    const duplicatedInvoice = {
-      ...invoice,
-      id: invoiceNumber,
-      invoiceNumber,
-      status: "draft",
-      paid: 0,
-      paidDate: null as string | null,
-      issueDate: new Date().toISOString().split("T")[0],
+      const duplicatedInvoice = {
+        ...invoice,
+        id: invoiceNumber,
+        invoiceNumber,
+        status: "draft",
+        paid: 0,
+        paidDate: null as string | null,
+        issueDate: new Date().toISOString().split("T")[0],
+      }
+
+      setInvoices(prev => [duplicatedInvoice, ...prev])
+
+      logActivity({
+        entityType: "invoice",
+        entityId: invoiceNumber,
+        entityDescription: `Invoice #${invoiceNumber} duplicated from #${invoice.invoiceNumber}`,
+        action: "created",
+        performedBy: "Current User",
+        performedAt: new Date().toISOString(),
+      })
+    } catch (err) {
+      console.error("Failed to duplicate invoice:", err)
     }
-
-    setInvoices(prev => [duplicatedInvoice, ...prev])
-
-    logActivity({
-      entityType: "invoice",
-      entityId: invoiceNumber,
-      entityDescription: `Invoice #${invoiceNumber} duplicated from #${invoice.invoiceNumber}`,
-      action: "created",
-      performedBy: "Current User",
-      performedAt: new Date().toISOString(),
-    })
   }
 
   // ==================== Invoice Status Change ====================
 
-  const handleInvoiceStatusChange = (invoiceId: string, newStatus: string) => {
+  const handleInvoiceStatusChange = async (invoiceId: string, newStatus: string) => {
     const invoice = invoices.find(inv => inv.id === invoiceId)
     if (!invoice) return
 
+    const updateData: Record<string, any> = { status: newStatus }
+    if (newStatus === "paid") {
+      updateData.paid = invoice.amount
+      updateData.paidDate = new Date().toISOString().split("T")[0]
+    }
+
+    // Optimistic local update
     setInvoices(prev => prev.map(inv => {
       if (inv.id !== invoiceId) return inv
       if (newStatus === "paid") {
@@ -983,6 +1372,15 @@ export default function FinancesPage() {
       }
       return { ...inv, status: newStatus }
     }))
+
+    // Persist to database
+    try {
+      await updateInvoiceAction(invoiceId, updateData)
+    } catch (err) {
+      console.error("Failed to persist invoice status change:", err)
+      // Rollback on failure
+      setInvoices(prev => prev.map(inv => inv.id === invoiceId ? { ...inv, status: invoice.status, paid: invoice.paid, paidDate: invoice.paidDate } : inv))
+    }
 
     logActivity({
       entityType: "invoice",
@@ -996,9 +1394,9 @@ export default function FinancesPage() {
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-BD", {
       style: "currency",
-      currency: "USD",
+      currency: "BDT",
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
     }).format(amount)
@@ -1173,7 +1571,7 @@ export default function FinancesPage() {
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <ComposedChart data={revenueData}>
+                  <ComposedChart data={computedRevenueData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
                     <YAxis stroke="hsl(var(--muted-foreground))" />
@@ -1208,8 +1606,8 @@ export default function FinancesPage() {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={280}>
                     <RechartsPieChart>
-                      <Pie data={incomeCategoryData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label>
-                        {incomeCategoryData.map((entry, index) => (
+                      <Pie data={computedIncomeCategoryData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label>
+                        {computedIncomeCategoryData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
@@ -1223,7 +1621,7 @@ export default function FinancesPage() {
                     </RechartsPieChart>
                   </ResponsiveContainer>
                   <div className="grid grid-cols-2 gap-2 mt-4">
-                    {incomeCategoryData.map((cat) => (
+                    {computedIncomeCategoryData.map((cat) => (
                       <div key={cat.name} className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded" style={{ backgroundColor: cat.color }} />
                         <span className="text-sm text-muted-foreground">{cat.name}</span>
@@ -1242,8 +1640,8 @@ export default function FinancesPage() {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={280}>
                     <RechartsPieChart>
-                      <Pie data={expenseCategoryData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label>
-                        {expenseCategoryData.map((entry, index) => (
+                      <Pie data={computedExpenseCategoryData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label>
+                        {computedExpenseCategoryData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
@@ -1257,7 +1655,7 @@ export default function FinancesPage() {
                     </RechartsPieChart>
                   </ResponsiveContainer>
                   <div className="grid grid-cols-2 gap-2 mt-4">
-                    {expenseCategoryData.slice(0, 6).map((cat) => (
+                    {computedExpenseCategoryData.slice(0, 6).map((cat) => (
                       <div key={cat.name} className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded" style={{ backgroundColor: cat.color }} />
                         <span className="text-sm text-muted-foreground">{cat.name}</span>
@@ -1275,7 +1673,7 @@ export default function FinancesPage() {
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={280}>
-                    <BarChart data={cashFlowData}>
+                    <BarChart data={computedCashFlowData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                       <XAxis dataKey="week" stroke="hsl(var(--muted-foreground))" />
                       <YAxis stroke="hsl(var(--muted-foreground))" />
@@ -1302,7 +1700,7 @@ export default function FinancesPage() {
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={280}>
-                    <LineChart data={profitMarginData}>
+                    <LineChart data={computedProfitMarginData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                       <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
                       <YAxis stroke="hsl(var(--muted-foreground))" unit="%" />
@@ -1720,13 +2118,13 @@ export default function FinancesPage() {
                                                   <div className="flex-1">
                                                     <p className="font-medium text-sm">{item.description}</p>
                                                     <p className="text-xs text-muted-foreground">
-                                                      {item.quantity} × {formatCurrency(item.rate)}
+                                                      {Number(item.quantity) || 0} × {formatCurrency(Number(item.rate) || 0)}
                                                       {item.taxable && (
                                                         <span className="ml-2 text-blue-500">(Taxable)</span>
                                                       )}
                                                     </p>
                                                   </div>
-                                                  <p className="font-bold">{formatCurrency(item.amount)}</p>
+                                                  <p className="font-bold">{formatCurrency(Number(item.amount) || 0)}</p>
                                                 </div>
                                               ))}
                                             </div>
@@ -2088,11 +2486,11 @@ export default function FinancesPage() {
                                           <div className="flex-1">
                                             <p className="font-medium text-sm">{item.description}</p>
                                             <p className="text-xs text-muted-foreground">
-                                              {item.quantity} × {formatCurrency(item.rate)}
+                                              {Number(item.quantity) || 0} × {formatCurrency(Number(item.rate) || 0)}
                                               {item.taxable && <span className="ml-2 text-blue-500">(Taxable)</span>}
                                             </p>
                                           </div>
-                                          <p className="font-bold">{formatCurrency(item.amount)}</p>
+                                          <p className="font-bold">{formatCurrency(Number(item.amount) || 0)}</p>
                                         </div>
                                       ))}
                                     </div>
@@ -2459,13 +2857,13 @@ export default function FinancesPage() {
                                                   <div className="flex-1">
                                                     <p className="font-medium text-sm">{item.description}</p>
                                                     <p className="text-xs text-muted-foreground">
-                                                      {item.quantity} × {formatCurrency(item.rate)}
+                                                      {Number(item.quantity) || 0} × {formatCurrency(Number(item.rate) || 0)}
                                                       {item.taxable && (
                                                         <span className="ml-2 text-blue-500">(Taxable)</span>
                                                       )}
                                                     </p>
                                                   </div>
-                                                  <p className="font-bold">{formatCurrency(item.amount)}</p>
+                                                  <p className="font-bold">{formatCurrency(Number(item.amount) || 0)}</p>
                                                 </div>
                                               ))}
                                             </div>
@@ -3987,7 +4385,7 @@ export default function FinancesPage() {
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={categoryData} layout="vertical">
+                    <BarChart data={computedCategoryData} layout="vertical">
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                       <XAxis type="number" stroke="hsl(var(--muted-foreground))" />
                       <YAxis dataKey="name" type="category" stroke="hsl(var(--muted-foreground))" width={120} />
@@ -3999,7 +4397,7 @@ export default function FinancesPage() {
                         }}
                       />
                       <Bar dataKey="value" radius={[0, 8, 8, 0]}>
-                        {categoryData.map((entry, index) => (
+                        {computedCategoryData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Bar>
@@ -4015,8 +4413,8 @@ export default function FinancesPage() {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
                     <RechartsPieChart>
-                      <Pie data={paymentMethodData} cx="50%" cy="50%" outerRadius={90} dataKey="value" label>
-                        {paymentMethodData.map((entry, index) => (
+                      <Pie data={computedPaymentMethodData} cx="50%" cy="50%" outerRadius={90} dataKey="value" label>
+                        {computedPaymentMethodData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
@@ -4030,7 +4428,7 @@ export default function FinancesPage() {
                     </RechartsPieChart>
                   </ResponsiveContainer>
                   <div className="grid grid-cols-2 gap-2 mt-4">
-                    {paymentMethodData.map((method) => (
+                    {computedPaymentMethodData.map((method) => (
                       <div key={method.name} className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded" style={{ backgroundColor: method.color }} />
                         <span className="text-sm text-muted-foreground">{method.name}</span>
@@ -4084,10 +4482,8 @@ export default function FinancesPage() {
                   <CardTitle>Budget Overview</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {budgetData.map((budget) => {
-                    const percentage = (budget.spent / budget.budget) * 100
-                    const isOverBudget = percentage > 100
-                    const isNearLimit = percentage > 80 && percentage <= 100
+                  {computedBudgetData.length > 0 ? computedBudgetData.map((budget) => {
+                    const percentage = budget.percentage
 
                     return (
                       <div key={budget.category} className="space-y-2">
@@ -4095,11 +4491,11 @@ export default function FinancesPage() {
                           <div>
                             <p className="font-medium text-sm">{budget.category}</p>
                             <p className="text-xs text-muted-foreground">
-                              {formatCurrency(budget.spent)} of {formatCurrency(budget.budget)}
+                              {formatCurrency(budget.spent)} of total {formatCurrency(budget.budget)}
                             </p>
                           </div>
                           <Badge
-                            variant={isOverBudget ? "destructive" : isNearLimit ? "outline" : "secondary"}
+                            variant={percentage > 40 ? "destructive" : percentage > 25 ? "outline" : "secondary"}
                             className="text-xs"
                           >
                             {percentage.toFixed(0)}%
@@ -4107,11 +4503,13 @@ export default function FinancesPage() {
                         </div>
                         <Progress
                           value={Math.min(percentage, 100)}
-                          className={cn("h-2", isOverBudget && "bg-red-500/20")}
+                          className="h-2"
                         />
                       </div>
                     )
-                  })}
+                  }) : (
+                    <p className="text-sm text-muted-foreground text-center py-4">No expense data available</p>
+                  )}
                 </CardContent>
               </AnimatedCard>
             </div>
@@ -4305,11 +4703,39 @@ export default function FinancesPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Client *</Label>
-                <Input
-                  placeholder="Client name"
-                  value={invoiceFormData.client}
-                  onChange={(e) => setInvoiceFormData(prev => ({ ...prev, client: e.target.value }))}
-                />
+                <Select
+                  value={invoiceFormData.client || undefined}
+                  onValueChange={(value) => {
+                    const selectedClient = allClients.find((c) => c.name === value)
+                    setInvoiceFormData((prev) => ({
+                      ...prev,
+                      client: value,
+                      clientEmail: selectedClient?.email || prev.clientEmail,
+                      project: "",
+                      projectId: "",
+                    }))
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select client" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {uniqueClients.map((c) => (
+                      <SelectItem key={c.id} value={c.name}>
+                        <span className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-[9px] font-bold">
+                            {c.name.split(" ").map((n: string) => n[0]).join("")}
+                          </span>
+                          {c.name}
+                          <span className="text-muted-foreground text-[10px]">({c.company})</span>
+                        </span>
+                      </SelectItem>
+                    ))}
+                    {uniqueClients.length === 0 && (
+                      <SelectItem value="__none" disabled>No clients found</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label>Client Email</Label>
@@ -4324,11 +4750,37 @@ export default function FinancesPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Project *</Label>
-                <Input
-                  placeholder="Project name"
-                  value={invoiceFormData.project}
-                  onChange={(e) => setInvoiceFormData(prev => ({ ...prev, project: e.target.value }))}
-                />
+                <Select
+                  value={invoiceFormData.project || undefined}
+                  onValueChange={(value) => {
+                    const selectedProject = allProjects.find((p) => p.name === value)
+                    setInvoiceFormData((prev) => ({
+                      ...prev,
+                      project: value,
+                      projectId: selectedProject?.id || "",
+                    }))
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={invoiceFormData.client ? "Select project" : "Select client first"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clientProjectsForCreate.length > 0 ? (
+                      clientProjectsForCreate.map((p) => (
+                        <SelectItem key={p.id} value={p.name}>
+                          <span className="flex items-center gap-2">
+                            <span className="text-muted-foreground text-xs">{p.uid || `#${p.id.slice(0, 6)}`}</span>
+                            {p.name}
+                          </span>
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="__no_projects" disabled>
+                        {invoiceFormData.client ? "No projects for this client" : "Select a client first"}
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label>Service Category</Label>
@@ -4528,10 +4980,34 @@ export default function FinancesPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Client *</Label>
-                <Input
-                  value={editInvoiceFormData.client}
-                  onChange={(e) => setEditInvoiceFormData(prev => ({ ...prev, client: e.target.value }))}
-                />
+                <Select
+                  value={editInvoiceFormData.client || undefined}
+                  onValueChange={(value) => {
+                    const selectedClient = allClients.find((c) => c.name === value)
+                    setEditInvoiceFormData((prev) => ({
+                      ...prev,
+                      client: value,
+                      clientEmail: selectedClient?.email || prev.clientEmail,
+                      project: "",
+                      projectId: "",
+                    }))
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select client" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {uniqueClients.map((c) => (
+                      <SelectItem key={c.id} value={c.name}>
+                        {c.name} ({c.company})
+                      </SelectItem>
+                    ))}
+                    {/* Keep existing client if not in DB */}
+                    {editInvoiceFormData.client && !uniqueClients.find((c) => c.name === editInvoiceFormData.client) && (
+                      <SelectItem value={editInvoiceFormData.client}>{editInvoiceFormData.client}</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label>Client Email</Label>
@@ -4545,10 +5021,41 @@ export default function FinancesPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Project *</Label>
-                <Input
-                  value={editInvoiceFormData.project}
-                  onChange={(e) => setEditInvoiceFormData(prev => ({ ...prev, project: e.target.value }))}
-                />
+                <Select
+                  value={editInvoiceFormData.project || undefined}
+                  onValueChange={(value) => {
+                    const selectedProject = allProjects.find((p) => p.name === value)
+                    setEditInvoiceFormData((prev) => ({
+                      ...prev,
+                      project: value,
+                      projectId: selectedProject?.id || "",
+                    }))
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={editInvoiceFormData.client ? "Select project" : "Select client first"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clientProjectsForEdit.length > 0 ? (
+                      clientProjectsForEdit.map((p) => (
+                        <SelectItem key={p.id} value={p.name}>
+                          <span className="flex items-center gap-2">
+                            <span className="text-muted-foreground text-xs">{p.uid || `#${p.id.slice(0, 6)}`}</span>
+                            {p.name}
+                          </span>
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="__no_projects" disabled>
+                        {editInvoiceFormData.client ? "No projects for this client" : "Select a client first"}
+                      </SelectItem>
+                    )}
+                    {/* Keep existing project if not in filtered list */}
+                    {editInvoiceFormData.project && !clientProjectsForEdit.find((p) => p.name === editInvoiceFormData.project) && (
+                      <SelectItem value={editInvoiceFormData.project}>{editInvoiceFormData.project}</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label>Category</Label>

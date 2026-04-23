@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { InvoiceDetailDialog } from "@/components/invoices/invoice-detail-dialog"
-import { sampleInvoices, samplePayments, generateInvoiceNumber } from "@/lib/data/invoices"
+import { sampleInvoices, samplePayments } from "@/lib/data/invoices"
 import type { Invoice, InvoiceItem, Payment } from "@/lib/types/finance"
 import { INVOICE_STATUS_CONFIG } from "@/lib/types/finance"
 import {
@@ -67,7 +67,7 @@ import { cn } from "@/lib/utils"
 import { getProjectById, updateProject as updateProjectAction, addProjectFileLink, addProjectDiscussionMessage } from "@/app/actions/projects"
 import { getTasks, createTask } from "@/app/actions/tasks"
 import { getEmployees } from "@/app/actions/team"
-import { getInvoices, createInvoice as createInvoiceAction, updateInvoice as updateInvoiceAction, createIncome, getIncomeEntries } from "@/app/actions/finances"
+import { getInvoices, createInvoice as createInvoiceAction, updateInvoice as updateInvoiceAction, createIncome, getIncomeEntries, generateNextInvoiceNumber } from "@/app/actions/finances"
 
 interface TeamMember {
     id: string
@@ -277,6 +277,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     const [isEditOpen, setIsEditOpen] = useState(false)
     const [isRecordPaymentOpen, setIsRecordPaymentOpen] = useState(false)
     const [isGenerateInvoiceOpen, setIsGenerateInvoiceOpen] = useState(false)
+    const [pendingInvoiceNumber, setPendingInvoiceNumber] = useState("")
     const [newMessage, setNewMessage] = useState("")
     const [taskViewMode, setTaskViewMode] = useState<"list" | "kanban">("kanban")
 
@@ -332,8 +333,41 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                         setAllEmployees(dbEmployees)
                     }
                     if (Array.isArray(dbInvoices)) {
-                        // Ensure it fits the `Invoice` type properly, though they mostly match
-                        setInvoices(dbInvoices.filter(i => i.projectId === resolvedParams.id) as any[])
+                        // Map DB invoice fields to the Invoice type expected by this page
+                        const mapped: Invoice[] = dbInvoices
+                            .filter(i => i.projectId === resolvedParams.id)
+                            .map((i: any) => ({
+                                id: i.id,
+                                invoiceNumber: i.invoiceNumber,
+                                projectId: i.projectId || "",
+                                projectName: i.project || "",
+                                clientId: "",
+                                clientName: i.client || "",
+                                clientEmail: i.clientEmail || "",
+                                subtotal: (i.amount || 0) - (i.tax || 0) + (i.discount || 0),
+                                taxRate: i.amount > 0 ? ((i.tax || 0) / ((i.amount || 0) - (i.tax || 0) + (i.discount || 0))) * 100 : 0,
+                                taxAmount: i.tax || 0,
+                                discount: i.discount || 0,
+                                totalAmount: i.amount || 0,
+                                amountPaid: i.paid || 0,
+                                amountDue: (i.amount || 0) - (i.paid || 0),
+                                status: i.status as Invoice["status"],
+                                issueDate: i.issueDate || "",
+                                dueDate: i.dueDate || "",
+                                paidDate: i.paidDate || undefined,
+                                items: Array.isArray(i.items) ? i.items.map((item: any) => ({
+                                    id: String(item.id),
+                                    description: item.description || "",
+                                    quantity: item.quantity || 0,
+                                    unitPrice: item.rate || item.unitPrice || 0,
+                                    amount: item.amount || 0,
+                                })) : [],
+                                notes: i.notes || "",
+                                terms: i.paymentTerms || "",
+                                createdAt: i.createdAt?.toISOString?.() || String(i.createdAt || ""),
+                                updatedAt: i.updatedAt?.toISOString?.() || String(i.updatedAt || ""),
+                            }))
+                        setInvoices(mapped)
                     }
                     if (Array.isArray(dbIncome)) {
                         const relatedIncomes: Payment[] = dbIncome.filter(i => i.project === resolvedParams.id || invoices.some(inv => inv.id === i.invoiceId)).map(i => ({
@@ -367,15 +401,16 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     const invoiceTotal = invoiceSubtotal + invoiceTaxAmount - invoiceDiscount
 
     // Helper to create an invoice
-    const createInvoiceFromData = (items: InvoiceItem[], notes?: string, isAuto?: boolean): Invoice => {
+    const createInvoiceFromData = async (items: InvoiceItem[], notes?: string, isAuto?: boolean): Promise<Invoice> => {
         const subtotal = items.reduce((sum, item) => sum + item.amount, 0)
         const taxAmt = subtotal * (invoiceTaxRate / 100)
         const total = subtotal + taxAmt - invoiceDiscount
         const now = new Date()
         const dueDate = new Date(now.getTime() + Number(invoicePaymentTerms) * 24 * 60 * 60 * 1000)
+        const invoiceNumber = await generateNextInvoiceNumber(project.name)
         return {
             id: `inv-${Date.now()}`,
-            invoiceNumber: generateInvoiceNumber(invoices),
+            invoiceNumber,
             projectId: project.id,
             projectName: project.name,
             clientId: project.id,
@@ -408,12 +443,13 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
             if (!hasCompletionInvoice) {
                 const remainingAmount = project.budget - project.spent
                 if (remainingAmount > 0) {
-                    const autoInvoice = createInvoiceFromData(
+                    createInvoiceFromData(
                         [{ id: `item-auto-${Date.now()}`, description: `Final Payment - ${project.name}`, quantity: 1, unitPrice: remainingAmount, amount: remainingAmount }],
                         `Auto-generated invoice upon project completion for ${project.name}.`,
                         true
-                    )
-                    setInvoices(prev => [autoInvoice, ...prev])
+                    ).then(autoInvoice => {
+                        setInvoices(prev => [autoInvoice, ...prev])
+                    })
                 }
             }
         }
@@ -430,12 +466,13 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
             )
             if (!hasThisMonthInvoice) {
                 const monthName = now.toLocaleDateString("en-US", { month: "long", year: "numeric" })
-                const autoInvoice = createInvoiceFromData(
+                createInvoiceFromData(
                     [{ id: `item-rec-${Date.now()}`, description: `Monthly Service - ${project.name} (${monthName})`, quantity: 1, unitPrice: project.monthlyRate, amount: project.monthlyRate }],
                     `Auto-generated monthly invoice for ${project.name}.`,
                     true
-                )
-                setInvoices(prev => [autoInvoice, ...prev])
+                ).then(autoInvoice => {
+                    setInvoices(prev => [autoInvoice, ...prev])
+                })
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -647,7 +684,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
         if (invoiceLineItems.every(item => item.amount === 0)) return
         
         try {
-            const newInvoiceLocal = createInvoiceFromData(invoiceLineItems.filter(item => item.amount > 0))
+            const newInvoiceLocal = await createInvoiceFromData(invoiceLineItems.filter(item => item.amount > 0))
             
             const createData = {
                 invoiceNumber: newInvoiceLocal.invoiceNumber,
@@ -1748,7 +1785,13 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                 </Dialog>
 
                 {/* Generate Invoice Dialog */}
-                <Dialog open={isGenerateInvoiceOpen} onOpenChange={setIsGenerateInvoiceOpen}>
+                <Dialog open={isGenerateInvoiceOpen} onOpenChange={async (open) => {
+                    if (open && project) {
+                        const num = await generateNextInvoiceNumber(project.name)
+                        setPendingInvoiceNumber(num)
+                    }
+                    setIsGenerateInvoiceOpen(open)
+                }}>
                     <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle className="flex items-center gap-2">
@@ -1761,7 +1804,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label>Invoice Number</Label>
-                                    <Input value={generateInvoiceNumber(invoices)} readOnly className="bg-secondary font-mono" />
+                                    <Input value={pendingInvoiceNumber} readOnly className="bg-secondary font-mono" />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Issue Date</Label>

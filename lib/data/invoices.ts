@@ -155,9 +155,19 @@ export const samplePayments: Payment[] = [
     },
 ]
 
-// Helper to generate next invoice number
-export function generateInvoiceNumber(existingInvoices: Invoice[]): string {
-    const year = new Date().getFullYear()
-    const count = existingInvoices.filter(inv => inv.invoiceNumber.includes(year.toString())).length + 1
-    return `INV-${year}-${count.toString().padStart(3, '0')}`
+// Helper to generate next invoice number (local fallback, prefer server action for DB-aware generation)
+export function generateInvoiceNumber(existingInvoices: Invoice[], projectName?: string): string {
+    const now = new Date()
+    const dd = String(now.getDate()).padStart(2, "0")
+    const mm = String(now.getMonth() + 1).padStart(2, "0")
+    const yy = String(now.getFullYear()).slice(-2)
+    const datePart = `${dd}${mm}${yy}`
+
+    const initials = projectName
+        ? projectName.split(/\s+/).map(w => w.charAt(0).toLowerCase()).join("")
+        : "inv"
+
+    const prefix = `${initials}-${datePart}-`
+    const matchingCount = existingInvoices.filter(inv => inv.invoiceNumber.startsWith(prefix)).length
+    return `${prefix}${matchingCount + 1}`
 }

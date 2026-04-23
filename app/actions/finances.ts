@@ -6,35 +6,52 @@ const prisma = new PrismaClient()
 
 // ==================== INVOICE NUMBER GENERATION ====================
 
-export async function generateNextInvoiceNumber(): Promise<string> {
-  const year = new Date().getFullYear()
-  const prefix = `INV-${year}-`
+/**
+ * Generates a project-based invoice UID in the format: {initials}-{DDMMYY}-{sequence}
+ * Example: "Let Me Glow" → lmg-220426-1
+ * @param projectName - The project name to derive initials from
+ */
+export async function generateNextInvoiceNumber(projectName?: string): Promise<string> {
+  const now = new Date()
+  const dd = String(now.getDate()).padStart(2, "0")
+  const mm = String(now.getMonth() + 1).padStart(2, "0")
+  const yy = String(now.getFullYear()).slice(-2)
+  const datePart = `${dd}${mm}${yy}`
 
-  const lastInvoice = await prisma.financeInvoice.findFirst({
+  // Derive initials from project name (first char of each word, lowercase)
+  const initials = projectName
+    ? projectName
+        .split(/\s+/)
+        .map((word) => word.charAt(0).toLowerCase())
+        .join("")
+    : "inv"
+
+  const prefix = `${initials}-${datePart}-`
+
+  // Find the last invoice with this prefix to determine the next sequence number
+  const matchingInvoices = await prisma.financeInvoice.findMany({
     where: {
       invoiceNumber: {
         startsWith: prefix,
       },
-    },
-    orderBy: {
-      invoiceNumber: "desc",
     },
     select: {
       invoiceNumber: true,
     },
   })
 
-  if (!lastInvoice) {
-    return `${prefix}001`
+  if (matchingInvoices.length === 0) {
+    return `${prefix}1`
   }
 
-  const numberPart = lastInvoice.invoiceNumber.split("-")[2]
-  if (!numberPart || isNaN(parseInt(numberPart, 10))) {
-    return `${prefix}001`
-  }
+  // Extract the sequence numbers and find the max
+  const maxSeq = matchingInvoices.reduce((max, inv) => {
+    const seqStr = inv.invoiceNumber.replace(prefix, "")
+    const seq = parseInt(seqStr, 10)
+    return isNaN(seq) ? max : Math.max(max, seq)
+  }, 0)
 
-  const nextNumber = parseInt(numberPart, 10) + 1
-  return `${prefix}${nextNumber.toString().padStart(3, "0")}`
+  return `${prefix}${maxSeq + 1}`
 }
 
 // ==================== INVOICE ACTIONS ====================

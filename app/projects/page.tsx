@@ -96,6 +96,7 @@ export default function ProjectsPage() {
 
   const uniqueClients = [...new Set(projects.map((p) => p.client))]
   const uniqueManagers = [...new Set(projects.map((p) => p.projectManager))]
+  const uniqueClientsList = Array.from(new Map(allClients.map(c => [c.name, c])).values())
 
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
@@ -404,10 +405,10 @@ export default function ProjectsPage() {
                             <SelectValue placeholder="Select client" />
                           </SelectTrigger>
                           <SelectContent>
-                            {allClients.map((c) => (
+                            {uniqueClientsList.map((c) => (
                               <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
                             ))}
-                            {allClients.length === 0 && (
+                            {uniqueClientsList.length === 0 && (
                               <SelectItem value="none" disabled>No clients found</SelectItem>
                             )}
                           </SelectContent>
@@ -1209,7 +1210,7 @@ export default function ProjectsPage() {
                     <Select name="client" defaultValue={editingProject.client}>
                       <SelectTrigger className="bg-secondary/50 border-border"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        {allClients.map((c) => (
+                        {uniqueClientsList.map((c) => (
                           <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
                         ))}
                         {/* Fallback if the project's client no longer exists in DB */}
