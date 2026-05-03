@@ -10,20 +10,22 @@ datasource db {
 model Lead {
   id              String            @id @default(cuid())
   name            String
-  company         String
-  email           String
+  company         String            @default("")
+  email           String            @default("")
   phone           String
-  status          String
-  stage           String
-  priority        String
-  category        String
-  value           Float
-  probability     Int
-  source          String
-  assignedTo      String
+  status          String            @default("warm")
+  stage           String            @default("new")
+  priority        String            @default("medium")
+  category        String            @default("other")
+  value           Float             @default(0)
+  probability     Int               @default(50)
+  source          String            @default("Website")
+  assignedTo      String            @default("Unassigned")
   activities      Int               @default(0)
   tags            String[]
   notes           String            @default("")
+  website         String            @default("")
+  pageLink        String            @default("")
   createdAt       DateTime          @default(now())
   lastContact     DateTime          @default(now())
   nextFollowUp    String            @default("")
@@ -33,6 +35,7 @@ model Lead {
   activityHistory ActivityHistory[]
   client          Client?           @relation(fields: [clientId], references: [id])
   noteHistory     NoteHistory[]
+  followUps       LeadFollowUp[]
 }
 
 model NoteHistory {
@@ -40,6 +43,16 @@ model NoteHistory {
   content   String
   createdAt DateTime @default(now())
   createdBy String
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+}
+
+model LeadFollowUp {
+  id        String   @id @default(cuid())
+  date      String
+  notes     String   @default("")
+  status    String   @default("scheduled")
+  createdAt DateTime @default(now())
   leadId    String
   lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
 }

@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { generateId, generateBulkIds } from "@/lib/id-generator"
-import { getLeads, createLead, updateLead, deleteLead, addLeadActivity, addLeadNote, bulkDeleteLeads } from "@/app/actions/leads"
+import { getLeads, createLead, updateLead, deleteLead, addLeadActivity, addLeadNote, bulkDeleteLeads, addLeadFollowUp, updateLeadFollowUp } from "@/app/actions/leads"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { AnimatedCard } from "@/components/animated-card"
 import { getEmployees } from "@/app/actions/team"
@@ -74,6 +74,14 @@ import {
   Tag,
   Video,
   MapPin,
+  Link2,
+  ExternalLink,
+  PhoneCall,
+  CalendarCheck,
+  CalendarX,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
 } from "lucide-react"
 
 type Stage = "new" | "contacted" | "qualified" | "proposal" | "negotiation" | "won" | "lost"
@@ -119,7 +127,16 @@ interface Lead {
   createdAt: string
   lastContact: string
   nextFollowUp: string
+  website: string
+  pageLink: string
   starred: boolean
+  followUps: Array<{
+    id: string
+    date: string
+    notes: string
+    status: string
+    createdAt: string
+  }>
   activityHistory: Array<{
     id: string
     type: "created" | "updated" | "note_added" | "status_changed" | "stage_changed" | "category_changed" | "meeting_scheduled"
@@ -164,6 +181,9 @@ const initialLeads: Lead[] = [
     starred: true,
     activities: 12,
     activityHistory: [],
+    website: "",
+    pageLink: "",
+    followUps: [],
   },
   {
     id: "LD-0002",
@@ -190,6 +210,9 @@ const initialLeads: Lead[] = [
     starred: false,
     activities: 5,
     activityHistory: [],
+    website: "",
+    pageLink: "",
+    followUps: [],
   },
   {
     id: "LD-0003",
@@ -218,6 +241,9 @@ const initialLeads: Lead[] = [
     starred: true,
     activities: 18,
     activityHistory: [],
+    website: "",
+    pageLink: "",
+    followUps: [],
   },
   {
     id: "LD-0004",
@@ -244,6 +270,9 @@ const initialLeads: Lead[] = [
     starred: false,
     activities: 2,
     activityHistory: [],
+    website: "",
+    pageLink: "",
+    followUps: [],
   },
   {
     id: "LD-0005",
@@ -271,6 +300,9 @@ const initialLeads: Lead[] = [
     starred: false,
     activities: 8,
     activityHistory: [],
+    website: "",
+    pageLink: "",
+    followUps: [],
   },
   {
     id: "LD-0006",
@@ -297,6 +329,9 @@ const initialLeads: Lead[] = [
     starred: true,
     activities: 15,
     activityHistory: [],
+    website: "",
+    pageLink: "",
+    followUps: [],
   },
   {
     id: "LD-0007",
@@ -323,6 +358,9 @@ const initialLeads: Lead[] = [
     starred: false,
     activities: 4,
     activityHistory: [],
+    website: "",
+    pageLink: "",
+    followUps: [],
   },
   {
     id: "LD-0008",
@@ -349,6 +387,9 @@ const initialLeads: Lead[] = [
     starred: false,
     activities: 1,
     activityHistory: [],
+    website: "",
+    pageLink: "",
+    followUps: [],
   },
 ]
 
@@ -502,25 +543,28 @@ export default function LeadsPage() {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     try {
+      const followUpDate = (formData.get("nextFollowUp") as string) || ""
       const createdData = await createLead({
         name: formData.get("name") as string,
-        email: formData.get("email") as string,
+        email: (formData.get("email") as string) || "",
         phone: formData.get("phone") as string,
-        company: formData.get("company") as string,
-        status: formData.get("status") as "hot" | "warm" | "cold",
-        stage: formData.get("stage") as Stage,
-        source: formData.get("source") as string,
-        value: Number(formData.get("value")),
+        company: (formData.get("company") as string) || "",
+        status: (formData.get("status") as "hot" | "warm" | "cold") || "warm",
+        stage: (formData.get("stage") as Stage) || "new",
+        source: (formData.get("source") as string) || "Website",
+        value: Number(formData.get("value")) || 0,
         probability: Number(formData.get("probability")) || 50,
-        nextFollowUp: (formData.get("nextFollowUp") as string) || "",
-        notes: formData.get("notes") as string,
+        nextFollowUp: followUpDate,
+        notes: (formData.get("notes") as string) || "",
+        website: (formData.get("website") as string) || "",
+        pageLink: (formData.get("pageLink") as string) || "",
         tags:
           (formData.get("tags") as string)
             ?.split(",")
             .map((t) => t.trim())
             .filter(Boolean) || [],
         assignedTo: (formData.get("assignedTo") as string) || "Unassigned",
-        priority: formData.get("priority") as "high" | "medium" | "low",
+        priority: (formData.get("priority") as "high" | "medium" | "low") || "medium",
         category: (formData.get("category") as LeadCategory) || "other",
         starred: false,
       })
@@ -529,6 +573,11 @@ export default function LeadsPage() {
       
       if (formData.get("notes")) {
         await addLeadNote(createdData.id, formData.get("notes") as string, "Current User")
+      }
+
+      // If a follow-up date was set, create a follow-up record
+      if (followUpDate) {
+        await addLeadFollowUp(createdData.id, followUpDate, "Initial follow-up")
       }
       
       await addLeadActivity(createdData.id, {
@@ -604,6 +653,7 @@ export default function LeadsPage() {
       delete (cleanData as any).id
       delete (cleanData as any).noteHistory
       delete (cleanData as any).activityHistory
+      delete (cleanData as any).followUps
       delete (cleanData as any).createdAt
       cleanData.lastContact = new Date().toISOString()
       
@@ -658,7 +708,7 @@ export default function LeadsPage() {
     } catch(e) { console.error(e) }
   }
 
-  // Handle Next Follow-Up date change
+  // Handle Next Follow-Up date change — also creates a follow-up record
   const handleFollowUpChange = async (id: string, newDate: string) => {
     const oldLead = leads.find((l) => l.id === id)
     if (!oldLead) return
@@ -666,11 +716,18 @@ export default function LeadsPage() {
     const oldDate = oldLead.nextFollowUp || "Not set"
 
     try {
-      const updated = await updateLead(id, { nextFollowUp: newDate })
-      setLeads((prev) => prev.map((l) => (l.id === id ? updated : l)))
+      // Create a follow-up record
+      if (newDate) {
+        await addLeadFollowUp(id, newDate)
+      }
+
+      // Refresh leads to get updated data
+      const freshLeads = await getLeads()
+      setLeads(freshLeads)
 
       if (selectedLead && selectedLead.id === id) {
-        setSelectedLead(updated)
+        const updated = freshLeads.find((l: Lead) => l.id === id)
+        if (updated) setSelectedLead(updated)
       }
 
       await addActivityHistory(id, "updated", `Next follow-up date changed`, {
@@ -679,6 +736,22 @@ export default function LeadsPage() {
           new: newDate ? new Date(newDate).toLocaleDateString() : "Not set",
         },
       })
+    } catch(e) { console.error(e) }
+  }
+
+  // Handle Follow-Up status change (mark as completed/missed)
+  const handleFollowUpStatusChange = async (followUpId: string, newStatus: string, leadId: string) => {
+    try {
+      await updateLeadFollowUp(followUpId, { status: newStatus })
+
+      // Refresh leads
+      const freshLeads = await getLeads()
+      setLeads(freshLeads)
+
+      if (selectedLead && selectedLead.id === leadId) {
+        const updated = freshLeads.find((l: Lead) => l.id === leadId)
+        if (updated) setSelectedLead(updated)
+      }
     } catch(e) { console.error(e) }
   }
 
@@ -944,18 +1017,34 @@ export default function LeadsPage() {
                       <Input id="name" name="name" placeholder="John Doe" required />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="company">Company *</Label>
-                      <Input id="company" name="company" placeholder="Acme Inc" required />
+                      <Label htmlFor="phone">Phone *</Label>
+                      <Input id="phone" name="phone" placeholder="+880 1XXX-XXXXXX" required />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email *</Label>
-                      <Input id="email" name="email" type="email" placeholder="john@acme.com" required />
+                      <Label htmlFor="email">Email</Label>
+                      <Input id="email" name="email" type="email" placeholder="john@acme.com" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone</Label>
-                      <Input id="phone" name="phone" placeholder="+1 (555) 000-0000" />
+                      <Label htmlFor="company">Company</Label>
+                      <Input id="company" name="company" placeholder="Acme Inc" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="website">Website</Label>
+                      <div className="relative">
+                        <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input id="website" name="website" placeholder="https://example.com" className="pl-9" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="pageLink">Page Link (Facebook/Social)</Label>
+                      <div className="relative">
+                        <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input id="pageLink" name="pageLink" placeholder="https://facebook.com/page" className="pl-9" />
+                      </div>
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-4">
@@ -1038,8 +1127,8 @@ export default function LeadsPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="value">Deal Value (৳) *</Label>
-                      <Input id="value" name="value" type="number" placeholder="10000" required />
+                      <Label htmlFor="value">Deal Value (৳)</Label>
+                      <Input id="value" name="value" type="number" placeholder="10000" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="probability">Win Probability (%)</Label>
@@ -2036,12 +2125,17 @@ export default function LeadsPage() {
                               <span className="text-sm">{new Date(selectedLead.lastContact).toLocaleDateString()}</span>
                             </div>
                             <div className="flex items-center justify-between p-2 rounded-lg bg-secondary/50 group">
-                              <span className="text-sm text-muted-foreground">Next Follow-up</span>
+                              <span className="text-sm text-muted-foreground">Add Follow-up</span>
                               <div className="flex items-center gap-2">
                                 <input
                                   type="date"
-                                  value={selectedLead.nextFollowUp || ""}
-                                  onChange={(e) => handleFollowUpChange(selectedLead.id, e.target.value)}
+                                  value=""
+                                  onChange={(e) => {
+                                    if (e.target.value) {
+                                      handleFollowUpChange(selectedLead.id, e.target.value)
+                                      e.target.value = ""
+                                    }
+                                  }}
                                   className="text-sm font-medium text-primary bg-transparent border border-transparent hover:border-border focus:border-primary rounded px-2 py-0.5 outline-none cursor-pointer transition-colors"
                                 />
                               </div>
@@ -2068,6 +2162,117 @@ export default function LeadsPage() {
                             </div>
                           </div>
                         </div>
+                      </div>
+
+                      {/* Business Links */}
+                      {(selectedLead.website || selectedLead.pageLink) && (
+                        <div className="mb-6 space-y-2">
+                          <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Business Links</h4>
+                          <div className="space-y-2">
+                            {selectedLead.website && (
+                              <a
+                                href={selectedLead.website.startsWith("http") ? selectedLead.website : `https://${selectedLead.website}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 p-2 rounded-lg bg-secondary/50 hover:bg-secondary/80 transition-colors group"
+                              >
+                                <Globe className="w-4 h-4 text-blue-400" />
+                                <span className="text-sm text-blue-400 group-hover:underline truncate flex-1">{selectedLead.website}</span>
+                                <ExternalLink className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </a>
+                            )}
+                            {selectedLead.pageLink && (
+                              <a
+                                href={selectedLead.pageLink.startsWith("http") ? selectedLead.pageLink : `https://${selectedLead.pageLink}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 p-2 rounded-lg bg-secondary/50 hover:bg-secondary/80 transition-colors group"
+                              >
+                                <Link2 className="w-4 h-4 text-violet-400" />
+                                <span className="text-sm text-violet-400 group-hover:underline truncate flex-1">{selectedLead.pageLink}</span>
+                                <ExternalLink className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Follow-Up History */}
+                      <div className="mb-6 space-y-3">
+                        <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                          Follow-up History ({selectedLead.followUps?.length || 0})
+                        </h4>
+                        {selectedLead.followUps && selectedLead.followUps.length > 0 ? (
+                          <div className="space-y-2 max-h-[240px] overflow-y-auto pr-1">
+                            {selectedLead.followUps.map((fu) => {
+                              const isOverdue = fu.status === "scheduled" && new Date(fu.date) < new Date()
+                              const statusStyles: Record<string, string> = {
+                                scheduled: isOverdue 
+                                  ? "bg-red-500/10 border-red-500/30 text-red-400"
+                                  : "bg-amber-500/10 border-amber-500/30 text-amber-400",
+                                completed: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
+                                missed: "bg-red-500/10 border-red-500/30 text-red-400",
+                              }
+                              const statusIcons: Record<string, React.ReactNode> = {
+                                scheduled: isOverdue ? <AlertCircle className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />,
+                                completed: <CheckCircle2 className="w-3.5 h-3.5" />,
+                                missed: <XCircle className="w-3.5 h-3.5" />,
+                              }
+                              return (
+                                <div
+                                  key={fu.id}
+                                  className={`flex items-center justify-between p-2.5 rounded-lg border ${statusStyles[fu.status] || statusStyles.scheduled} transition-all`}
+                                >
+                                  <div className="flex items-center gap-2.5">
+                                    <div className="flex items-center gap-1.5">
+                                      {statusIcons[fu.status]}
+                                      <CalendarCheck className="w-3.5 h-3.5 opacity-60" />
+                                    </div>
+                                    <div>
+                                      <span className="text-sm font-medium">
+                                        {new Date(fu.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}
+                                      </span>
+                                      {fu.notes && (
+                                        <p className="text-xs opacity-70 mt-0.5">{fu.notes}</p>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    {fu.status === "scheduled" && (
+                                      <>
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          className="h-6 w-6 p-0 hover:bg-emerald-500/20"
+                                          title="Mark completed"
+                                          onClick={() => handleFollowUpStatusChange(fu.id, "completed", selectedLead.id)}
+                                        >
+                                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          className="h-6 w-6 p-0 hover:bg-red-500/20"
+                                          title="Mark missed"
+                                          onClick={() => handleFollowUpStatusChange(fu.id, "missed", selectedLead.id)}
+                                        >
+                                          <XCircle className="w-3.5 h-3.5 text-red-400" />
+                                        </Button>
+                                      </>
+                                    )}
+                                    <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${statusStyles[fu.status]}`}>
+                                      {isOverdue ? "Overdue" : fu.status}
+                                    </Badge>
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        ) : (
+                          <p className="text-xs text-muted-foreground p-3 rounded-lg bg-secondary/30 text-center">
+                            No follow-ups scheduled yet. Use the date picker above to add one.
+                          </p>
+                        )}
                       </div>
 
                       {selectedLead.tags.length > 0 && (
@@ -2501,6 +2706,8 @@ function EditLeadForm({
     source: lead.source,
     tags: lead.tags.join(", "),
     nextFollowUp: lead.nextFollowUp,
+    website: lead.website || "",
+    pageLink: lead.pageLink || "",
   })
 
   const handleChange = (field: string, value: string) => {
@@ -2530,6 +2737,15 @@ function EditLeadForm({
           />
         </div>
         <div className="space-y-2">
+          <Label htmlFor="phone">Phone</Label>
+          <Input
+            id="phone"
+            value={formData.phone}
+            onChange={(e) => handleChange("phone", e.target.value)}
+            placeholder="+880 1XXX-XXXXXX"
+          />
+        </div>
+        <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input
             id="email"
@@ -2540,15 +2756,6 @@ function EditLeadForm({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="phone">Phone</Label>
-          <Input
-            id="phone"
-            value={formData.phone}
-            onChange={(e) => handleChange("phone", e.target.value)}
-            placeholder="+1 (555) 123-4567"
-          />
-        </div>
-        <div className="space-y-2">
           <Label htmlFor="company">Company</Label>
           <Input
             id="company"
@@ -2556,6 +2763,32 @@ function EditLeadForm({
             onChange={(e) => handleChange("company", e.target.value)}
             placeholder="Company name"
           />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="website">Website</Label>
+          <div className="relative">
+            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              id="website"
+              value={formData.website}
+              onChange={(e) => handleChange("website", e.target.value)}
+              placeholder="https://example.com"
+              className="pl-9"
+            />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="pageLink">Page Link (Facebook/Social)</Label>
+          <div className="relative">
+            <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              id="pageLink"
+              value={formData.pageLink}
+              onChange={(e) => handleChange("pageLink", e.target.value)}
+              placeholder="https://facebook.com/page"
+              className="pl-9"
+            />
+          </div>
         </div>
         <div className="space-y-2">
           <Label htmlFor="status">Status</Label>

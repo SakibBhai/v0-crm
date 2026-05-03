@@ -15,6 +15,9 @@ export async function getLeads() {
         activityHistory: {
           orderBy: { timestamp: "desc" },
         },
+        followUps: {
+          orderBy: { date: "desc" },
+        },
         client: true,
       },
       orderBy: { createdAt: "desc" },
@@ -34,6 +37,7 @@ export async function createLead(data: Prisma.LeadCreateInput) {
       include: {
         noteHistory: true,
         activityHistory: true,
+        followUps: true,
       },
     })
     revalidatePath("/leads")
@@ -52,6 +56,9 @@ export async function updateLead(id: string, data: Prisma.LeadUpdateInput) {
       include: {
         noteHistory: true,
         activityHistory: true,
+        followUps: {
+          orderBy: { date: "desc" },
+        },
       },
     })
     revalidatePath("/leads")
@@ -136,5 +143,93 @@ export async function addLeadActivity(
   } catch (error) {
     console.error("Error adding lead activity:", error)
     throw new Error("Failed to add activity")
+  }
+}
+
+// --- Follow-Up History ---
+
+export async function addLeadFollowUp(
+  leadId: string,
+  date: string,
+  notes: string = ""
+) {
+  try {
+    // Create the follow-up record
+    const followUp = await prisma.leadFollowUp.create({
+      data: {
+        date,
+        notes,
+        status: "scheduled",
+        leadId,
+      },
+    })
+
+    // Update the lead's nextFollowUp to this new date
+    // (always set to the latest scheduled follow-up)
+    const latestFollowUp = await prisma.leadFollowUp.findFirst({
+      where: {
+        leadId,
+        status: "scheduled",
+      },
+      orderBy: { date: "desc" },
+    })
+
+    if (latestFollowUp) {
+      await prisma.lead.update({
+        where: { id: leadId },
+        data: { nextFollowUp: latestFollowUp.date },
+      })
+    }
+
+    revalidatePath("/leads")
+    return JSON.parse(JSON.stringify(followUp))
+  } catch (error) {
+    console.error("Error adding follow-up:", error)
+    throw new Error("Failed to add follow-up")
+  }
+}
+
+export async function updateLeadFollowUp(
+  followUpId: string,
+  data: { status?: string; notes?: string; date?: string }
+) {
+  try {
+    const followUp = await prisma.leadFollowUp.update({
+      where: { id: followUpId },
+      data,
+    })
+
+    // Re-calculate the lead's nextFollowUp
+    const latestScheduled = await prisma.leadFollowUp.findFirst({
+      where: {
+        leadId: followUp.leadId,
+        status: "scheduled",
+      },
+      orderBy: { date: "asc" },
+    })
+
+    await prisma.lead.update({
+      where: { id: followUp.leadId },
+      data: { nextFollowUp: latestScheduled?.date || "" },
+    })
+
+    revalidatePath("/leads")
+    return JSON.parse(JSON.stringify(followUp))
+  } catch (error) {
+    console.error("Error updating follow-up:", error)
+    throw new Error("Failed to update follow-up")
+  }
+}
+
+export async function getLeadFollowUps(leadId: string) {
+  try {
+    const followUps = await prisma.leadFollowUp.findMany({
+      where: { leadId },
+      orderBy: { date: "desc" },
+    })
+    return JSON.parse(JSON.stringify(followUps))
+  } catch (error) {
+    console.error("Error fetching follow-ups:", error)
+    return []
   }
 }
