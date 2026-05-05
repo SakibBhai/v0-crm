@@ -2,40 +2,30 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useSession, signOut } from "next-auth/react"
 import { cn } from "@/lib/utils"
 import {
-  LayoutDashboard,
-  Users,
-  UserCheck,
-  FolderKanban,
-  CheckSquare,
-  UsersRound,
-  Settings,
   ChevronLeft,
   Zap,
-  DollarSign,
-  BarChart3,
-  CalendarDays,
+  LogOut,
 } from "lucide-react"
 import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-
-const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/leads", label: "Leads", icon: Users },
-  { href: "/clients", label: "Clients", icon: UserCheck },
-  { href: "/projects", label: "Projects", icon: FolderKanban },
-  { href: "/tasks", label: "Tasks", icon: CheckSquare },
-  { href: "/team", label: "Team", icon: UsersRound },
-  { href: "/finances", label: "Finances", icon: DollarSign },
-  { href: "/reports", label: "Reports", icon: BarChart3 },
-  { href: "/calendar", label: "Calendar", icon: CalendarDays },
-  { href: "/settings", label: "Settings", icon: Settings },
-]
+import { getNavItemsForRole, getRoleLabel, getRoleColor, getRoleBgColor } from "@/lib/role-config"
+import type { UserRole } from "@prisma/client"
 
 export function Sidebar() {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
+  const { data: session } = useSession()
+
+  const userRole = ((session?.user as any)?.role || "EMPLOYEE") as UserRole
+  const userName = session?.user?.name || "User"
+  const userInitials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
+  const navItems = getNavItemsForRole(userRole)
+  const roleLabel = getRoleLabel(userRole)
+  const roleColor = getRoleColor(userRole)
+  const roleBgColor = getRoleBgColor(userRole)
 
   return (
     <aside
@@ -59,7 +49,7 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
-          const isActive = pathname === item.href
+          const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
           return (
             <Link
               key={item.href}
@@ -86,7 +76,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* User Profile & Collapse */}
+      {/* User Profile & Actions */}
       <div className="border-t border-sidebar-border p-3 space-y-2">
         <div
           className={cn(
@@ -95,16 +85,30 @@ export function Sidebar() {
           )}
         >
           <Avatar className="w-8 h-8">
-            <AvatarImage src="/professional-avatar.png" />
-            <AvatarFallback className="bg-primary/20 text-primary text-xs">JD</AvatarFallback>
+            <AvatarImage src={(session?.user as any)?.avatar || ""} />
+            <AvatarFallback className="bg-primary/20 text-primary text-xs">{userInitials}</AvatarFallback>
           </Avatar>
           {!collapsed && (
             <div className="flex-1 min-w-0 animate-in fade-in slide-in-from-left-2 duration-200">
-              <p className="text-sm font-medium text-sidebar-foreground truncate">John Doe</p>
-              <p className="text-xs text-muted-foreground truncate">Admin</p>
+              <p className="text-sm font-medium text-sidebar-foreground truncate">{userName}</p>
+              <span className={cn("text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded", roleBgColor, roleColor)}>
+                {roleLabel}
+              </span>
             </div>
           )}
         </div>
+
+        {/* Logout Button */}
+        <button
+          onClick={() => signOut({ callbackUrl: "/login" })}
+          className={cn(
+            "flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors",
+            collapsed && "justify-center px-0",
+          )}
+        >
+          <LogOut className="w-4 h-4 shrink-0" />
+          {!collapsed && <span>Sign Out</span>}
+        </button>
 
         <button
           onClick={() => setCollapsed(!collapsed)}

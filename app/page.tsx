@@ -1,5 +1,6 @@
 "use client"
 
+import { useSession } from "next-auth/react"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { StatCard } from "@/components/stat-card"
 import { AnimatedCard } from "@/components/animated-card"
@@ -204,6 +205,34 @@ const uniqueClientsCount = [...new Set(initialProjects.map(p => p.client))].leng
 const totalRevenuePaid = invoicesData.filter(i => i.status === 'paid').reduce((acc, i) => acc + i.paid, 0)
 
 export default function DashboardPage() {
+  const { data: session } = useSession()
+  const userRole = (session?.user as any)?.role || "SUPER_ADMIN"
+
+  // Role-based dashboard imports (lazy)
+  const ManagementDashboard = require("@/components/dashboards/management-dashboard").ManagementDashboard
+  const ManagerDashboard = require("@/components/dashboards/manager-dashboard").ManagerDashboard
+  const EmployeeDashboard = require("@/components/dashboards/employee-dashboard").EmployeeDashboard
+  const ClientDashboard = require("@/components/dashboards/client-dashboard").ClientDashboard
+
+  // Render role-specific dashboards
+  if (userRole === "MANAGEMENT") {
+    return <DashboardLayout><ManagementDashboard /></DashboardLayout>
+  }
+  if (userRole === "MANAGER") {
+    return <DashboardLayout><ManagerDashboard /></DashboardLayout>
+  }
+  if (userRole === "EMPLOYEE") {
+    return <DashboardLayout><EmployeeDashboard /></DashboardLayout>
+  }
+  if (userRole === "CLIENT") {
+    return <DashboardLayout><ClientDashboard /></DashboardLayout>
+  }
+
+  // SUPER_ADMIN gets the full original dashboard
+  return <DashboardLayout><FullAdminDashboard /></DashboardLayout>
+}
+
+function FullAdminDashboard() {
   const today = new Date().toISOString().split("T")[0]
   const [dbEmployees, setDbEmployees] = useState<Employee[]>([])
   const [dbAttendance, setDbAttendance] = useState<AttendanceRecord[]>([])
@@ -277,7 +306,6 @@ export default function DashboardPage() {
   }
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         {/* Hero Welcome Section */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-chart-2/10 to-chart-3/20 border border-primary/20 p-6 md:p-8 animate-in fade-in slide-in-from-top-4 duration-700">
@@ -457,7 +485,6 @@ export default function DashboardPage() {
                     }
                     return (
                       <div key={i} className="flex gap-3 relative">
-                        {/* Timeline line */}
                         {i !== recentActivities.length - 1 && (
                           <div className="absolute left-4 top-8 bottom-[-16px] w-[1px] bg-border/50" />
                         )}
@@ -502,7 +529,7 @@ export default function DashboardPage() {
               <StatCard title="Revenue" value="৳342K" change={15.3} icon={DollarSign} delay={400} iconColor="text-chart-4" />
             </div>
 
-            {/* 3. Financial Overview (CRUCIAL FOR OWNERS) */}
+            {/* 3. Financial Overview */}
             <AnimatedCard delay={500} className="border-amber-500/20 bg-gradient-to-br from-background to-amber-500/5">
               <CardHeader className="pb-4">
                 <CardTitle className="text-base font-semibold flex items-center gap-2">
@@ -537,69 +564,9 @@ export default function DashboardPage() {
               </CardContent>
             </AnimatedCard>
 
-            {/* 4. Charts Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* Revenue vs Target */}
-              <AnimatedCard delay={600}>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Revenue vs Target</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[220px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <ComposedChart data={monthlyTargetData}>
-                        <defs>
-                          <linearGradient id="profitGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                        <XAxis dataKey="month" stroke="#666" fontSize={11} tickLine={false} axisLine={false} />
-                        <YAxis stroke="#666" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `৳${v / 1000}k`} width={40} />
-                        <Tooltip
-                          contentStyle={{ backgroundColor: "#1a1a2e", border: "1px solid #333", borderRadius: "8px", fontSize: "12px" }}
-                          formatter={(value: number) => `৳${value.toLocaleString()}`}
-                        />
-                        <Bar dataKey="target" fill="#666" opacity={0.3} name="Target" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                        <Bar dataKey="actual" fill="#60a5fa" name="Actual Revenue" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                        <Line type="monotone" dataKey="profit" stroke="#10b981" strokeWidth={2} name="Profit" />
-                      </ComposedChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </AnimatedCard>
-
-              {/* Conversion Funnel */}
-              <AnimatedCard delay={700}>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Pipeline Health</CardTitle>
-                  <Badge variant="outline" className="text-[10px]">Trailing 7W</Badge>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[220px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <ComposedChart data={conversionData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                        <XAxis dataKey="week" stroke="#666" fontSize={11} tickLine={false} axisLine={false} />
-                        <YAxis yAxisId="left" stroke="#666" fontSize={11} tickLine={false} axisLine={false} width={30} />
-                        <YAxis yAxisId="right" orientation="right" stroke="#f97316" fontSize={11} tickLine={false} axisLine={false} width={35} tickFormatter={(v) => `${v}%`} />
-                        <Tooltip contentStyle={{ backgroundColor: "#1a1a2e", border: "1px solid #333", borderRadius: "8px", fontSize: "12px" }} />
-                        <Bar yAxisId="left" dataKey="leads" fill="#94a3b8" name="Total Leads" radius={[4, 4, 0, 0]} stackId="a" maxBarSize={30} />
-                        <Bar yAxisId="left" dataKey="qualified" fill="#60a5fa" name="Qualified" radius={[4, 4, 0, 0]} stackId="a" maxBarSize={30} />
-                        <Bar yAxisId="left" dataKey="converted" fill="#4ade80" name="Converted" radius={[4, 4, 0, 0]} stackId="a" maxBarSize={30} />
-                        <Line yAxisId="right" type="monotone" dataKey="rate" stroke="#f97316" strokeWidth={2} name="Conv. Rate %" />
-                      </ComposedChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </AnimatedCard>
-            </div>
-
-            {/* 5. Health KPIs & Active Projects */}
+            {/* 4. KPIs */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-4">
-                {/* Micro KPIs */}
                 <div className="grid grid-cols-2 gap-4">
                   {kpis.map((kpi, i) => {
                     const isPositive = kpi.trend.startsWith("+")
@@ -651,79 +618,9 @@ export default function DashboardPage() {
               </AnimatedCard>
             </div>
 
-            {/* 6. Team Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <AnimatedCard delay={1000}>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Team Performance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[200px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={teamPerformance} layout="vertical">
-                        <CartesianGrid strokeDasharray="3 3" stroke="#333" horizontal={false} />
-                        <XAxis type="number" stroke="#666" fontSize={11} tickLine={false} axisLine={false} />
-                        <YAxis
-                          type="category"
-                          dataKey="name"
-                          stroke="#666"
-                          fontSize={11}
-                          tickLine={false}
-                          axisLine={false}
-                          width={60}
-                        />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "#1a1a2e",
-                            border: "1px solid #333",
-                            borderRadius: "8px",
-                            fontSize: "12px",
-                          }}
-                        />
-                        <Bar dataKey="tasks" fill="#333" radius={[0, 4, 4, 0]} name="Total Tasks" maxBarSize={20} />
-                        <Bar dataKey="completed" fill="#60a5fa" radius={[0, 4, 4, 0]} name="Completed" maxBarSize={20} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </AnimatedCard>
-
-              {/* Team Status Snapshot [REAL DATA] */}
-              <AnimatedCard delay={1050} className="border-indigo-500/20 bg-gradient-to-br from-background to-indigo-500/5">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Users className="w-4 h-4 text-indigo-500" />
-                    Team Status Today
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="flex flex-col justify-center h-[200px] space-y-6 pt-0">
-                  <div className="flex items-center justify-between px-2">
-                    <div className="space-y-1 text-center">
-                      <p className="text-3xl font-bold tracking-tight">{teamSnapshot.activeEmployees}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Members</p>
-                    </div>
-                    <div className="h-10 w-[1px] bg-border/50"></div>
-                    <div className="space-y-1 text-center">
-                      <p className="text-3xl font-bold tracking-tight text-amber-500">{teamSnapshot.onLeave}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">On Leave</p>
-                    </div>
-                    <div className="h-10 w-[1px] bg-border/50"></div>
-                    <div className="space-y-1 text-center">
-                      <p className="text-3xl font-bold tracking-tight text-green-500">{teamSnapshot.attendanceRate}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Present</p>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Progress value={parseInt(teamSnapshot.attendanceRate)} className="h-1.5" />
-                    <p className="text-[10px] text-muted-foreground text-center">Live data from HR & Team module</p>
-                  </div>
-                </CardContent>
-              </AnimatedCard>
-            </div>
-
           </div>
         </div>
       </div>
-    </DashboardLayout >
   )
 }
+

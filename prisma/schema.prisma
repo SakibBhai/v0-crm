@@ -7,6 +7,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ==================== Auth Models ====================
+
+enum UserRole {
+  SUPER_ADMIN
+  MANAGEMENT
+  MANAGER
+  EMPLOYEE
+  CLIENT
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String
+  role          UserRole  @default(EMPLOYEE)
+  avatar        String?
+  isActive      Boolean   @default(true)
+  lastLogin     DateTime?
+
+  employeeId    String?   @unique
+  employee      TeamEmployee? @relation(fields: [employeeId], references: [id])
+  clientId      String?   @unique
+  client        Client?   @relation("ClientUser", fields: [clientId], references: [id])
+
+  sessions      Session[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ==================== CRM Models ====================
+
 model Lead {
   id              String            @id @default(cuid())
   name            String
@@ -112,6 +153,7 @@ model Client {
   updatedAt         DateTime @updatedAt
   uid               String?  @unique
   leads             Lead[]
+  user              User?   @relation("ClientUser")
 }
 
 model Project {
@@ -285,6 +327,7 @@ model TeamEmployee {
   careerHistory     Json     @default("[]")
   emergencyContacts Json     @default("[]")
   leaveBalance      Json     @default("{}")
+  user              User?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
