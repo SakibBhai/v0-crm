@@ -1,6 +1,7 @@
 "use client"
 
 import { useSession } from "next-auth/react"
+import dynamic from "next/dynamic"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { StatCard } from "@/components/stat-card"
 import { AnimatedCard } from "@/components/animated-card"
@@ -209,10 +210,10 @@ export default function DashboardPage() {
   const userRole = (session?.user as any)?.role || "SUPER_ADMIN"
 
   // Role-based dashboard imports (lazy)
-  const ManagementDashboard = require("@/components/dashboards/management-dashboard").ManagementDashboard
-  const ManagerDashboard = require("@/components/dashboards/manager-dashboard").ManagerDashboard
-  const EmployeeDashboard = require("@/components/dashboards/employee-dashboard").EmployeeDashboard
-  const ClientDashboard = require("@/components/dashboards/client-dashboard").ClientDashboard
+  const ManagementDashboard = dynamic(() => import("@/components/dashboards/management-dashboard").then(mod => mod.ManagementDashboard), { ssr: false })
+  const ManagerDashboard = dynamic(() => import("@/components/dashboards/manager-dashboard").then(mod => mod.ManagerDashboard), { ssr: false })
+  const EmployeeDashboard = dynamic(() => import("@/components/dashboards/employee-dashboard").then(mod => mod.EmployeeDashboard), { ssr: false })
+  const ClientDashboard = dynamic(() => import("@/components/dashboards/client-dashboard").then(mod => mod.ClientDashboard), { ssr: false })
 
   // Render role-specific dashboards
   if (userRole === "MANAGEMENT") {
