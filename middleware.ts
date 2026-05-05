@@ -1,7 +1,10 @@
-import { auth } from "@/lib/auth"
+import NextAuth from "next-auth"
+import { authConfig } from "@/lib/auth.config"
 import { NextResponse } from "next/server"
-import { canAccessRoute } from "@/lib/role-config"
+import { canAccessRoute } from "@/lib/routes-config"
 import type { UserRole } from "@prisma/client"
+
+const { auth } = NextAuth(authConfig)
 
 // Routes that don't require authentication
 const publicRoutes = ["/login", "/api/auth"]

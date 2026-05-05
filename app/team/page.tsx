@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useSession } from "next-auth/react"
 import type { Employee, Candidate, LeaveRequest, OKR, AttendanceRecord, PerformanceReview, CourseEnrollment, TrainingCourse, HRMetrics } from "@/lib/types/hr"
 import { skillDefinitions } from "@/lib/data/hr"
 import { DEPARTMENT_CONFIG } from "@/lib/types/hr"
@@ -114,7 +115,8 @@ export default function TeamPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [editEmployeeId, setEditEmployeeId] = useState<string | null>(null)
 
-  const currentUserId = "EMP001" // Simulated logged-in user
+  const { data: session } = useSession()
+  const currentUserId = session?.user?.employeeId || session?.user?.id || "EMP001"
 
   const editingEmployee = editEmployeeId ? employees.find(e => e.id === editEmployeeId) : null
 

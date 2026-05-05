@@ -45,6 +45,7 @@ import {
     CheckCircle2,
     Edit,
     Trash2,
+    Zap,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -62,14 +63,15 @@ export function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, o
     const [isUploadOpen, setIsUploadOpen] = useState(false)
     const [localEmployee, setLocalEmployee] = useState(employee)
     const [downloadingId, setDownloadingId] = useState<string | null>(null)
-    const initials = `${employee.firstName[0]}${employee.lastName[0]}`
-    const deptConfig = DEPARTMENT_CONFIG[employee.department]
+    const initials = `${employee?.firstName?.[0] || ""}${employee?.lastName?.[0] || ""}`
+    const deptConfig = DEPARTMENT_CONFIG[employee?.department] || { label: employee?.department || "Unknown", color: "text-muted-foreground", bgColor: "bg-muted" }
 
     const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat("en-US", { style: "currency", currency: employee.currency }).format(amount)
+        return new Intl.NumberFormat("en-US", { style: "currency", currency: employee?.currency || "USD" }).format(amount || 0)
     }
 
     const formatDate = (date: string) => {
+        if (!date) return "—"
         return new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
     }
 
@@ -99,7 +101,7 @@ export function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, o
         return daysUntilExpiry < 30 && daysUntilExpiry > 0
     }
 
-    if (!isOpen) return null
+    if (!isOpen || !employee) return null
 
     const handleUploadDoc = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -111,7 +113,7 @@ export function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, o
             fileUrl: "#",
             uploadedAt: new Date().toISOString(),
         }
-        const updated = { ...localEmployee, documents: [newDoc, ...localEmployee.documents] }
+        const updated = { ...localEmployee, documents: [newDoc, ...(localEmployee?.documents || [])] }
         setLocalEmployee(updated)
         if (onUpdateEmployee) onUpdateEmployee(updated)
         setIsUploadOpen(false)
@@ -147,10 +149,10 @@ export function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, o
                                                     {deptConfig.label}
                                                 </Badge>
                                                 <Badge variant="outline" className="text-xs capitalize">
-                                                    {employee.employmentType.replace("-", " ")}
+                                                    {(employee.employmentType || "full-time").replace("-", " ")}
                                                 </Badge>
                                                 <Badge variant={employee.status === "active" ? "default" : "secondary"} className="text-xs capitalize">
-                                                    {employee.status}
+                                                    {employee.status || "active"}
                                                 </Badge>
                                             </div>
                                         </div>
@@ -175,10 +177,10 @@ export function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, o
                                 {/* Quick Stats */}
                                 <div className="grid grid-cols-4 gap-4 mt-6">
                                     {[
-                                        { label: "Rating", value: employee.performanceRating.toFixed(1), icon: Star, color: "text-yellow-500" },
-                                        { label: "Experience", value: `${employee.yearsOfExperience}y`, icon: Clock, color: "text-blue-500" },
-                                        { label: "Skills", value: employee.skills.length, icon: Award, color: "text-green-500" },
-                                        { label: "Certifications", value: employee.certifications.length, icon: GraduationCap, color: "text-purple-500" },
+                                        { label: "Rating", value: (employee.performanceRating || 0).toFixed(1), icon: Star, color: "text-yellow-500" },
+                                        { label: "Experience", value: `${employee.yearsOfExperience || 0}y`, icon: Clock, color: "text-blue-500" },
+                                        { label: "Skills", value: employee.skills?.length || 0, icon: Award, color: "text-green-500" },
+                                        { label: "Certifications", value: employee.certifications?.length || 0, icon: GraduationCap, color: "text-purple-500" },
                                     ].map((stat) => (
                                         <div key={stat.label} className="text-center">
                                             <stat.icon className={cn("w-5 h-5 mx-auto mb-1", stat.color)} />
@@ -218,14 +220,14 @@ export function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, o
                                             <div className="p-2 rounded-lg bg-secondary"><Phone className="w-4 h-4" /></div>
                                             <div>
                                                 <p className="text-xs text-muted-foreground">Phone</p>
-                                                <p className="text-sm font-medium">{employee.phone}</p>
+                                                <p className="text-sm font-medium">{employee.phone || "—"}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <div className="p-2 rounded-lg bg-secondary"><MapPin className="w-4 h-4" /></div>
                                             <div>
                                                 <p className="text-xs text-muted-foreground">Location</p>
-                                                <p className="text-sm font-medium">{employee.workLocation}</p>
+                                                <p className="text-sm font-medium">{employee.workLocation || "—"}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
@@ -258,13 +260,13 @@ export function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, o
                                         </div>
                                         <div>
                                             <p className="text-xs text-muted-foreground">Pay Frequency</p>
-                                            <p className="text-sm font-medium capitalize">{employee.payFrequency}</p>
+                                            <p className="text-sm font-medium capitalize">{employee.payFrequency || "monthly"}</p>
                                         </div>
                                     </CardContent>
                                 </Card>
 
                                 {/* Emergency Contacts */}
-                                {employee.emergencyContacts.length > 0 && (
+                                {employee.emergencyContacts && employee.emergencyContacts.length > 0 && (
                                     <Card>
                                         <CardHeader className="pb-3">
                                             <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -287,7 +289,7 @@ export function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, o
                                 )}
 
                                 {/* Certifications */}
-                                {employee.certifications.length > 0 && (
+                                {employee.certifications && employee.certifications.length > 0 && (
                                     <Card>
                                         <CardHeader className="pb-3">
                                             <CardTitle className="text-sm font-medium">Certifications</CardTitle>
@@ -305,25 +307,32 @@ export function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, o
                             </TabsContent>
 
                             <TabsContent value="skills" className="space-y-4">
-                                {employee.skills.map((skill) => {
-                                    const profConfig = PROFICIENCY_CONFIG[skill.proficiency]
-                                    return (
-                                        <div key={skill.skillId} className="p-4 rounded-lg bg-secondary/30">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-medium">{skill.skillName}</span>
-                                                    {skill.isVerified && <Badge variant="outline" className="text-[10px]">Verified</Badge>}
+                                {(!employee.skills || employee.skills.length === 0) ? (
+                                    <div className="text-center py-8 text-muted-foreground">
+                                        <Zap className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                                        <p>No skills recorded</p>
+                                    </div>
+                                ) : (
+                                    employee.skills.map((skill) => {
+                                        const profConfig = PROFICIENCY_CONFIG[skill.proficiency] || { label: "Unknown", color: "bg-gray-400", value: 0 }
+                                        return (
+                                            <div key={skill.skillId} className="p-4 rounded-lg bg-secondary/30">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-medium">{skill.skillName}</span>
+                                                        {skill.isVerified && <Badge variant="outline" className="text-[10px]">Verified</Badge>}
+                                                    </div>
+                                                    <Badge className={cn("text-xs text-white", profConfig.color)}>{profConfig.label}</Badge>
                                                 </div>
-                                                <Badge className={cn("text-xs text-white", profConfig.color)}>{profConfig.label}</Badge>
+                                                <Progress value={profConfig.value} className="h-2" />
+                                                <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
+                                                    <span>{skill.yearsUsed} years experience</span>
+                                                    <span className="capitalize">{skill.category}</span>
+                                                </div>
                                             </div>
-                                            <Progress value={profConfig.value} className="h-2" />
-                                            <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-                                                <span>{skill.yearsUsed} years experience</span>
-                                                <span className="capitalize">{skill.category}</span>
-                                            </div>
-                                        </div>
-                                    )
-                                })}
+                                        )
+                                    })
+                                )}
                             </TabsContent>
 
                             <TabsContent value="documents" className="space-y-4">
@@ -332,7 +341,7 @@ export function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, o
                                         <Upload className="w-4 h-4" /> Upload Document
                                     </Button>
                                 </div>
-                                {localEmployee.documents.length === 0 ? (
+                                {(!localEmployee.documents || localEmployee.documents.length === 0) ? (
                                     <div className="text-center py-8 text-muted-foreground">
                                         <FileText className="w-12 h-12 mx-auto mb-2 opacity-50" />
                                         <p>No documents uploaded</p>
@@ -376,7 +385,7 @@ export function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, o
                             </TabsContent>
 
                             <TabsContent value="career" className="space-y-4">
-                                {employee.careerHistory.length === 0 ? (
+                                {(!employee.careerHistory || employee.careerHistory.length === 0) ? (
                                     <div className="text-center py-8 text-muted-foreground">
                                         <TrendingUp className="w-12 h-12 mx-auto mb-2 opacity-50" />
                                         <p>No career history recorded</p>
@@ -412,12 +421,12 @@ export function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, o
                             <TabsContent value="leave" className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
                                     {[
-                                        { label: "Vacation", data: employee.leaveBalance.vacation, color: "bg-blue-500" },
-                                        { label: "Sick Leave", data: employee.leaveBalance.sick, color: "bg-orange-500" },
-                                        { label: "Personal", data: employee.leaveBalance.personal, color: "bg-purple-500" },
+                                        { label: "Vacation", data: employee.leaveBalance?.vacation || { total: 0, used: 0, pending: 0 }, color: "bg-blue-500" },
+                                        { label: "Sick Leave", data: employee.leaveBalance?.sick || { total: 0, used: 0, pending: 0 }, color: "bg-orange-500" },
+                                        { label: "Personal", data: employee.leaveBalance?.personal || { total: 0, used: 0, pending: 0 }, color: "bg-purple-500" },
                                     ].map((leave) => {
                                         const remaining = leave.data.total - leave.data.used - leave.data.pending
-                                        const usedPercent = (leave.data.used / leave.data.total) * 100
+                                        const usedPercent = leave.data.total > 0 ? (leave.data.used / leave.data.total) * 100 : 0
                                         return (
                                             <Card key={leave.label}>
                                                 <CardContent className="pt-4">

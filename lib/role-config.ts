@@ -80,6 +80,9 @@ const clientNavItems: NavItem[] = [
 
 // ==================== Role Configuration ====================
 
+import { ROLE_ROUTES, canAccessRoute } from "./routes-config"
+export { canAccessRoute }
+
 export interface RoleConfig {
   label: string
   color: string
@@ -93,35 +96,35 @@ export const ROLE_CONFIG: Record<UserRole, RoleConfig> = {
     label: "Super Admin",
     color: "text-red-400",
     bgColor: "bg-red-500/20",
-    routes: ["*"], // access everything
+    routes: ROLE_ROUTES.SUPER_ADMIN,
     sidebar: allNavItems,
   },
   MANAGEMENT: {
     label: "Management",
     color: "text-amber-400",
     bgColor: "bg-amber-500/20",
-    routes: ["/", "/leads", "/clients", "/projects", "/tasks", "/team", "/finances", "/reports", "/calendar", "/users", "/settings"],
+    routes: ROLE_ROUTES.MANAGEMENT,
     sidebar: managementNavItems,
   },
   MANAGER: {
     label: "Manager",
     color: "text-blue-400",
     bgColor: "bg-blue-500/20",
-    routes: ["/", "/leads", "/clients", "/projects", "/tasks", "/team", "/reports", "/calendar"],
+    routes: ROLE_ROUTES.MANAGER,
     sidebar: managerNavItems,
   },
   EMPLOYEE: {
     label: "Employee",
     color: "text-green-400",
     bgColor: "bg-green-500/20",
-    routes: ["/", "/projects", "/tasks", "/team", "/calendar"],
+    routes: ROLE_ROUTES.EMPLOYEE,
     sidebar: employeeNavItems,
   },
   CLIENT: {
     label: "Client",
     color: "text-purple-400",
     bgColor: "bg-purple-500/20",
-    routes: ["/", "/portal/projects", "/portal/invoices", "/portal/messages"],
+    routes: ROLE_ROUTES.CLIENT,
     sidebar: clientNavItems,
   },
 }
@@ -130,20 +133,6 @@ export const ROLE_CONFIG: Record<UserRole, RoleConfig> = {
 
 export function getNavItemsForRole(role: UserRole): NavItem[] {
   return ROLE_CONFIG[role]?.sidebar || employeeNavItems
-}
-
-export function canAccessRoute(role: UserRole, path: string): boolean {
-  const config = ROLE_CONFIG[role]
-  if (!config) return false
-  if (config.routes.includes("*")) return true
-  
-  // Check exact match or prefix match
-  return config.routes.some(route => {
-    if (route === path) return true
-    // Allow sub-routes (e.g., /projects/[id])
-    if (path.startsWith(route + "/")) return true
-    return false
-  })
 }
 
 export function getRoleLabel(role: UserRole): string {

@@ -43,6 +43,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$check$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircle2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/circle-check.js [app-client] (ecmascript) <export default as CheckCircle2>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$square$2d$pen$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Edit$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/square-pen.js [app-client] (ecmascript) <export default as Edit>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Trash2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/trash-2.js [app-client] (ecmascript) <export default as Trash2>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$zap$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Zap$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/zap.js [app-client] (ecmascript) <export default as Zap>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/utils.ts [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
@@ -68,15 +69,20 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
     const [isUploadOpen, setIsUploadOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [localEmployee, setLocalEmployee] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(employee);
     const [downloadingId, setDownloadingId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
-    const initials = `${employee.firstName[0]}${employee.lastName[0]}`;
-    const deptConfig = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$types$2f$hr$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DEPARTMENT_CONFIG"][employee.department];
+    const initials = `${employee?.firstName?.[0] || ""}${employee?.lastName?.[0] || ""}`;
+    const deptConfig = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$types$2f$hr$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DEPARTMENT_CONFIG"][employee?.department] || {
+        label: employee?.department || "Unknown",
+        color: "text-muted-foreground",
+        bgColor: "bg-muted"
+    };
     const formatCurrency = (amount)=>{
         return new Intl.NumberFormat("en-US", {
             style: "currency",
-            currency: employee.currency
-        }).format(amount);
+            currency: employee?.currency || "USD"
+        }).format(amount || 0);
     };
     const formatDate = (date)=>{
+        if (!date) return "—";
         return new Date(date).toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",
@@ -116,7 +122,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
         const daysUntilExpiry = (new Date(doc.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
         return daysUntilExpiry < 30 && daysUntilExpiry > 0;
     };
-    if (!isOpen) return null;
+    if (!isOpen || !employee) return null;
     const handleUploadDoc = (e)=>{
         e.preventDefault();
         const fd = new FormData(e.currentTarget);
@@ -131,7 +137,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
             ...localEmployee,
             documents: [
                 newDoc,
-                ...localEmployee.documents
+                ...localEmployee?.documents || []
             ]
         };
         setLocalEmployee(updated);
@@ -152,7 +158,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                         onClick: onClose
                     }, void 0, false, {
                         fileName: "[project]/components/team/employee-profile.tsx",
-                        lineNumber: 128,
+                        lineNumber: 130,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -178,12 +184,12 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                     children: initials
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 138,
+                                                                    lineNumber: 140,
                                                                     columnNumber: 45
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 137,
+                                                                lineNumber: 139,
                                                                 columnNumber: 41
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -197,7 +203,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                                        lineNumber: 143,
+                                                                        lineNumber: 145,
                                                                         columnNumber: 45
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -205,7 +211,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                         children: employee.jobTitle
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                                        lineNumber: 144,
+                                                                        lineNumber: 146,
                                                                         columnNumber: 45
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -216,43 +222,43 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                 children: deptConfig.label
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                lineNumber: 146,
+                                                                                lineNumber: 148,
                                                                                 columnNumber: 49
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Badge"], {
                                                                                 variant: "outline",
                                                                                 className: "text-xs capitalize",
-                                                                                children: employee.employmentType.replace("-", " ")
+                                                                                children: (employee.employmentType || "full-time").replace("-", " ")
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                lineNumber: 149,
+                                                                                lineNumber: 151,
                                                                                 columnNumber: 49
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Badge"], {
                                                                                 variant: employee.status === "active" ? "default" : "secondary",
                                                                                 className: "text-xs capitalize",
-                                                                                children: employee.status
+                                                                                children: employee.status || "active"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                lineNumber: 152,
+                                                                                lineNumber: 154,
                                                                                 columnNumber: 49
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                                        lineNumber: 145,
+                                                                        lineNumber: 147,
                                                                         columnNumber: 45
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 142,
+                                                                lineNumber: 144,
                                                                 columnNumber: 41
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                        lineNumber: 136,
+                                                        lineNumber: 138,
                                                         columnNumber: 37
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -267,12 +273,12 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                     className: "w-4 h-4 text-muted-foreground hover:text-foreground"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 161,
+                                                                    lineNumber: 163,
                                                                     columnNumber: 49
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 160,
+                                                                lineNumber: 162,
                                                                 columnNumber: 45
                                                             }, this),
                                                             onDeleteEmployee && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -285,12 +291,12 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                     className: "w-4 h-4"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 166,
+                                                                    lineNumber: 168,
                                                                     columnNumber: 49
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 165,
+                                                                lineNumber: 167,
                                                                 columnNumber: 45
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -302,24 +308,24 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                     className: "w-5 h-5"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 170,
+                                                                    lineNumber: 172,
                                                                     columnNumber: 45
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 169,
+                                                                lineNumber: 171,
                                                                 columnNumber: 41
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                        lineNumber: 158,
+                                                        lineNumber: 160,
                                                         columnNumber: 37
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                lineNumber: 135,
+                                                lineNumber: 137,
                                                 columnNumber: 33
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -327,25 +333,25 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                 children: [
                                                     {
                                                         label: "Rating",
-                                                        value: employee.performanceRating.toFixed(1),
+                                                        value: (employee.performanceRating || 0).toFixed(1),
                                                         icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$star$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Star$3e$__["Star"],
                                                         color: "text-yellow-500"
                                                     },
                                                     {
                                                         label: "Experience",
-                                                        value: `${employee.yearsOfExperience}y`,
+                                                        value: `${employee.yearsOfExperience || 0}y`,
                                                         icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$clock$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Clock$3e$__["Clock"],
                                                         color: "text-blue-500"
                                                     },
                                                     {
                                                         label: "Skills",
-                                                        value: employee.skills.length,
+                                                        value: employee.skills?.length || 0,
                                                         icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$award$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Award$3e$__["Award"],
                                                         color: "text-green-500"
                                                     },
                                                     {
                                                         label: "Certifications",
-                                                        value: employee.certifications.length,
+                                                        value: employee.certifications?.length || 0,
                                                         icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$graduation$2d$cap$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__GraduationCap$3e$__["GraduationCap"],
                                                         color: "text-purple-500"
                                                     }
@@ -356,7 +362,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                 className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("w-5 h-5 mx-auto mb-1", stat.color)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 184,
+                                                                lineNumber: 186,
                                                                 columnNumber: 45
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -364,7 +370,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                 children: stat.value
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 185,
+                                                                lineNumber: 187,
                                                                 columnNumber: 45
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -372,29 +378,29 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                 children: stat.label
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 186,
+                                                                lineNumber: 188,
                                                                 columnNumber: 45
                                                             }, this)
                                                         ]
                                                     }, stat.label, true, {
                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                        lineNumber: 183,
+                                                        lineNumber: 185,
                                                         columnNumber: 41
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                lineNumber: 176,
+                                                lineNumber: 178,
                                                 columnNumber: 33
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                        lineNumber: 134,
+                                        lineNumber: 136,
                                         columnNumber: 29
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                    lineNumber: 133,
+                                    lineNumber: 135,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Tabs"], {
@@ -410,7 +416,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                     children: "Overview"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                    lineNumber: 196,
+                                                    lineNumber: 198,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsTrigger"], {
@@ -418,7 +424,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                     children: "Skills"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                    lineNumber: 197,
+                                                    lineNumber: 199,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsTrigger"], {
@@ -426,7 +432,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                     children: "Documents"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                    lineNumber: 198,
+                                                    lineNumber: 200,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsTrigger"], {
@@ -434,7 +440,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                     children: "Career"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                    lineNumber: 199,
+                                                    lineNumber: 201,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsTrigger"], {
@@ -442,13 +448,13 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                     children: "Leave"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                    lineNumber: 200,
+                                                    lineNumber: 202,
                                                     columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                            lineNumber: 195,
+                                            lineNumber: 197,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsContent"], {
@@ -464,12 +470,12 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                 children: "Contact Information"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 207,
+                                                                lineNumber: 209,
                                                                 columnNumber: 41
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 206,
+                                                            lineNumber: 208,
                                                             columnNumber: 37
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -484,12 +490,12 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                 className: "w-4 h-4"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                lineNumber: 211,
+                                                                                lineNumber: 213,
                                                                                 columnNumber: 90
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 211,
+                                                                            lineNumber: 213,
                                                                             columnNumber: 45
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -499,7 +505,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                     children: "Email"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                    lineNumber: 213,
+                                                                                    lineNumber: 215,
                                                                                     columnNumber: 49
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -507,19 +513,19 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                     children: employee.email
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                    lineNumber: 214,
+                                                                                    lineNumber: 216,
                                                                                     columnNumber: 49
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 212,
+                                                                            lineNumber: 214,
                                                                             columnNumber: 45
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 210,
+                                                                    lineNumber: 212,
                                                                     columnNumber: 41
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -531,12 +537,12 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                 className: "w-4 h-4"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                lineNumber: 218,
+                                                                                lineNumber: 220,
                                                                                 columnNumber: 90
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 218,
+                                                                            lineNumber: 220,
                                                                             columnNumber: 45
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -546,27 +552,27 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                     children: "Phone"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                    lineNumber: 220,
+                                                                                    lineNumber: 222,
                                                                                     columnNumber: 49
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                                                     className: "text-sm font-medium",
-                                                                                    children: employee.phone
+                                                                                    children: employee.phone || "—"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                    lineNumber: 221,
+                                                                                    lineNumber: 223,
                                                                                     columnNumber: 49
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 219,
+                                                                            lineNumber: 221,
                                                                             columnNumber: 45
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 217,
+                                                                    lineNumber: 219,
                                                                     columnNumber: 41
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -578,12 +584,12 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                 className: "w-4 h-4"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                lineNumber: 225,
+                                                                                lineNumber: 227,
                                                                                 columnNumber: 90
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 225,
+                                                                            lineNumber: 227,
                                                                             columnNumber: 45
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -593,27 +599,27 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                     children: "Location"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                    lineNumber: 227,
+                                                                                    lineNumber: 229,
                                                                                     columnNumber: 49
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                                                     className: "text-sm font-medium",
-                                                                                    children: employee.workLocation
+                                                                                    children: employee.workLocation || "—"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                    lineNumber: 228,
+                                                                                    lineNumber: 230,
                                                                                     columnNumber: 49
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 226,
+                                                                            lineNumber: 228,
                                                                             columnNumber: 45
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 224,
+                                                                    lineNumber: 226,
                                                                     columnNumber: 41
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -625,12 +631,12 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                 className: "w-4 h-4"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                lineNumber: 232,
+                                                                                lineNumber: 234,
                                                                                 columnNumber: 90
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 232,
+                                                                            lineNumber: 234,
                                                                             columnNumber: 45
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -640,7 +646,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                     children: "Start Date"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                    lineNumber: 234,
+                                                                                    lineNumber: 236,
                                                                                     columnNumber: 49
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -648,31 +654,31 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                     children: formatDate(employee.startDate)
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                    lineNumber: 235,
+                                                                                    lineNumber: 237,
                                                                                     columnNumber: 49
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 233,
+                                                                            lineNumber: 235,
                                                                             columnNumber: 45
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 231,
+                                                                    lineNumber: 233,
                                                                     columnNumber: 41
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 209,
+                                                            lineNumber: 211,
                                                             columnNumber: 37
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                    lineNumber: 205,
+                                                    lineNumber: 207,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -684,12 +690,12 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                 children: "Employment Details"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 244,
+                                                                lineNumber: 246,
                                                                 columnNumber: 41
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 243,
+                                                            lineNumber: 245,
                                                             columnNumber: 37
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -702,7 +708,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                             children: "Employee ID"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 248,
+                                                                            lineNumber: 250,
                                                                             columnNumber: 45
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -710,13 +716,13 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                             children: employee.employeeId
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 249,
+                                                                            lineNumber: 251,
                                                                             columnNumber: 45
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 247,
+                                                                    lineNumber: 249,
                                                                     columnNumber: 41
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -726,7 +732,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                             children: "Reports To"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 252,
+                                                                            lineNumber: 254,
                                                                             columnNumber: 45
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -734,13 +740,13 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                             children: employee.managerName || "—"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 253,
+                                                                            lineNumber: 255,
                                                                             columnNumber: 45
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 251,
+                                                                    lineNumber: 253,
                                                                     columnNumber: 41
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -750,7 +756,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                             children: "Salary"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 256,
+                                                                            lineNumber: 258,
                                                                             columnNumber: 45
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -761,13 +767,13 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 257,
+                                                                            lineNumber: 259,
                                                                             columnNumber: 45
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 255,
+                                                                    lineNumber: 257,
                                                                     columnNumber: 41
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -777,36 +783,36 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                             children: "Pay Frequency"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 260,
+                                                                            lineNumber: 262,
                                                                             columnNumber: 45
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                                             className: "text-sm font-medium capitalize",
-                                                                            children: employee.payFrequency
+                                                                            children: employee.payFrequency || "monthly"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 261,
+                                                                            lineNumber: 263,
                                                                             columnNumber: 45
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 259,
+                                                                    lineNumber: 261,
                                                                     columnNumber: 41
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 246,
+                                                            lineNumber: 248,
                                                             columnNumber: 37
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                    lineNumber: 242,
+                                                    lineNumber: 244,
                                                     columnNumber: 33
                                                 }, this),
-                                                employee.emergencyContacts.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
+                                                employee.emergencyContacts && employee.emergencyContacts.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardHeader"], {
                                                             className: "pb-3",
@@ -817,19 +823,19 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                         className: "w-4 h-4 text-destructive"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                                        lineNumber: 271,
+                                                                        lineNumber: 273,
                                                                         columnNumber: 49
                                                                     }, this),
                                                                     "Emergency Contacts"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 270,
+                                                                lineNumber: 272,
                                                                 columnNumber: 45
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 269,
+                                                            lineNumber: 271,
                                                             columnNumber: 41
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -844,7 +850,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                     children: contact.name
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                    lineNumber: 279,
+                                                                                    lineNumber: 281,
                                                                                     columnNumber: 57
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -852,13 +858,13 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                     children: contact.relationship
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                    lineNumber: 280,
+                                                                                    lineNumber: 282,
                                                                                     columnNumber: 57
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 278,
+                                                                            lineNumber: 280,
                                                                             columnNumber: 53
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -866,27 +872,27 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                             children: contact.phone
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 282,
+                                                                            lineNumber: 284,
                                                                             columnNumber: 53
                                                                         }, this)
                                                                     ]
                                                                 }, i, true, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 277,
+                                                                    lineNumber: 279,
                                                                     columnNumber: 49
                                                                 }, this))
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 275,
+                                                            lineNumber: 277,
                                                             columnNumber: 41
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                    lineNumber: 268,
+                                                    lineNumber: 270,
                                                     columnNumber: 37
                                                 }, this),
-                                                employee.certifications.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
+                                                employee.certifications && employee.certifications.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardHeader"], {
                                                             className: "pb-3",
@@ -895,12 +901,12 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                 children: "Certifications"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 293,
+                                                                lineNumber: 295,
                                                                 columnNumber: 45
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 292,
+                                                            lineNumber: 294,
                                                             columnNumber: 41
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -913,38 +919,64 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                             className: "w-3 h-3"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 298,
+                                                                            lineNumber: 300,
                                                                             columnNumber: 53
                                                                         }, this),
                                                                         cert
                                                                     ]
                                                                 }, i, true, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 297,
+                                                                    lineNumber: 299,
                                                                     columnNumber: 49
                                                                 }, this))
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 295,
+                                                            lineNumber: 297,
                                                             columnNumber: 41
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                    lineNumber: 291,
+                                                    lineNumber: 293,
                                                     columnNumber: 37
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                            lineNumber: 203,
+                                            lineNumber: 205,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsContent"], {
                                             value: "skills",
                                             className: "space-y-4",
-                                            children: employee.skills.map((skill)=>{
-                                                const profConfig = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$types$2f$hr$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PROFICIENCY_CONFIG"][skill.proficiency];
+                                            children: !employee.skills || employee.skills.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "text-center py-8 text-muted-foreground",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$zap$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Zap$3e$__["Zap"], {
+                                                        className: "w-12 h-12 mx-auto mb-2 opacity-50"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/team/employee-profile.tsx",
+                                                        lineNumber: 312,
+                                                        columnNumber: 41
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        children: "No skills recorded"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/team/employee-profile.tsx",
+                                                        lineNumber: 313,
+                                                        columnNumber: 41
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/components/team/employee-profile.tsx",
+                                                lineNumber: 311,
+                                                columnNumber: 37
+                                            }, this) : employee.skills.map((skill)=>{
+                                                const profConfig = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$types$2f$hr$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PROFICIENCY_CONFIG"][skill.proficiency] || {
+                                                    label: "Unknown",
+                                                    color: "bg-gray-400",
+                                                    value: 0
+                                                };
                                                 return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "p-4 rounded-lg bg-secondary/30",
                                                     children: [
@@ -959,8 +991,8 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                             children: skill.skillName
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 314,
-                                                                            columnNumber: 53
+                                                                            lineNumber: 322,
+                                                                            columnNumber: 57
                                                                         }, this),
                                                                         skill.isVerified && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Badge"], {
                                                                             variant: "outline",
@@ -968,36 +1000,36 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                             children: "Verified"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 315,
-                                                                            columnNumber: 74
+                                                                            lineNumber: 323,
+                                                                            columnNumber: 78
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 313,
-                                                                    columnNumber: 49
+                                                                    lineNumber: 321,
+                                                                    columnNumber: 53
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Badge"], {
                                                                     className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("text-xs text-white", profConfig.color),
                                                                     children: profConfig.label
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 317,
-                                                                    columnNumber: 49
+                                                                    lineNumber: 325,
+                                                                    columnNumber: 53
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 312,
-                                                            columnNumber: 45
+                                                            lineNumber: 320,
+                                                            columnNumber: 49
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$progress$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Progress"], {
                                                             value: profConfig.value,
                                                             className: "h-2"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 319,
-                                                            columnNumber: 45
+                                                            lineNumber: 327,
+                                                            columnNumber: 49
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                             className: "flex items-center justify-between mt-2 text-xs text-muted-foreground",
@@ -1009,33 +1041,33 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 321,
-                                                                    columnNumber: 49
+                                                                    lineNumber: 329,
+                                                                    columnNumber: 53
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                     className: "capitalize",
                                                                     children: skill.category
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 322,
-                                                                    columnNumber: 49
+                                                                    lineNumber: 330,
+                                                                    columnNumber: 53
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 320,
-                                                            columnNumber: 45
+                                                            lineNumber: 328,
+                                                            columnNumber: 49
                                                         }, this)
                                                     ]
                                                 }, skill.skillId, true, {
                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                    lineNumber: 311,
-                                                    columnNumber: 41
+                                                    lineNumber: 319,
+                                                    columnNumber: 45
                                                 }, this);
                                             })
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                            lineNumber: 307,
+                                            lineNumber: 309,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsContent"], {
@@ -1053,36 +1085,36 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                 className: "w-4 h-4"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 332,
+                                                                lineNumber: 341,
                                                                 columnNumber: 41
                                                             }, this),
                                                             " Upload Document"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                        lineNumber: 331,
+                                                        lineNumber: 340,
                                                         columnNumber: 37
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                    lineNumber: 330,
+                                                    lineNumber: 339,
                                                     columnNumber: 33
                                                 }, this),
-                                                localEmployee.documents.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                !localEmployee.documents || localEmployee.documents.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "text-center py-8 text-muted-foreground",
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$file$2d$text$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__FileText$3e$__["FileText"], {
                                                             className: "w-12 h-12 mx-auto mb-2 opacity-50"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 337,
+                                                            lineNumber: 346,
                                                             columnNumber: 41
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                             children: "No documents uploaded"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 338,
+                                                            lineNumber: 347,
                                                             columnNumber: 41
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1092,13 +1124,13 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                             children: "Upload First Document"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 339,
+                                                            lineNumber: 348,
                                                             columnNumber: 41
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                    lineNumber: 336,
+                                                    lineNumber: 345,
                                                     columnNumber: 37
                                                 }, this) : localEmployee.documents.map((doc)=>{
                                                     const Icon = getDocumentIcon(doc.type);
@@ -1112,12 +1144,12 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                     className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("w-5 h-5", expiring && "text-destructive")
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 348,
+                                                                    lineNumber: 357,
                                                                     columnNumber: 53
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 347,
+                                                                lineNumber: 356,
                                                                 columnNumber: 49
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1128,7 +1160,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                         children: doc.name
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                                        lineNumber: 351,
+                                                                        lineNumber: 360,
                                                                         columnNumber: 53
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1141,7 +1173,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                lineNumber: 353,
+                                                                                lineNumber: 362,
                                                                                 columnNumber: 57
                                                                             }, this),
                                                                             doc.expiresAt && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -1150,7 +1182,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                         children: "•"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                        lineNumber: 356,
+                                                                                        lineNumber: 365,
                                                                                         columnNumber: 65
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1161,7 +1193,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                        lineNumber: 357,
+                                                                                        lineNumber: 366,
                                                                                         columnNumber: 65
                                                                                     }, this)
                                                                                 ]
@@ -1169,20 +1201,20 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                                        lineNumber: 352,
+                                                                        lineNumber: 361,
                                                                         columnNumber: 53
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 350,
+                                                                lineNumber: 359,
                                                                 columnNumber: 49
                                                             }, this),
                                                             expiring && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$triangle$2d$alert$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertTriangle$3e$__["AlertTriangle"], {
                                                                 className: "w-4 h-4 text-destructive"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 364,
+                                                                lineNumber: 373,
                                                                 columnNumber: 62
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1193,57 +1225,57 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                     className: "w-4 h-4 text-green-500"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 367,
+                                                                    lineNumber: 376,
                                                                     columnNumber: 57
                                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$download$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Download$3e$__["Download"], {
                                                                     className: "w-4 h-4"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 369,
+                                                                    lineNumber: 378,
                                                                     columnNumber: 57
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 365,
+                                                                lineNumber: 374,
                                                                 columnNumber: 49
                                                             }, this)
                                                         ]
                                                     }, doc.id, true, {
                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                        lineNumber: 346,
+                                                        lineNumber: 355,
                                                         columnNumber: 45
                                                     }, this);
                                                 })
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                            lineNumber: 329,
+                                            lineNumber: 338,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsContent"], {
                                             value: "career",
                                             className: "space-y-4",
-                                            children: employee.careerHistory.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: !employee.careerHistory || employee.careerHistory.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "text-center py-8 text-muted-foreground",
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trending$2d$up$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__TrendingUp$3e$__["TrendingUp"], {
                                                         className: "w-12 h-12 mx-auto mb-2 opacity-50"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                        lineNumber: 381,
+                                                        lineNumber: 390,
                                                         columnNumber: 41
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                         children: "No career history recorded"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                        lineNumber: 382,
+                                                        lineNumber: 391,
                                                         columnNumber: 41
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                lineNumber: 380,
+                                                lineNumber: 389,
                                                 columnNumber: 37
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "relative pl-4 border-l-2 border-border",
@@ -1258,12 +1290,12 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                     className: "w-3 h-3 text-primary-foreground"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 391,
+                                                                    lineNumber: 400,
                                                                     columnNumber: 57
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 390,
+                                                                lineNumber: 399,
                                                                 columnNumber: 53
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1274,7 +1306,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                         children: formatDate(event.date)
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                                        lineNumber: 394,
+                                                                        lineNumber: 403,
                                                                         columnNumber: 57
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1282,7 +1314,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                         children: event.title
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                                        lineNumber: 395,
+                                                                        lineNumber: 404,
                                                                         columnNumber: 57
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1290,7 +1322,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                         children: event.details
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                                        lineNumber: 396,
+                                                                        lineNumber: 405,
                                                                         columnNumber: 57
                                                                     }, this),
                                                                     event.previousValue && event.newValue && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1301,14 +1333,14 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                 children: event.previousValue
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                lineNumber: 399,
+                                                                                lineNumber: 408,
                                                                                 columnNumber: 65
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__["ChevronRight"], {
                                                                                 className: "w-3 h-3 inline mx-1"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                lineNumber: 400,
+                                                                                lineNumber: 409,
                                                                                 columnNumber: 65
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1316,36 +1348,36 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                                 children: event.newValue
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                                lineNumber: 401,
+                                                                                lineNumber: 410,
                                                                                 columnNumber: 65
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                                        lineNumber: 398,
+                                                                        lineNumber: 407,
                                                                         columnNumber: 61
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                                lineNumber: 393,
+                                                                lineNumber: 402,
                                                                 columnNumber: 53
                                                             }, this)
                                                         ]
                                                     }, event.id, true, {
                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                        lineNumber: 389,
+                                                        lineNumber: 398,
                                                         columnNumber: 49
                                                     }, this);
                                                 })
                                             }, void 0, false, {
                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                lineNumber: 385,
+                                                lineNumber: 394,
                                                 columnNumber: 37
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                            lineNumber: 378,
+                                            lineNumber: 387,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsContent"], {
@@ -1356,22 +1388,34 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                 children: [
                                                     {
                                                         label: "Vacation",
-                                                        data: employee.leaveBalance.vacation,
+                                                        data: employee.leaveBalance?.vacation || {
+                                                            total: 0,
+                                                            used: 0,
+                                                            pending: 0
+                                                        },
                                                         color: "bg-blue-500"
                                                     },
                                                     {
                                                         label: "Sick Leave",
-                                                        data: employee.leaveBalance.sick,
+                                                        data: employee.leaveBalance?.sick || {
+                                                            total: 0,
+                                                            used: 0,
+                                                            pending: 0
+                                                        },
                                                         color: "bg-orange-500"
                                                     },
                                                     {
                                                         label: "Personal",
-                                                        data: employee.leaveBalance.personal,
+                                                        data: employee.leaveBalance?.personal || {
+                                                            total: 0,
+                                                            used: 0,
+                                                            pending: 0
+                                                        },
                                                         color: "bg-purple-500"
                                                     }
                                                 ].map((leave)=>{
                                                     const remaining = leave.data.total - leave.data.used - leave.data.pending;
-                                                    const usedPercent = leave.data.used / leave.data.total * 100;
+                                                    const usedPercent = leave.data.total > 0 ? leave.data.used / leave.data.total * 100 : 0;
                                                     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
                                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CardContent"], {
                                                             className: "pt-4",
@@ -1384,7 +1428,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                             children: leave.label
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 425,
+                                                                            lineNumber: 434,
                                                                             columnNumber: 57
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1392,13 +1436,13 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                             children: remaining
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 426,
+                                                                            lineNumber: 435,
                                                                             columnNumber: 57
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 424,
+                                                                    lineNumber: 433,
                                                                     columnNumber: 53
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$progress$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Progress"], {
@@ -1406,7 +1450,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                     className: "h-2 mb-2"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 428,
+                                                                    lineNumber: 437,
                                                                     columnNumber: 53
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1419,7 +1463,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 430,
+                                                                            lineNumber: 439,
                                                                             columnNumber: 57
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1429,7 +1473,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 431,
+                                                                            lineNumber: 440,
                                                                             columnNumber: 57
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1439,58 +1483,58 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                                            lineNumber: 432,
+                                                                            lineNumber: 441,
                                                                             columnNumber: 57
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                                    lineNumber: 429,
+                                                                    lineNumber: 438,
                                                                     columnNumber: 53
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 423,
+                                                            lineNumber: 432,
                                                             columnNumber: 49
                                                         }, this)
                                                     }, leave.label, false, {
                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                        lineNumber: 422,
+                                                        lineNumber: 431,
                                                         columnNumber: 45
                                                     }, this);
                                                 })
                                             }, void 0, false, {
                                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                                lineNumber: 413,
+                                                lineNumber: 422,
                                                 columnNumber: 33
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                            lineNumber: 412,
+                                            lineNumber: 421,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                    lineNumber: 194,
+                                    lineNumber: 196,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/team/employee-profile.tsx",
-                            lineNumber: 131,
+                            lineNumber: 133,
                             columnNumber: 21
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/team/employee-profile.tsx",
-                        lineNumber: 130,
+                        lineNumber: 132,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/team/employee-profile.tsx",
-                lineNumber: 127,
+                lineNumber: 129,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Dialog"], {
@@ -1506,19 +1550,19 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                         className: "w-5 h-5 text-primary"
                                     }, void 0, false, {
                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                        lineNumber: 450,
+                                        lineNumber: 459,
                                         columnNumber: 29
                                     }, this),
                                     "Upload Document"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/team/employee-profile.tsx",
-                                lineNumber: 449,
+                                lineNumber: 458,
                                 columnNumber: 25
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/team/employee-profile.tsx",
-                            lineNumber: 448,
+                            lineNumber: 457,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -1536,13 +1580,13 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                     children: "*"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                    lineNumber: 456,
+                                                    lineNumber: 465,
                                                     columnNumber: 50
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                            lineNumber: 456,
+                                            lineNumber: 465,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -1552,13 +1596,13 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                             className: "bg-secondary/50"
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                            lineNumber: 457,
+                                            lineNumber: 466,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                    lineNumber: 455,
+                                    lineNumber: 464,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1568,7 +1612,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                             children: "Document Type"
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                            lineNumber: 460,
+                                            lineNumber: 469,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Select"], {
@@ -1579,12 +1623,12 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                     className: "bg-secondary/50",
                                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectValue"], {}, void 0, false, {
                                                         fileName: "[project]/components/team/employee-profile.tsx",
-                                                        lineNumber: 462,
+                                                        lineNumber: 471,
                                                         columnNumber: 76
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                    lineNumber: 462,
+                                                    lineNumber: 471,
                                                     columnNumber: 33
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -1594,7 +1638,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                             children: "Contract"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 464,
+                                                            lineNumber: 473,
                                                             columnNumber: 37
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -1602,7 +1646,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                             children: "NDA"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 465,
+                                                            lineNumber: 474,
                                                             columnNumber: 37
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -1610,7 +1654,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                             children: "Certification"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 466,
+                                                            lineNumber: 475,
                                                             columnNumber: 37
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -1618,7 +1662,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                             children: "Tax Form"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 467,
+                                                            lineNumber: 476,
                                                             columnNumber: 37
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -1626,7 +1670,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                             children: "ID Document"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 468,
+                                                            lineNumber: 477,
                                                             columnNumber: 37
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -1634,25 +1678,25 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                                             children: "Other"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                                            lineNumber: 469,
+                                                            lineNumber: 478,
                                                             columnNumber: 37
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                                    lineNumber: 463,
+                                                    lineNumber: 472,
                                                     columnNumber: 33
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                            lineNumber: 461,
+                                            lineNumber: 470,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                    lineNumber: 459,
+                                    lineNumber: 468,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1662,7 +1706,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                             children: "File"
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                            lineNumber: 474,
+                                            lineNumber: 483,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
@@ -1670,7 +1714,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                             className: "bg-secondary/50"
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                            lineNumber: 475,
+                                            lineNumber: 484,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1678,13 +1722,13 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                             children: "PDF, DOC, DOCX, JPG, PNG up to 10MB"
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                            lineNumber: 476,
+                                            lineNumber: 485,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                    lineNumber: 473,
+                                    lineNumber: 482,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DialogFooter"], {
@@ -1696,7 +1740,7 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                             children: "Cancel"
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                            lineNumber: 479,
+                                            lineNumber: 488,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1704,30 +1748,30 @@ function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, onEditEm
                                             children: "Upload"
                                         }, void 0, false, {
                                             fileName: "[project]/components/team/employee-profile.tsx",
-                                            lineNumber: 480,
+                                            lineNumber: 489,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/team/employee-profile.tsx",
-                                    lineNumber: 478,
+                                    lineNumber: 487,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/team/employee-profile.tsx",
-                            lineNumber: 454,
+                            lineNumber: 463,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/team/employee-profile.tsx",
-                    lineNumber: 447,
+                    lineNumber: 456,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/team/employee-profile.tsx",
-                lineNumber: 446,
+                lineNumber: 455,
                 columnNumber: 13
             }, this)
         ]
