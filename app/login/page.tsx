@@ -28,14 +28,14 @@ function LoginContent() {
       const result = await signIn("credentials", {
         email,
         password,
-        redirect: false,
+        redirect: false, // Wait, if I use redirect: true, result?.error won't be caught cleanly in some NextAuth versions
       })
 
       if (result?.error) {
         setError("Invalid email or password. Please try again.")
       } else {
-        router.push(callbackUrl)
-        router.refresh()
+        // Use window.location to force a full hard reload so middleware sees the cookie
+        window.location.href = callbackUrl
       }
     } catch (err) {
       setError("Something went wrong. Please try again.")

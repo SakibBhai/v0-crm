@@ -3255,3 +3255,47 @@ Import traces:
 [00:23:17.863] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
 [00:23:17.863] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
 [00:23:17.863] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1777983117820} /_vercel/insights/view
+[00:24:54.128] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:24:54.607] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:24:54.607] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/users","route":"/users"}
+[00:24:54.607] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/users color: rgb(120, 120, 120) color: inherit {"dp":"/users","o":"http://localhost:3000/users","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1777983214959} /_vercel/insights/view
+[00:25:11.299] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1777983231641} /_vercel/insights/view
+[00:25:17.029] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:25:17.029] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1777983237253} /_vercel/insights/view
+[00:32:04.789] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:32:06.563] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:32:06.563] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/users","route":"/users"}
+[00:32:06.563] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/users color: rgb(120, 120, 120) color: inherit {"dp":"/users","o":"http://localhost:3000/users","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1777983646905} /_vercel/insights/view
+[00:37:32.900] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:37:33.075] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:37:33.075] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/login","route":"/login"}
+[00:37:33.075] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/login color: rgb(120, 120, 120) color: inherit {"dp":"/login","o":"http://localhost:3000/login","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1777983973425} /_vercel/insights/view
+[00:37:36.228] Server  ERROR   [auth][error] CredentialsSignin: Read more at https://errors.authjs.dev#credentialssignin
+[00:37:36.228] Server  ERROR       at Module.callback (E:\antigravity\v0-crm\v0-crm\.next\dev\server\chunks\node_modules_@auth_core_36df0127._.js:4314:30)
+    at async AuthInternal (E:\antigravity\v0-crm\v0-crm\.next\dev\server\chunks\node_modules_@auth_core_36df0127._.js:5162:24)
+    at async Auth (E:\antigravity\v0-crm\v0-crm\.next\dev\server\chunks\node_modules_@auth_core_36df0127._.js:5384:34)
+    at async AppRouteRouteModule.do (E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37789)
+    at async AppRouteRouteModule.handle (E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45045)
+    at async responseGenerator (E:\antigravity\v0-crm\v0-crm\.next\dev\server\chunks\node_modules_next_830cf173._.js:16104:38)
+    at async AppRouteRouteModule.handleResponse (E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187851)
+    at async handleResponse (E:\antigravity\v0-crm\v0-crm\.next\dev\server\chunks\node_modules_next_830cf173._.js:16166:32)
+    at async handler (E:\antigravity\v0-crm\v0-crm\.next\dev\server\chunks\node_modules_next_830cf173._.js:16219:13)
+    at async DevServer.renderToResponseWithComponentsImpl (E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\base-server.js:1413:9)
+    at async DevServer.renderPageComponent (E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\base-server.js:1515:32)
+    at async DevServer.pipeImpl (E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\next-server.js:394:17)
+    at async DevServer.handleRequestImpl (E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\base-server.js:912:17)
+    at async E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\dev\next-dev-server.js:382:20
+    at async Span.traceAsyncFn (E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\dev\next-dev-server.js:378:24)
+    at async invokeRender (E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\lib\router-server.js:240:21)
+    at async handleRequest (E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\lib\router-server.js:436:24)
+    at async requestHandlerImpl (E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\lib\router-server.js:484:13)
+    at async Server.requestListener (E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\lib\start-server.js:226:13)
+[00:37:42.374] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:37:42.374] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1777983982598} /_vercel/insights/view
+[00:37:45.393] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/users color: rgb(120, 120, 120) color: inherit {"dp":"/users","o":"http://localhost:3000/users","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1777983985690} /_vercel/insights/view
+[00:37:49.905] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3000/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1777983990251} /_vercel/insights/view
+[00:56:11.149] Server  LOG      ✓ Compiled in 98ms
+[00:56:58.045] Server  LOG      ✓ Compiled in 73ms
