@@ -116,7 +116,7 @@ export default function TeamPage() {
   const [editEmployeeId, setEditEmployeeId] = useState<string | null>(null)
 
   const { data: session } = useSession()
-  const currentUserId = session?.user?.employeeId || session?.user?.id || "EMP001"
+  const currentUserId = (session?.user as any)?.employeeId || session?.user?.id || ""
 
   const editingEmployee = editEmployeeId ? employees.find(e => e.id === editEmployeeId) : null
 

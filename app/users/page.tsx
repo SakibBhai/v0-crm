@@ -12,10 +12,12 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { UserCog, Plus, Search, Shield, Briefcase, Target, Users, User, MoreHorizontal, Check, X, Pencil, Trash2, Key } from "lucide-react"
-import { getUsers, createUser, toggleUserActive, resetPassword, deleteUser } from "@/app/actions/auth-actions"
+import { UserCog, Plus, Search, Shield, Briefcase, Target, Users, User, MoreHorizontal, Check, X, Pencil, Trash2, Key, Link as LinkIcon } from "lucide-react"
+import { getUsers, createUser, updateUser, toggleUserActive, resetPassword, deleteUser } from "@/app/actions/auth-actions"
+import { getEmployees } from "@/app/actions/team"
 import { getRoleLabel, getRoleColor, getRoleBgColor } from "@/lib/role-config"
 import type { UserRole } from "@prisma/client"
+import type { Employee } from "@/lib/types/hr"
 
 const roleIcons: Record<string, any> = {
   SUPER_ADMIN: Shield,
@@ -28,29 +30,67 @@ const roleIcons: Record<string, any> = {
 export default function UsersPage() {
   const { data: session } = useSession()
   const [users, setUsers] = useState<any[]>([])
+  const [employees, setEmployees] = useState<Employee[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [roleFilter, setRoleFilter] = useState("all")
+  
+  // Create State
   const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [newUser, setNewUser] = useState({ name: "", email: "", password: "", role: "EMPLOYEE" as UserRole })
+  const [newUser, setNewUser] = useState({ name: "", email: "", password: "", role: "EMPLOYEE" as UserRole, employeeId: "" })
   const [creating, setCreating] = useState(false)
 
-  useEffect(() => { loadUsers() }, [])
+  // Edit State
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [editUser, setEditUser] = useState({ id: "", name: "", email: "", role: "EMPLOYEE" as UserRole, employeeId: "" })
+  const [editing, setEditing] = useState(false)
 
-  async function loadUsers() {
-    const result = await getUsers()
-    if (Array.isArray(result)) setUsers(result)
+  useEffect(() => { loadData() }, [])
+
+  async function loadData() {
+    const [usersRes, employeesRes] = await Promise.all([getUsers(), getEmployees()])
+    if (Array.isArray(usersRes)) setUsers(usersRes)
+    if (Array.isArray(employeesRes)) setEmployees(employeesRes as Employee[])
   }
 
   async function handleCreateUser() {
     if (!newUser.name || !newUser.email || !newUser.password) return
     setCreating(true)
-    const result = await createUser(newUser)
+    const result = await createUser({ ...newUser, employeeId: newUser.employeeId || undefined })
     if (!("error" in result)) {
       setUsers(prev => [result, ...prev])
-      setNewUser({ name: "", email: "", password: "", role: "EMPLOYEE" })
+      setNewUser({ name: "", email: "", password: "", role: "EMPLOYEE", employeeId: "" })
       setIsCreateOpen(false)
     }
     setCreating(false)
+  }
+
+  function openEditModal(user: any) {
+    setEditUser({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      employeeId: user.employeeId || "",
+    })
+    setIsEditOpen(true)
+  }
+
+  async function handleEditUser() {
+    if (!editUser.name || !editUser.email) return
+    setEditing(true)
+    const result = await updateUser(editUser.id, {
+      name: editUser.name,
+      email: editUser.email,
+      role: editUser.role,
+      employeeId: editUser.employeeId || null,
+    })
+    if (!("error" in result)) {
+      // Need to fetch full user object again to get the populated employee details
+      const fullUsers = await getUsers()
+      if (Array.isArray(fullUsers)) setUsers(fullUsers)
+      setIsEditOpen(false)
+    }
+    setEditing(false)
   }
 
   async function handleToggleActive(id: string) {
@@ -118,7 +158,56 @@ export default function UsersPage() {
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="space-y-2">
+                  <Label>Link to Employee (Optional)</Label>
+                  <Select value={newUser.employeeId} onValueChange={v => setNewUser(p => ({ ...p, employeeId: v === "none" ? "" : v }))}>
+                    <SelectTrigger className="bg-secondary border-0"><SelectValue placeholder="Select an employee" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      {employees.map(emp => (
+                        <SelectItem key={emp.id} value={emp.id}>{emp.firstName} {emp.lastName} - {emp.jobTitle}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <Button onClick={handleCreateUser} disabled={creating} className="w-full">{creating ? "Creating..." : "Create User"}</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Edit User Dialog */}
+          <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader><DialogTitle>Edit User</DialogTitle></DialogHeader>
+              <div className="space-y-4 mt-4">
+                <div className="space-y-2"><Label>Full Name</Label><Input value={editUser.name} onChange={e => setEditUser(p => ({ ...p, name: e.target.value }))} className="bg-secondary border-0" /></div>
+                <div className="space-y-2"><Label>Email</Label><Input type="email" value={editUser.email} onChange={e => setEditUser(p => ({ ...p, email: e.target.value }))} className="bg-secondary border-0" /></div>
+                <div className="space-y-2">
+                  <Label>Role</Label>
+                  <Select value={editUser.role} onValueChange={v => setEditUser(p => ({ ...p, role: v as UserRole }))}>
+                    <SelectTrigger className="bg-secondary border-0"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
+                      <SelectItem value="MANAGEMENT">Management</SelectItem>
+                      <SelectItem value="MANAGER">Manager</SelectItem>
+                      <SelectItem value="EMPLOYEE">Employee</SelectItem>
+                      <SelectItem value="CLIENT">Client</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Link to Employee</Label>
+                  <Select value={editUser.employeeId || "none"} onValueChange={v => setEditUser(p => ({ ...p, employeeId: v === "none" ? "" : v }))}>
+                    <SelectTrigger className="bg-secondary border-0"><SelectValue placeholder="Select an employee" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      {employees.map(emp => (
+                        <SelectItem key={emp.id} value={emp.id}>{emp.firstName} {emp.lastName} - {emp.jobTitle}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button onClick={handleEditUser} disabled={editing} className="w-full">{editing ? "Saving..." : "Save Changes"}</Button>
               </div>
             </DialogContent>
           </Dialog>
@@ -166,6 +255,12 @@ export default function UsersPage() {
                           {!user.isActive && <Badge variant="secondary" className="text-[10px] bg-red-500/10 text-red-400">Inactive</Badge>}
                         </p>
                         <p className="text-sm text-muted-foreground">{user.email}</p>
+                        {user.employee && (
+                          <div className="flex items-center gap-1 mt-1 text-xs text-primary/80">
+                            <LinkIcon className="w-3 h-3" />
+                            <span>Linked: {user.employee.firstName} {user.employee.lastName}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -177,6 +272,7 @@ export default function UsersPage() {
                         {user.lastLogin ? `Last: ${new Date(user.lastLogin).toLocaleDateString()}` : "Never logged in"}
                       </span>
                       <div className="flex gap-1">
+                        <Button variant="ghost" size="sm" onClick={() => openEditModal(user)} title="Edit user"><Pencil className="w-4 h-4 text-blue-400" /></Button>
                         <Button variant="ghost" size="sm" onClick={() => handleToggleActive(user.id)} title={user.isActive ? "Deactivate" : "Activate"}>
                           {user.isActive ? <X className="w-4 h-4 text-red-400" /> : <Check className="w-4 h-4 text-green-400" />}
                         </Button>

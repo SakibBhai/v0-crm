@@ -91,7 +91,7 @@ function LoginContent() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@agencyflow.com"
+                  placeholder="name@company.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 h-11 bg-secondary/50 border-border/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
@@ -142,45 +142,6 @@ function LoginContent() {
               )}
             </Button>
           </form>
-
-          {/* Demo Accounts */}
-          <div className="space-y-3 pt-2">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border/50" />
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="bg-card/40 backdrop-blur-sm px-3 text-muted-foreground">Demo Accounts</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-2">
-              {[
-                { label: "Super Admin", email: "admin@agencyflow.com", color: "text-red-400 border-red-500/30 hover:bg-red-500/10" },
-                { label: "Management", email: "management@agencyflow.com", color: "text-amber-400 border-amber-500/30 hover:bg-amber-500/10" },
-                { label: "Manager", email: "manager@agencyflow.com", color: "text-blue-400 border-blue-500/30 hover:bg-blue-500/10" },
-                { label: "Employee", email: "employee@agencyflow.com", color: "text-green-400 border-green-500/30 hover:bg-green-500/10" },
-                { label: "Client", email: "client@agencyflow.com", color: "text-purple-400 border-purple-500/30 hover:bg-purple-500/10" },
-              ].map((demo) => (
-                <button
-                  key={demo.email}
-                  type="button"
-                  onClick={() => {
-                    setEmail(demo.email)
-                    setPassword("password123")
-                    setError("")
-                  }}
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg border text-xs font-medium transition-all ${demo.color}`}
-                >
-                  <span>{demo.label}</span>
-                  <span className="text-muted-foreground font-normal">{demo.email}</span>
-                </button>
-              ))}
-            </div>
-            <p className="text-[10px] text-center text-muted-foreground">
-              All demo accounts use password: <code className="bg-secondary/50 px-1.5 py-0.5 rounded text-foreground/70">password123</code>
-            </p>
-          </div>
         </div>
 
         {/* Footer */}

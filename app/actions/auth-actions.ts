@@ -147,6 +147,15 @@ export async function getUsers() {
         clientId: true,
         createdAt: true,
         lastLogin: true,
+        employee: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            jobTitle: true,
+            department: true,
+          }
+        }
       },
       orderBy: { createdAt: "desc" },
     })

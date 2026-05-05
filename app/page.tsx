@@ -250,7 +250,8 @@ function FullAdminDashboard() {
   // Office timing
   const OFFICE_IN = "10:30"
   const GRACE = 30
-  const currentUserId = "EMP001"
+  const { data: session } = useSession()
+  const currentUserId = (session?.user as any)?.employeeId || ""
   const currentEmp = dbEmployees.find(e => e.id === currentUserId || e.employeeId === currentUserId)
   const myRecord = currentEmp ? dbAttendance.find(r => r.employeeId === currentEmp.id && r.date === today) : null
 
