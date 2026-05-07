@@ -58,6 +58,14 @@ export const authConfig = {
       }
       return session
     },
+    async redirect({ url, baseUrl }) {
+      // If the url is relative, prefix it with the baseUrl
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      // If the url is on the same origin, allow it
+      if (new URL(url).origin === baseUrl) return url
+      // Otherwise, redirect to baseUrl (dashboard)
+      return baseUrl
+    },
   },
   pages: {
     signIn: "/login",
@@ -67,5 +75,5 @@ export const authConfig = {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "agencyflow-super-secret-key-change-in-production",
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
 } satisfies NextAuthConfig
