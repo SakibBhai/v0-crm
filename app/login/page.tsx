@@ -1,47 +1,43 @@
 "use client"
 
-import { useState, Suspense } from "react"
-import { signIn } from "next-auth/react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useState, Suspense, useTransition } from "react"
+import { useSearchParams } from "next/navigation"
 import { Zap, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { loginAction } from "./actions"
 
 function LoginContent() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get("callbackUrl") || "/"
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isPending, startTransition] = useTransition()
   const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
     setError("")
 
-    try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false, // Wait, if I use redirect: true, result?.error won't be caught cleanly in some NextAuth versions
-      })
-
-      if (result?.error) {
-        setError("Invalid email or password. Please try again.")
-      } else {
-        // Use window.location to force a full hard reload so middleware sees the cookie
-        window.location.href = callbackUrl
+    startTransition(async () => {
+      try {
+        const errorMessage = await loginAction({ email, password, callbackUrl })
+        if (errorMessage) {
+          setError(errorMessage)
+        }
+        // If no error is returned, signIn succeeded and NextAuth handles the redirect automatically
+      } catch (err) {
+        // NEXT_REDIRECT errors are expected on success - they bubble up and Next.js handles the redirect
+        // Any other error is unexpected
+        const errorStr = String(err)
+        if (!errorStr.includes("NEXT_REDIRECT")) {
+          setError("Something went wrong. Please try again.")
+        }
       }
-    } catch (err) {
-      setError("Something went wrong. Please try again.")
-    } finally {
-      setIsLoading(false)
-    }
+    })
   }
 
   return (
@@ -96,7 +92,7 @@ function LoginContent() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 h-11 bg-secondary/50 border-border/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
                   required
-                  disabled={isLoading}
+                  disabled={isPending}
                 />
               </div>
             </div>
@@ -115,7 +111,7 @@ function LoginContent() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10 pr-10 h-11 bg-secondary/50 border-border/50 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
                   required
-                  disabled={isLoading}
+                  disabled={isPending}
                 />
                 <button
                   type="button"
@@ -130,9 +126,9 @@ function LoginContent() {
             <Button
               type="submit"
               className="w-full h-11 bg-gradient-to-r from-primary to-chart-2 hover:opacity-90 text-white font-medium shadow-lg shadow-primary/20 transition-all duration-300"
-              disabled={isLoading}
+              disabled={isPending}
             >
-              {isLoading ? (
+              {isPending ? (
                 <span className="flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   Signing in...
