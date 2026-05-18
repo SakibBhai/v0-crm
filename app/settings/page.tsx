@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useTheme } from "next-themes"
+import { useSession } from "next-auth/react"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { AnimatedCard } from "@/components/animated-card"
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -58,8 +59,13 @@ import {
   ShieldCheck,
   Download,
   AlertTriangle,
+  Loader2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { getSettings, updateSettings, type SettingsData } from "@/app/actions/settings"
+import { changePassword, getUsers, updateUser, deleteUser, createUser } from "@/app/actions/auth-actions"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import type { UserRole } from "@prisma/client"
 
 // ==================== Types ====================
 interface PipelineStage {
@@ -139,12 +145,7 @@ const initialNotifications: NotificationSetting[] = [
   { id: "6", title: "Weekly Reports", description: "Receive weekly summary reports", email: true, push: false, sms: false },
 ]
 
-const teamMembers = [
-  { id: "1", name: "John Doe", email: "john@company.com", role: "Admin", avatar: "JD" },
-  { id: "2", name: "Sarah Mitchell", email: "sarah@company.com", role: "Manager", avatar: "SM" },
-  { id: "3", name: "Emily Chen", email: "emily@company.com", role: "Member", avatar: "EC" },
-  { id: "4", name: "James Wilson", email: "james@company.com", role: "Member", avatar: "JW" },
-]
+
 
 // ==================== Settings Sections Config ====================
 const settingsSections = [
@@ -166,9 +167,11 @@ const groupOrder = ["General", "Sales", "Finance", "Operations", "Team", "System
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("organization")
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle")
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle")
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const { data: session } = useSession()
 
   // Settings State
   const [pipelineStages, setPipelineStages] = useState<PipelineStage[]>(initialPipelineStages)
@@ -178,16 +181,194 @@ export default function SettingsPage() {
   const [invoicePrefix, setInvoicePrefix] = useState("INV")
   const [invoiceStartNumber, setInvoiceStartNumber] = useState(1001)
 
+  // Team Management
+  const [teamUsers, setTeamUsers] = useState<any[]>([])
+  const [inviteModalOpen, setInviteModalOpen] = useState(false)
+  const [inviteData, setInviteData] = useState({ name: "", email: "", password: "", role: "EMPLOYEE" as UserRole })
+  const [isInviting, setIsInviting] = useState(false)
+
+  // Organization
+  const [companyName, setCompanyName] = useState("Your Company")
+  const [websiteVal, setWebsiteVal] = useState("")
+  const [businessEmail, setBusinessEmail] = useState("")
+  const [phoneVal, setPhoneVal] = useState("")
+  const [taxIdVal, setTaxIdVal] = useState("")
+  const [addressVal, setAddressVal] = useState("")
+
+  // Regional
+  const [timezoneVal, setTimezoneVal] = useState("utc+6")
+  const [currencyVal, setCurrencyVal] = useState("bdt")
+  const [dateFormatVal, setDateFormatVal] = useState("dmy")
+  const [fiscalYearVal, setFiscalYearVal] = useState("jan")
+
+  // Templates
+  const [logoPosition, setLogoPosition] = useState("left")
+  const [accentColor, setAccentColor] = useState("#3b82f6")
+  const [paymentTermsText, setPaymentTermsText] = useState("Payment is due within 30 days. Late payments may incur a fee of 1.5% per month.")
+  const [defaultNotesText, setDefaultNotesText] = useState("Thank you for your business!")
+
+  // Finance
+  const [defaultPaymentTerms, setDefaultPaymentTerms] = useState("net30")
+  const [latePaymentFee, setLatePaymentFee] = useState(1.5)
+  const [paymentMethods, setPaymentMethods] = useState([
+    { name: "Bank Transfer", enabled: true },
+    { name: "Credit Card", enabled: true },
+    { name: "Cash", enabled: true },
+    { name: "Check", enabled: false },
+    { name: "Mobile Payment", enabled: true },
+    { name: "PayPal", enabled: false },
+  ])
+
+  // Client Settings
+  const [clientTiers, setClientTiers] = useState([
+    { name: "Enterprise", minValue: 100000, color: "#f59e0b" },
+    { name: "Professional", minValue: 25000, color: "#3b82f6" },
+    { name: "Starter", minValue: 0, color: "#64748b" },
+  ])
+  const [healthScoreWeights, setHealthScoreWeights] = useState([
+    { factor: "Payment History", weight: 30 },
+    { factor: "Engagement", weight: 25 },
+    { factor: "Project Activity", weight: 25 },
+    { factor: "NPS Score", weight: 20 },
+  ])
+
+  // Tasks
+  const [taskStatuses, setTaskStatuses] = useState(["Backlog", "To Do", "In Progress", "In Review", "Done", "Blocked"])
+  const [taskAutomation, setTaskAutomation] = useState(true)
+
+  // Appearance
+  const [compactMode, setCompactMode] = useState(false)
+  const [animations, setAnimations] = useState(true)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+
+  // Security
+  const [currentPassword, setCurrentPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [passwordStatus, setPasswordStatus] = useState<"idle" | "saving" | "saved" | "error">("idle")
+  const [passwordError, setPasswordError] = useState("")
+
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const handleSave = () => {
+  // Load settings from database
+  useEffect(() => {
+    async function load() {
+      try {
+        const [s, users] = await Promise.all([
+          getSettings(),
+          getUsers()
+        ])
+
+        if (users) {
+          setTeamUsers(users)
+        }
+
+        if (s) {
+          setCompanyName(s.companyName)
+          setWebsiteVal(s.website)
+          setBusinessEmail(s.businessEmail)
+          setPhoneVal(s.phone)
+          setTaxIdVal(s.taxId)
+          setAddressVal(s.address)
+          setTimezoneVal(s.timezone)
+          setCurrencyVal(s.currency)
+          setDateFormatVal(s.dateFormat)
+          setFiscalYearVal(s.fiscalYearStart)
+          setInvoicePrefix(s.invoicePrefix)
+          setInvoiceStartNumber(s.invoiceStartNumber)
+          setLogoPosition(s.logoPosition)
+          setAccentColor(s.accentColor)
+          setPaymentTermsText(s.paymentTermsText)
+          setDefaultNotesText(s.defaultNotes)
+          setDefaultPaymentTerms(s.defaultPaymentTerms)
+          setLatePaymentFee(s.latePaymentFee)
+          if (Array.isArray(s.paymentMethods)) setPaymentMethods(s.paymentMethods as any)
+          if (Array.isArray(s.taxConfigs)) setTaxConfigs(s.taxConfigs as any)
+          if (Array.isArray(s.pipelineStages)) setPipelineStages(s.pipelineStages as any)
+          if (Array.isArray(s.leadCategories)) setLeadCategories(s.leadCategories as any)
+          if (Array.isArray(s.clientTiers)) setClientTiers(s.clientTiers as any)
+          if (Array.isArray(s.healthScoreWeights)) setHealthScoreWeights(s.healthScoreWeights as any)
+          if (Array.isArray(s.taskStatuses)) setTaskStatuses(s.taskStatuses as any)
+          setTaskAutomation(s.taskAutomation)
+          if (Array.isArray(s.notifications)) setNotifications(s.notifications as any)
+          setCompactMode(s.compactMode)
+          setAnimations(s.animations)
+          setSidebarCollapsed(s.sidebarCollapsed)
+        }
+      } catch (e) {
+        console.error("Failed to load settings:", e)
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  const handleSave = async () => {
     setSaveStatus("saving")
-    setTimeout(() => {
-      setSaveStatus("saved")
+    try {
+      const data: SettingsData = {
+        companyName, website: websiteVal, businessEmail, phone: phoneVal,
+        taxId: taxIdVal, address: addressVal,
+        timezone: timezoneVal, currency: currencyVal, dateFormat: dateFormatVal, fiscalYearStart: fiscalYearVal,
+        invoicePrefix, invoiceStartNumber, logoPosition, accentColor,
+        paymentTermsText, defaultNotes: defaultNotesText,
+        defaultPaymentTerms, latePaymentFee, paymentMethods, taxConfigs,
+        pipelineStages, leadCategories,
+        clientTiers, healthScoreWeights,
+        taskStatuses, taskAutomation,
+        notifications,
+        compactMode, animations, sidebarCollapsed,
+      }
+      const result = await updateSettings(data)
+      if ("error" in result) {
+        setSaveStatus("error")
+        setTimeout(() => setSaveStatus("idle"), 2000)
+      } else {
+        setSaveStatus("saved")
+        setTimeout(() => setSaveStatus("idle"), 2000)
+      }
+    } catch {
+      setSaveStatus("error")
       setTimeout(() => setSaveStatus("idle"), 2000)
-    }, 1000)
+    }
+  }
+
+  const handlePasswordChange = async () => {
+    setPasswordError("")
+    if (newPassword !== confirmPassword) {
+      setPasswordError("Passwords do not match")
+      return
+    }
+    if (newPassword.length < 6) {
+      setPasswordError("Password must be at least 6 characters")
+      return
+    }
+    if (!session?.user?.id) {
+      setPasswordError("Not authenticated")
+      return
+    }
+    setPasswordStatus("saving")
+    try {
+      const result = await changePassword(session.user.id as string, currentPassword, newPassword)
+      if ("error" in result) {
+        setPasswordError(result.error as string)
+        setPasswordStatus("error")
+        setTimeout(() => setPasswordStatus("idle"), 2000)
+      } else {
+        setPasswordStatus("saved")
+        setCurrentPassword("")
+        setNewPassword("")
+        setConfirmPassword("")
+        setTimeout(() => setPasswordStatus("idle"), 2000)
+      }
+    } catch {
+      setPasswordError("Failed to change password")
+      setPasswordStatus("error")
+      setTimeout(() => setPasswordStatus("idle"), 2000)
+    }
   }
 
   const toggleNotification = (id: string, type: "email" | "push" | "sms") => {
@@ -201,6 +382,62 @@ export default function SettingsPage() {
     sections: settingsSections.filter(s => s.group === group)
   }))
 
+  const handleRoleChange = async (userId: string, newRole: UserRole) => {
+    try {
+      setTeamUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u))
+      await updateUser(userId, { role: newRole })
+    } catch (error) {
+      console.error("Failed to update role:", error)
+    }
+  }
+
+  const handleRemoveUser = async (userId: string) => {
+    if (!confirm("Are you sure you want to remove this team member?")) return
+    try {
+      await deleteUser(userId)
+      setTeamUsers(prev => prev.filter(u => u.id !== userId))
+    } catch (error) {
+      console.error("Failed to remove user:", error)
+    }
+  }
+
+  const handleInviteUser = async () => {
+    if (!inviteData.name || !inviteData.email || !inviteData.password) return
+    setIsInviting(true)
+    try {
+      const res = await createUser({
+        name: inviteData.name,
+        email: inviteData.email,
+        password: inviteData.password,
+        role: inviteData.role,
+      })
+      if (!("error" in res)) {
+        setTeamUsers(prev => [res, ...prev])
+        setInviteModalOpen(false)
+        setInviteData({ name: "", email: "", password: "", role: "EMPLOYEE" as UserRole })
+      } else {
+        alert(res.error)
+      }
+    } catch (error) {
+      console.error("Failed to invite user:", error)
+    } finally {
+      setIsInviting(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-[60vh]">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">Loading settings...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    )
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -210,16 +447,21 @@ export default function SettingsPage() {
             <h1 className="text-2xl font-bold text-foreground">Settings</h1>
             <p className="text-muted-foreground mt-1">Configure your CRM, templates, and business preferences</p>
           </div>
-          <Button onClick={handleSave} disabled={saveStatus === "saving"} className="gap-2">
+          <Button onClick={handleSave} disabled={saveStatus === "saving"} className={cn("gap-2", saveStatus === "error" && "bg-destructive hover:bg-destructive/90")}>
             {saveStatus === "saving" ? (
               <>
-                <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
                 Saving...
               </>
             ) : saveStatus === "saved" ? (
               <>
                 <Check className="w-4 h-4" />
-                Saved
+                Saved!
+              </>
+            ) : saveStatus === "error" ? (
+              <>
+                <AlertTriangle className="w-4 h-4" />
+                Failed
               </>
             ) : (
               <>
@@ -301,39 +543,40 @@ export default function SettingsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2 md:col-span-2">
                         <Label htmlFor="companyName">Company Name</Label>
-                        <Input id="companyName" defaultValue="Your Company" className="bg-secondary border-0" />
+                        <Input id="companyName" value={companyName} onChange={(e) => setCompanyName(e.target.value)} className="bg-secondary border-0" />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="website">Website</Label>
                         <div className="relative">
                           <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                          <Input id="website" defaultValue="yourcompany.com" className="bg-secondary border-0 pl-10" />
+                          <Input id="website" value={websiteVal} onChange={(e) => setWebsiteVal(e.target.value)} className="bg-secondary border-0 pl-10" />
                         </div>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="email">Business Email</Label>
                         <div className="relative">
                           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                          <Input id="email" defaultValue="contact@yourcompany.com" className="bg-secondary border-0 pl-10" />
+                          <Input id="email" value={businessEmail} onChange={(e) => setBusinessEmail(e.target.value)} className="bg-secondary border-0 pl-10" />
                         </div>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="phone">Phone</Label>
                         <div className="relative">
                           <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                          <Input id="phone" defaultValue="+1 (555) 123-4567" className="bg-secondary border-0 pl-10" />
+                          <Input id="phone" value={phoneVal} onChange={(e) => setPhoneVal(e.target.value)} className="bg-secondary border-0 pl-10" />
                         </div>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="taxId">Tax ID / VAT Number</Label>
-                        <Input id="taxId" placeholder="Enter tax ID" className="bg-secondary border-0" />
+                        <Input id="taxId" value={taxIdVal} onChange={(e) => setTaxIdVal(e.target.value)} placeholder="Enter tax ID" className="bg-secondary border-0" />
                       </div>
                       <div className="space-y-2 md:col-span-2">
                         <Label htmlFor="address">Business Address</Label>
                         <Textarea
                           id="address"
                           className="bg-secondary border-0"
-                          defaultValue="123 Business Street, Suite 100&#10;City, State 12345"
+                          value={addressVal}
+                          onChange={(e) => setAddressVal(e.target.value)}
                         />
                       </div>
                     </div>
@@ -351,7 +594,7 @@ export default function SettingsPage() {
                   <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Timezone</Label>
-                      <Select defaultValue="utc+6">
+                      <Select value={timezoneVal} onValueChange={setTimezoneVal}>
                         <SelectTrigger className="bg-secondary border-0">
                           <SelectValue placeholder="Select timezone" />
                         </SelectTrigger>
@@ -365,7 +608,7 @@ export default function SettingsPage() {
                     </div>
                     <div className="space-y-2">
                       <Label>Default Currency</Label>
-                      <Select defaultValue="bdt">
+                      <Select value={currencyVal} onValueChange={setCurrencyVal}>
                         <SelectTrigger className="bg-secondary border-0">
                           <SelectValue placeholder="Select currency" />
                         </SelectTrigger>
@@ -379,7 +622,7 @@ export default function SettingsPage() {
                     </div>
                     <div className="space-y-2">
                       <Label>Date Format</Label>
-                      <Select defaultValue="dmy">
+                      <Select value={dateFormatVal} onValueChange={setDateFormatVal}>
                         <SelectTrigger className="bg-secondary border-0">
                           <SelectValue placeholder="Select format" />
                         </SelectTrigger>
@@ -392,7 +635,7 @@ export default function SettingsPage() {
                     </div>
                     <div className="space-y-2">
                       <Label>Fiscal Year Start</Label>
-                      <Select defaultValue="jan">
+                      <Select value={fiscalYearVal} onValueChange={setFiscalYearVal}>
                         <SelectTrigger className="bg-secondary border-0">
                           <SelectValue placeholder="Select month" />
                         </SelectTrigger>
@@ -449,7 +692,7 @@ export default function SettingsPage() {
                       <div className="space-y-4">
                         <div className="space-y-2">
                           <Label>Logo Position</Label>
-                          <Select defaultValue="left">
+                          <Select value={logoPosition} onValueChange={setLogoPosition}>
                             <SelectTrigger className="bg-secondary border-0">
                               <SelectValue />
                             </SelectTrigger>
@@ -466,7 +709,11 @@ export default function SettingsPage() {
                             {["#3b82f6", "#8b5cf6", "#22c55e", "#f59e0b", "#ef4444"].map((color) => (
                               <button
                                 key={color}
-                                className="w-8 h-8 rounded-lg border-2 border-transparent hover:border-foreground/50 transition-all"
+                                onClick={() => setAccentColor(color)}
+                                className={cn(
+                                  "w-8 h-8 rounded-lg border-2 transition-all",
+                                  accentColor === color ? "border-foreground scale-110" : "border-transparent hover:border-foreground/50"
+                                )}
                                 style={{ backgroundColor: color }}
                               />
                             ))}
@@ -482,7 +729,8 @@ export default function SettingsPage() {
                         <Label>Default Payment Terms</Label>
                         <Textarea
                           className="bg-secondary border-0"
-                          defaultValue="Payment is due within 30 days. Late payments may incur a fee of 1.5% per month."
+                          value={paymentTermsText}
+                          onChange={(e) => setPaymentTermsText(e.target.value)}
                           rows={3}
                         />
                       </div>
@@ -490,7 +738,8 @@ export default function SettingsPage() {
                         <Label>Default Notes</Label>
                         <Textarea
                           className="bg-secondary border-0"
-                          defaultValue="Thank you for your business!"
+                          value={defaultNotesText}
+                          onChange={(e) => setDefaultNotesText(e.target.value)}
                           rows={2}
                         />
                       </div>
@@ -695,7 +944,7 @@ export default function SettingsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label>Default Payment Terms</Label>
-                        <Select defaultValue="net30">
+                        <Select value={defaultPaymentTerms} onValueChange={setDefaultPaymentTerms}>
                           <SelectTrigger className="bg-secondary border-0">
                             <SelectValue />
                           </SelectTrigger>
@@ -709,7 +958,7 @@ export default function SettingsPage() {
                       </div>
                       <div className="space-y-2">
                         <Label>Late Payment Fee (%)</Label>
-                        <Input type="number" defaultValue="1.5" className="bg-secondary border-0" />
+                        <Input type="number" value={latePaymentFee} onChange={(e) => setLatePaymentFee(parseFloat(e.target.value) || 0)} className="bg-secondary border-0" />
                       </div>
                     </div>
 
@@ -718,17 +967,17 @@ export default function SettingsPage() {
                     <div>
                       <Label className="mb-3 block">Accepted Payment Methods</Label>
                       <div className="grid grid-cols-2 gap-3">
-                        {[
-                          { name: "Bank Transfer", enabled: true },
-                          { name: "Credit Card", enabled: true },
-                          { name: "Cash", enabled: true },
-                          { name: "Check", enabled: false },
-                          { name: "Mobile Payment", enabled: true },
-                          { name: "PayPal", enabled: false },
-                        ].map((method) => (
+                        {paymentMethods.map((method, i) => (
                           <div key={method.name} className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
                             <span className="text-sm">{method.name}</span>
-                            <Switch defaultChecked={method.enabled} />
+                            <Switch
+                              checked={method.enabled}
+                              onCheckedChange={(checked) => {
+                                const updated = [...paymentMethods]
+                                updated[i] = { ...updated[i], enabled: checked }
+                                setPaymentMethods(updated)
+                              }}
+                            />
                           </div>
                         ))}
                       </div>
@@ -752,11 +1001,7 @@ export default function SettingsPage() {
                   <div>
                     <Label className="mb-3 block">Client Tiers</Label>
                     <div className="space-y-3">
-                      {[
-                        { name: "Enterprise", minValue: 100000, color: "#f59e0b" },
-                        { name: "Professional", minValue: 25000, color: "#3b82f6" },
-                        { name: "Starter", minValue: 0, color: "#64748b" },
-                      ].map((tier) => (
+                      {clientTiers.map((tier, i) => (
                         <div
                           key={tier.name}
                           className="flex items-center justify-between p-4 rounded-lg bg-secondary/50"
@@ -769,7 +1014,12 @@ export default function SettingsPage() {
                             <span className="text-sm text-muted-foreground">Min Value: ৳</span>
                             <Input
                               type="number"
-                              defaultValue={tier.minValue}
+                              value={tier.minValue}
+                              onChange={(e) => {
+                                const updated = [...clientTiers]
+                                updated[i] = { ...updated[i], minValue: parseInt(e.target.value) || 0 }
+                                setClientTiers(updated)
+                              }}
                               className="w-28 bg-secondary border-0 h-8"
                             />
                           </div>
@@ -783,18 +1033,18 @@ export default function SettingsPage() {
                   <div>
                     <Label className="mb-3 block">Health Score Weights</Label>
                     <div className="grid grid-cols-2 gap-4">
-                      {[
-                        { factor: "Payment History", weight: 30 },
-                        { factor: "Engagement", weight: 25 },
-                        { factor: "Project Activity", weight: 25 },
-                        { factor: "NPS Score", weight: 20 },
-                      ].map((item) => (
+                      {healthScoreWeights.map((item, i) => (
                         <div key={item.factor} className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
                           <span className="text-sm">{item.factor}</span>
                           <div className="flex items-center gap-2">
                             <Input
                               type="number"
-                              defaultValue={item.weight}
+                              value={item.weight}
+                              onChange={(e) => {
+                                const updated = [...healthScoreWeights]
+                                updated[i] = { ...updated[i], weight: parseInt(e.target.value) || 0 }
+                                setHealthScoreWeights(updated)
+                              }}
                               className="w-16 bg-secondary border-0 h-8 text-center"
                             />
                             <span className="text-sm text-muted-foreground">%</span>
@@ -821,13 +1071,26 @@ export default function SettingsPage() {
                   <div>
                     <Label className="mb-3 block">Task Statuses</Label>
                     <div className="flex flex-wrap gap-2">
-                      {["Backlog", "To Do", "In Progress", "In Review", "Done", "Blocked"].map((status) => (
+                      {taskStatuses.map((status) => (
                         <Badge key={status} variant="secondary" className="gap-2 py-2 px-3">
                           {status}
-                          <X className="w-3 h-3 cursor-pointer hover:text-destructive" />
+                          <X
+                            className="w-3 h-3 cursor-pointer hover:text-destructive"
+                            onClick={() => setTaskStatuses(prev => prev.filter(s => s !== status))}
+                          />
                         </Badge>
                       ))}
-                      <Button variant="outline" size="sm" className="gap-1">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1"
+                        onClick={() => {
+                          const name = prompt("Enter new status name:")
+                          if (name && !taskStatuses.includes(name)) {
+                            setTaskStatuses(prev => [...prev, name])
+                          }
+                        }}
+                      >
                         <Plus className="w-3 h-3" />
                         Add Status
                       </Button>
@@ -860,7 +1123,7 @@ export default function SettingsPage() {
                       <p className="font-medium">Enable Task Automation</p>
                       <p className="text-sm text-muted-foreground">Automatically move tasks based on rules</p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch checked={taskAutomation} onCheckedChange={setTaskAutomation} />
                   </div>
                 </CardContent>
               </AnimatedCard>
@@ -877,21 +1140,24 @@ export default function SettingsPage() {
                     </CardTitle>
                     <CardDescription>Manage team access and permissions</CardDescription>
                   </div>
-                  <Button size="sm" className="gap-2">
+                  <Button size="sm" className="gap-2" onClick={() => setInviteModalOpen(true)}>
                     <Plus className="w-4 h-4" />
                     Invite Member
                   </Button>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {teamMembers.map((member) => (
+                    {teamUsers.map((member) => (
                       <div
                         key={member.id}
                         className="flex items-center justify-between p-4 rounded-lg bg-secondary/50"
                       >
                         <div className="flex items-center gap-3">
                           <Avatar className="w-10 h-10">
-                            <AvatarFallback className="bg-primary/20 text-primary">{member.avatar}</AvatarFallback>
+                            <AvatarFallback className="bg-primary/20 text-primary">
+                              {member.avatar ? "" : member.name.substring(0, 2).toUpperCase()}
+                            </AvatarFallback>
+                            {member.avatar && <AvatarImage src={member.avatar} />}
                           </Avatar>
                           <div>
                             <p className="font-medium">{member.name}</p>
@@ -899,18 +1165,29 @@ export default function SettingsPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
-                          <Select defaultValue={member.role.toLowerCase()}>
-                            <SelectTrigger className="w-[120px] bg-secondary border-0">
+                          <Select 
+                            value={member.role} 
+                            onValueChange={(val) => handleRoleChange(member.id, val as UserRole)}
+                            disabled={member.id === session?.user?.id}
+                          >
+                            <SelectTrigger className="w-[150px] bg-secondary border-0">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="admin">Admin</SelectItem>
-                              <SelectItem value="manager">Manager</SelectItem>
-                              <SelectItem value="member">Member</SelectItem>
-                              <SelectItem value="viewer">Viewer</SelectItem>
+                              <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
+                              <SelectItem value="MANAGEMENT">Management</SelectItem>
+                              <SelectItem value="MANAGER">Manager</SelectItem>
+                              <SelectItem value="EMPLOYEE">Employee</SelectItem>
+                              <SelectItem value="CLIENT">Client</SelectItem>
                             </SelectContent>
                           </Select>
-                          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="text-muted-foreground hover:text-destructive"
+                            onClick={() => handleRemoveUser(member.id)}
+                            disabled={member.id === session?.user?.id}
+                          >
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
@@ -1089,19 +1366,31 @@ export default function SettingsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="currentPassword">Current Password</Label>
-                        <Input id="currentPassword" type="password" className="bg-secondary border-0" placeholder="••••••••" />
+                        <Input id="currentPassword" type="password" className="bg-secondary border-0" placeholder="••••••••" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
                       </div>
                       <div />
                       <div className="space-y-2">
                         <Label htmlFor="newPassword">New Password</Label>
-                        <Input id="newPassword" type="password" className="bg-secondary border-0" placeholder="••••••••" />
+                        <Input id="newPassword" type="password" className="bg-secondary border-0" placeholder="••••••••" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                        <Input id="confirmPassword" type="password" className="bg-secondary border-0" placeholder="••••••••" />
+                        <Input id="confirmPassword" type="password" className="bg-secondary border-0" placeholder="••••••••" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
                       </div>
                     </div>
-                    <Button variant="outline" className="bg-transparent">Update Password</Button>
+                    {passwordError && (
+                      <p className="text-sm text-destructive">{passwordError}</p>
+                    )}
+                    {passwordStatus === "saved" && (
+                      <p className="text-sm text-green-500">Password updated successfully!</p>
+                    )}
+                    <Button variant="outline" className="bg-transparent gap-2" onClick={handlePasswordChange} disabled={passwordStatus === "saving"}>
+                      {passwordStatus === "saving" ? (
+                        <><Loader2 className="w-4 h-4 animate-spin" /> Updating...</>
+                      ) : (
+                        "Update Password"
+                      )}
+                    </Button>
                   </CardContent>
                 </AnimatedCard>
 
@@ -1189,21 +1478,21 @@ export default function SettingsPage() {
                         <p className="font-medium">Compact Mode</p>
                         <p className="text-sm text-muted-foreground">Reduce spacing in the interface</p>
                       </div>
-                      <Switch />
+                      <Switch checked={compactMode} onCheckedChange={setCompactMode} />
                     </div>
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">Animations</p>
                         <p className="text-sm text-muted-foreground">Enable smooth animations</p>
                       </div>
-                      <Switch defaultChecked />
+                      <Switch checked={animations} onCheckedChange={setAnimations} />
                     </div>
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">Sidebar Collapsed by Default</p>
                         <p className="text-sm text-muted-foreground">Start with collapsed sidebar</p>
                       </div>
-                      <Switch />
+                      <Switch checked={sidebarCollapsed} onCheckedChange={setSidebarCollapsed} />
                     </div>
                   </div>
                 </CardContent>
@@ -1211,6 +1500,51 @@ export default function SettingsPage() {
             )}
           </div>
         </div>
+
+        {/* Invite Member Dialog */}
+        <Dialog open={inviteModalOpen} onOpenChange={setInviteModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Invite Team Member</DialogTitle>
+              <DialogDescription>Add a new user to your organization.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>Name</Label>
+                <Input value={inviteData.name} onChange={(e) => setInviteData({ ...inviteData, name: e.target.value })} placeholder="John Doe" />
+              </div>
+              <div className="space-y-2">
+                <Label>Email</Label>
+                <Input type="email" value={inviteData.email} onChange={(e) => setInviteData({ ...inviteData, email: e.target.value })} placeholder="john@example.com" />
+              </div>
+              <div className="space-y-2">
+                <Label>Password</Label>
+                <Input type="password" value={inviteData.password} onChange={(e) => setInviteData({ ...inviteData, password: e.target.value })} placeholder="••••••••" />
+              </div>
+              <div className="space-y-2">
+                <Label>Role</Label>
+                <Select value={inviteData.role} onValueChange={(val: UserRole) => setInviteData({ ...inviteData, role: val })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
+                    <SelectItem value="MANAGEMENT">Management</SelectItem>
+                    <SelectItem value="MANAGER">Manager</SelectItem>
+                    <SelectItem value="EMPLOYEE">Employee</SelectItem>
+                    <SelectItem value="CLIENT">Client</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setInviteModalOpen(false)}>Cancel</Button>
+              <Button onClick={handleInviteUser} disabled={isInviting}>
+                {isInviting ? "Inviting..." : "Invite User"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   )

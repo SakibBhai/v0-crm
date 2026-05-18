@@ -887,10 +887,6 @@
     margin-top: calc(var(--spacing) * 1);
   }
 
-  .mt-1\.5 {
-    margin-top: calc(var(--spacing) * 1.5);
-  }
-
   .mt-2 {
     margin-top: calc(var(--spacing) * 2);
   }
@@ -1164,6 +1160,10 @@
     height: calc(var(--spacing) * 48);
   }
 
+  .h-52 {
+    height: calc(var(--spacing) * 52);
+  }
+
   .h-64 {
     height: calc(var(--spacing) * 64);
   }
@@ -1178,6 +1178,10 @@
 
   .h-\[31px\] {
     height: 31px;
+  }
+
+  .h-\[60vh\] {
+    height: 60vh;
   }
 
   .h-\[250px\] {
@@ -1657,6 +1661,13 @@
     --tw-scale-x: 95%;
     --tw-scale-y: 95%;
     --tw-scale-z: 95%;
+    scale: var(--tw-scale-x) var(--tw-scale-y);
+  }
+
+  .scale-110 {
+    --tw-scale-x: 110%;
+    --tw-scale-y: 110%;
+    --tw-scale-z: 110%;
     scale: var(--tw-scale-x) var(--tw-scale-y);
   }
 
@@ -2294,6 +2305,10 @@
     }
   }
 
+  .border-foreground {
+    border-color: var(--foreground);
+  }
+
   .border-gray-500 {
     border-color: var(--color-gray-500);
   }
@@ -2382,16 +2397,6 @@
 
   .border-primary {
     border-color: var(--primary);
-  }
-
-  .border-primary-foreground\/30 {
-    border-color: var(--primary-foreground);
-  }
-
-  @supports (color: color-mix(in lab, red, red)) {
-    .border-primary-foreground\/30 {
-      border-color: color-mix(in oklab, var(--primary-foreground) 30%, transparent);
-    }
   }
 
   .border-primary\/20 {
@@ -2590,10 +2595,6 @@
 
   .border-zinc-700 {
     border-color: var(--color-zinc-700);
-  }
-
-  .border-t-primary-foreground {
-    border-top-color: var(--primary-foreground);
   }
 
   .border-t-transparent {
@@ -5124,10 +5125,6 @@
     transition-property: none;
   }
 
-  .delay-75 {
-    transition-delay: 75ms;
-  }
-
   .delay-200 {
     transition-delay: .2s;
   }
@@ -5168,11 +5165,6 @@
   .ease-out {
     --tw-ease: var(--ease-out);
     transition-timing-function: var(--ease-out);
-  }
-
-  .delay-75 {
-    --tw-animation-delay: 75ms;
-    animation-delay: 75ms;
   }
 
   .delay-200 {

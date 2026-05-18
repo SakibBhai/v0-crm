@@ -30,110 +30,16 @@ import {
   BarChart3,
   PieChart as PieChartIcon,
 } from "lucide-react"
-import {
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  Line,
-  ComposedChart,
-} from "recharts"
 import { useState, useEffect } from "react"
-import { sampleTasks } from "@/lib/data/tasks"
-import { initialProjects } from "@/lib/data/projects"
-import { invoicesData } from "@/lib/data/finance-data"
-import { employees, leaveRequests, attendanceRecords } from "@/lib/data/hr"
 import {
   getEmployees, getAttendanceRecords as getAttendanceRecordsDB,
   createAttendanceRecord as createAttendanceRecordAction,
   updateAttendanceRecord as updateAttendanceRecordAction,
 } from "@/app/actions/team"
+import { getDashboardStats } from "@/app/actions/dashboard"
 import type { Employee, AttendanceRecord } from "@/lib/types/hr"
 import { LogIn, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
-
-const revenueData = [
-  { month: "Jan", revenue: 45000, leads: 120 },
-  { month: "Feb", revenue: 52000, leads: 145 },
-  { month: "Mar", revenue: 48000, leads: 130 },
-  { month: "Apr", revenue: 61000, leads: 168 },
-  { month: "May", revenue: 55000, leads: 155 },
-  { month: "Jun", revenue: 67000, leads: 180 },
-  { month: "Jul", revenue: 72000, leads: 195 },
-]
-
-const projectStatusData = [
-  { name: "Completed", value: initialProjects.filter(p => p.status === 'completed').length, color: "#4ade80" },
-  { name: "In Progress", value: initialProjects.filter(p => p.status === 'in-progress').length, color: "#60a5fa" },
-  { name: "On Hold", value: initialProjects.filter(p => p.status === 'on-hold').length, color: "#fbbf24" },
-  { name: "Planning", value: initialProjects.filter(p => p.status === 'planning').length, color: "#a78bfa" },
-]
-
-const recentLeads = [
-  { name: "Sarah Mitchell", company: "TechStart Inc", status: "Hot", value: "৳15,000", avatar: "SM" },
-  { name: "James Wilson", company: "GrowthCo", status: "Warm", value: "৳8,500", avatar: "JW" },
-  { name: "Emily Chen", company: "InnovateLab", status: "Hot", value: "৳22,000", avatar: "EC" },
-  { name: "Michael Brown", company: "ScaleUp Ltd", status: "Cold", value: "৳5,000", avatar: "MB" },
-]
-
-const activeProjects = initialProjects
-  .filter(p => p.status === 'in-progress')
-  .slice(0, 4)
-  .map(p => ({
-    name: p.name,
-    client: p.client,
-    progress: p.progress,
-    dueDate: new Date(p.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-  }))
-
-const teamPerformance = [
-  { name: "Design", tasks: 24, completed: 18 },
-  { name: "Dev", tasks: 32, completed: 28 },
-  { name: "Marketing", tasks: 18, completed: 15 },
-  { name: "Content", tasks: 21, completed: 19 },
-]
-
-const conversionData = [
-  { week: "W1", leads: 120, qualified: 45, converted: 12, rate: 26.7 },
-  { week: "W2", leads: 145, qualified: 58, converted: 18, rate: 31.0 },
-  { week: "W3", leads: 130, qualified: 52, converted: 14, rate: 26.9 },
-  { week: "W4", leads: 168, qualified: 72, converted: 22, rate: 30.6 },
-  { week: "W5", leads: 155, qualified: 65, converted: 20, rate: 30.8 },
-  { week: "W6", leads: 180, qualified: 78, converted: 25, rate: 32.1 },
-  { week: "W7", leads: 195, qualified: 88, converted: 28, rate: 31.8 },
-]
-
-const clientSourceData = [
-  { name: "Organic", value: 35, color: "#4ade80" },
-  { name: "Referral", value: 25, color: "#60a5fa" },
-  { name: "Paid Ads", value: 28, color: "#f97316" },
-  { name: "Direct", value: 12, color: "#a78bfa" },
-]
-
-const monthlyTargetData = [
-  { month: "Jan", target: 50000, actual: 45000, profit: 12000 },
-  { month: "Feb", target: 55000, actual: 52000, profit: 14000 },
-  { month: "Mar", target: 60000, actual: 48000, profit: 11000 },
-  { month: "Apr", target: 65000, actual: 61000, profit: 18000 },
-  { month: "May", target: 70000, actual: 55000, profit: 15000 },
-  { month: "Jun", target: 75000, actual: 67000, profit: 19000 },
-  { month: "Jul", target: 80000, actual: 72000, profit: 21000 },
-]
-
-const recentActivities = [
-  { id: 1, type: "lead", action: "New Lead Added", detail: "Sarah Mitchell from TechStart Inc", time: "2 hours ago", icon: Users },
-  { id: 2, type: "project", action: "Project Completed", detail: "E-commerce Redesign for TechMart", time: "5 hours ago", icon: CheckCircle },
-  { id: 3, type: "task", action: "Task Created", detail: "SEO Optimization for GreenLife", time: "1 day ago", icon: Target },
-  { id: 4, type: "meeting", action: "Client Meeting", detail: "Strategy discussion with AutoDeal", time: "1 day ago", icon: Calendar },
-  { id: 5, type: "alert", action: "Overdue Invoice", detail: "Invoice #2024-001 - ৳5,200", time: "2 days ago", icon: AlertCircle },
-]
 
 const quickActions = [
   { label: "New Lead", icon: Users, color: "bg-blue-500/20 text-blue-400" },
@@ -144,66 +50,13 @@ const quickActions = [
   { label: "Report", icon: Activity, color: "bg-cyan-500/20 text-cyan-400" },
 ]
 
-const kpis = [
-  { label: "Conversion Rate", value: "31.8%", trend: "+2.3%", color: "text-green-400" },
-  { label: "Avg Deal Value", value: "৳18,750", trend: "+8.5%", color: "text-green-400" },
-  { label: "Client Retention", value: "94.2%", trend: "+1.2%", color: "text-green-400" },
-  { label: "Project ROI", value: "285%", trend: "-3.1%", color: "text-red-400" },
+const recentActivities = [
+  { id: 1, type: "lead", action: "New Lead Added", detail: "Latest from CRM", time: "Recent", icon: Users },
+  { id: 2, type: "project", action: "Project Updated", detail: "Check projects tab", time: "Recent", icon: CheckCircle },
+  { id: 3, type: "task", action: "Task Created", detail: "Check tasks tab", time: "Recent", icon: Target },
+  { id: 4, type: "meeting", action: "Client Activity", detail: "Check clients tab", time: "Recent", icon: Calendar },
+  { id: 5, type: "alert", action: "Invoice Alert", detail: "Check finances tab", time: "Recent", icon: AlertCircle },
 ]
-
-// --- Computed Real Data ---
-
-const upcomingTasks = sampleTasks
-  .filter(t => t.status !== 'done')
-  .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
-
-const dailyTasks = upcomingTasks.slice(0, 5).map(t => ({
-  id: t.id,
-  title: t.title,
-  time: new Date(t.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-  priority: t.priority,
-  completed: t.status === 'done'
-}))
-
-const tasksCompletedToday = sampleTasks.filter(t => t.status === 'done').length
-
-const totalMRR = invoicesData
-  .filter(i => i.recurringInvoice)
-  .reduce((sum, inv) => sum + inv.amount, 0)
-const overdueInvoices = invoicesData.filter(i => i.status === 'overdue')
-const totalOverdue = overdueInvoices.reduce((sum, inv) => sum + (inv.amount - inv.paid), 0)
-const pendingInvoices = invoicesData.filter(i => i.status === 'pending' || i.status === 'sent')
-const totalPending = pendingInvoices.reduce((sum, inv) => sum + (inv.amount - inv.paid), 0)
-
-const financialSummary = {
-  mrr: `৳${(totalMRR / 1000).toFixed(1)}k`,
-  mrrGrowth: "+3.2%",
-  outstanding: `৳${(totalPending / 1000).toFixed(1)}k`,
-  invoicesPending: pendingInvoices.length,
-  overdue: `৳${(totalOverdue / 1000).toFixed(1)}k`,
-  invoicesOverdue: overdueInvoices.length,
-  netProfitYTD: "৳142,500",
-}
-
-const todayDateStr = new Date().toISOString().split('T')[0]
-const teamOnLeave = leaveRequests.filter(lr =>
-  lr.status === 'approved' &&
-  new Date(lr.startDate) <= new Date() &&
-  new Date(lr.endDate) >= new Date()
-)
-const recentAttendanceDate = attendanceRecords.length > 0 ? attendanceRecords[attendanceRecords.length - 1].date : todayDateStr
-const recentAttendance = attendanceRecords.filter(a => a.date === recentAttendanceDate)
-const presentCount = recentAttendance.filter(a => ['present', 'late', 'remote', 'half-day'].includes(a.status)).length
-const activeEmployees = employees.filter(e => e.status === 'active').length
-const attendanceRate = activeEmployees > 0 ? Math.round((presentCount / activeEmployees) * 100) : 0
-const teamSnapshot = {
-  onLeave: teamOnLeave.length,
-  attendanceRate: `${attendanceRate}%`,
-  activeEmployees
-}
-
-const uniqueClientsCount = [...new Set(initialProjects.map(p => p.client))].length
-const totalRevenuePaid = invoicesData.filter(i => i.status === 'paid').reduce((acc, i) => acc + i.paid, 0)
 
 export default function DashboardPage() {
   const { data: session } = useSession()
@@ -238,12 +91,18 @@ function FullAdminDashboard() {
   const [dbEmployees, setDbEmployees] = useState<Employee[]>([])
   const [dbAttendance, setDbAttendance] = useState<AttendanceRecord[]>([])
   const [clockLoading, setClockLoading] = useState(false)
+  const [dashData, setDashData] = useState<any>(null)
 
   useEffect(() => {
     async function loadData() {
-      const [empRes, attRes] = await Promise.all([getEmployees(), getAttendanceRecordsDB()])
+      const [empRes, attRes, statsRes] = await Promise.all([
+        getEmployees(),
+        getAttendanceRecordsDB(),
+        getDashboardStats(),
+      ])
       if (Array.isArray(empRes)) setDbEmployees(empRes as Employee[])
       if (Array.isArray(attRes)) setDbAttendance(attRes as AttendanceRecord[])
+      if (statsRes && !("error" in statsRes)) setDashData(statsRes)
     }
     loadData()
   }, [])
@@ -299,13 +158,38 @@ function FullAdminDashboard() {
     setClockLoading(false)
   }
 
-  // Calculate totals for hero section
+  const fmt = (v: number) => v >= 1e6 ? `৳${(v/1e6).toFixed(1)}M` : v >= 1e3 ? `৳${(v/1e3).toFixed(0)}K` : `৳${v}`
+
+  // Calculate totals for hero section from real data
   const todayStats = {
-    newLeads: 12,
-    meetings: 3,
-    tasksCompleted: tasksCompletedToday,
-    revenue: `৳${(totalRevenuePaid / 1000).toFixed(1)}k`,
+    newLeads: dashData?.counts?.leadCount ?? 0,
+    tasksCompleted: dashData?.tasks?.completed ?? 0,
+    totalTasks: dashData?.tasks?.total ?? 0,
+    revenue: dashData ? fmt(dashData.finance.paidInvoiceValue) : "৳0",
   }
+
+  // Financial snapshot from real data
+  const financialSummary = dashData ? {
+    mrr: fmt(dashData.finance.mrrValue),
+    outstanding: fmt(dashData.finance.pendingInvoiceValue),
+    invoicesPending: dashData.finance.pendingInvoiceCount,
+    overdue: fmt(dashData.finance.overdueInvoiceValue),
+    invoicesOverdue: dashData.finance.overdueInvoiceCount,
+  } : { mrr: "৳0", outstanding: "৳0", invoicesPending: 0, overdue: "৳0", invoicesOverdue: 0 }
+
+  // KPIs from real data
+  const convRate = dashData && dashData.counts.leadCount > 0
+    ? Math.round((dashData.tasks.completed / Math.max(dashData.tasks.total, 1)) * 1000) / 10
+    : 0
+  const avgDealValue = dashData && dashData.counts.leadCount > 0
+    ? fmt(dashData.finance.totalRevenue / Math.max(dashData.counts.clientCount, 1))
+    : "৳0"
+  const kpis = [
+    { label: "Task Completion", value: `${convRate}%`, trend: `${dashData?.tasks?.completed ?? 0} done`, color: "text-green-400" },
+    { label: "Avg Client Value", value: avgDealValue, trend: `${dashData?.counts?.clientCount ?? 0} clients`, color: "text-green-400" },
+    { label: "Active Employees", value: String(dashData?.team?.active ?? 0), trend: `${dashData?.team?.total ?? 0} total`, color: "text-blue-400" },
+    { label: "Budget Utilization", value: dashData ? `${Math.round((dashData.projects.totalSpent / Math.max(dashData.projects.totalBudget, 1)) * 100)}%` : "0%", trend: `${fmt(dashData?.projects?.totalSpent ?? 0)} spent`, color: "text-amber-400" },
+  ]
 
   return (
       <div className="space-y-6">
@@ -328,37 +212,29 @@ function FullAdminDashboard() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
               <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-lg bg-blue-500/20">
-                    <Zap className="w-4 h-4 text-blue-400" />
-                  </div>
-                  <span className="text-sm text-muted-foreground">New Leads</span>
+                  <div className="p-2 rounded-lg bg-blue-500/20"><Zap className="w-4 h-4 text-blue-400" /></div>
+                  <span className="text-sm text-muted-foreground">Total Leads</span>
                 </div>
-                <p className="text-2xl font-bold mt-2">+{todayStats.newLeads}</p>
+                <p className="text-2xl font-bold mt-2">{todayStats.newLeads}</p>
               </div>
               <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-lg bg-purple-500/20">
-                    <Calendar className="w-4 h-4 text-purple-400" />
-                  </div>
-                  <span className="text-sm text-muted-foreground">Meetings</span>
+                  <div className="p-2 rounded-lg bg-purple-500/20"><FolderKanban className="w-4 h-4 text-purple-400" /></div>
+                  <span className="text-sm text-muted-foreground">Total Tasks</span>
                 </div>
-                <p className="text-2xl font-bold mt-2">{todayStats.meetings}</p>
+                <p className="text-2xl font-bold mt-2">{todayStats.totalTasks}</p>
               </div>
               <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-lg bg-green-500/20">
-                    <CheckCircle className="w-4 h-4 text-green-400" />
-                  </div>
+                  <div className="p-2 rounded-lg bg-green-500/20"><CheckCircle className="w-4 h-4 text-green-400" /></div>
                   <span className="text-sm text-muted-foreground">Tasks Done</span>
                 </div>
                 <p className="text-2xl font-bold mt-2">{todayStats.tasksCompleted}</p>
               </div>
               <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-lg bg-amber-500/20">
-                    <DollarSign className="w-4 h-4 text-amber-400" />
-                  </div>
-                  <span className="text-sm text-muted-foreground">Today's Revenue</span>
+                  <div className="p-2 rounded-lg bg-amber-500/20"><DollarSign className="w-4 h-4 text-amber-400" /></div>
+                  <span className="text-sm text-muted-foreground">Revenue</span>
                 </div>
                 <p className="text-2xl font-bold mt-2">{todayStats.revenue}</p>
               </div>
@@ -418,45 +294,45 @@ function FullAdminDashboard() {
           {/* LEFT COLUMN: DAILY OPERATIONS (5 columns wide on XL) */}
           <div className="xl:col-span-5 space-y-6">
 
-            {/* 1. Daily Priority Tasks */}
+            {/* 1. Recent Activity Summary */}
             <AnimatedCard delay={100} className="border-primary/20 shadow-md shadow-primary/5">
               <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border/50 bg-muted/30">
                 <div className="flex items-center gap-2">
                   <div className="p-1.5 rounded-md bg-blue-500/20">
                     <CheckCircle className="w-4 h-4 text-blue-400" />
                   </div>
-                  <CardTitle className="text-base font-semibold">Today's Priorities</CardTitle>
+                  <CardTitle className="text-base font-semibold">Recent Leads</CardTitle>
                 </div>
                 <Badge variant="outline" className="text-xs font-normal">
-                  {todayStats.tasksCompleted} / {dailyTasks.length} Done
+                  {dashData?.counts?.leadCount ?? 0} total
                 </Badge>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="divide-y divide-border/50">
-                  {dailyTasks.map((task, i) => (
-                    <div key={task.id} className="p-4 flex gap-3 hover:bg-muted/50 transition-colors group">
+                  {(dashData?.recentLeads || []).map((lead: any, i: number) => (
+                    <div key={i} className="p-4 flex gap-3 hover:bg-muted/50 transition-colors group">
                       <div className="mt-0.5">
-                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center cursor-pointer transition-colors ${task.completed ? 'bg-primary border-primary' : 'border-muted-foreground/50 hover:border-primary delay-75'}`}>
-                          {task.completed && <CheckCircle className="w-3.5 h-3.5 text-primary-foreground" />}
+                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
+                          {lead.avatar}
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-medium ${task.completed ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                          {task.title}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1.5 mt-1">
+                        <p className="text-sm font-medium text-foreground">{lead.name}</p>
+                        <div className="flex items-center gap-2 mt-1">
                           <Badge variant="secondary" className="text-[10px] uppercase font-semibold tracking-wider h-5 px-1.5">
-                            {task.time}
+                            {lead.company || "No company"}
                           </Badge>
-                          <span className={`text-[10px] font-medium uppercase tracking-wider ${task.priority === 'high' ? 'text-red-400' :
-                            task.priority === 'medium' ? 'text-amber-400' : 'text-blue-400'
-                            }`}>
-                            {task.priority} Priority
+                          <span className={`text-[10px] font-medium uppercase tracking-wider ${lead.status === 'hot' ? 'text-red-400' : lead.status === 'warm' ? 'text-amber-400' : 'text-blue-400'}`}>
+                            {lead.status}
                           </span>
+                          <span className="text-[10px] text-muted-foreground">{lead.value}</span>
                         </div>
                       </div>
                     </div>
                   ))}
+                  {(!dashData?.recentLeads || dashData.recentLeads.length === 0) && (
+                    <div className="p-4 text-sm text-muted-foreground text-center">No leads yet</div>
+                  )}
                 </div>
               </CardContent>
             </AnimatedCard>
@@ -525,10 +401,10 @@ function FullAdminDashboard() {
 
             {/* 2. Top-level KPIs */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard title="Total Leads" value="1,284" change={12.5} icon={Users} delay={100} iconColor="text-chart-1" />
-              <StatCard title="Active Clients" value="86" change={8.2} icon={UserCheck} delay={200} iconColor="text-chart-2" />
-              <StatCard title="Projects" value="28" change={-3.1} icon={FolderKanban} delay={300} iconColor="text-chart-3" />
-              <StatCard title="Revenue" value="৳342K" change={15.3} icon={DollarSign} delay={400} iconColor="text-chart-4" />
+              <StatCard title="Total Leads" value={String(dashData?.counts?.leadCount ?? 0)} change={0} icon={Users} delay={100} iconColor="text-chart-1" />
+              <StatCard title="Active Clients" value={String(dashData?.counts?.clientCount ?? 0)} change={0} icon={UserCheck} delay={200} iconColor="text-chart-2" />
+              <StatCard title="Projects" value={String(dashData?.counts?.projectCount ?? 0)} change={0} icon={FolderKanban} delay={300} iconColor="text-chart-3" />
+              <StatCard title="Revenue" value={dashData ? fmt(dashData.finance.paidInvoiceValue) : "৳0"} change={0} icon={DollarSign} delay={400} iconColor="text-chart-4" />
             </div>
 
             {/* 3. Financial Overview */}
@@ -543,7 +419,7 @@ function FullAdminDashboard() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                   <div className="space-y-1">
                     <p className="text-xs font-medium text-muted-foreground flex items-center justify-between">
-                      MRR <Badge variant="secondary" className="text-[9px] h-4 px-1 bg-green-500/10 text-green-500 border-green-500/20">{financialSummary.mrrGrowth}</Badge>
+                      MRR <Badge variant="secondary" className="text-[9px] h-4 px-1 bg-green-500/10 text-green-500 border-green-500/20">recurring</Badge>
                     </p>
                     <p className="text-2xl font-bold tracking-tight">{financialSummary.mrr}</p>
                     <p className="text-[10px] text-muted-foreground">Monthly Recurring Revenue</p>
@@ -571,16 +447,13 @@ function FullAdminDashboard() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   {kpis.map((kpi, i) => {
-                    const isPositive = kpi.trend.startsWith("+")
-                    const TrendIcon = isPositive ? TrendingUp : TrendingDown
                     return (
                       <AnimatedCard key={i} delay={800 + i * 50}>
                         <CardContent className="p-4">
                           <p className="text-xs text-muted-foreground mb-1">{kpi.label}</p>
                           <div className="flex items-end justify-between">
                             <p className="text-xl font-bold">{kpi.value}</p>
-                            <span className={`flex items-center gap-0.5 text-[10px] font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
-                              <TrendIcon className="w-3 h-3" />
+                            <span className={`flex items-center gap-0.5 text-[10px] font-medium ${kpi.color}`}>
                               {kpi.trend}
                             </span>
                           </div>
@@ -598,7 +471,7 @@ function FullAdminDashboard() {
                 </CardHeader>
                 <CardContent className="px-4 pb-4 flex-1">
                   <div className="space-y-4">
-                    {activeProjects.slice(0, 3).map((project, i) => (
+                    {(dashData?.activeProjectsList || []).slice(0, 3).map((project: any, i: number) => (
                       <div key={i} className="space-y-1.5">
                         <div className="flex justify-between items-end">
                           <div>
@@ -612,6 +485,9 @@ function FullAdminDashboard() {
                         <Progress value={project.progress} className="h-1.5" />
                       </div>
                     ))}
+                    {(!dashData?.activeProjectsList || dashData.activeProjectsList.length === 0) && (
+                      <p className="text-sm text-muted-foreground text-center py-2">No active projects</p>
+                    )}
                   </div>
                   <button className="w-full mt-4 text-xs text-muted-foreground hover:text-foreground transition-colors pb-1 border-b border-transparent hover:border-foreground mx-auto block text-center">
                     View all projects

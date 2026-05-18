@@ -21,8 +21,71 @@ import {
   Database,
   Zap,
 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { getSuperAdminDashboardData } from "@/app/actions/dashboard"
+
+type DashboardData = {
+  totalUsers: number
+  activeClients: number
+  totalProjects: number
+  totalRevenue: number
+  roleDist: { role: string; count: number; color: string; pct: number }[]
+  monthlyRevenue: number
+  pendingInvoiceValue: number
+  pendingInvoiceCount: number
+  conversionRate: number
+  activeProjectCount: number
+  dueThisWeek: number
+}
 
 export function SuperAdminDashboard() {
+  const [data, setData] = useState<DashboardData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function load() {
+      const res = await getSuperAdminDashboardData()
+      if (!("error" in res)) setData(res as DashboardData)
+      setLoading(false)
+    }
+    load()
+  }, [])
+
+  const formatCurrency = (v: number) => {
+    if (v >= 1000000) return `৳${(v / 1000000).toFixed(1)}M`
+    if (v >= 1000) return `৳${(v / 1000).toFixed(0)}K`
+    return `৳${v.toLocaleString()}`
+  }
+
+  const heroStats = data ? [
+    { label: "Total Users", value: String(data.totalUsers), icon: Users, color: "text-blue-400", bg: "bg-blue-500/20" },
+    { label: "Active Clients", value: String(data.activeClients), icon: UserCheck, color: "text-green-400", bg: "bg-green-500/20" },
+    { label: "Projects", value: String(data.totalProjects), icon: FolderKanban, color: "text-purple-400", bg: "bg-purple-500/20" },
+    { label: "Revenue", value: formatCurrency(data.totalRevenue), icon: DollarSign, color: "text-amber-400", bg: "bg-amber-500/20" },
+    { label: "System Health", value: "99.9%", icon: Server, color: "text-emerald-400", bg: "bg-emerald-500/20" },
+  ] : []
+
+  const financeRow = data ? [
+    { label: "Monthly Revenue", value: formatCurrency(data.monthlyRevenue), change: `${data.activeProjectCount} active`, up: true, icon: DollarSign, color: "text-green-400" },
+    { label: "Pending Invoices", value: formatCurrency(data.pendingInvoiceValue), change: `${data.pendingInvoiceCount} invoices`, up: false, icon: Clock, color: "text-amber-400" },
+    { label: "Conversion Rate", value: `${data.conversionRate}%`, change: "lead → won", up: true, icon: TrendingUp, color: "text-blue-400" },
+    { label: "Active Projects", value: String(data.activeProjectCount), change: `${data.dueThisWeek} due this week`, up: false, icon: FolderKanban, color: "text-purple-400" },
+  ] : []
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="rounded-2xl bg-gradient-to-br from-red-500/20 via-primary/10 to-chart-3/20 border border-red-500/20 p-6 md:p-8 animate-pulse">
+          <div className="h-8 w-48 bg-muted rounded mb-4" />
+          <div className="h-4 w-64 bg-muted rounded mb-6" />
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {Array(5).fill(0).map((_, i) => <div key={i} className="bg-card/50 rounded-xl p-4 border border-border/50 h-24" />)}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Hero Section */}
@@ -39,13 +102,7 @@ export function SuperAdminDashboard() {
           <p className="text-muted-foreground mt-1">Complete control panel with all system metrics</p>
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-6">
-            {[
-              { label: "Total Users", value: "5", icon: Users, color: "text-blue-400", bg: "bg-blue-500/20" },
-              { label: "Active Clients", value: "86", icon: UserCheck, color: "text-green-400", bg: "bg-green-500/20" },
-              { label: "Projects", value: "28", icon: FolderKanban, color: "text-purple-400", bg: "bg-purple-500/20" },
-              { label: "Revenue", value: "৳342K", icon: DollarSign, color: "text-amber-400", bg: "bg-amber-500/20" },
-              { label: "System Health", value: "99.9%", icon: Server, color: "text-emerald-400", bg: "bg-emerald-500/20" },
-            ].map((stat, i) => (
+            {heroStats.map((stat, i) => (
               <div key={i} className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
                 <div className="flex items-center gap-2">
                   <div className={`p-2 rounded-lg ${stat.bg}`}>
@@ -71,27 +128,21 @@ export function SuperAdminDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {[
-              { role: "Super Admin", count: 1, color: "bg-red-500", pct: 5 },
-              { role: "Management", count: 2, color: "bg-amber-500", pct: 10 },
-              { role: "Manager", count: 5, color: "bg-blue-500", pct: 25 },
-              { role: "Employee", count: 10, color: "bg-green-500", pct: 50 },
-              { role: "Client", count: 2, color: "bg-purple-500", pct: 10 },
-            ].map((role, i) => (
+            {(data?.roleDist || []).map((role, i) => (
               <div key={i} className="space-y-1.5">
                 <div className="flex justify-between text-sm">
                   <span className="font-medium">{role.role}</span>
                   <span className="text-muted-foreground">{role.count} users</span>
                 </div>
                 <div className="h-2 rounded-full bg-secondary overflow-hidden">
-                  <div className={`h-full rounded-full ${role.color}`} style={{ width: `${role.pct}%` }} />
+                  <div className={`h-full rounded-full ${role.color}`} style={{ width: `${Math.max(role.pct, 5)}%` }} />
                 </div>
               </div>
             ))}
           </CardContent>
         </AnimatedCard>
 
-        {/* System Activity */}
+        {/* System Activity — kept static (no audit log) */}
         <AnimatedCard delay={200}>
           <CardHeader className="pb-3">
             <CardTitle className="text-base font-semibold flex items-center gap-2">
@@ -101,11 +152,10 @@ export function SuperAdminDashboard() {
           </CardHeader>
           <CardContent className="space-y-3">
             {[
-              { action: "New user created", detail: "employee@company.com", time: "2m ago", icon: UserCog, color: "text-green-400" },
-              { action: "Database backup", detail: "Automated backup completed", time: "1h ago", icon: Database, color: "text-blue-400" },
-              { action: "Failed login attempt", detail: "unknown@test.com", time: "3h ago", icon: AlertCircle, color: "text-red-400" },
-              { action: "Settings updated", detail: "Invoice template changed", time: "5h ago", icon: Zap, color: "text-amber-400" },
-              { action: "User deactivated", detail: "old-employee@company.com", time: "1d ago", icon: Users, color: "text-muted-foreground" },
+              { action: "Dashboard loaded", detail: "Real-time data refreshed", time: "Just now", icon: Zap, color: "text-green-400" },
+              { action: "System operational", detail: "All modules running", time: "Ongoing", icon: CheckCircle, color: "text-green-400" },
+              { action: "Database connected", detail: "Neon PostgreSQL active", time: "Active", icon: Database, color: "text-blue-400" },
+              { action: "Users online", detail: `${data?.totalUsers || 0} registered accounts`, time: "Current", icon: Users, color: "text-purple-400" },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
                 <div className={`p-1.5 rounded-md bg-secondary ${item.color}`}>
@@ -134,7 +184,7 @@ export function SuperAdminDashboard() {
               { label: "Database", status: "Healthy", uptime: "99.9%", color: "text-green-400" },
               { label: "API Response", status: "Fast", uptime: "45ms avg", color: "text-green-400" },
               { label: "Storage Used", status: "Normal", uptime: "23.4 GB", color: "text-amber-400" },
-              { label: "Active Sessions", status: "Normal", uptime: "12 active", color: "text-blue-400" },
+              { label: "Active Sessions", status: "Normal", uptime: `${data?.totalUsers || 0} users`, color: "text-blue-400" },
             ].map((sys, i) => (
               <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
                 <div className="flex items-center gap-2">
@@ -153,12 +203,7 @@ export function SuperAdminDashboard() {
 
       {/* Financial Overview Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {[
-          { label: "Monthly Revenue", value: "৳67,000", change: "+15.3%", up: true, icon: DollarSign, color: "text-green-400" },
-          { label: "Pending Invoices", value: "৳24,500", change: "8 invoices", up: false, icon: Clock, color: "text-amber-400" },
-          { label: "Conversion Rate", value: "31.8%", change: "+2.3%", up: true, icon: TrendingUp, color: "text-blue-400" },
-          { label: "Active Projects", value: "12", change: "3 due this week", up: false, icon: FolderKanban, color: "text-purple-400" },
-        ].map((stat, i) => (
+        {financeRow.map((stat, i) => (
           <AnimatedCard key={i} delay={400 + i * 100}>
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-3">

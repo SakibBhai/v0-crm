@@ -459,3 +459,61 @@ model TeamHoliday {
   description String?
   createdAt   DateTime @default(now())
 }
+
+// ==================== Settings (single-row) ====================
+
+model Settings {
+  id                  String   @id @default("default")
+
+  // Organization
+  companyName         String   @default("Your Company")
+  companyLogo         String?
+  website             String   @default("")
+  businessEmail       String   @default("")
+  phone               String   @default("")
+  taxId               String   @default("")
+  address             String   @default("")
+
+  // Regional
+  timezone            String   @default("utc+6")
+  currency            String   @default("bdt")
+  dateFormat          String   @default("dmy")
+  fiscalYearStart     String   @default("jan")
+
+  // Invoice Templates
+  invoicePrefix       String   @default("INV")
+  invoiceStartNumber  Int      @default(1001)
+  logoPosition        String   @default("left")
+  accentColor         String   @default("#3b82f6")
+  paymentTermsText    String   @default("Payment is due within 30 days. Late payments may incur a fee of 1.5% per month.")
+  defaultNotes        String   @default("Thank you for your business!")
+
+  // Finance
+  defaultPaymentTerms String   @default("net30")
+  latePaymentFee      Float    @default(1.5)
+  paymentMethods      Json     @default("[{\"name\":\"Bank Transfer\",\"enabled\":true},{\"name\":\"Credit Card\",\"enabled\":true},{\"name\":\"Cash\",\"enabled\":true},{\"name\":\"Check\",\"enabled\":false},{\"name\":\"Mobile Payment\",\"enabled\":true},{\"name\":\"PayPal\",\"enabled\":false}]")
+  taxConfigs          Json     @default("[{\"id\":\"1\",\"name\":\"Standard VAT\",\"rate\":15,\"isDefault\":true},{\"id\":\"2\",\"name\":\"Reduced VAT\",\"rate\":5,\"isDefault\":false},{\"id\":\"3\",\"name\":\"Zero Rate\",\"rate\":0,\"isDefault\":false}]")
+
+  // Pipeline & Leads
+  pipelineStages      Json     @default("[{\"id\":\"1\",\"name\":\"New\",\"color\":\"#64748b\",\"probability\":10,\"order\":0},{\"id\":\"2\",\"name\":\"Contacted\",\"color\":\"#3b82f6\",\"probability\":25,\"order\":1},{\"id\":\"3\",\"name\":\"Qualified\",\"color\":\"#06b6d4\",\"probability\":40,\"order\":2},{\"id\":\"4\",\"name\":\"Proposal\",\"color\":\"#8b5cf6\",\"probability\":60,\"order\":3},{\"id\":\"5\",\"name\":\"Negotiation\",\"color\":\"#f59e0b\",\"probability\":80,\"order\":4},{\"id\":\"6\",\"name\":\"Won\",\"color\":\"#22c55e\",\"probability\":100,\"order\":5},{\"id\":\"7\",\"name\":\"Lost\",\"color\":\"#ef4444\",\"probability\":0,\"order\":6}]")
+  leadCategories      Json     @default("[{\"id\":\"1\",\"name\":\"Digital Marketing\",\"color\":\"#8b5cf6\"},{\"id\":\"2\",\"name\":\"SEO\",\"color\":\"#22c55e\"},{\"id\":\"3\",\"name\":\"Social Media\",\"color\":\"#ec4899\"},{\"id\":\"4\",\"name\":\"Content\",\"color\":\"#06b6d4\"},{\"id\":\"5\",\"name\":\"Branding\",\"color\":\"#f97316\"},{\"id\":\"6\",\"name\":\"Web Development\",\"color\":\"#6366f1\"},{\"id\":\"7\",\"name\":\"PPC\",\"color\":\"#f43f5e\"}]")
+
+  // Client Settings
+  clientTiers         Json     @default("[{\"name\":\"Enterprise\",\"minValue\":100000,\"color\":\"#f59e0b\"},{\"name\":\"Professional\",\"minValue\":25000,\"color\":\"#3b82f6\"},{\"name\":\"Starter\",\"minValue\":0,\"color\":\"#64748b\"}]")
+  healthScoreWeights  Json     @default("[{\"factor\":\"Payment History\",\"weight\":30},{\"factor\":\"Engagement\",\"weight\":25},{\"factor\":\"Project Activity\",\"weight\":25},{\"factor\":\"NPS Score\",\"weight\":20}]")
+
+  // Tasks & Projects
+  taskStatuses        Json     @default("[\"Backlog\",\"To Do\",\"In Progress\",\"In Review\",\"Done\",\"Blocked\"]")
+  taskAutomation      Boolean  @default(true)
+
+  // Notifications
+  notifications       Json     @default("[{\"id\":\"1\",\"title\":\"New Lead Assigned\",\"description\":\"Get notified when a new lead is assigned to you\",\"email\":true,\"push\":true,\"sms\":false},{\"id\":\"2\",\"title\":\"Task Reminders\",\"description\":\"Receive reminders for upcoming task deadlines\",\"email\":true,\"push\":true,\"sms\":true},{\"id\":\"3\",\"title\":\"Invoice Paid\",\"description\":\"Notification when an invoice is paid\",\"email\":true,\"push\":true,\"sms\":false},{\"id\":\"4\",\"title\":\"Client Messages\",\"description\":\"Notifications for new client communications\",\"email\":true,\"push\":true,\"sms\":true},{\"id\":\"5\",\"title\":\"Overdue Payments\",\"description\":\"Alerts for overdue invoice payments\",\"email\":true,\"push\":true,\"sms\":true},{\"id\":\"6\",\"title\":\"Weekly Reports\",\"description\":\"Receive weekly summary reports\",\"email\":true,\"push\":false,\"sms\":false}]")
+
+  // Appearance
+  compactMode         Boolean  @default(false)
+  animations          Boolean  @default(true)
+  sidebarCollapsed    Boolean  @default(false)
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}

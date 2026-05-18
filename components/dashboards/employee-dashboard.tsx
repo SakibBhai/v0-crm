@@ -3,17 +3,58 @@
 import { AnimatedCard } from "@/components/animated-card"
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+import { CheckSquare, Clock, FolderKanban, LogIn, CheckCircle, Calendar } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useSession } from "next-auth/react"
+import { getEmployeeDashboardData } from "@/app/actions/dashboard"
+import { getEmployees } from "@/app/actions/team"
 import { Button } from "@/components/ui/button"
-import { CheckSquare, Clock, FolderKanban, LogIn, LogOut, Calendar, CheckCircle, AlertCircle } from "lucide-react"
+
+type EmpData = {
+  totalTasks: number
+  pendingCount: number
+  completedCount: number
+  dueToday: number
+  projectCount: number
+  taskList: { title: string; project: string; priority: string; due: string; done: boolean }[]
+}
 
 export function EmployeeDashboard() {
-  const myTasks = [
-    { title: "Design homepage mockup", project: "E-commerce Redesign", priority: "high", due: "May 6", done: false },
-    { title: "Review SEO audit report", project: "SEO Campaign Q2", priority: "medium", due: "May 7", done: false },
-    { title: "Update brand guidelines", project: "Brand Identity Kit", priority: "low", due: "May 8", done: true },
-    { title: "Client presentation prep", project: "E-commerce Redesign", priority: "high", due: "May 9", done: false },
-  ]
+  const { data: session } = useSession()
+  const [data, setData] = useState<EmpData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function load() {
+      const employeeId = (session?.user as any)?.employeeId || ""
+      let employeeName = session?.user?.name || ""
+
+      // If we have an employeeId, try to get full name from DB
+      if (employeeId) {
+        try {
+          const emps = await getEmployees()
+          if (Array.isArray(emps)) {
+            const me = emps.find((e: any) => e.id === employeeId || e.employeeId === employeeId)
+            if (me) employeeName = `${(me as any).firstName} ${(me as any).lastName}`
+          }
+        } catch {}
+      }
+
+      const res = await getEmployeeDashboardData(employeeId, employeeName)
+      if (!("error" in res)) setData(res as EmpData)
+      setLoading(false)
+    }
+    load()
+  }, [session])
+
+  if (loading) return <div className="space-y-6 animate-pulse"><div className="rounded-2xl bg-muted/30 p-8 h-52" /></div>
+
+  const heroStats = data ? [
+    { label: "My Tasks", value: String(data.pendingCount), icon: CheckSquare, color: "text-green-400", bg: "bg-green-500/20" },
+    { label: "Due Today", value: String(data.dueToday), icon: Clock, color: "text-amber-400", bg: "bg-amber-500/20" },
+    { label: "Projects", value: String(data.projectCount), icon: FolderKanban, color: "text-blue-400", bg: "bg-blue-500/20" },
+    { label: "Completed", value: String(data.completedCount), icon: CheckCircle, color: "text-emerald-400", bg: "bg-emerald-500/20" },
+  ] : []
 
   return (
     <div className="space-y-6">
@@ -23,12 +64,7 @@ export function EmployeeDashboard() {
           <h1 className="text-2xl md:text-3xl font-bold">My Workspace 🎯</h1>
           <p className="text-muted-foreground mt-1">Your tasks, attendance, and project progress</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-            {[
-              { label: "My Tasks", value: "4", icon: CheckSquare, color: "text-green-400", bg: "bg-green-500/20" },
-              { label: "Due Today", value: "1", icon: Clock, color: "text-amber-400", bg: "bg-amber-500/20" },
-              { label: "Projects", value: "2", icon: FolderKanban, color: "text-blue-400", bg: "bg-blue-500/20" },
-              { label: "Completed", value: "1", icon: CheckCircle, color: "text-emerald-400", bg: "bg-emerald-500/20" },
-            ].map((s, i) => (
+            {heroStats.map((s, i) => (
               <div key={i} className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
                 <div className="flex items-center gap-2"><div className={`p-2 rounded-lg ${s.bg}`}><s.icon className={`w-4 h-4 ${s.color}`} /></div><span className="text-xs text-muted-foreground">{s.label}</span></div>
                 <p className="text-2xl font-bold mt-2">{s.value}</p>
@@ -56,7 +92,7 @@ export function EmployeeDashboard() {
         <CardHeader className="pb-3"><CardTitle className="text-base font-semibold flex items-center gap-2"><CheckSquare className="w-4 h-4 text-green-400" />My Tasks</CardTitle></CardHeader>
         <CardContent>
           <div className="divide-y divide-border/50">
-            {myTasks.map((t, i) => (
+            {(data?.taskList || []).map((t, i) => (
               <div key={i} className="py-3 flex items-start gap-3">
                 <div className={`mt-0.5 w-5 h-5 rounded-full border flex items-center justify-center ${t.done ? "bg-primary border-primary" : "border-muted-foreground/50"}`}>
                   {t.done && <CheckCircle className="w-3.5 h-3.5 text-primary-foreground" />}
@@ -71,6 +107,7 @@ export function EmployeeDashboard() {
                 </div>
               </div>
             ))}
+            {(data?.taskList || []).length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No tasks assigned to you</p>}
           </div>
         </CardContent>
       </AnimatedCard>
