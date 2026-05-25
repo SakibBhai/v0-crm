@@ -127,10 +127,11 @@ export function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, o
     return (
         <>
             <div className="fixed inset-0 z-50 flex justify-end">
-                <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+                <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
-                <div className="relative w-full max-w-3xl bg-background border-l border-border shadow-2xl animate-in slide-in-from-right duration-300">
-                    <ScrollArea className="h-full">
+                <div className="relative w-full max-w-3xl h-full bg-background border-l border-border shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col">
+                    <ScrollArea className="flex-1">
+                        <div className="min-h-full pb-8">
                         {/* Header */}
                         <div className="sticky top-0 bg-gradient-to-r from-primary/20 to-chart-2/20 z-10">
                             <div className="p-6">
@@ -447,6 +448,7 @@ export function EmployeeProfile({ employee, isOpen, onClose, onUpdateEmployee, o
                                 </div>
                             </TabsContent>
                         </Tabs>
+                        </div>
                     </ScrollArea>
                 </div>
             </div>

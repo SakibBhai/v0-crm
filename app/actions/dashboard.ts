@@ -1,103 +1,108 @@
 "use server"
 
 import { prisma } from "@/lib/prisma"
+import { cacheGet } from "@/lib/redis"
 
 /**
  * Cross-module aggregation action for the dashboard.
  * Pulls live data from all integrated modules.
+ * Cached in Redis for 60 seconds to reduce DB load.
  */
 export async function getDashboardStats() {
-  try {
-    const [
-      leadCount, clientCount, projectCount, taskCount,
-      invoiceCount, incomeCount, expenseCount, employeeCount,
-      leads, clients, projects, tasks, invoices, incomeEntries, expenses, employees,
-    ] = await Promise.all([
-      prisma.lead.count(),
-      prisma.client.count(),
-      prisma.project.count(),
-      prisma.task.count(),
-      prisma.financeInvoice.count(),
-      prisma.financeIncome.count(),
-      prisma.financeExpense.count(),
-      prisma.teamEmployee.count(),
-      prisma.lead.findMany({ orderBy: { createdAt: "desc" }, take: 5 }),
-      prisma.client.findMany({ orderBy: { createdAt: "desc" }, take: 5 }),
-      prisma.project.findMany({ orderBy: { createdAt: "desc" } }),
-      prisma.task.findMany(),
-      prisma.financeInvoice.findMany(),
-      prisma.financeIncome.findMany({ where: { entityStatus: "active" } }),
-      prisma.financeExpense.findMany({ where: { entityStatus: "active" } }),
-      prisma.teamEmployee.findMany({ where: { status: "active" } }),
-    ])
+  return cacheGet("dashboard:stats:global", async () => {
+    try {
+      const [
+        leadCount, clientCount, projectCount, taskCount,
+        invoiceCount, incomeCount, expenseCount, employeeCount,
+        leads, clients, projects, tasks, invoices, incomeEntries, expenses, employees,
+      ] = await Promise.all([
+        prisma.lead.count(),
+        prisma.client.count(),
+        prisma.project.count(),
+        prisma.task.count(),
+        prisma.financeInvoice.count(),
+        prisma.financeIncome.count(),
+        prisma.financeExpense.count(),
+        prisma.teamEmployee.count(),
+        prisma.lead.findMany({ orderBy: { createdAt: "desc" }, take: 5 }),
+        prisma.client.findMany({ orderBy: { createdAt: "desc" }, take: 5 }),
+        prisma.project.findMany({ orderBy: { createdAt: "desc" } }),
+        prisma.task.findMany(),
+        prisma.financeInvoice.findMany(),
+        prisma.financeIncome.findMany({ where: { entityStatus: "active" } }),
+        prisma.financeExpense.findMany({ where: { entityStatus: "active" } }),
+        prisma.teamEmployee.findMany({ where: { status: "active" } }),
+      ])
 
-    // Calculate cross-module metrics
-    const totalRevenue = incomeEntries.reduce((sum, i) => sum + i.amount, 0)
-    const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0)
-    const totalInvoiceValue = invoices.reduce((sum, i) => sum + i.amount, 0)
-    const paidInvoiceValue = invoices.filter(i => i.status === "paid").reduce((sum, i) => sum + i.amount, 0)
-    const pendingInvoiceValue = invoices.filter(i => ["sent", "pending", "partial"].includes(i.status)).reduce((sum, i) => sum + (i.amount - i.paid), 0)
+      // Calculate cross-module metrics
+      const totalRevenue = incomeEntries.reduce((sum, i) => sum + i.amount, 0)
+      const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0)
+      const totalInvoiceValue = invoices.reduce((sum, i) => sum + i.amount, 0)
+      const paidInvoiceValue = invoices.filter(i => i.status === "paid").reduce((sum, i) => sum + i.amount, 0)
+      const pendingInvoiceValue = invoices.filter(i => ["sent", "pending", "partial"].includes(i.status)).reduce((sum, i) => sum + (i.amount - i.paid), 0)
 
-    const activeProjects = projects.filter(p => p.status === "in-progress")
-    const completedProjects = projects.filter(p => p.status === "completed")
-    const totalBudget = projects.reduce((sum, p) => sum + p.budget, 0)
-    const totalSpent = projects.reduce((sum, p) => sum + p.spent, 0)
+      const activeProjects = projects.filter(p => p.status === "in-progress")
+      const completedProjects = projects.filter(p => p.status === "completed")
+      const totalBudget = projects.reduce((sum, p) => sum + p.budget, 0)
+      const totalSpent = projects.reduce((sum, p) => sum + p.spent, 0)
 
-    const completedTasks = tasks.filter(t => t.status === "done").length
-    const inProgressTasks = tasks.filter(t => t.status === "in-progress").length
+      const completedTasks = tasks.filter(t => t.status === "done").length
+      const inProgressTasks = tasks.filter(t => t.status === "in-progress").length
 
-    // Project status distribution
-    const projectStatusDist = [
-      { name: "Completed", value: completedProjects.length, color: "#4ade80" },
-      { name: "In Progress", value: activeProjects.length, color: "#60a5fa" },
-      { name: "On Hold", value: projects.filter(p => p.status === "on-hold").length, color: "#fbbf24" },
-      { name: "Planning", value: projects.filter(p => p.status === "planning").length, color: "#a78bfa" },
-    ]
+      // Project status distribution
+      const projectStatusDist = [
+        { name: "Completed", value: completedProjects.length, color: "#4ade80" },
+        { name: "In Progress", value: activeProjects.length, color: "#60a5fa" },
+        { name: "On Hold", value: projects.filter(p => p.status === "on-hold").length, color: "#fbbf24" },
+        { name: "Planning", value: projects.filter(p => p.status === "planning").length, color: "#a78bfa" },
+      ]
 
-    // Recent leads for dashboard
-    const recentLeads = leads.map(l => ({
-      name: l.name,
-      company: l.company,
-      status: l.status,
-      value: `৳${l.value.toLocaleString()}`,
-      avatar: l.name.split(" ").map(n => n[0]).join(""),
-    }))
+      // Recent leads for dashboard
+      const recentLeads = leads.map(l => ({
+        name: l.name,
+        company: l.company,
+        status: l.status,
+        value: `৳${l.value.toLocaleString()}`,
+        avatar: l.name.split(" ").map(n => n[0]).join(""),
+      }))
 
-    // Active projects list for dashboard
-    const activeProjectsList = activeProjects.slice(0, 4).map(p => ({
-      name: p.name,
-      client: p.client,
-      progress: p.progress,
-      dueDate: p.dueDate,
-    }))
+      // Active projects list for dashboard
+      const activeProjectsList = activeProjects.slice(0, 4).map(p => ({
+        name: p.name,
+        client: p.client,
+        progress: p.progress,
+        dueDate: p.dueDate,
+      }))
 
-    // Pending invoices
-    const pendingInvoiceCount = invoices.filter(i => ["sent", "pending", "partial"].includes(i.status)).length
-    const overdueInvoiceCount = invoices.filter(i => i.status === "overdue").length
-    const overdueInvoiceValue = invoices.filter(i => i.status === "overdue").reduce((sum, i) => sum + (i.amount - i.paid), 0)
+      // Pending invoices
+      const pendingInvoiceCount = invoices.filter(i => ["sent", "pending", "partial"].includes(i.status)).length
+      const overdueInvoiceCount = invoices.filter(i => i.status === "overdue").length
+      const overdueInvoiceValue = invoices.filter(i => i.status === "overdue").reduce((sum, i) => sum + (i.amount - i.paid), 0)
 
-    // MRR
-    const mrrValue = invoices.filter(i => i.recurringInvoice).reduce((sum, i) => sum + i.amount, 0)
+      // MRR
+      const mrrValue = invoices.filter(i => i.recurringInvoice).reduce((sum, i) => sum + i.amount, 0)
 
-    return {
-      counts: { leadCount, clientCount, projectCount, taskCount, invoiceCount, incomeCount, expenseCount, employeeCount },
-      finance: { totalRevenue, totalExpenses, totalInvoiceValue, paidInvoiceValue, pendingInvoiceValue, pendingInvoiceCount, overdueInvoiceCount, overdueInvoiceValue, mrrValue },
-      projects: { total: projectCount, active: activeProjects.length, completed: completedProjects.length, totalBudget, totalSpent },
-      tasks: { total: taskCount, completed: completedTasks, inProgress: inProgressTasks },
-      team: { total: employeeCount, active: employees.length },
-      projectStatusDist,
-      recentLeads,
-      activeProjectsList,
+      return {
+        counts: { leadCount, clientCount, projectCount, taskCount, invoiceCount, incomeCount, expenseCount, employeeCount },
+        finance: { totalRevenue, totalExpenses, totalInvoiceValue, paidInvoiceValue, pendingInvoiceValue, pendingInvoiceCount, overdueInvoiceCount, overdueInvoiceValue, mrrValue },
+        projects: { total: projectCount, active: activeProjects.length, completed: completedProjects.length, totalBudget, totalSpent },
+        tasks: { total: taskCount, completed: completedTasks, inProgress: inProgressTasks },
+        team: { total: employeeCount, active: employees.length },
+        projectStatusDist,
+        recentLeads,
+        activeProjectsList,
+      }
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error)
+      return { error: "Failed to fetch dashboard stats" }
     }
-  } catch (error) {
-    console.error("Error fetching dashboard stats:", error)
-    return { error: "Failed to fetch dashboard stats" }
-  }
+  }, 60)
 }
 
 // ==================== Super Admin Dashboard ====================
 
 export async function getSuperAdminDashboardData() {
+  return cacheGet("dashboard:superadmin", async () => {
   try {
     const [users, clients, projects, tasks, invoices, incomeEntries, expenses, employees, leads] = await Promise.all([
       prisma.user.findMany({ select: { role: true } }),
@@ -167,11 +172,13 @@ export async function getSuperAdminDashboardData() {
     console.error("Error fetching super admin dashboard:", error)
     return { error: "Failed to fetch super admin dashboard" }
   }
+  }, 60)
 }
 
 // ==================== Management Dashboard ====================
 
 export async function getManagementDashboardData() {
+  return cacheGet("dashboard:management", async () => {
   try {
     const [leads, employees, projects, tasks, incomeEntries] = await Promise.all([
       prisma.lead.findMany(),
@@ -260,11 +267,13 @@ export async function getManagementDashboardData() {
     console.error("Error fetching management dashboard:", error)
     return { error: "Failed to fetch management dashboard" }
   }
+  }, 60)
 }
 
 // ==================== Manager Dashboard ====================
 
 export async function getManagerDashboardData(managerName?: string) {
+  return cacheGet(`dashboard:manager:${managerName || "all"}`, async () => {
   try {
     const [employees, projects, tasks, attendanceRecords] = await Promise.all([
       prisma.teamEmployee.findMany({ where: { status: "active" } }),
@@ -340,11 +349,13 @@ export async function getManagerDashboardData(managerName?: string) {
     console.error("Error fetching manager dashboard:", error)
     return { error: "Failed to fetch manager dashboard" }
   }
+  }, 60)
 }
 
 // ==================== Employee Dashboard ====================
 
 export async function getEmployeeDashboardData(employeeId?: string, employeeName?: string) {
+  return cacheGet(`dashboard:employee:${employeeId || "all"}`, async () => {
   try {
     const [tasks, projects, attendanceRecords] = await Promise.all([
       prisma.task.findMany(),
@@ -399,11 +410,13 @@ export async function getEmployeeDashboardData(employeeId?: string, employeeName
     console.error("Error fetching employee dashboard:", error)
     return { error: "Failed to fetch employee dashboard" }
   }
+  }, 60)
 }
 
 // ==================== Client Dashboard ====================
 
 export async function getClientDashboardData(clientId?: string) {
+  return cacheGet(`dashboard:client:${clientId || "all"}`, async () => {
   try {
     // Get the client record
     const client = clientId ? await prisma.client.findUnique({ where: { id: clientId } }) : null
@@ -452,6 +465,7 @@ export async function getClientDashboardData(clientId?: string) {
     console.error("Error fetching client dashboard:", error)
     return { error: "Failed to fetch client dashboard" }
   }
+  }, 60)
 }
 
 // ==================== Cross-Module Queries ====================

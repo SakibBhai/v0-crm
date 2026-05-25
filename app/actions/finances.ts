@@ -1,8 +1,8 @@
 "use server"
 
-import { PrismaClient } from "@prisma/client"
-
-const prisma = new PrismaClient()
+import { prisma } from "@/lib/prisma"
+import { createBroadcastNotification } from "@/app/actions/notifications"
+import { cacheInvalidate } from "@/lib/redis"
 
 // ==================== INVOICE NUMBER GENERATION ====================
 
@@ -144,6 +144,17 @@ export async function createInvoice(data: {
         attachments: (data.attachments || []) as any,
       },
     })
+
+    // Send notification about new invoice
+    await createBroadcastNotification({
+      type: "invoice_paid",
+      title: "New Invoice Created",
+      message: `Invoice ${data.invoiceNumber} for ${data.client} - ৳${data.amount.toLocaleString()} has been created.`,
+      link: "/finances",
+    }).catch(() => {})
+
+    await cacheInvalidate("dashboard:*").catch(() => {})
+
     return {
       ...invoice,
       clientLogo: "/placeholder.svg?height=40&width=40",
@@ -162,6 +173,7 @@ export async function updateInvoice(id: string, data: Record<string, any>) {
       where: { id },
       data,
     })
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return {
       ...invoice,
       clientLogo: "/placeholder.svg?height=40&width=40",
@@ -177,6 +189,7 @@ export async function updateInvoice(id: string, data: Record<string, any>) {
 export async function deleteInvoice(id: string) {
   try {
     await prisma.financeInvoice.delete({ where: { id } })
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return { success: true }
   } catch (error) {
     console.error("Error deleting invoice:", error)
@@ -255,6 +268,7 @@ export async function createIncome(data: {
         notes: data.notes || "",
       },
     })
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return {
       ...income,
       entityStatus: income.entityStatus as "active" | "neutralized",
@@ -275,6 +289,7 @@ export async function updateIncome(id: string, data: Record<string, any>) {
       where: { id },
       data,
     })
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return {
       ...income,
       entityStatus: income.entityStatus as "active" | "neutralized",
@@ -292,6 +307,7 @@ export async function updateIncome(id: string, data: Record<string, any>) {
 export async function deleteIncome(id: string) {
   try {
     await prisma.financeIncome.delete({ where: { id } })
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return { success: true }
   } catch (error) {
     console.error("Error deleting income:", error)
@@ -388,6 +404,7 @@ export async function createExpense(data: {
         clientName: data.clientName || null,
       },
     })
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return {
       ...expense,
       entityStatus: expense.entityStatus as "active" | "neutralized",
@@ -407,6 +424,7 @@ export async function updateExpense(id: string, data: Record<string, any>) {
       where: { id },
       data,
     })
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return {
       ...expense,
       entityStatus: expense.entityStatus as "active" | "neutralized",
@@ -423,6 +441,7 @@ export async function updateExpense(id: string, data: Record<string, any>) {
 export async function deleteExpense(id: string) {
   try {
     await prisma.financeExpense.delete({ where: { id } })
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return { success: true }
   } catch (error) {
     console.error("Error deleting expense:", error)

@@ -1,9 +1,11 @@
 "use server"
 
 import { prisma } from "@/lib/prisma"
+import { cacheInvalidate } from "@/lib/redis"
 import { revalidatePath } from "next/cache"
 import { Prisma } from "@prisma/client"
 import { generateNextUid } from "@/lib/uid-generator"
+import { createBroadcastNotification } from "@/app/actions/notifications"
 
 export async function getLeads() {
   try {
@@ -41,6 +43,16 @@ export async function createLead(data: Prisma.LeadCreateInput) {
       },
     })
     revalidatePath("/leads")
+    await cacheInvalidate("dashboard:*").catch(() => {})
+
+    // Send notification to all users
+    await createBroadcastNotification({
+      type: "lead_assigned",
+      title: "New Lead Created",
+      message: `New lead "${data.name}" (${data.company || "No company"}) has been added.`,
+      link: "/leads",
+    }).catch(() => {}) // Don't fail if notification fails
+
     return JSON.parse(JSON.stringify(lead))
   } catch (error) {
     console.error("Error creating lead:", error)
@@ -62,6 +74,7 @@ export async function updateLead(id: string, data: Prisma.LeadUpdateInput) {
       },
     })
     revalidatePath("/leads")
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return JSON.parse(JSON.stringify(lead))
   } catch (error) {
     console.error("Error updating lead:", error)
@@ -75,6 +88,7 @@ export async function deleteLead(id: string) {
       where: { id },
     })
     revalidatePath("/leads")
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return { success: true }
   } catch (error) {
     console.error("Error deleting lead:", error)
@@ -88,6 +102,7 @@ export async function bulkDeleteLeads(ids: string[]) {
       where: { id: { in: ids } },
     })
     revalidatePath("/leads")
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return { success: true }
   } catch (error) {
     console.error("Error bulk deleting leads:", error)
@@ -113,6 +128,7 @@ export async function addLeadNote(
     // but here we just add activity and note history.
     
     revalidatePath("/leads")
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return { success: true }
   } catch (error) {
     console.error("Error adding lead note:", error)
@@ -139,6 +155,7 @@ export async function addLeadActivity(
     })
     
     revalidatePath("/leads")
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return { success: true }
   } catch (error) {
     console.error("Error adding lead activity:", error)
@@ -182,6 +199,7 @@ export async function addLeadFollowUp(
     }
 
     revalidatePath("/leads")
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return JSON.parse(JSON.stringify(followUp))
   } catch (error) {
     console.error("Error adding follow-up:", error)
@@ -214,6 +232,7 @@ export async function updateLeadFollowUp(
     })
 
     revalidatePath("/leads")
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return JSON.parse(JSON.stringify(followUp))
   } catch (error) {
     console.error("Error updating follow-up:", error)

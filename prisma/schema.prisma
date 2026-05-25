@@ -33,6 +33,7 @@ model User {
   client        Client?   @relation("ClientUser", fields: [clientId], references: [id])
 
   sessions      Session[]
+  notifications Notification[]
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -462,6 +463,22 @@ model TeamHoliday {
 
 // ==================== Settings (single-row) ====================
 
+model Notification {
+  id          String   @id @default(cuid())
+  type        String   // e.g., "lead_assigned", "task_reminder", "invoice_paid", etc.
+  title       String
+  message     String
+  isRead      Boolean  @default(false)
+  link        String?  // Optional link to navigate to
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+}
+
 model Settings {
   id                  String   @id @default("default")
 
@@ -508,6 +525,12 @@ model Settings {
 
   // Notifications
   notifications       Json     @default("[{\"id\":\"1\",\"title\":\"New Lead Assigned\",\"description\":\"Get notified when a new lead is assigned to you\",\"email\":true,\"push\":true,\"sms\":false},{\"id\":\"2\",\"title\":\"Task Reminders\",\"description\":\"Receive reminders for upcoming task deadlines\",\"email\":true,\"push\":true,\"sms\":true},{\"id\":\"3\",\"title\":\"Invoice Paid\",\"description\":\"Notification when an invoice is paid\",\"email\":true,\"push\":true,\"sms\":false},{\"id\":\"4\",\"title\":\"Client Messages\",\"description\":\"Notifications for new client communications\",\"email\":true,\"push\":true,\"sms\":true},{\"id\":\"5\",\"title\":\"Overdue Payments\",\"description\":\"Alerts for overdue invoice payments\",\"email\":true,\"push\":true,\"sms\":true},{\"id\":\"6\",\"title\":\"Weekly Reports\",\"description\":\"Receive weekly summary reports\",\"email\":true,\"push\":false,\"sms\":false}]")
+
+  // Integrations
+  integrations        Json     @default("[{\"name\":\"Google Calendar\",\"connected\":false},{\"name\":\"Stripe\",\"connected\":false},{\"name\":\"Slack\",\"connected\":false},{\"name\":\"QuickBooks\",\"connected\":false}]")
+
+  // Email Templates
+  emailTemplates      Json     @default("[{\"id\":\"1\",\"name\":\"Invoice Sent\",\"description\":\"Sent when invoice is issued to client\",\"subject\":\"Invoice #{invoiceNumber} from {companyName}\",\"body\":\"Dear {clientName},\\n\\nPlease find attached invoice #{invoiceNumber} for {amount}.\\n\\nPayment is due by {dueDate}.\\n\\nThank you for your business!\\n\\n{companyName}\"},{\"id\":\"2\",\"name\":\"Payment Reminder\",\"description\":\"Reminder for upcoming/overdue payments\",\"subject\":\"Payment Reminder: Invoice #{invoiceNumber}\",\"body\":\"Dear {clientName},\\n\\nThis is a friendly reminder that invoice #{invoiceNumber} for {amount} is due on {dueDate}.\\n\\nPlease make the payment at your earliest convenience.\\n\\nThank you,\\n{companyName}\"},{\"id\":\"3\",\"name\":\"Payment Received\",\"description\":\"Confirmation when payment is received\",\"subject\":\"Payment Received - Invoice #{invoiceNumber}\",\"body\":\"Dear {clientName},\\n\\nWe have received your payment of {amount} for invoice #{invoiceNumber}.\\n\\nThank you for your prompt payment!\\n\\nBest regards,\\n{companyName}\"},{\"id\":\"4\",\"name\":\"Welcome Email\",\"description\":\"Sent to new clients\",\"subject\":\"Welcome to {companyName}!\",\"body\":\"Dear {clientName},\\n\\nWelcome aboard! We are thrilled to have you as our valued client.\\n\\nIf you have any questions, feel free to reach out.\\n\\nBest regards,\\n{companyName}\"}]")
 
   // Appearance
   compactMode         Boolean  @default(false)

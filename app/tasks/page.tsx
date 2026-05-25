@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
+import { useSession } from "next-auth/react"
 import { generateId } from "@/lib/id-generator"
 import type { Task, TaskStatus, TaskPriority, TaskType, SwimlaneType, TaskTemplate, AutomationRule, TeamMember } from "@/lib/types/task"
 import { DEFAULT_COLUMNS, PRIORITY_CONFIG, STATUS_CONFIG, TASK_TYPE_CONFIG } from "@/lib/types/task"
@@ -75,6 +76,8 @@ const QUICK_FILTERS = [
 ]
 
 export default function TasksPage() {
+  const { data: session } = useSession()
+
   // State
   const [tasks, setTasks] = useState<Task[]>([])
   const [templates, setTemplates] = useState<TaskTemplate[]>(taskTemplates)
@@ -88,6 +91,25 @@ export default function TasksPage() {
   // Computed: use DB data if available, else fallback
   const projects = dbProjects.length > 0 ? dbProjects : fallbackProjects
   const teamMembers = dbTeamMembers.length > 0 ? dbTeamMembers : fallbackTeamMembers
+
+  // Set default assignedBy value to current logged-in employee matching session
+  useEffect(() => {
+    if (teamMembers.length > 0) {
+      let match = session?.user?.employeeId
+        ? teamMembers.find((m) => m.id === session.user.employeeId)
+        : null
+
+      if (!match && session?.user?.email) {
+        match = teamMembers.find((m) => m.email?.toLowerCase() === session.user.email?.toLowerCase())
+      }
+
+      if (match) {
+        setAssignedByValue(match.id)
+      } else {
+        setAssignedByValue(teamMembers[0]?.id || "")
+      }
+    }
+  }, [session, teamMembers])
 
   // Load tasks, projects, and team from DB on mount
   useEffect(() => {
@@ -143,6 +165,7 @@ export default function TasksPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [selectedTasks, setSelectedTasks] = useState<string[]>([])
   const [initialStatus, setInitialStatus] = useState<TaskStatus>("todo")
+  const [assignedByValue, setAssignedByValue] = useState("")
 
   // Stats
   const stats = useMemo(() => ({
@@ -505,8 +528,13 @@ export default function TasksPage() {
                       <Label htmlFor="assignedBy" className="text-sm">
                         Assigned By <span className="text-destructive">*</span>
                       </Label>
-                      <Select name="assignedBy" defaultValue={teamMembers[0]?.id || ""}>
-                        <SelectTrigger className="bg-secondary/50 border-border">
+                      <Select 
+                        name="assignedBy_display" 
+                        value={assignedByValue} 
+                        onValueChange={setAssignedByValue} 
+                        disabled
+                      >
+                        <SelectTrigger className="bg-secondary/50 border-border opacity-80 cursor-not-allowed">
                           <SelectValue placeholder="Who is assigning?" />
                         </SelectTrigger>
                         <SelectContent>
@@ -523,6 +551,7 @@ export default function TasksPage() {
                           ))}
                         </SelectContent>
                       </Select>
+                      <input type="hidden" name="assignedBy" value={assignedByValue} />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">

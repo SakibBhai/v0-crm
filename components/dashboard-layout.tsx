@@ -5,9 +5,10 @@ import type React from "react"
 import { Sidebar } from "@/components/sidebar"
 import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
-import { Bell, Search, Plus, Menu, X } from "lucide-react"
+import { Search, Plus, Menu, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { NotificationDropdown } from "@/components/notification-dropdown"
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -122,10 +123,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <span className="hidden sm:inline">New Project</span>
                 <span className="sm:hidden">New</span>
               </Button>
-              <button className="relative p-2 rounded-lg hover:bg-secondary transition-colors">
-                <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
-                <span className="absolute top-1 right-1 sm:top-1.5 sm:right-1.5 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full" />
-              </button>
+              <NotificationDropdown />
             </div>
           </div>
         </header>

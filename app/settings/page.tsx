@@ -62,7 +62,7 @@ import {
   Loader2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { getSettings, updateSettings, type SettingsData } from "@/app/actions/settings"
+import { getSettings, updateSettings, exportAllData, deleteAllData, type SettingsData } from "@/app/actions/settings"
 import { changePassword, getUsers, updateUser, deleteUser, createUser } from "@/app/actions/auth-actions"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import type { UserRole } from "@prisma/client"
@@ -109,6 +109,19 @@ interface NotificationSetting {
   sms: boolean
 }
 
+interface EmailTemplate {
+  id: string
+  name: string
+  description: string
+  subject: string
+  body: string
+}
+
+interface IntegrationConfig {
+  name: string
+  connected: boolean
+}
+
 // ==================== Initial Data ====================
 const initialPipelineStages: PipelineStage[] = [
   { id: "1", name: "New", color: "#64748b", probability: 10, order: 0 },
@@ -145,7 +158,19 @@ const initialNotifications: NotificationSetting[] = [
   { id: "6", title: "Weekly Reports", description: "Receive weekly summary reports", email: true, push: false, sms: false },
 ]
 
+const initialEmailTemplates: EmailTemplate[] = [
+  { id: "1", name: "Invoice Sent", description: "Sent when invoice is issued to client", subject: "Invoice #{invoiceNumber} from {companyName}", body: "Dear {clientName},\n\nPlease find attached invoice #{invoiceNumber} for {amount}.\n\nPayment is due by {dueDate}.\n\nThank you for your business!\n\n{companyName}" },
+  { id: "2", name: "Payment Reminder", description: "Reminder for upcoming/overdue payments", subject: "Payment Reminder: Invoice #{invoiceNumber}", body: "Dear {clientName},\n\nThis is a friendly reminder that invoice #{invoiceNumber} for {amount} is due on {dueDate}.\n\nPlease make the payment at your earliest convenience.\n\nThank you,\n{companyName}" },
+  { id: "3", name: "Payment Received", description: "Confirmation when payment is received", subject: "Payment Received - Invoice #{invoiceNumber}", body: "Dear {clientName},\n\nWe have received your payment of {amount} for invoice #{invoiceNumber}.\n\nThank you for your prompt payment!\n\nBest regards,\n{companyName}" },
+  { id: "4", name: "Welcome Email", description: "Sent to new clients", subject: "Welcome to {companyName}!", body: "Dear {clientName},\n\nWelcome aboard! We are thrilled to have you as our valued client.\n\nIf you have any questions, feel free to reach out.\n\nBest regards,\n{companyName}" },
+]
 
+const initialIntegrations: IntegrationConfig[] = [
+  { name: "Google Calendar", connected: false },
+  { name: "Stripe", connected: false },
+  { name: "Slack", connected: false },
+  { name: "QuickBooks", connected: false },
+]
 
 // ==================== Settings Sections Config ====================
 const settingsSections = [
@@ -236,6 +261,22 @@ export default function SettingsPage() {
   const [taskStatuses, setTaskStatuses] = useState(["Backlog", "To Do", "In Progress", "In Review", "Done", "Blocked"])
   const [taskAutomation, setTaskAutomation] = useState(true)
 
+  // Email Templates
+  const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>(initialEmailTemplates)
+  const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null)
+  const [isTemplateEditorOpen, setIsTemplateEditorOpen] = useState(false)
+  const [isTemplatePreviewOpen, setIsTemplatePreviewOpen] = useState(false)
+  const [previewTemplate, setPreviewTemplate] = useState<EmailTemplate | null>(null)
+
+  // Integrations
+  const [integrationStates, setIntegrationStates] = useState<IntegrationConfig[]>(initialIntegrations)
+
+  // Data Management
+  const [isExporting, setIsExporting] = useState(false)
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
+  const [deleteConfirmText, setDeleteConfirmText] = useState("")
+  const [isDeleting, setIsDeleting] = useState(false)
+
   // Appearance
   const [compactMode, setCompactMode] = useState(false)
   const [animations, setAnimations] = useState(true)
@@ -293,6 +334,8 @@ export default function SettingsPage() {
           if (Array.isArray(s.taskStatuses)) setTaskStatuses(s.taskStatuses as any)
           setTaskAutomation(s.taskAutomation)
           if (Array.isArray(s.notifications)) setNotifications(s.notifications as any)
+          if (Array.isArray(s.emailTemplates)) setEmailTemplates(s.emailTemplates as any)
+          if (Array.isArray(s.integrations)) setIntegrationStates(s.integrations as any)
           setCompactMode(s.compactMode)
           setAnimations(s.animations)
           setSidebarCollapsed(s.sidebarCollapsed)
@@ -320,6 +363,8 @@ export default function SettingsPage() {
         clientTiers, healthScoreWeights,
         taskStatuses, taskAutomation,
         notifications,
+        integrations: integrationStates,
+        emailTemplates,
         compactMode, animations, sidebarCollapsed,
       }
       const result = await updateSettings(data)
@@ -375,6 +420,131 @@ export default function SettingsPage() {
     setNotifications((prev) =>
       prev.map((n) => n.id === id ? { ...n, [type]: !n[type] } : n)
     )
+  }
+
+  // ==================== Pipeline Handlers ====================
+  const handleAddPipelineStage = () => {
+    const newId = String(Date.now())
+    setPipelineStages(prev => [...prev, { id: newId, name: "New Stage", color: "#64748b", probability: 0, order: prev.length }])
+  }
+
+  const handleDeletePipelineStage = (id: string) => {
+    setPipelineStages(prev => prev.filter(s => s.id !== id))
+  }
+
+  // ==================== Lead Category Handlers ====================
+  const handleAddLeadCategory = () => {
+    const name = prompt("Enter category name:")
+    if (name && !leadCategories.some(c => c.name === name)) {
+      const colors = ["#8b5cf6", "#22c55e", "#ec4899", "#06b6d4", "#f97316", "#6366f1", "#f43f5e", "#14b8a6"]
+      setLeadCategories(prev => [...prev, { id: String(Date.now()), name, color: colors[prev.length % colors.length] }])
+    }
+  }
+
+  const handleEditLeadCategory = (id: string) => {
+    const cat = leadCategories.find(c => c.id === id)
+    if (!cat) return
+    const newName = prompt("Edit category name:", cat.name)
+    if (newName && newName !== cat.name) {
+      setLeadCategories(prev => prev.map(c => c.id === id ? { ...c, name: newName } : c))
+    }
+  }
+
+  const handleDeleteLeadCategory = (id: string) => {
+    setLeadCategories(prev => prev.filter(c => c.id !== id))
+  }
+
+  // ==================== Tax Config Handlers ====================
+  const handleAddTaxConfig = () => {
+    const name = prompt("Enter tax name:")
+    if (!name) return
+    const rateStr = prompt("Enter tax rate (%):")
+    const rate = parseFloat(rateStr || "0")
+    setTaxConfigs(prev => [...prev, { id: String(Date.now()), name, rate, isDefault: false }])
+  }
+
+  const handleEditTaxConfig = (id: string) => {
+    const tax = taxConfigs.find((t: TaxConfig) => t.id === id)
+    if (!tax) return
+    const newName = prompt("Tax name:", tax.name)
+    if (!newName) return
+    const newRate = prompt("Tax rate (%):", String(tax.rate))
+    setTaxConfigs((prev: TaxConfig[]) => prev.map(t => t.id === id ? { ...t, name: newName, rate: parseFloat(newRate || "0") } : t))
+  }
+
+  const handleDeleteTaxConfig = (id: string) => {
+    setTaxConfigs((prev: TaxConfig[]) => prev.filter(t => t.id !== id))
+  }
+
+  const handleSetDefaultTax = (id: string) => {
+    setTaxConfigs((prev: TaxConfig[]) => prev.map(t => ({ ...t, isDefault: t.id === id })))
+  }
+
+  // ==================== Email Template Handlers ====================
+  const handleEditEmailTemplate = (template: EmailTemplate) => {
+    setEditingTemplate({ ...template })
+    setIsTemplateEditorOpen(true)
+  }
+
+  const handleSaveEmailTemplate = () => {
+    if (!editingTemplate) return
+    setEmailTemplates(prev => prev.map(t => t.id === editingTemplate.id ? editingTemplate : t))
+    setIsTemplateEditorOpen(false)
+    setEditingTemplate(null)
+  }
+
+  const handlePreviewEmailTemplate = (template: EmailTemplate) => {
+    setPreviewTemplate(template)
+    setIsTemplatePreviewOpen(true)
+  }
+
+  // ==================== Integration Handlers ====================
+  const handleToggleIntegration = (name: string) => {
+    setIntegrationStates(prev => prev.map(i => i.name === name ? { ...i, connected: !i.connected } : i))
+  }
+
+  // ==================== Data Management Handlers ====================
+  const handleExportData = async () => {
+    setIsExporting(true)
+    try {
+      const result = await exportAllData()
+      if ("error" in result) {
+        alert("Failed to export data")
+        return
+      }
+      const blob = new Blob([JSON.stringify(result, null, 2)], { type: "application/json" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `crm-export-${new Date().toISOString().split("T")[0]}.json`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch {
+      alert("Export failed")
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const handleDeleteAllData = async () => {
+    if (deleteConfirmText !== "DELETE") return
+    setIsDeleting(true)
+    try {
+      const result = await deleteAllData("DELETE-ALL-DATA")
+      if ("error" in result) {
+        alert(result.error)
+      } else {
+        alert("All data has been deleted successfully.")
+        setIsDeleteConfirmOpen(false)
+        setDeleteConfirmText("")
+      }
+    } catch {
+      alert("Failed to delete data")
+    } finally {
+      setIsDeleting(false)
+    }
   }
 
   const groupedSections = groupOrder.map(group => ({
@@ -757,14 +927,9 @@ export default function SettingsPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {[
-                        { name: "Invoice Sent", description: "Sent when invoice is issued to client" },
-                        { name: "Payment Reminder", description: "Reminder for upcoming/overdue payments" },
-                        { name: "Payment Received", description: "Confirmation when payment is received" },
-                        { name: "Welcome Email", description: "Sent to new clients" },
-                      ].map((template, i) => (
+                      {emailTemplates.map((template) => (
                         <div
-                          key={i}
+                          key={template.id}
                           className="flex items-center justify-between p-4 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
                         >
                           <div>
@@ -772,10 +937,10 @@ export default function SettingsPage() {
                             <p className="text-sm text-muted-foreground">{template.description}</p>
                           </div>
                           <div className="flex gap-2">
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" onClick={() => handlePreviewEmailTemplate(template)}>
                               <Eye className="w-4 h-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" onClick={() => handleEditEmailTemplate(template)}>
                               <Pencil className="w-4 h-4" />
                             </Button>
                           </div>
@@ -799,7 +964,7 @@ export default function SettingsPage() {
                       </CardTitle>
                       <CardDescription>Configure your sales pipeline stages</CardDescription>
                     </div>
-                    <Button size="sm" className="gap-2">
+                    <Button size="sm" className="gap-2" onClick={handleAddPipelineStage}>
                       <Plus className="w-4 h-4" />
                       Add Stage
                     </Button>
@@ -839,7 +1004,7 @@ export default function SettingsPage() {
                             />
                             <span className="text-sm text-muted-foreground">%</span>
                           </div>
-                          <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100">
+                          <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100" onClick={() => handleDeletePipelineStage(stage.id)}>
                             <Trash2 className="w-4 h-4 text-destructive" />
                           </Button>
                         </div>
@@ -857,7 +1022,7 @@ export default function SettingsPage() {
                       </CardTitle>
                       <CardDescription>Categorize your leads by service type</CardDescription>
                     </div>
-                    <Button size="sm" className="gap-2">
+                    <Button size="sm" className="gap-2" onClick={handleAddLeadCategory}>
                       <Plus className="w-4 h-4" />
                       Add Category
                     </Button>
@@ -874,8 +1039,11 @@ export default function SettingsPage() {
                             style={{ backgroundColor: cat.color }}
                           />
                           <span className="flex-1 text-sm font-medium">{cat.name}</span>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100">
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100" onClick={() => handleEditLeadCategory(cat.id)}>
                             <Pencil className="w-3 h-3" />
+                          </Button>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100" onClick={() => handleDeleteLeadCategory(cat.id)}>
+                            <X className="w-3 h-3 text-destructive" />
                           </Button>
                         </div>
                       ))}
@@ -897,7 +1065,7 @@ export default function SettingsPage() {
                       </CardTitle>
                       <CardDescription>Manage tax rates for invoices</CardDescription>
                     </div>
-                    <Button size="sm" className="gap-2">
+                    <Button size="sm" className="gap-2" onClick={handleAddTaxConfig}>
                       <Plus className="w-4 h-4" />
                       Add Tax Rate
                     </Button>
@@ -919,10 +1087,15 @@ export default function SettingsPage() {
                             )}
                           </div>
                           <div className="flex gap-2">
-                            <Button variant="ghost" size="sm">
+                            {!tax.isDefault && (
+                              <Button variant="ghost" size="sm" onClick={() => handleSetDefaultTax(tax.id)} title="Set as default">
+                                <Check className="w-4 h-4 text-muted-foreground" />
+                              </Button>
+                            )}
+                            <Button variant="ghost" size="sm" onClick={() => handleEditTaxConfig(tax.id)}>
                               <Pencil className="w-4 h-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" onClick={() => handleDeleteTaxConfig(tax.id)}>
                               <Trash2 className="w-4 h-4 text-destructive" />
                             </Button>
                           </div>
@@ -1273,33 +1446,43 @@ export default function SettingsPage() {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {[
-                      { name: "Google Calendar", description: "Sync events and meetings", connected: true, icon: Calendar },
-                      { name: "Stripe", description: "Accept online payments", connected: true, icon: CreditCard },
-                      { name: "Slack", description: "Team notifications", connected: false, icon: Zap },
-                      { name: "QuickBooks", description: "Accounting sync", connected: false, icon: BarChart3 },
-                    ].map((integration) => (
-                      <div
-                        key={integration.name}
-                        className="flex items-center justify-between p-4 rounded-lg bg-secondary/50"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 rounded-lg bg-primary/10">
-                            <integration.icon className="w-5 h-5 text-primary" />
+                      { name: "Google Calendar", description: "Sync events and meetings", icon: Calendar },
+                      { name: "Stripe", description: "Accept online payments", icon: CreditCard },
+                      { name: "Slack", description: "Team notifications", icon: Zap },
+                      { name: "QuickBooks", description: "Accounting sync", icon: BarChart3 },
+                    ].map((integration) => {
+                      const state = integrationStates.find(i => i.name === integration.name)
+                      const isConnected = state?.connected ?? false
+                      return (
+                        <div
+                          key={integration.name}
+                          className="flex items-center justify-between p-4 rounded-lg bg-secondary/50"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={cn("p-2 rounded-lg", isConnected ? "bg-green-500/10" : "bg-primary/10")}>
+                              <integration.icon className={cn("w-5 h-5", isConnected ? "text-green-500" : "text-primary")} />
+                            </div>
+                            <div>
+                              <p className="font-medium">{integration.name}</p>
+                              <p className="text-sm text-muted-foreground">{integration.description}</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium">{integration.name}</p>
-                            <p className="text-sm text-muted-foreground">{integration.description}</p>
+                          <div className="flex items-center gap-2">
+                            {isConnected && (
+                              <Badge className="bg-green-500/20 text-green-500 border-0">Connected</Badge>
+                            )}
+                            <Button
+                              variant={isConnected ? "outline" : "default"}
+                              size="sm"
+                              className={isConnected ? "bg-transparent" : ""}
+                              onClick={() => handleToggleIntegration(integration.name)}
+                            >
+                              {isConnected ? "Disconnect" : "Connect"}
+                            </Button>
                           </div>
                         </div>
-                        <Button
-                          variant={integration.connected ? "outline" : "default"}
-                          size="sm"
-                          className={integration.connected ? "bg-transparent" : ""}
-                        >
-                          {integration.connected ? "Disconnect" : "Connect"}
-                        </Button>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </CardContent>
               </AnimatedCard>
@@ -1322,8 +1505,14 @@ export default function SettingsPage() {
                         <Download className="w-5 h-5 text-primary" />
                         <span className="font-medium">Export Data</span>
                       </div>
-                      <p className="text-sm text-muted-foreground">Download all your data as CSV or JSON</p>
-                      <Button variant="outline" className="w-full bg-transparent">Export All Data</Button>
+                      <p className="text-sm text-muted-foreground">Download all your data as JSON</p>
+                      <Button variant="outline" className="w-full bg-transparent gap-2" onClick={handleExportData} disabled={isExporting}>
+                        {isExporting ? (
+                          <><Loader2 className="w-4 h-4 animate-spin" /> Exporting...</>
+                        ) : (
+                          <><Download className="w-4 h-4" /> Export All Data</>
+                        )}
+                      </Button>
                     </div>
                     <div className="p-4 rounded-lg bg-secondary/50 space-y-3">
                       <div className="flex items-center gap-2">
@@ -1331,7 +1520,9 @@ export default function SettingsPage() {
                         <span className="font-medium">Import Data</span>
                       </div>
                       <p className="text-sm text-muted-foreground">Import leads, clients, or projects from CSV</p>
-                      <Button variant="outline" className="w-full bg-transparent">Import Data</Button>
+                      <Button variant="outline" className="w-full bg-transparent gap-2" disabled>
+                        <Upload className="w-4 h-4" /> Import Data (Coming Soon)
+                      </Button>
                     </div>
                   </div>
 
@@ -1343,9 +1534,9 @@ export default function SettingsPage() {
                       <span className="font-medium">Danger Zone</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Permanently delete all data. This action cannot be undone.
+                      Permanently delete all business data (clients, leads, projects, tasks, invoices, employees). This action cannot be undone. User accounts and settings will be preserved.
                     </p>
-                    <Button variant="destructive" size="sm">Delete All Data</Button>
+                    <Button variant="destructive" size="sm" onClick={() => setIsDeleteConfirmOpen(true)}>Delete All Data</Button>
                   </div>
                 </CardContent>
               </AnimatedCard>
@@ -1541,6 +1732,122 @@ export default function SettingsPage() {
               <Button variant="outline" onClick={() => setInviteModalOpen(false)}>Cancel</Button>
               <Button onClick={handleInviteUser} disabled={isInviting}>
                 {isInviting ? "Inviting..." : "Invite User"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Email Template Editor Dialog */}
+        <Dialog open={isTemplateEditorOpen} onOpenChange={setIsTemplateEditorOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Edit Email Template</DialogTitle>
+              <DialogDescription>Customize the subject and body of this email template. Use variables like {"{clientName}"}, {"{invoiceNumber}"}, {"{amount}"}, {"{dueDate}"}, {"{companyName}"}.</DialogDescription>
+            </DialogHeader>
+            {editingTemplate && (
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>Template Name</Label>
+                  <Input value={editingTemplate.name} disabled className="bg-secondary border-0 opacity-60" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Subject</Label>
+                  <Input
+                    value={editingTemplate.subject}
+                    onChange={(e) => setEditingTemplate({ ...editingTemplate, subject: e.target.value })}
+                    className="bg-secondary border-0"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Body</Label>
+                  <Textarea
+                    value={editingTemplate.body}
+                    onChange={(e) => setEditingTemplate({ ...editingTemplate, body: e.target.value })}
+                    className="bg-secondary border-0 min-h-[200px] font-mono text-sm"
+                    rows={10}
+                  />
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsTemplateEditorOpen(false)}>Cancel</Button>
+              <Button onClick={handleSaveEmailTemplate}>Save Template</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Email Template Preview Dialog */}
+        <Dialog open={isTemplatePreviewOpen} onOpenChange={setIsTemplatePreviewOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Eye className="w-5 h-5 text-primary" />
+                Preview: {previewTemplate?.name}
+              </DialogTitle>
+              <DialogDescription>This is how the email will look when sent.</DialogDescription>
+            </DialogHeader>
+            {previewTemplate && (
+              <div className="space-y-4 py-4">
+                <div className="p-4 rounded-lg bg-secondary/50 space-y-1">
+                  <p className="text-xs text-muted-foreground font-medium">SUBJECT</p>
+                  <p className="font-medium">{previewTemplate.subject.replace(/\{(\w+)\}/g, (_, key) => {
+                    const map: Record<string, string> = { clientName: "John Doe", invoiceNumber: "INV-2026-001", amount: "৳50,000", dueDate: "2026-06-30", companyName: companyName || "Your Company" }
+                    return map[key] || `{${key}}`
+                  })}</p>
+                </div>
+                <div className="p-4 rounded-lg bg-secondary/50 space-y-1">
+                  <p className="text-xs text-muted-foreground font-medium">BODY</p>
+                  <div className="whitespace-pre-wrap text-sm leading-relaxed">{previewTemplate.body.replace(/\{(\w+)\}/g, (_, key) => {
+                    const map: Record<string, string> = { clientName: "John Doe", invoiceNumber: "INV-2026-001", amount: "৳50,000", dueDate: "2026-06-30", companyName: companyName || "Your Company" }
+                    return map[key] || `{${key}}`
+                  })}</div>
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsTemplatePreviewOpen(false)}>Close</Button>
+              <Button onClick={() => { setIsTemplatePreviewOpen(false); if (previewTemplate) handleEditEmailTemplate(previewTemplate) }}>
+                <Pencil className="w-4 h-4 mr-2" /> Edit Template
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete All Data Confirmation Dialog */}
+        <Dialog open={isDeleteConfirmOpen} onOpenChange={(open) => { setIsDeleteConfirmOpen(open); if (!open) setDeleteConfirmText("") }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-destructive">
+                <AlertTriangle className="w-5 h-5" />
+                Delete All Data
+              </DialogTitle>
+              <DialogDescription>
+                This will permanently delete all business data including clients, leads, projects, tasks, invoices, and employees. User accounts and settings will NOT be deleted. This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30">
+                <p className="text-sm text-destructive font-medium">Type &quot;DELETE&quot; to confirm:</p>
+              </div>
+              <Input
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder='Type "DELETE" to confirm'
+                className="bg-secondary border-0"
+              />
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => { setIsDeleteConfirmOpen(false); setDeleteConfirmText("") }}>Cancel</Button>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteAllData}
+                disabled={deleteConfirmText !== "DELETE" || isDeleting}
+              >
+                {isDeleting ? (
+                  <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Deleting...</>
+                ) : (
+                  "Permanently Delete All Data"
+                )}
               </Button>
             </DialogFooter>
           </DialogContent>

@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { useState, use, useEffect } from "react"
+import { useSession } from "next-auth/react"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { AnimatedCard } from "@/components/animated-card"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -65,7 +66,8 @@ import { generateId } from "@/lib/id-generator"
 import { DatePicker } from "@/components/ui/date-picker"
 import { cn } from "@/lib/utils"
 import { getProjectById, updateProject as updateProjectAction, addProjectFileLink, addProjectDiscussionMessage } from "@/app/actions/projects"
-import { getTasks, createTask } from "@/app/actions/tasks"
+import { getTasks, createTask, updateTask, deleteTask } from "@/app/actions/tasks"
+import { TaskDetailPanel } from "@/components/tasks/task-detail-panel"
 import { getEmployees } from "@/app/actions/team"
 import { getInvoices, createInvoice as createInvoiceAction, updateInvoice as updateInvoiceAction, createIncome, getIncomeEntries, generateNextInvoiceNumber } from "@/app/actions/finances"
 
@@ -266,6 +268,7 @@ const fileIcons = {
 }
 
 export default function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+    const { data: session } = useSession()
     const resolvedParams = use(params)
     const [project, setProject] = useState<Project>(getProjectByIdLocal(resolvedParams.id))
     const [isDbLoaded, setIsDbLoaded] = useState(false)
@@ -280,6 +283,8 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     const [pendingInvoiceNumber, setPendingInvoiceNumber] = useState("")
     const [newMessage, setNewMessage] = useState("")
     const [taskViewMode, setTaskViewMode] = useState<"list" | "kanban">("kanban")
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+    const [isTaskPanelOpen, setIsTaskPanelOpen] = useState(false)
 
     // File Link state
     const [isAddFileOpen, setIsAddFileOpen] = useState(false)
@@ -761,6 +766,22 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     const handleCreateTask = async (formData: FormData) => {
         try {
             const assignees = JSON.stringify([teamMembers.find((m) => m.id === formData.get("assignee")) || teamMembers[0]])
+            
+            // Resolve assignedBy (logged-in user)
+            let match = null
+            const mergedTeam = allEmployees.length > 0
+                ? allEmployees.map(e => ({ id: e.id, name: `${e.firstName} ${e.lastName}`, email: e.email }))
+                : teamMembers
+
+            if (session?.user?.employeeId) {
+                match = mergedTeam.find((m) => m.id === session.user.employeeId)
+            }
+            if (!match && session?.user?.email) {
+                match = mergedTeam.find((m) => m.email?.toLowerCase() === session.user.email?.toLowerCase())
+            }
+
+            const assignedBy = match || mergedTeam[0] || { id: "current-user-id", name: "Current User" }
+
             const newTaskData = {
                 title: formData.get("title") as string,
                 description: formData.get("description") as string || "",
@@ -770,10 +791,10 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                 projectId: project.id,
                 projectName: project.name,
                 assignees: assignees,
-                assignedById: "current-user-id",
-                assignedByName: "Current User",
-                reporterId: "current-user-id",
-                reporterName: "Current User",
+                assignedById: assignedBy.id,
+                assignedByName: assignedBy.name,
+                reporterId: assignedBy.id,
+                reporterName: assignedBy.name,
                 dueDate: formData.get("dueDate") as string || new Date().toISOString().split("T")[0],
                 startDate: formData.get("startDate") as string || new Date().toISOString().split("T")[0],
                 tags: (formData.get("tags") as string || "").split(",").map((t) => t.trim()).filter(Boolean),
@@ -788,6 +809,35 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
             console.error("Failed to create task", error)
         }
         setIsAddTaskOpen(false)
+    }
+
+    const handleTaskClick = (task: Task) => {
+        setSelectedTask(task)
+        setIsTaskPanelOpen(true)
+    }
+
+    const handleUpdateTask = async (updatedTask: Task) => {
+        setProjectTasks((prev) => prev.map((t) => t.id === updatedTask.id ? updatedTask : t))
+        setSelectedTask(updatedTask)
+        try {
+            const { id, createdAt, updatedAt, ...updateData } = updatedTask
+            const res = await updateTask(id, { ...updateData, updatedAt: new Date().toISOString() } as any)
+            if (res?.error) console.error("Task update returned error:", res.error)
+        } catch (err) {
+            console.error("Failed to update task:", err)
+        }
+    }
+
+    const handleDeleteTask = async (taskId: string) => {
+        setProjectTasks((prev) => prev.filter((t) => t.id !== taskId))
+        setIsTaskPanelOpen(false)
+        setSelectedTask(null)
+        try {
+            const res = await deleteTask(taskId)
+            if (res?.error) console.error("Task deletion returned error:", res.error)
+        } catch (err) {
+            console.error("Failed to delete task:", err)
+        }
     }
 
     return (
@@ -1051,7 +1101,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                                             </CardHeader>
                                             <CardContent className="space-y-2 max-h-[400px] overflow-y-auto">
                                                 {statusTasks.map((task) => (
-                                                    <div key={task.id} className="p-3 rounded-lg bg-background border border-border/50 hover:border-primary/50 transition-colors cursor-pointer group">
+                                                    <div key={task.id} onClick={() => handleTaskClick(task)} className="p-3 rounded-lg bg-background border border-border/50 hover:border-primary/50 transition-colors cursor-pointer group">
                                                         <div className="flex items-start justify-between gap-2">
                                                             <p className="font-medium text-sm leading-tight">{task.title}</p>
                                                             <GripVertical className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
@@ -1117,7 +1167,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                                             </thead>
                                             <tbody>
                                                 {projectTasks.map((task) => (
-                                                    <tr key={task.id} className="border-b border-border/50 hover:bg-secondary/30 transition-colors cursor-pointer text-sm">
+                                                    <tr key={task.id} onClick={() => handleTaskClick(task)} className="border-b border-border/50 hover:bg-secondary/30 transition-colors cursor-pointer text-sm">
                                                         <td className="py-3 px-4 font-medium">
                                                             <div className="flex flex-col">
                                                                 <span>{task.title}</span>
@@ -2241,6 +2291,16 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {selectedTask && (
+                <TaskDetailPanel
+                    task={selectedTask}
+                    isOpen={isTaskPanelOpen}
+                    onClose={() => setIsTaskPanelOpen(false)}
+                    onUpdate={handleUpdateTask}
+                    onDelete={handleDeleteTask}
+                />
+            )}
 
         </DashboardLayout>
     )

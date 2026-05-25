@@ -3,7 +3,7 @@
 import { TabsContent } from "@/components/ui/tabs"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { generateId, generateBulkIds } from "@/lib/id-generator"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -626,10 +626,19 @@ export default function ClientsPage() {
     }
   }
 
+  const wasDragging = useRef(false)
+
   // Drag handlers for Kanban
   const handleDragStart = (e: React.DragEvent, client: Client) => {
     setDraggedClient(client)
+    wasDragging.current = true
     e.dataTransfer.effectAllowed = "move"
+  }
+
+  const handleDragEnd = () => {
+    setTimeout(() => {
+      wasDragging.current = false
+    }, 50)
   }
 
   const handleDragOver = (e: React.DragEvent, status: string) => {
@@ -1508,7 +1517,12 @@ export default function ClientsPage() {
                           key={client.id}
                           draggable
                           onDragStart={(e) => handleDragStart(e, client)}
-                          onClick={() => setSelectedClient(client)}
+                          onDragEnd={handleDragEnd}
+                          onClick={(e) => {
+                            if ((e.target as HTMLElement).closest('button, [role="menuitem"], [data-radix-collection-item]')) return;
+                            if (wasDragging.current) return;
+                            setSelectedClient(client)
+                          }}
                           className={`group p-3 bg-card border border-border/50 rounded-lg cursor-grab active:cursor-grabbing hover:border-border hover:shadow-lg transition-all duration-200 animate-in fade-in slide-in-from-bottom-2 ${draggedClient?.id === client.id ? "opacity-50 scale-95" : ""
                             }`}
                           style={{ animationDelay: `${i * 30}ms` }}
@@ -1524,10 +1538,10 @@ export default function ClientsPage() {
                                     .join("")}
                                 </AvatarFallback>
                               </Avatar>
-                              <div className="min-w-0">
-                                <div className="flex items-center gap-1.5">
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5 min-w-0 w-full">
                                   <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-1.5 py-0.5 rounded shrink-0">{client.uid || client.id.slice(0, 6)}</span>
-                                  <h4 className="font-medium text-sm truncate">{client.company}</h4>
+                                  <h4 className="font-medium text-sm truncate flex-1">{client.company}</h4>
                                 </div>
                                 <p className="text-xs text-muted-foreground truncate">{client.name}</p>
                               </div>
@@ -2394,20 +2408,25 @@ export default function ClientsPage() {
                           className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-background ${statusConfig[selectedClient.status].dotColor}`}
                         />
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <DialogTitle className="text-xl">{selectedClient.company}</DialogTitle>
-                          <span className="text-xs font-mono text-muted-foreground bg-secondary px-2 py-1 rounded">{selectedClient.id}</span>
-                          <Badge className={tierConfig[selectedClient.tier].color}>
+                      <div className="flex-1 min-w-0">
+                        <DialogTitle className="text-2xl font-bold tracking-tight text-foreground truncate max-w-[400px]" title={selectedClient.company}>
+                          {selectedClient.company}
+                        </DialogTitle>
+                        <div className="flex flex-wrap items-center gap-2 mt-1.5 text-sm text-muted-foreground">
+                          <span className="text-[10px] font-mono text-muted-foreground bg-secondary px-2 py-0.5 rounded select-all" title="Client ID (click to select)">
+                            {selectedClient.uid || selectedClient.id.slice(0, 8)}
+                          </span>
+                          <Badge className={`${tierConfig[selectedClient.tier].color} text-[10px] px-1.5 py-0`}>
                             {tierConfig[selectedClient.tier].label}
                           </Badge>
+                          <span className="text-muted-foreground opacity-60">•</span>
+                          <span className="font-medium text-foreground">{selectedClient.name}</span>
+                          <span className="text-muted-foreground opacity-60">•</span>
+                          <span>{selectedClient.industry}</span>
                         </div>
-                        <p className="text-muted-foreground">
-                          {selectedClient.name} • {selectedClient.industry}
-                        </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       <Button variant="outline" size="sm" className="gap-2 bg-transparent" onClick={() => window.open(`mailto:${selectedClient.email}`)}>
                         <Mail className="w-4 h-4" />
                         Email
@@ -2420,7 +2439,7 @@ export default function ClientsPage() {
                         <Edit className="w-4 h-4" />
                         Edit
                       </Button>
-                      <Button variant="outline" size="sm" className="gap-2 text-red-400 hover:text-red-300 bg-transparent" onClick={() => handleDeleteClient(selectedClient.id)}>
+                      <Button variant="outline" size="sm" className="gap-2 text-red-400 hover:text-red-300 bg-transparent flex-shrink-0" onClick={() => handleDeleteClient(selectedClient.id)}>
                         <Trash2 className="w-4 h-4" />
                         Delete
                       </Button>

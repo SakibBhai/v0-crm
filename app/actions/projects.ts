@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { Prisma } from "@prisma/client"
 import { generateNextUid } from "@/lib/uid-generator"
+import { createBroadcastNotification } from "@/app/actions/notifications"
+import { cacheInvalidate } from "@/lib/redis"
 
 export async function getProjects() {
   try {
@@ -36,6 +38,16 @@ export async function createProject(data: Prisma.ProjectCreateInput | any) {
       data: { ...data, uid },
     })
     revalidatePath("/projects")
+    await cacheInvalidate("dashboard:*").catch(() => {})
+
+    // Send notification about new project
+    await createBroadcastNotification({
+      type: "project_update",
+      title: "New Project Created",
+      message: `New project "${project.name}" has been created.`,
+      link: `/projects/${project.id}`,
+    }).catch(() => {})
+
     return JSON.parse(JSON.stringify(project))
   } catch (error) {
     console.error("Error creating project:", error)
@@ -51,6 +63,7 @@ export async function updateProject(id: string, data: Prisma.ProjectUpdateInput 
     })
     revalidatePath("/projects")
     revalidatePath(`/projects/${id}`)
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return JSON.parse(JSON.stringify(project))
   } catch (error) {
     console.error("Error updating project:", error)
@@ -64,6 +77,7 @@ export async function deleteProject(id: string) {
       where: { id },
     })
     revalidatePath("/projects")
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return { success: true }
   } catch (error) {
     console.error("Error deleting project:", error)
@@ -77,6 +91,7 @@ export async function bulkDeleteProjects(ids: string[]) {
       where: { id: { in: ids } },
     })
     revalidatePath("/projects")
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return { success: true }
   } catch (error) {
     console.error("Error bulk deleting projects:", error)

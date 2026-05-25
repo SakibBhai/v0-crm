@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { Prisma } from "@prisma/client"
 import { generateNextUid } from "@/lib/uid-generator"
+import { createBroadcastNotification } from "@/app/actions/notifications"
+import { cacheInvalidate } from "@/lib/redis"
 
 export async function getClients() {
   try {
@@ -27,6 +29,16 @@ export async function createClient(data: Prisma.ClientCreateInput) {
       data: { ...data, uid },
     })
     revalidatePath("/clients")
+    await cacheInvalidate("dashboard:*").catch(() => {})
+
+    // Send notification about new client
+    await createBroadcastNotification({
+      type: "new_client",
+      title: "New Client Added",
+      message: `New client "${data.name}" (${data.company || "No company"}) has been added.`,
+      link: "/clients",
+    }).catch(() => {})
+
     return JSON.parse(JSON.stringify(client))
   } catch (error) {
     console.error("Error creating client:", error)
@@ -41,6 +53,7 @@ export async function updateClient(id: string, data: Prisma.ClientUpdateInput) {
       data,
     })
     revalidatePath("/clients")
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return JSON.parse(JSON.stringify(client))
   } catch (error) {
     console.error("Error updating client:", error)
@@ -54,6 +67,7 @@ export async function deleteClient(id: string) {
       where: { id },
     })
     revalidatePath("/clients")
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return { success: true }
   } catch (error) {
     console.error("Error deleting client:", error)
@@ -67,6 +81,7 @@ export async function bulkDeleteClients(ids: string[]) {
       where: { id: { in: ids } },
     })
     revalidatePath("/clients")
+    await cacheInvalidate("dashboard:*").catch(() => {})
     return { success: true }
   } catch (error) {
     console.error("Error bulk deleting clients:", error)
