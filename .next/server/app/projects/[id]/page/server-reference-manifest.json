@@ -1,0 +1,200 @@
+{
+  "node": {
+    "40b7ee313bd2cafdcb0f34067a1520e6b73d88fdcf": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": 34727,
+          "async": false,
+          "exportedName": "getProjectById",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "getProjectById",
+      "filename": "app/actions/projects.ts"
+    },
+    "60c5f27ca53b148ab4464bc2fba56bfc0b3c4e847d": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": 34727,
+          "async": false,
+          "exportedName": "updateProject",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "updateProject",
+      "filename": "app/actions/projects.ts"
+    },
+    "6003921a810d88981fd16922b64cc3f7fa8a1c8af1": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": 34727,
+          "async": false,
+          "exportedName": "addProjectFileLink",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "addProjectFileLink",
+      "filename": "app/actions/projects.ts"
+    },
+    "6045b25e5f56a0520d5a2bde09527d5dbbea760597": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": 34727,
+          "async": false,
+          "exportedName": "addProjectDiscussionMessage",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "addProjectDiscussionMessage",
+      "filename": "app/actions/projects.ts"
+    },
+    "00ec268890c1debadd09e0e4e2c8e40f6cba764570": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": 34727,
+          "async": false,
+          "exportedName": "getTasks",
+          "filename": "app/actions/tasks.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "getTasks",
+      "filename": "app/actions/tasks.ts"
+    },
+    "402a1b41871dd71ef4f94d187d16cd5446dfdda404": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": 34727,
+          "async": false,
+          "exportedName": "createTask",
+          "filename": "app/actions/tasks.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "createTask",
+      "filename": "app/actions/tasks.ts"
+    },
+    "005b2f4b429162327eb8c306659da88d547f16d4ae": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": 34727,
+          "async": false,
+          "exportedName": "getEmployees",
+          "filename": "app/actions/team.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "getEmployees",
+      "filename": "app/actions/team.ts"
+    },
+    "0060ce20b0df6100711fc2a8e2110cf2811f68fab5": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": 34727,
+          "async": false,
+          "exportedName": "getInvoices",
+          "filename": "app/actions/finances.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "getInvoices",
+      "filename": "app/actions/finances.ts"
+    },
+    "40d8b44d87188928db4418c1c2931bf1d4f9e8808c": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": 34727,
+          "async": false,
+          "exportedName": "createInvoice",
+          "filename": "app/actions/finances.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "createInvoice",
+      "filename": "app/actions/finances.ts"
+    },
+    "607e2cb8af0f607d46ccb7960f1c0770435a5209bf": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": 34727,
+          "async": false,
+          "exportedName": "updateInvoice",
+          "filename": "app/actions/finances.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "updateInvoice",
+      "filename": "app/actions/finances.ts"
+    },
+    "40fdb514772af2ee65952ddef4a03219e7e86858dc": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": 34727,
+          "async": false,
+          "exportedName": "createIncome",
+          "filename": "app/actions/finances.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "createIncome",
+      "filename": "app/actions/finances.ts"
+    },
+    "006bb697c656c5b7925ad5ac450552851213318a94": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": 34727,
+          "async": false,
+          "exportedName": "getIncomeEntries",
+          "filename": "app/actions/finances.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "getIncomeEntries",
+      "filename": "app/actions/finances.ts"
+    },
+    "408bb603eacd3de29e1ad5db47bd1114d05d7b8a30": {
+      "workers": {
+        "app/projects/[id]/page": {
+          "moduleId": 34727,
+          "async": false,
+          "exportedName": "generateNextInvoiceNumber",
+          "filename": "app/actions/finances.ts"
+        }
+      },
+      "layer": {
+        "app/projects/[id]/page": "action-browser"
+      },
+      "exportedName": "generateNextInvoiceNumber",
+      "filename": "app/actions/finances.ts"
+    }
+  },
+  "edge": {}
+}

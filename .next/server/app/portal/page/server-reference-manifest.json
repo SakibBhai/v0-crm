@@ -1,0 +1,20 @@
+{
+  "node": {
+    "409bcdbdf886d8649f60b946224eaa34fdd597c5a3": {
+      "workers": {
+        "app/portal/page": {
+          "moduleId": 6295,
+          "async": false,
+          "exportedName": "getClientDashboardData",
+          "filename": "app/actions/dashboard.ts"
+        }
+      },
+      "layer": {
+        "app/portal/page": "action-browser"
+      },
+      "exportedName": "getClientDashboardData",
+      "filename": "app/actions/dashboard.ts"
+    }
+  },
+  "edge": {}
+}

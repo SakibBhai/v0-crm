@@ -1,0 +1,95 @@
+{
+  "node": {
+    "00a48e48ded34acdb519f51fe33ed0e1afe2356072": {
+      "workers": {
+        "app/projects/page": {
+          "moduleId": 64488,
+          "async": false,
+          "exportedName": "getProjects",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/page": "action-browser"
+      },
+      "exportedName": "getProjects",
+      "filename": "app/actions/projects.ts"
+    },
+    "40fb8a31aa4448163fd6b2433ee08a9bb9fb29d71a": {
+      "workers": {
+        "app/projects/page": {
+          "moduleId": 64488,
+          "async": false,
+          "exportedName": "createProject",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/page": "action-browser"
+      },
+      "exportedName": "createProject",
+      "filename": "app/actions/projects.ts"
+    },
+    "60c5f27ca53b148ab4464bc2fba56bfc0b3c4e847d": {
+      "workers": {
+        "app/projects/page": {
+          "moduleId": 64488,
+          "async": false,
+          "exportedName": "updateProject",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/page": "action-browser"
+      },
+      "exportedName": "updateProject",
+      "filename": "app/actions/projects.ts"
+    },
+    "40821ecb52a4d8c4822a4b79ac584020b88866901c": {
+      "workers": {
+        "app/projects/page": {
+          "moduleId": 64488,
+          "async": false,
+          "exportedName": "deleteProject",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/projects/page": "action-browser"
+      },
+      "exportedName": "deleteProject",
+      "filename": "app/actions/projects.ts"
+    },
+    "0001c0ef9f44572caacfeaa853c8cce5ba845dfa51": {
+      "workers": {
+        "app/projects/page": {
+          "moduleId": 64488,
+          "async": false,
+          "exportedName": "getClients",
+          "filename": "app/actions/clients.ts"
+        }
+      },
+      "layer": {
+        "app/projects/page": "action-browser"
+      },
+      "exportedName": "getClients",
+      "filename": "app/actions/clients.ts"
+    },
+    "005b2f4b429162327eb8c306659da88d547f16d4ae": {
+      "workers": {
+        "app/projects/page": {
+          "moduleId": 64488,
+          "async": false,
+          "exportedName": "getEmployees",
+          "filename": "app/actions/team.ts"
+        }
+      },
+      "layer": {
+        "app/projects/page": "action-browser"
+      },
+      "exportedName": "getEmployees",
+      "filename": "app/actions/team.ts"
+    }
+  },
+  "edge": {}
+}

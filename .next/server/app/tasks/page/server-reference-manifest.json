@@ -1,0 +1,95 @@
+{
+  "node": {
+    "00ec268890c1debadd09e0e4e2c8e40f6cba764570": {
+      "workers": {
+        "app/tasks/page": {
+          "moduleId": 91779,
+          "async": false,
+          "exportedName": "getTasks",
+          "filename": "app/actions/tasks.ts"
+        }
+      },
+      "layer": {
+        "app/tasks/page": "action-browser"
+      },
+      "exportedName": "getTasks",
+      "filename": "app/actions/tasks.ts"
+    },
+    "402a1b41871dd71ef4f94d187d16cd5446dfdda404": {
+      "workers": {
+        "app/tasks/page": {
+          "moduleId": 91779,
+          "async": false,
+          "exportedName": "createTask",
+          "filename": "app/actions/tasks.ts"
+        }
+      },
+      "layer": {
+        "app/tasks/page": "action-browser"
+      },
+      "exportedName": "createTask",
+      "filename": "app/actions/tasks.ts"
+    },
+    "60d5ab601e4a0455df1799b1edb01d6c4004493ab7": {
+      "workers": {
+        "app/tasks/page": {
+          "moduleId": 91779,
+          "async": false,
+          "exportedName": "updateTask",
+          "filename": "app/actions/tasks.ts"
+        }
+      },
+      "layer": {
+        "app/tasks/page": "action-browser"
+      },
+      "exportedName": "updateTask",
+      "filename": "app/actions/tasks.ts"
+    },
+    "40b41babd74481e5bfc4240d9ec92187df3055be7e": {
+      "workers": {
+        "app/tasks/page": {
+          "moduleId": 91779,
+          "async": false,
+          "exportedName": "deleteTask",
+          "filename": "app/actions/tasks.ts"
+        }
+      },
+      "layer": {
+        "app/tasks/page": "action-browser"
+      },
+      "exportedName": "deleteTask",
+      "filename": "app/actions/tasks.ts"
+    },
+    "00a48e48ded34acdb519f51fe33ed0e1afe2356072": {
+      "workers": {
+        "app/tasks/page": {
+          "moduleId": 91779,
+          "async": false,
+          "exportedName": "getProjects",
+          "filename": "app/actions/projects.ts"
+        }
+      },
+      "layer": {
+        "app/tasks/page": "action-browser"
+      },
+      "exportedName": "getProjects",
+      "filename": "app/actions/projects.ts"
+    },
+    "005b2f4b429162327eb8c306659da88d547f16d4ae": {
+      "workers": {
+        "app/tasks/page": {
+          "moduleId": 91779,
+          "async": false,
+          "exportedName": "getEmployees",
+          "filename": "app/actions/team.ts"
+        }
+      },
+      "layer": {
+        "app/tasks/page": "action-browser"
+      },
+      "exportedName": "getEmployees",
+      "filename": "app/actions/team.ts"
+    }
+  },
+  "edge": {}
+}
