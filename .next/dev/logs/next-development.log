@@ -1,61 +1,48 @@
-[00:00:01.780] Server  WARN     ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-[00:00:01.971] Server  LOG      ✓ Ready in 1593ms
-[00:00:06.064] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:11.332] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:00:11.332] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:00:11.332] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/settings","route":"/settings"}
-[00:00:11.332] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779093562113} /_vercel/insights/view
-[00:00:11.332] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/settings color: rgb(120, 120, 120) color: inherit {"dp":"/settings","o":"http://localhost:3000/settings","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779093562113} /_vercel/insights/view
-[00:00:11.348] Server  ERROR   E:\antigravity\v0-crm\v0-crm\.next\dev\server\chunks\ssr\[root-of-the-server]__63b57571._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.366] Server  ERROR   E:\antigravity\v0-crm\v0-crm\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.409] Server  ERROR   E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.421] Server  ERROR   E:\antigravity\v0-crm\v0-crm\.next\dev\server\chunks\ssr\node_modules_next_dist_179b90d2._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.425] Server  ERROR   E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.427] Server  ERROR   E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.429] Server  ERROR   E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.429] Server  ERROR   E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.430] Server  ERROR   E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.431] Server  ERROR   E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.433] Server  ERROR   Error fetching employees: PrismaClientInitializationError: 
-Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].teamEmployee.findMany()` invocation in
-E:\antigravity\v0-crm\v0-crm\.next\dev\server\chunks\ssr\[root-of-the-server]__63b57571._.js:87:166
-
-  84 ;
-  85 async function getEmployees() {
-  86     try {
-→ 87         const employees = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].teamEmployee.findMany(
-Can't reach database server at `ep-wild-sky-a19cbjyk-pooler.ap-southeast-1.aws.neon.tech:5432`
-
-Please make sure your database server is running at `ep-wild-sky-a19cbjyk-pooler.ap-southeast-1.aws.neon.tech:5432`.
-[00:00:11.435] Server  ERROR   E:\antigravity\v0-crm\v0-crm\.next\dev\server\chunks\ssr\[root-of-the-server]__63b57571._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.437] Server  ERROR   E:\antigravity\v0-crm\v0-crm\node_modules\@prisma\client\runtime\library.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.438] Server  ERROR   E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\compiled\next-server\app-page-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.439] Server  ERROR   E:\antigravity\v0-crm\v0-crm\.next\dev\server\chunks\ssr\node_modules_next_dist_179b90d2._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.439] Server  ERROR   E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.440] Server  ERROR   E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.440] Server  ERROR   E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.440] Server  ERROR   E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.441] Server  ERROR   E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.441] Server  ERROR   E:\antigravity\v0-crm\v0-crm\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:00:11.442] Server  ERROR   Error fetching attendance records: PrismaClientInitializationError: 
-Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].teamAttendanceRecord.findMany()` invocation in
-E:\antigravity\v0-crm\v0-crm\.next\dev\server\chunks\ssr\[root-of-the-server]__63b57571._.js:402:172
-
-  399 }
-  400 async function getAttendanceRecords() {
-  401     try {
-→ 402         const records = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prisma$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].teamAttendanceRecord.findMany(
-Can't reach database server at `ep-wild-sky-a19cbjyk-pooler.ap-southeast-1.aws.neon.tech:5432`
-
-Please make sure your database server is running at `ep-wild-sky-a19cbjyk-pooler.ap-southeast-1.aws.neon.tech:5432`.
-[00:03:14.328] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
-[00:04:20.973] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:04:21.140] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:04:21.140] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/settings","route":"/settings"}
-[00:04:21.140] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/settings color: rgb(120, 120, 120) color: inherit {"dp":"/settings","o":"http://localhost:3000/settings","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779093811918} /_vercel/insights/view
-[00:04:39.536] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:04:39.672] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:04:39.672] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/settings","route":"/settings"}
-[00:04:39.672] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/settings color: rgb(120, 120, 120) color: inherit {"dp":"/settings","o":"http://localhost:3000/settings","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779093830448} /_vercel/insights/view
-[00:04:42.777] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
-[00:04:42.777] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779093833558} /_vercel/insights/view
+[00:00:01.124] Server  WARN     ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+[00:00:01.266] Server  LOG      ✓ Ready in 955ms
+[00:00:04.520] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:06.938] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:06.938] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:00:06.938] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779708590366} /_vercel/insights/view
+[00:01:01.701] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:02.673] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:01:02.673] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:01:02.673] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779708646821} /_vercel/insights/view
+[00:01:05.567] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779708649716} /_vercel/insights/view
+[00:01:14.517] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3000/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779708658665} /_vercel/insights/view
+[00:01:17.435] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects color: rgb(120, 120, 120) color: inherit {"dp":"/projects","o":"http://localhost:3000/projects","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779708661588} /_vercel/insights/view
+[00:01:21.730] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/projects/cmow1firz0002kw04r8k3x66q color: rgb(120, 120, 120) color: inherit {"dp":"/projects/[id]","o":"http://localhost:3000/projects/cmow1firz0002kw04r8k3x66q","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779708665877} /_vercel/insights/view
+[00:01:22.047] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:03:26.986] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779708791137} /_vercel/insights/view
+[00:03:39.432] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3000/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779708803581} /_vercel/insights/view
+[00:03:40.905] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:03:40.905] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:03:51.898] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779708816049} /_vercel/insights/view
+[00:03:54.252] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:03:54.252] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:03:57.821] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779708821957} /_vercel/insights/view
+[00:05:17.528] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:05:17.528] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:05:40.615] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/finances color: rgb(120, 120, 120) color: inherit {"dp":"/finances","o":"http://localhost:3000/finances","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779708924768} /_vercel/insights/view
+[00:06:04.635] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779708948782} /_vercel/insights/view
+[00:06:37.718] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779708981868} /_vercel/insights/view
+[00:06:39.702] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:06:39.702] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:07:20.673] Server  LOG      ✓ Compiled in 171ms
+[00:07:29.488] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:07:30.488] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:07:30.488] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/leads","route":"/leads"}
+[00:07:30.488] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779709034646} /_vercel/insights/view
+[00:07:40.197] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/team color: rgb(120, 120, 120) color: inherit {"dp":"/team","o":"http://localhost:3000/team","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779709044351} /_vercel/insights/view
+[00:14:55.754] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/tasks color: rgb(120, 120, 120) color: inherit {"dp":"/tasks","o":"http://localhost:3000/tasks","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779709479912} /_vercel/insights/view
+[00:14:57.038] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/clients color: rgb(120, 120, 120) color: inherit {"dp":"/clients","o":"http://localhost:3000/clients","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779709481194} /_vercel/insights/view
+[00:14:57.802] Server  ERROR   E:\antigravity\v0-crm\v0-crm\.next\dev\server\chunks\[root-of-the-server]__c9abd647._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:14:57.804] Server  ERROR   [SSE] Initial count error: TypeError [ERR_INVALID_STATE]: Invalid state: Controller is already closed
+[00:14:59.799] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:14:59.799] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779709483954} /_vercel/insights/view
+[00:15:03.019] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779709487166} /_vercel/insights/view
+[00:15:03.871] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779709488026} /_vercel/insights/view
+[00:35:26.582] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:35:28.845] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:35:28.845] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/leads","route":"/leads"}
+[00:35:28.845] Browser LOG     %c[Vercel Web Analytics]%c [view] http://localhost:3000/leads color: rgb(120, 120, 120) color: inherit {"dp":"/leads","o":"http://localhost:3000/leads","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1779710713019} /_vercel/insights/view
