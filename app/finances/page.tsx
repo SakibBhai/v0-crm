@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,6 +66,7 @@ import {
   History,
   RotateCcw,
   Ban,
+  Wallet,
 } from "lucide-react"
 import {
   Area,
@@ -240,6 +241,12 @@ export default function FinancesPage() {
   const [showViewInvoiceDialog, setShowViewInvoiceDialog] = useState(false)
   const [showNeutralizeDialog, setShowNeutralizeDialog] = useState(false)
   const [showDeleteInvoiceDialog, setShowDeleteInvoiceDialog] = useState(false)
+  const [showRecordPaymentDialog, setShowRecordPaymentDialog] = useState(false)
+  const [recordPaymentInvoice, setRecordPaymentInvoice] = useState<InvoiceData | null>(null)
+  const [paymentAmount, setPaymentAmount] = useState("")
+  const [paymentMethod, setPaymentMethod] = useState("Bank Transfer")
+  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0])
+  const [paymentNotes, setPaymentNotes] = useState("")
   const [neutralizeTarget, setNeutralizeTarget] = useState<{ type: "expense" | "income"; id: string | number } | null>(null)
   const [deleteInvoiceTarget, setDeleteInvoiceTarget] = useState<string | null>(null)
   const [selectedIncome, setSelectedIncome] = useState<IncomeEntry | null>(null)
@@ -281,10 +288,37 @@ export default function FinancesPage() {
     loadFinanceData()
   }, [])
 
+  const loadLogoImage = (): Promise<{ base64: string; width: number; height: number }> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.crossOrigin = "anonymous"
+      img.src = "/logo.png"
+      img.onload = () => {
+        const canvas = document.createElement("canvas")
+        canvas.width = img.width
+        canvas.height = img.height
+        const ctx = canvas.getContext("2d")
+        if (ctx) {
+          ctx.drawImage(img, 0, 0)
+          resolve({
+            base64: canvas.toDataURL("image/png"),
+            width: img.width,
+            height: img.height,
+          })
+        } else {
+          reject(new Error("Canvas context failed"))
+        }
+      }
+      img.onerror = (err) => {
+        reject(err)
+      }
+    })
+  }
+
   const handleDownloadInvoice = async (invoiceId: string) => {
     const invoice = invoices.find(inv => inv.id === invoiceId);
     if (!invoice) return;
-    
+
     try {
       const pdf = new jsPDF("p", "mm", "a4");
       const pageWidth = pdf.internal.pageSize.getWidth();
@@ -292,133 +326,168 @@ export default function FinancesPage() {
       const contentWidth = pageWidth - margin * 2;
       let y = margin;
 
-      // Header
-      pdf.setFontSize(24);
-      pdf.setFont("helvetica", "bold");
-      pdf.text("INVOICE", margin, y);
-      
-      pdf.setFontSize(10);
-      pdf.setFont("helvetica", "normal");
-      pdf.setTextColor(100);
-      pdf.text(invoice.invoiceNumber, margin, y + 7);
-      
-      // Issue date & due date on the right
-      pdf.text(`Issue Date: ${formatDate(invoice.issueDate)}`, pageWidth - margin, y, { align: "right" });
-      pdf.text(`Due Date: ${formatDate(invoice.dueDate)}`, pageWidth - margin, y + 5, { align: "right" });
-      
-      y += 20;
-      
+      // Load ZOO LYUM Logo
+      let logoData = null
+      try {
+        logoData = await loadLogoImage()
+      } catch (err) {
+        console.warn("Could not load logo for PDF:", err)
+      }
+
+      if (logoData) {
+        const logoWidth = 30 // 30mm
+        const logoHeight = (logoData.height / logoData.width) * logoWidth
+        pdf.addImage(logoData.base64, "PNG", margin, y - 5, logoWidth, logoHeight)
+
+        pdf.setFontSize(22)
+        pdf.setFont("helvetica", "bold")
+        pdf.setTextColor(24, 24, 27) // zinc-900
+        pdf.text("INVOICE", pageWidth - margin, y + 2, { align: "right" })
+
+        pdf.setFontSize(10)
+        pdf.setFont("helvetica", "normal")
+        pdf.setTextColor(113, 113, 122) // zinc-500
+        pdf.text(getInvoiceDisplayNumber(invoice), pageWidth - margin, y + 8, { align: "right" })
+
+        y += Math.max(logoHeight, 15) + 5
+
+        // Add dates section below logo/header
+        pdf.setFontSize(9)
+        pdf.setFont("helvetica", "normal")
+        pdf.setTextColor(82, 82, 91) // zinc-600
+        pdf.text(`Issue Date: ${formatDate(invoice.issueDate)}`, margin, y)
+        pdf.text(`Due Date: ${formatDate(invoice.dueDate)}`, pageWidth - margin, y, { align: "right" })
+
+        y += 6
+      } else {
+        // Fallback Header
+        pdf.setFontSize(24)
+        pdf.setFont("helvetica", "bold")
+        pdf.text("INVOICE", margin, y)
+
+        pdf.setFontSize(10)
+        pdf.setFont("helvetica", "normal")
+        pdf.setTextColor(100)
+        pdf.text(getInvoiceDisplayNumber(invoice), margin, y + 7)
+
+        // Issue date & due date on the right
+        pdf.text(`Issue Date: ${formatDate(invoice.issueDate)}`, pageWidth - margin, y, { align: "right" })
+        pdf.text(`Due Date: ${formatDate(invoice.dueDate)}`, pageWidth - margin, y + 5, { align: "right" })
+
+        y += 20
+      }
+
       // Divider
-      pdf.setDrawColor(200);
+      pdf.setDrawColor(228, 228, 231); // zinc-200
       pdf.line(margin, y, pageWidth - margin, y);
       y += 8;
-      
+
       // Bill To / Project info
-      pdf.setFontSize(8);
-      pdf.setTextColor(130);
-      pdf.setFont("helvetica", "normal");
-      pdf.text("BILL TO", margin, y);
-      pdf.text("PROJECT", pageWidth / 2 + 10, y);
-      
+      pdf.setFontSize(8)
+      pdf.setTextColor(113, 113, 122) // zinc-500
+      pdf.setFont("helvetica", "bold")
+      pdf.text("BILL TO", margin, y)
+      pdf.text("PROJECT DETAILS", pageWidth / 2 + 10, y)
+
       y += 5;
       pdf.setFontSize(11);
-      pdf.setTextColor(30);
+      pdf.setTextColor(24, 24, 27); // zinc-900
       pdf.setFont("helvetica", "bold");
       pdf.text(invoice.client, margin, y);
       pdf.text(invoice.project, pageWidth / 2 + 10, y);
-      
+
       y += 5;
       pdf.setFontSize(9);
       pdf.setFont("helvetica", "normal");
-      pdf.setTextColor(100);
+      pdf.setTextColor(82, 82, 91); // zinc-600
       if (invoice.clientEmail) {
         pdf.text(invoice.clientEmail, margin, y);
       }
       pdf.text(`Payment: ${invoice.paymentMethod || "N/A"}`, pageWidth / 2 + 10, y);
-      
+
       y += 12;
-      
+
       // Table header
-      pdf.setFillColor(245, 245, 245);
+      pdf.setFillColor(244, 244, 245); // zinc-100
       pdf.rect(margin, y - 4, contentWidth, 8, "F");
       pdf.setFontSize(8);
-      pdf.setTextColor(100);
+      pdf.setTextColor(113, 113, 122); // zinc-500
       pdf.setFont("helvetica", "bold");
       pdf.text("DESCRIPTION", margin + 2, y);
       pdf.text("QTY", margin + contentWidth * 0.55, y, { align: "center" });
       pdf.text("RATE", margin + contentWidth * 0.72, y, { align: "right" });
       pdf.text("AMOUNT", margin + contentWidth - 2, y, { align: "right" });
-      
+
       y += 6;
-      pdf.setDrawColor(180);
+      pdf.setDrawColor(228, 228, 231); // zinc-200
       pdf.line(margin, y, pageWidth - margin, y);
       y += 5;
-      
+
       // Table rows
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(9);
-      pdf.setTextColor(40);
-      
+      pdf.setTextColor(39, 39, 42); // zinc-800
+
       invoice.items.forEach((item) => {
         const qty = Number(item.quantity) || 0;
         const rate = Number(item.rate) || 0;
         const amount = Number(item.amount) || 0;
-        
+
         pdf.text(item.description || "", margin + 2, y);
         pdf.text(String(qty), margin + contentWidth * 0.55, y, { align: "center" });
         pdf.text(`BDT ${rate.toLocaleString()}`, margin + contentWidth * 0.72, y, { align: "right" });
         pdf.setFont("helvetica", "bold");
         pdf.text(`BDT ${amount.toLocaleString()}`, margin + contentWidth - 2, y, { align: "right" });
         pdf.setFont("helvetica", "normal");
-        
+
         y += 6;
-        pdf.setDrawColor(230);
+        pdf.setDrawColor(244, 244, 245); // zinc-100
         pdf.line(margin, y, pageWidth - margin, y);
         y += 5;
       });
-      
+
       y += 5;
-      
+
       // Financial summary - right aligned
       const summaryX = pageWidth - margin - 60;
       const valueX = pageWidth - margin;
-      
+
       const subtotal = invoice.amount - invoice.tax + invoice.discount;
       const amountDue = invoice.amount - invoice.paid;
-      
+
       pdf.setFontSize(9);
-      pdf.setTextColor(100);
+      pdf.setTextColor(113, 113, 122); // zinc-500
       pdf.text("Subtotal", summaryX, y);
-      pdf.setTextColor(40);
+      pdf.setTextColor(39, 39, 42); // zinc-800
       pdf.text(`BDT ${subtotal.toLocaleString()}`, valueX, y, { align: "right" });
       y += 6;
-      
+
       if (invoice.discount > 0) {
-        pdf.setTextColor(100);
+        pdf.setTextColor(113, 113, 122);
         pdf.text("Discount", summaryX, y);
         pdf.setTextColor(22, 163, 74); // green
         pdf.text(`-BDT ${invoice.discount.toLocaleString()}`, valueX, y, { align: "right" });
         y += 6;
       }
-      
-      pdf.setTextColor(100);
+
+      pdf.setTextColor(113, 113, 122);
       pdf.text("Tax", summaryX, y);
-      pdf.setTextColor(40);
+      pdf.setTextColor(39, 39, 42);
       pdf.text(`BDT ${invoice.tax.toLocaleString()}`, valueX, y, { align: "right" });
       y += 3;
-      
+
       // Total line
-      pdf.setDrawColor(30);
+      pdf.setDrawColor(82, 82, 91); // zinc-600
       pdf.line(summaryX - 5, y, valueX, y);
       y += 6;
-      
+
       pdf.setFontSize(12);
       pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(30);
+      pdf.setTextColor(24, 24, 27); // zinc-900
       pdf.text("Total", summaryX, y);
       pdf.text(`BDT ${invoice.amount.toLocaleString()}`, valueX, y, { align: "right" });
       y += 7;
-      
+
       if (invoice.paid > 0) {
         pdf.setFontSize(9);
         pdf.setTextColor(22, 163, 74);
@@ -426,7 +495,7 @@ export default function FinancesPage() {
         pdf.text(`BDT ${invoice.paid.toLocaleString()}`, valueX, y, { align: "right" });
         y += 6;
       }
-      
+
       if (amountDue > 0) {
         pdf.setFontSize(10);
         pdf.setFont("helvetica", "bold");
@@ -435,30 +504,30 @@ export default function FinancesPage() {
         pdf.text(`BDT ${amountDue.toLocaleString()}`, valueX, y, { align: "right" });
         y += 8;
       }
-      
+
       // Notes
       if (invoice.notes) {
         y += 5;
-        pdf.setDrawColor(200);
+        pdf.setDrawColor(228, 228, 231); // zinc-200
         pdf.line(margin, y, pageWidth - margin, y);
         y += 6;
-        
+
         pdf.setFontSize(8);
-        pdf.setTextColor(130);
-        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(113, 113, 122);
+        pdf.setFont("helvetica", "bold");
         pdf.text("NOTES", margin, y);
         y += 4;
-        
+
         pdf.setFontSize(9);
-        pdf.setTextColor(60);
+        pdf.setTextColor(82, 82, 91);
         const noteLines = pdf.splitTextToSize(invoice.notes, contentWidth);
         pdf.text(noteLines, margin, y);
       }
-      
-      pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
+
+      pdf.save(`Invoice_${getInvoiceDisplayNumber(invoice)}.pdf`);
     } catch (error) {
-        console.error("Error generating PDF:", error);
-        alert("Failed to generate PDF. Please try again.")
+      console.error("Error generating PDF:", error);
+      alert("Failed to generate PDF. Please try again.")
     }
   }
 
@@ -1099,7 +1168,7 @@ export default function FinancesPage() {
     }
 
     const expenseAmount = Number.parseFloat(expenseFormData.amount)
-    
+
     try {
       const created = await createExpenseAction({
         vendor: expenseFormData.vendor,
@@ -1182,7 +1251,7 @@ export default function FinancesPage() {
         amount: incomeAmount,
         date: incomeFormData.date,
         client: incomeFormData.clientName || "Direct",
-        project: incomeFormData.project || undefined,
+        project: (incomeFormData.project && incomeFormData.project !== "none_general") ? incomeFormData.project : undefined,
         status: incomeFormData.status as "pending" | "received",
         invoiceId: incomeFormData.linkedInvoiceId || null,
         paymentMethod: incomeFormData.paymentMethod,
@@ -1477,6 +1546,115 @@ export default function FinancesPage() {
       performedBy: "Current User",
       performedAt: new Date().toISOString(),
     })
+  }
+
+  // ==================== Record Payment ====================
+
+  const openRecordPayment = (invoice: InvoiceData) => {
+    setRecordPaymentInvoice(invoice)
+    setPaymentAmount(String(invoice.amount - invoice.paid))
+    setPaymentMethod(invoice.paymentMethod || "Bank Transfer")
+    setPaymentDate(new Date().toISOString().split("T")[0])
+    setPaymentNotes("")
+    setShowRecordPaymentDialog(true)
+  }
+
+  const handleRecordPayment = async () => {
+    if (!recordPaymentInvoice) return
+
+    const amount = Number.parseFloat(paymentAmount)
+    const remainingDue = recordPaymentInvoice.amount - recordPaymentInvoice.paid
+
+    if (isNaN(amount) || amount <= 0) {
+      alert("Please enter a valid payment amount.")
+      return
+    }
+    if (amount > remainingDue) {
+      alert(`Payment amount cannot exceed remaining due: ${formatCurrency(remainingDue)}`)
+      return
+    }
+
+    const newPaid = recordPaymentInvoice.paid + amount
+    const isFullyPaid = newPaid >= recordPaymentInvoice.amount
+    const newStatus = isFullyPaid ? "paid" : "partial"
+    const newPaidDate = isFullyPaid ? paymentDate : recordPaymentInvoice.paidDate
+
+    const updateData: Record<string, any> = {
+      paid: newPaid,
+      status: newStatus,
+    }
+    if (isFullyPaid) {
+      updateData.paidDate = paymentDate
+    }
+
+    // Optimistic local update
+    setInvoices(prev => prev.map(inv =>
+      inv.id === recordPaymentInvoice.id
+        ? { ...inv, paid: newPaid, status: newStatus, paidDate: newPaidDate }
+        : inv
+    ))
+
+    // Persist invoice update
+    try {
+      await updateInvoiceAction(recordPaymentInvoice.id, updateData)
+    } catch (err) {
+      console.error("Failed to persist payment:", err)
+      // Rollback
+      setInvoices(prev => prev.map(inv =>
+        inv.id === recordPaymentInvoice.id
+          ? { ...inv, paid: recordPaymentInvoice.paid, status: recordPaymentInvoice.status, paidDate: recordPaymentInvoice.paidDate }
+          : inv
+      ))
+      alert("Failed to record payment. Please try again.")
+      return
+    }
+
+    // Auto-create linked income entry
+    try {
+      const incomeEntry = await createIncomeAction({
+        description: `Payment for ${recordPaymentInvoice.invoiceNumber} - ${recordPaymentInvoice.project}`,
+        category: "project_payment",
+        amount: amount,
+        date: paymentDate,
+        client: recordPaymentInvoice.client,
+        project: recordPaymentInvoice.project,
+        status: "received",
+        invoiceId: recordPaymentInvoice.id,
+        paymentMethod: paymentMethod,
+        notes: paymentNotes || `${isFullyPaid ? "Full" : "Partial"} payment for invoice ${recordPaymentInvoice.invoiceNumber}`,
+      })
+      if (incomeEntry && !('error' in incomeEntry)) {
+        setIncome(prev => [incomeEntry as any, ...prev])
+      }
+    } catch (err) {
+      console.error("Failed to create linked income entry:", err)
+    }
+
+    logActivity({
+      entityType: "invoice",
+      entityId: recordPaymentInvoice.id,
+      entityDescription: `Invoice #${recordPaymentInvoice.invoiceNumber} - ${recordPaymentInvoice.client}`,
+      action: "payment_recorded",
+      changes: [
+        { field: "paid", oldValue: recordPaymentInvoice.paid, newValue: newPaid },
+        { field: "status", oldValue: recordPaymentInvoice.status, newValue: newStatus },
+      ],
+      performedBy: "Current User",
+      performedAt: new Date().toISOString(),
+      notes: `${isFullyPaid ? "Full" : "Partial"} payment of ${formatCurrency(amount)} recorded`,
+    })
+
+    setShowRecordPaymentDialog(false)
+    setRecordPaymentInvoice(null)
+  }
+
+  // ==================== Invoice Display Number with Status Suffix ====================
+
+  const getInvoiceDisplayNumber = (invoice: InvoiceData): string => {
+    const base = invoice.invoiceNumber
+    if (invoice.status === "paid") return `${base}-p`
+    if (invoice.status === "partial") return `${base}-pr`
+    return `${base}-d`
   }
 
   const formatCurrency = (amount: number) => {
@@ -2078,7 +2256,7 @@ export default function FinancesPage() {
                                 <div className="flex items-start justify-between">
                                   <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-1">
-                                      <p className="font-bold text-xs text-muted-foreground">{invoice.invoiceNumber}</p>
+                                      <p className="font-bold text-xs text-muted-foreground">{getInvoiceDisplayNumber(invoice)}</p>
                                       {invoice.recurringInvoice && (
                                         <Badge variant="outline" className="text-[10px] h-4 px-1 border-blue-500/30 text-blue-400">
                                           <Repeat className="h-2 w-2 mr-0.5" />
@@ -2096,240 +2274,18 @@ export default function FinancesPage() {
                                       ) : null
                                     })()}
                                   </div>
-                                  <Dialog>
-                                    <DialogTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-6 w-6"
-                                        onClick={(e) => {
-                                          e.stopPropagation()
-                                          setSelectedInvoice(invoice)
-                                        }}
-                                      >
-                                        <Eye className="h-3 w-3" />
-                                      </Button>
-                                    </DialogTrigger>
-                                    <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                                      <DialogHeader>
-                                        <DialogTitle>Invoice Details - {selectedInvoice?.invoiceNumber}</DialogTitle>
-                                      </DialogHeader>
-                                      {selectedInvoice && (
-                                        <div className="space-y-6 py-4 bg-background p-6" id={`invoice-content-${selectedInvoice.id}`}>
-                                          <div className="grid grid-cols-2 gap-6">
-                                            <div className="space-y-4">
-                                              <div>
-                                                <p className="text-sm font-medium text-muted-foreground mb-1">Client</p>
-                                                <div className="flex items-center gap-2">
-                                                  <Avatar className="h-8 w-8">
-                                                    <AvatarImage
-                                                      src={selectedInvoice.clientLogo || "/placeholder.svg"}
-                                                    />
-                                                    <AvatarFallback>
-                                                      {selectedInvoice.client.substring(0, 2)}
-                                                    </AvatarFallback>
-                                                  </Avatar>
-                                                  <div>
-                                                    <p className="font-medium">{selectedInvoice.client}</p>
-                                                    <p className="text-xs text-muted-foreground">
-                                                      {selectedInvoice.clientEmail}
-                                                    </p>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                              <div>
-                                                <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                  Project
-                                                </p>
-                                                <p className="font-medium">{selectedInvoice.project}</p>
-                                                <p className="text-xs text-muted-foreground">
-                                                  {selectedInvoice.projectId}
-                                                </p>
-                                              </div>
-                                              <div>
-                                                <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                  Payment Terms
-                                                </p>
-                                                <p className="font-medium">{selectedInvoice.paymentTerms}</p>
-                                              </div>
-                                            </div>
-                                            <div className="space-y-4">
-                                              <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                  <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                    Issue Date
-                                                  </p>
-                                                  <p className="font-medium">{formatDate(selectedInvoice.issueDate)}</p>
-                                                </div>
-                                                <div>
-                                                  <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                    Due Date
-                                                  </p>
-                                                  <p className="font-medium">{formatDate(selectedInvoice.dueDate)}</p>
-                                                </div>
-                                              </div>
-                                              {selectedInvoice.paidDate && (
-                                                <div>
-                                                  <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                    Paid Date
-                                                  </p>
-                                                  <p className="font-medium text-emerald-500">
-                                                    {formatDate(selectedInvoice.paidDate)}
-                                                  </p>
-                                                </div>
-                                              )}
-                                              <div>
-                                                <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                  Payment Method
-                                                </p>
-                                                <Badge>{selectedInvoice.paymentMethod}</Badge>
-                                              </div>
-                                              <div>
-                                                <p className="text-sm font-medium text-muted-foreground mb-1">Status</p>
-                                                <Badge className={statusConfig[selectedInvoice.status]?.color}>
-                                                  {statusConfig[selectedInvoice.status]?.label}
-                                                </Badge>
-                                              </div>
-                                            </div>
-                                          </div>
-
-                                          <div className="border-t pt-4">
-                                            <p className="font-medium mb-3">Line Items</p>
-                                            <div className="space-y-2">
-                                              {selectedInvoice.items.map((item) => (
-                                                <div
-                                                  key={item.id}
-                                                  className="flex items-start justify-between p-3 rounded-lg bg-muted/50"
-                                                >
-                                                  <div className="flex-1">
-                                                    <p className="font-medium text-sm">{item.description}</p>
-                                                    <p className="text-xs text-muted-foreground">
-                                                      {Number(item.quantity) || 0} × {formatCurrency(Number(item.rate) || 0)}
-                                                      {item.taxable && (
-                                                        <span className="ml-2 text-blue-500">(Taxable)</span>
-                                                      )}
-                                                    </p>
-                                                  </div>
-                                                  <p className="font-bold">{formatCurrency(Number(item.amount) || 0)}</p>
-                                                </div>
-                                              ))}
-                                            </div>
-                                          </div>
-
-                                          <div className="border-t pt-4">
-                                            <div className="space-y-2 max-w-xs ml-auto">
-                                              <div className="flex items-center justify-between text-sm">
-                                                <span className="text-muted-foreground">Subtotal</span>
-                                                <span className="font-medium">
-                                                  {formatCurrency(
-                                                    selectedInvoice.amount -
-                                                    selectedInvoice.tax +
-                                                    selectedInvoice.discount,
-                                                  )}
-                                                </span>
-                                              </div>
-                                              {selectedInvoice.discount > 0 && (
-                                                <div className="flex items-center justify-between text-sm">
-                                                  <span className="text-muted-foreground">Discount</span>
-                                                  <span className="font-medium text-emerald-500">
-                                                    -{formatCurrency(selectedInvoice.discount)}
-                                                  </span>
-                                                </div>
-                                              )}
-                                              <div className="flex items-center justify-between text-sm">
-                                                <span className="text-muted-foreground">Tax</span>
-                                                <span className="font-medium">
-                                                  {formatCurrency(selectedInvoice.tax)}
-                                                </span>
-                                              </div>
-                                              <div className="flex items-center justify-between text-base font-bold pt-2 border-t">
-                                                <span>Total</span>
-                                                <span className="text-primary">
-                                                  {formatCurrency(selectedInvoice.amount)}
-                                                </span>
-                                              </div>
-                                              {selectedInvoice.paid > 0 && (
-                                                <div className="flex items-center justify-between text-sm pt-2 border-t">
-                                                  <span className="text-emerald-500 font-medium">Amount Paid</span>
-                                                  <span className="font-bold text-emerald-500">
-                                                    {formatCurrency(selectedInvoice.paid)}
-                                                  </span>
-                                                </div>
-                                              )}
-                                              {selectedInvoice.paid < selectedInvoice.amount && (
-                                                <div className="flex items-center justify-between text-sm">
-                                                  <span className="text-red-500 font-medium">Amount Due</span>
-                                                  <span className="font-bold text-red-500">
-                                                    {formatCurrency(selectedInvoice.amount - selectedInvoice.paid)}
-                                                  </span>
-                                                </div>
-                                              )}
-                                            </div>
-                                          </div>
-
-                                          {(selectedInvoice.notes || selectedInvoice.internalNotes) && (
-                                            <div className="border-t pt-4 space-y-3">
-                                              {selectedInvoice.notes && (
-                                                <div>
-                                                  <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                    Invoice Notes
-                                                  </p>
-                                                  <p className="text-sm bg-muted/50 p-3 rounded-lg">
-                                                    {selectedInvoice.notes}
-                                                  </p>
-                                                </div>
-                                              )}
-                                              {selectedInvoice.internalNotes && (
-                                                <div>
-                                                  <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                    Internal Notes (Private)
-                                                  </p>
-                                                  <p className="text-sm bg-amber-500/10 p-3 rounded-lg text-amber-600 dark:text-amber-400">
-                                                    {selectedInvoice.internalNotes}
-                                                  </p>
-                                                </div>
-                                              )}
-                                            </div>
-                                          )}
-
-                                          {selectedInvoice.attachments && selectedInvoice.attachments.length > 0 && (
-                                            <div className="border-t pt-4">
-                                              <p className="text-sm font-medium text-muted-foreground mb-2">
-                                                Attachments
-                                              </p>
-                                              <div className="flex flex-wrap gap-2">
-                                                {selectedInvoice.attachments.map((file, idx) => (
-                                                  <Badge
-                                                    key={idx}
-                                                    variant="outline"
-                                                    className="cursor-pointer hover:bg-muted"
-                                                  >
-                                                    <FileText className="h-3 w-3 mr-1" />
-                                                    {file}
-                                                  </Badge>
-                                                ))}
-                                              </div>
-                                            </div>
-                                          )}
-
-                                          <div className="flex gap-2 pt-4 border-t">
-                                            <Button variant="outline" className="flex-1 bg-transparent">
-                                              <Mail className="mr-2 h-4 w-4" />
-                                              Send Reminder
-                                            </Button>
-                                            <Button variant="outline" className="flex-1 bg-transparent">
-                                              <Printer className="mr-2 h-4 w-4" />
-                                              Print
-                                            </Button>
-                                            <Button variant="outline" className="flex-1 bg-transparent" onClick={() => handleDownloadInvoice(selectedInvoice.id)}>
-                                              <Download className="mr-2 h-4 w-4" />
-                                              Download PDF
-                                            </Button>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </DialogContent>
-                                  </Dialog>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      setSelectedInvoice(invoice)
+                                      setShowViewInvoiceDialog(true)
+                                    }}
+                                  >
+                                    <Eye className="h-3 w-3" />
+                                  </Button>
                                 </div>
 
                                 <div className="space-y-1">
@@ -2378,6 +2334,12 @@ export default function FinancesPage() {
                                         <Mail className="mr-2 h-3 w-3" />
                                         Send
                                       </DropdownMenuItem>
+                                      {invoice.status !== "paid" && (
+                                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); openRecordPayment(invoice) }}>
+                                          <Wallet className="mr-2 h-3 w-3" />
+                                          Record Payment
+                                        </DropdownMenuItem>
+                                      )}
                                       <DropdownMenuSeparator />
                                       {invoice.status !== "paid" && (
                                         <DropdownMenuItem onClick={() => handleInvoiceStatusChange(invoice.id, "paid")}>
@@ -2415,7 +2377,7 @@ export default function FinancesPage() {
                       <CardContent className="p-4 space-y-3">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <p className="font-bold text-sm text-muted-foreground mb-1">{invoice.invoiceNumber}</p>
+                            <p className="font-bold text-sm text-muted-foreground mb-1">{getInvoiceDisplayNumber(invoice)}</p>
                             <p className="font-semibold text-lg">{invoice.client}</p>
                             <p className="text-sm text-muted-foreground">{invoice.project}</p>
                           </div>
@@ -2484,204 +2446,18 @@ export default function FinancesPage() {
                         </div>
 
                         <div className="flex gap-2 pt-2">
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="flex-1 bg-transparent"
-                                onClick={() => setSelectedInvoice(invoice)}
-                              >
-                                <Eye className="mr-2 h-3 w-3" />
-                                View
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                              <DialogHeader>
-                                <DialogTitle>Invoice Details - {selectedInvoice?.invoiceNumber}</DialogTitle>
-                              </DialogHeader>
-                              {selectedInvoice && (
-                                <div className="space-y-6 py-4">
-                                  <div className="grid grid-cols-2 gap-6">
-                                    <div className="space-y-4">
-                                      <div>
-                                        <p className="text-sm font-medium text-muted-foreground mb-1">Client</p>
-                                        <div className="flex items-center gap-2">
-                                          <Avatar className="h-8 w-8">
-                                            <AvatarImage src={selectedInvoice.clientLogo || "/placeholder.svg"} />
-                                            <AvatarFallback>{selectedInvoice.client.substring(0, 2)}</AvatarFallback>
-                                          </Avatar>
-                                          <div>
-                                            <p className="font-medium">{selectedInvoice.client}</p>
-                                            <p className="text-xs text-muted-foreground">
-                                              {selectedInvoice.clientEmail}
-                                            </p>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div>
-                                        <p className="text-sm font-medium text-muted-foreground mb-1">Project</p>
-                                        <p className="font-medium">{selectedInvoice.project}</p>
-                                        <p className="text-xs text-muted-foreground">{selectedInvoice.projectId}</p>
-                                      </div>
-                                      <div>
-                                        <p className="text-sm font-medium text-muted-foreground mb-1">Payment Terms</p>
-                                        <p className="font-medium">{selectedInvoice.paymentTerms}</p>
-                                      </div>
-                                    </div>
-                                    <div className="space-y-4">
-                                      <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                          <p className="text-sm font-medium text-muted-foreground mb-1">Issue Date</p>
-                                          <p className="font-medium">{formatDate(selectedInvoice.issueDate)}</p>
-                                        </div>
-                                        <div>
-                                          <p className="text-sm font-medium text-muted-foreground mb-1">Due Date</p>
-                                          <p className="font-medium">{formatDate(selectedInvoice.dueDate)}</p>
-                                        </div>
-                                      </div>
-                                      {selectedInvoice.paidDate && (
-                                        <div>
-                                          <p className="text-sm font-medium text-muted-foreground mb-1">Paid Date</p>
-                                          <p className="font-medium text-emerald-500">
-                                            {formatDate(selectedInvoice.paidDate)}
-                                          </p>
-                                        </div>
-                                      )}
-                                      <div>
-                                        <p className="text-sm font-medium text-muted-foreground mb-1">Payment Method</p>
-                                        <Badge>{selectedInvoice.paymentMethod}</Badge>
-                                      </div>
-                                      <div>
-                                        <p className="text-sm font-medium text-muted-foreground mb-1">Status</p>
-                                        <Badge className={statusConfig[selectedInvoice.status]?.color}>
-                                          {statusConfig[selectedInvoice.status]?.label}
-                                        </Badge>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="border-t pt-4">
-                                    <p className="font-medium mb-3">Line Items</p>
-                                    <div className="space-y-2">
-                                      {selectedInvoice.items.map((item) => (
-                                        <div
-                                          key={item.id}
-                                          className="flex items-start justify-between p-3 rounded-lg bg-muted/50"
-                                        >
-                                          <div className="flex-1">
-                                            <p className="font-medium text-sm">{item.description}</p>
-                                            <p className="text-xs text-muted-foreground">
-                                              {Number(item.quantity) || 0} × {formatCurrency(Number(item.rate) || 0)}
-                                              {item.taxable && <span className="ml-2 text-blue-500">(Taxable)</span>}
-                                            </p>
-                                          </div>
-                                          <p className="font-bold">{formatCurrency(Number(item.amount) || 0)}</p>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-
-                                  <div className="border-t pt-4">
-                                    <div className="space-y-2 max-w-xs ml-auto">
-                                      <div className="flex items-center justify-between text-sm">
-                                        <span className="text-muted-foreground">Subtotal</span>
-                                        <span className="font-medium">
-                                          {formatCurrency(
-                                            selectedInvoice.amount - selectedInvoice.tax + selectedInvoice.discount,
-                                          )}
-                                        </span>
-                                      </div>
-                                      {selectedInvoice.discount > 0 && (
-                                        <div className="flex items-center justify-between text-sm">
-                                          <span className="text-muted-foreground">Discount</span>
-                                          <span className="font-medium text-emerald-500">
-                                            -{formatCurrency(selectedInvoice.discount)}
-                                          </span>
-                                        </div>
-                                      )}
-                                      <div className="flex items-center justify-between text-sm">
-                                        <span className="text-muted-foreground">Tax</span>
-                                        <span className="font-medium">{formatCurrency(selectedInvoice.tax)}</span>
-                                      </div>
-                                      <div className="flex items-center justify-between text-base font-bold pt-2 border-t">
-                                        <span>Total</span>
-                                        <span className="text-primary">{formatCurrency(selectedInvoice.amount)}</span>
-                                      </div>
-                                      {selectedInvoice.paid > 0 && (
-                                        <div className="flex items-center justify-between text-sm pt-2 border-t">
-                                          <span className="text-emerald-500 font-medium">Amount Paid</span>
-                                          <span className="font-bold text-emerald-500">
-                                            {formatCurrency(selectedInvoice.paid)}
-                                          </span>
-                                        </div>
-                                      )}
-                                      {selectedInvoice.paid < selectedInvoice.amount && (
-                                        <div className="flex items-center justify-between text-sm">
-                                          <span className="text-red-500 font-medium">Amount Due</span>
-                                          <span className="font-bold text-red-500">
-                                            {formatCurrency(selectedInvoice.amount - selectedInvoice.paid)}
-                                          </span>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  {(selectedInvoice.notes || selectedInvoice.internalNotes) && (
-                                    <div className="border-t pt-4 space-y-3">
-                                      {selectedInvoice.notes && (
-                                        <div>
-                                          <p className="text-sm font-medium text-muted-foreground mb-1">
-                                            Invoice Notes
-                                          </p>
-                                          <p className="text-sm bg-muted/50 p-3 rounded-lg">{selectedInvoice.notes}</p>
-                                        </div>
-                                      )}
-                                      {selectedInvoice.internalNotes && (
-                                        <div>
-                                          <p className="text-sm font-medium text-muted-foreground mb-1">
-                                            Internal Notes (Private)
-                                          </p>
-                                          <p className="text-sm bg-amber-500/10 p-3 rounded-lg text-amber-600 dark:text-amber-400">
-                                            {selectedInvoice.internalNotes}
-                                          </p>
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-
-                                  {selectedInvoice.attachments && selectedInvoice.attachments.length > 0 && (
-                                    <div className="border-t pt-4">
-                                      <p className="text-sm font-medium text-muted-foreground mb-2">Attachments</p>
-                                      <div className="flex flex-wrap gap-2">
-                                        {selectedInvoice.attachments.map((file, idx) => (
-                                          <Badge key={idx} variant="outline" className="cursor-pointer hover:bg-muted">
-                                            <FileText className="h-3 w-3 mr-1" />
-                                            {file}
-                                          </Badge>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  <div className="flex gap-2 pt-4 border-t">
-                                    <Button variant="outline" className="flex-1 bg-transparent">
-                                      <Mail className="mr-2 h-4 w-4" />
-                                      Send Reminder
-                                    </Button>
-                                    <Button variant="outline" className="flex-1 bg-transparent">
-                                      <Printer className="mr-2 h-4 w-4" />
-                                      Print
-                                    </Button>
-                                    <Button variant="outline" className="flex-1 bg-transparent">
-                                      <Download className="mr-2 h-4 w-4" />
-                                      Download PDF
-                                    </Button>
-                                  </div>
-                                </div>
-                              )}
-                            </DialogContent>
-                          </Dialog>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 bg-transparent"
+                            onClick={() => {
+                              setSelectedInvoice(invoice)
+                              setShowViewInvoiceDialog(true)
+                            }}
+                          >
+                            <Eye className="mr-2 h-3 w-3" />
+                            View
+                          </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="outline" size="icon" className="h-8 w-8 bg-transparent">
@@ -2701,6 +2477,12 @@ export default function FinancesPage() {
                                 <Mail className="mr-2 h-4 w-4" />
                                 Send
                               </DropdownMenuItem>
+                              {invoice.status !== "paid" && (
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); openRecordPayment(invoice) }}>
+                                  <Wallet className="mr-2 h-4 w-4" />
+                                  Record Payment
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuSeparator />
                               {invoice.status !== "paid" && (
                                 <DropdownMenuItem onClick={() => handleInvoiceStatusChange(invoice.id, "paid")}>
@@ -2749,7 +2531,7 @@ export default function FinancesPage() {
                           return (
                             <tr key={invoice.id} className={cn("border-b hover:bg-muted/30 transition-colors cursor-pointer", invoice.status === "overdue" && "bg-red-500/5")} onClick={() => { setSelectedInvoice(invoice); setShowViewInvoiceDialog(true) }}>
                               <td className="p-3">
-                                <p className="font-mono text-sm font-semibold">{invoice.invoiceNumber}</p>
+                                <p className="font-mono text-sm font-semibold">{getInvoiceDisplayNumber(invoice)}</p>
                                 <div className="flex items-center gap-1 mt-1">
                                   {invoice.recurringInvoice && (
                                     <Badge variant="outline" className="text-[10px] h-4 border-blue-500/30 text-blue-400">
@@ -2838,237 +2620,17 @@ export default function FinancesPage() {
                                       <Mail className="h-3.5 w-3.5" />
                                     </Button>
                                   )}
-                                  <Dialog>
-                                    <DialogTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-7 w-7"
-                                        onClick={() => setSelectedInvoice(invoice)}
-                                      >
-                                        <Eye className="h-3 w-3" />
-                                      </Button>
-                                    </DialogTrigger>
-                                    <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                                      <DialogHeader>
-                                        <DialogTitle>Invoice Details - {selectedInvoice?.invoiceNumber}</DialogTitle>
-                                      </DialogHeader>
-                                      {selectedInvoice && (
-                                        <div className="space-y-6 py-4 bg-background p-6" id={`invoice-content-${selectedInvoice.id}`}>
-                                          <div className="grid grid-cols-2 gap-6">
-                                            <div className="space-y-4">
-                                              <div>
-                                                <p className="text-sm font-medium text-muted-foreground mb-1">Client</p>
-                                                <div className="flex items-center gap-2">
-                                                  <Avatar className="h-8 w-8">
-                                                    <AvatarImage
-                                                      src={selectedInvoice.clientLogo || "/placeholder.svg"}
-                                                    />
-                                                    <AvatarFallback>
-                                                      {selectedInvoice.client.substring(0, 2)}
-                                                    </AvatarFallback>
-                                                  </Avatar>
-                                                  <div>
-                                                    <p className="font-medium">{selectedInvoice.client}</p>
-                                                    <p className="text-xs text-muted-foreground">
-                                                      {selectedInvoice.clientEmail}
-                                                    </p>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                              <div>
-                                                <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                  Project
-                                                </p>
-                                                <p className="font-medium">{selectedInvoice.project}</p>
-                                                <p className="text-xs text-muted-foreground">
-                                                  {selectedInvoice.projectId}
-                                                </p>
-                                              </div>
-                                              <div>
-                                                <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                  Payment Terms
-                                                </p>
-                                                <p className="font-medium">{selectedInvoice.paymentTerms}</p>
-                                              </div>
-                                            </div>
-                                            <div className="space-y-4">
-                                              <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                  <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                    Issue Date
-                                                  </p>
-                                                  <p className="font-medium">{formatDate(selectedInvoice.issueDate)}</p>
-                                                </div>
-                                                <div>
-                                                  <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                    Due Date
-                                                  </p>
-                                                  <p className="font-medium">{formatDate(selectedInvoice.dueDate)}</p>
-                                                </div>
-                                              </div>
-                                              {selectedInvoice.paidDate && (
-                                                <div>
-                                                  <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                    Paid Date
-                                                  </p>
-                                                  <p className="font-medium text-emerald-500">
-                                                    {formatDate(selectedInvoice.paidDate)}
-                                                  </p>
-                                                </div>
-                                              )}
-                                              <div>
-                                                <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                  Payment Method
-                                                </p>
-                                                <Badge>{selectedInvoice.paymentMethod}</Badge>
-                                              </div>
-                                              <div>
-                                                <p className="text-sm font-medium text-muted-foreground mb-1">Status</p>
-                                                <Badge className={statusConfig[selectedInvoice.status]?.color}>
-                                                  {statusConfig[selectedInvoice.status]?.label}
-                                                </Badge>
-                                              </div>
-                                            </div>
-                                          </div>
-
-                                          <div className="border-t pt-4">
-                                            <p className="font-medium mb-3">Line Items</p>
-                                            <div className="space-y-2">
-                                              {selectedInvoice.items.map((item) => (
-                                                <div
-                                                  key={item.id}
-                                                  className="flex items-start justify-between p-3 rounded-lg bg-muted/50"
-                                                >
-                                                  <div className="flex-1">
-                                                    <p className="font-medium text-sm">{item.description}</p>
-                                                    <p className="text-xs text-muted-foreground">
-                                                      {Number(item.quantity) || 0} × {formatCurrency(Number(item.rate) || 0)}
-                                                      {item.taxable && (
-                                                        <span className="ml-2 text-blue-500">(Taxable)</span>
-                                                      )}
-                                                    </p>
-                                                  </div>
-                                                  <p className="font-bold">{formatCurrency(Number(item.amount) || 0)}</p>
-                                                </div>
-                                              ))}
-                                            </div>
-                                          </div>
-
-                                          <div className="border-t pt-4">
-                                            <div className="space-y-2 max-w-xs ml-auto">
-                                              <div className="flex items-center justify-between text-sm">
-                                                <span className="text-muted-foreground">Subtotal</span>
-                                                <span className="font-medium">
-                                                  {formatCurrency(
-                                                    selectedInvoice.amount -
-                                                    selectedInvoice.tax +
-                                                    selectedInvoice.discount,
-                                                  )}
-                                                </span>
-                                              </div>
-                                              {selectedInvoice.discount > 0 && (
-                                                <div className="flex items-center justify-between text-sm">
-                                                  <span className="text-muted-foreground">Discount</span>
-                                                  <span className="font-medium text-emerald-500">
-                                                    -{formatCurrency(selectedInvoice.discount)}
-                                                  </span>
-                                                </div>
-                                              )}
-                                              <div className="flex items-center justify-between text-sm">
-                                                <span className="text-muted-foreground">Tax</span>
-                                                <span className="font-medium">
-                                                  {formatCurrency(selectedInvoice.tax)}
-                                                </span>
-                                              </div>
-                                              <div className="flex items-center justify-between text-base font-bold pt-2 border-t">
-                                                <span>Total</span>
-                                                <span className="text-primary">
-                                                  {formatCurrency(selectedInvoice.amount)}
-                                                </span>
-                                              </div>
-                                              {selectedInvoice.paid > 0 && (
-                                                <div className="flex items-center justify-between text-sm pt-2 border-t">
-                                                  <span className="text-emerald-500 font-medium">Amount Paid</span>
-                                                  <span className="font-bold text-emerald-500">
-                                                    {formatCurrency(selectedInvoice.paid)}
-                                                  </span>
-                                                </div>
-                                              )}
-                                              {selectedInvoice.paid < selectedInvoice.amount && (
-                                                <div className="flex items-center justify-between text-sm">
-                                                  <span className="text-red-500 font-medium">Amount Due</span>
-                                                  <span className="font-bold text-red-500">
-                                                    {formatCurrency(selectedInvoice.amount - selectedInvoice.paid)}
-                                                  </span>
-                                                </div>
-                                              )}
-                                            </div>
-                                          </div>
-
-                                          {(selectedInvoice.notes || selectedInvoice.internalNotes) && (
-                                            <div className="border-t pt-4 space-y-3">
-                                              {selectedInvoice.notes && (
-                                                <div>
-                                                  <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                    Invoice Notes
-                                                  </p>
-                                                  <p className="text-sm bg-muted/50 p-3 rounded-lg">
-                                                    {selectedInvoice.notes}
-                                                  </p>
-                                                </div>
-                                              )}
-                                              {selectedInvoice.internalNotes && (
-                                                <div>
-                                                  <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                    Internal Notes (Private)
-                                                  </p>
-                                                  <p className="text-sm bg-amber-500/10 p-3 rounded-lg text-amber-600 dark:text-amber-400">
-                                                    {selectedInvoice.internalNotes}
-                                                  </p>
-                                                </div>
-                                              )}
-                                            </div>
-                                          )}
-
-                                          {selectedInvoice.attachments && selectedInvoice.attachments.length > 0 && (
-                                            <div className="border-t pt-4">
-                                              <p className="text-sm font-medium text-muted-foreground mb-2">
-                                                Attachments
-                                              </p>
-                                              <div className="flex flex-wrap gap-2">
-                                                {selectedInvoice.attachments.map((file, idx) => (
-                                                  <Badge
-                                                    key={idx}
-                                                    variant="outline"
-                                                    className="cursor-pointer hover:bg-muted"
-                                                  >
-                                                    <FileText className="h-3 w-3 mr-1" />
-                                                    {file}
-                                                  </Badge>
-                                                ))}
-                                              </div>
-                                            </div>
-                                          )}
-
-                                          <div className="flex gap-2 pt-4 border-t">
-                                            <Button variant="outline" className="flex-1 bg-transparent">
-                                              <Mail className="mr-2 h-4 w-4" />
-                                              Send Reminder
-                                            </Button>
-                                            <Button variant="outline" className="flex-1 bg-transparent">
-                                              <Printer className="mr-2 h-4 w-4" />
-                                              Print
-                                            </Button>
-                                            <Button variant="outline" className="flex-1 bg-transparent" onClick={() => handleDownloadInvoice(selectedInvoice.id)}>
-                                              <Download className="mr-2 h-4 w-4" />
-                                              Download PDF
-                                            </Button>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </DialogContent>
-                                  </Dialog>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7"
+                                    onClick={() => {
+                                      setSelectedInvoice(invoice)
+                                      setShowViewInvoiceDialog(true)
+                                    }}
+                                  >
+                                    <Eye className="h-3 w-3" />
+                                  </Button>
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button variant="ghost" size="icon" className="h-7 w-7">
@@ -3088,6 +2650,12 @@ export default function FinancesPage() {
                                         <Mail className="mr-2 h-3 w-3" />
                                         Send
                                       </DropdownMenuItem>
+                                      {invoice.status !== "paid" && (
+                                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); openRecordPayment(invoice) }}>
+                                          <Wallet className="mr-2 h-3 w-3" />
+                                          Record Payment
+                                        </DropdownMenuItem>
+                                      )}
                                       <DropdownMenuSeparator />
                                       {invoice.status !== "paid" && (
                                         <DropdownMenuItem onClick={() => handleInvoiceStatusChange(invoice.id, "paid")}>
@@ -3237,15 +2805,18 @@ export default function FinancesPage() {
                             <Label>Client *</Label>
                             <Select
                               value={incomeFormData.clientName}
-                              onValueChange={(value) => setIncomeFormData({ ...incomeFormData, clientName: value, clientId: value })}
+                              onValueChange={(value) => setIncomeFormData({ ...incomeFormData, clientName: value, clientId: value, project: "" })}
                             >
                               <SelectTrigger>
                                 <SelectValue placeholder="Select client" />
                               </SelectTrigger>
                               <SelectContent>
-                                {invoices.map(inv => inv.client).filter((v, i, a) => a.indexOf(v) === i).map(client => (
-                                  <SelectItem key={client} value={client}>{client}</SelectItem>
+                                {uniqueClients.map(c => (
+                                  <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
                                 ))}
+                                {uniqueClients.length === 0 && (
+                                  <SelectItem value="none" disabled>No clients found</SelectItem>
+                                )}
                               </SelectContent>
                             </Select>
                           </div>
@@ -3284,11 +2855,22 @@ export default function FinancesPage() {
                         </div>
                         <div className="space-y-2">
                           <Label>Project</Label>
-                          <Input
-                            placeholder="Project name"
+                          <Select
                             value={incomeFormData.project}
-                            onChange={(e) => setIncomeFormData({ ...incomeFormData, project: e.target.value })}
-                          />
+                            onValueChange={(value) => setIncomeFormData({ ...incomeFormData, project: value })}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder={incomeFormData.clientName ? "Select project" : "Select client first"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none_general">None / General Payment</SelectItem>
+                              {allProjects.filter(p => p.client === incomeFormData.clientName).map((p) => (
+                                <SelectItem key={p.id} value={p.name}>
+                                  {p.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
                     )}
@@ -4725,6 +4307,368 @@ export default function FinancesPage() {
               Delete Invoice
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Record Payment Dialog */}
+      <Dialog open={showRecordPaymentDialog} onOpenChange={setShowRecordPaymentDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Wallet className="h-5 w-5 text-emerald-500" />
+              Record Payment
+            </DialogTitle>
+          </DialogHeader>
+          {recordPaymentInvoice && (
+            <div className="space-y-5 py-4">
+              {/* Invoice Summary */}
+              <div className="p-4 rounded-xl bg-muted/50 border space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Invoice</span>
+                  <span className="font-mono font-semibold text-sm">{getInvoiceDisplayNumber(recordPaymentInvoice)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Client</span>
+                  <span className="font-semibold text-sm">{recordPaymentInvoice.client}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Total Amount</span>
+                  <span className="font-bold">{formatCurrency(recordPaymentInvoice.amount)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Already Paid</span>
+                  <span className="font-semibold text-emerald-500">{formatCurrency(recordPaymentInvoice.paid)}</span>
+                </div>
+                <div className="flex items-center justify-between border-t pt-2">
+                  <span className="text-sm font-semibold">Remaining Due</span>
+                  <span className="font-bold text-red-500">{formatCurrency(recordPaymentInvoice.amount - recordPaymentInvoice.paid)}</span>
+                </div>
+              </div>
+
+              {/* Payment Amount */}
+              <div className="space-y-2">
+                <Label htmlFor="paymentAmountInput">Payment Amount *</Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">৳</span>
+                  <Input
+                    id="paymentAmountInput"
+                    type="number"
+                    className="pl-7"
+                    placeholder="0.00"
+                    step="0.01"
+                    value={paymentAmount}
+                    onChange={(e) => setPaymentAmount(e.target.value)}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs h-7"
+                    onClick={() => setPaymentAmount(String(recordPaymentInvoice.amount - recordPaymentInvoice.paid))}
+                  >
+                    Full Amount
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs h-7"
+                    onClick={() => setPaymentAmount(String(Math.round((recordPaymentInvoice.amount - recordPaymentInvoice.paid) / 2)))}
+                  >
+                    Half
+                  </Button>
+                </div>
+              </div>
+
+              {/* Payment Details */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Payment Date</Label>
+                  <Input
+                    type="date"
+                    value={paymentDate}
+                    onChange={(e) => setPaymentDate(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Payment Method</Label>
+                  <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                      <SelectItem value="Cash">Cash</SelectItem>
+                      <SelectItem value="Credit Card">Credit Card</SelectItem>
+                      <SelectItem value="Mobile Payment">Mobile Payment</SelectItem>
+                      <SelectItem value="Check">Check</SelectItem>
+                      <SelectItem value="PayPal">PayPal</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div className="space-y-2">
+                <Label>Notes (optional)</Label>
+                <Textarea
+                  placeholder="Payment notes..."
+                  rows={2}
+                  value={paymentNotes}
+                  onChange={(e) => setPaymentNotes(e.target.value)}
+                />
+              </div>
+
+              {/* Info Banner */}
+              {Number(paymentAmount) > 0 && Number(paymentAmount) < (recordPaymentInvoice.amount - recordPaymentInvoice.paid) && (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-sm">
+                  <AlertTriangle className="h-4 w-4 shrink-0" />
+                  <span>This is a partial payment. Invoice will be marked as <strong>Partial Paid</strong>.</span>
+                </div>
+              )}
+              {Number(paymentAmount) > 0 && Number(paymentAmount) >= (recordPaymentInvoice.amount - recordPaymentInvoice.paid) && (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm">
+                  <CheckCircle2 className="h-4 w-4 shrink-0" />
+                  <span>Full payment. Invoice will be marked as <strong>Paid</strong> and due will be <strong>BDT 0</strong>.</span>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="outline" onClick={() => setShowRecordPaymentDialog(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleRecordPayment} className="bg-emerald-600 hover:bg-emerald-700">
+                  <Wallet className="mr-2 h-4 w-4" />
+                  Record Payment
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* View Invoice Dialog (A4 sheet preview) */}
+      <Dialog open={showViewInvoiceDialog} onOpenChange={setShowViewInvoiceDialog}>
+        <DialogContent className="max-w-[850px] w-[95vw] max-h-[95vh] overflow-y-auto p-0 border-0 bg-zinc-100 dark:bg-zinc-950" style={{ resize: "both", overflow: "auto", minWidth: "400px", minHeight: "400px" }}>
+          {selectedInvoice && (
+            <div className="flex flex-col h-full">
+              {/* Toolbar */}
+              <div className="flex items-center justify-between px-6 py-4 bg-background border-b border-border sticky top-0 z-10">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-primary" />
+                  <DialogTitle className="font-semibold text-lg">
+                    Invoice Details - {getInvoiceDisplayNumber(selectedInvoice)}
+                  </DialogTitle>
+                  <DialogDescription className="sr-only">
+                    Details and A4 preview of the selected invoice.
+                  </DialogDescription>
+                </div>
+                <div className="flex items-center gap-2 pr-6">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="gap-2"
+                    onClick={() => handleDownloadInvoice(selectedInvoice.id)}
+                  >
+                    <Download className="h-4 w-4" />
+                    Download PDF
+                  </Button>
+                </div>
+              </div>
+
+              {/* A4 Paper Sheet Preview Area */}
+              <div className="flex-1 overflow-y-auto p-6 flex justify-center">
+                <div
+                  className="w-full max-w-[794px] min-h-[1123px] bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 p-12 shadow-2xl border border-zinc-200 dark:border-zinc-800 rounded-sm font-sans flex flex-col justify-between"
+                  id={`invoice-preview-sheet-${selectedInvoice.id}`}
+                >
+                  <div className="space-y-8">
+                    {/* Header */}
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-3">
+                        {/* ZOO LYUM Logo */}
+                        <div className="relative w-36 h-12 flex items-center justify-start overflow-hidden">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src="/logo.png"
+                            alt="ZOO LYUM Logo"
+                            className="object-contain max-h-full max-w-full"
+                          />
+                        </div>
+                        <div className="text-xs text-zinc-500 space-y-0.5">
+                          <p className="font-semibold text-zinc-700 dark:text-zinc-300">ZOO LYUM</p>
+                          <p>Dhaka, Bangladesh</p>
+                          <p>support@zoolyum.com</p>
+                        </div>
+                      </div>
+                      <div className="text-right space-y-1">
+                        <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
+                          INVOICE
+                        </h1>
+                        <p className="text-sm font-semibold text-zinc-500">
+                          {getInvoiceDisplayNumber(selectedInvoice)}
+                        </p>
+                        <div className="inline-block mt-2">
+                          <Badge className={cn("px-2.5 py-1 text-xs font-semibold capitalize", statusConfig[selectedInvoice.status]?.color)}>
+                            {statusConfig[selectedInvoice.status]?.label}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-zinc-200 dark:border-zinc-800 pt-6 grid grid-cols-2 gap-8">
+                      {/* Bill To */}
+                      <div className="space-y-2">
+                        <h2 className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
+                          BILL TO
+                        </h2>
+                        <div className="space-y-1 text-sm">
+                          <p className="font-bold text-zinc-900 dark:text-white">
+                            {selectedInvoice.client}
+                          </p>
+                          {selectedInvoice.clientEmail && (
+                            <p className="text-zinc-600 dark:text-zinc-400">
+                              {selectedInvoice.clientEmail}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Invoice Details */}
+                      <div className="space-y-2 text-right md:text-left md:pl-12">
+                        <h2 className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
+                          PROJECT DETAILS
+                        </h2>
+                        <div className="space-y-1 text-sm">
+                          <p className="font-semibold text-zinc-900 dark:text-white">
+                            {selectedInvoice.project}
+                          </p>
+                          <p className="text-zinc-600 dark:text-zinc-400">
+                            Terms: {selectedInvoice.paymentTerms}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Dates */}
+                    <div className="grid grid-cols-2 gap-8 border-t border-zinc-200 dark:border-zinc-800 pt-4 text-xs text-zinc-500">
+                      <div>
+                        <span className="font-semibold">Issue Date:</span> {formatDate(selectedInvoice.issueDate)}
+                      </div>
+                      <div className="text-right">
+                        <span className="font-semibold">Due Date:</span> {formatDate(selectedInvoice.dueDate)}
+                      </div>
+                    </div>
+
+                    {/* Line Items Table */}
+                    <div className="pt-4">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 text-[10px] font-bold tracking-wider text-zinc-400 uppercase">
+                            <th className="py-2 px-3">Description</th>
+                            <th className="py-2 px-3 text-center">Qty</th>
+                            <th className="py-2 px-3 text-right">Rate</th>
+                            <th className="py-2 px-3 text-right">Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-sm">
+                          {selectedInvoice.items.map((item) => (
+                            <tr key={item.id}>
+                              <td className="py-3 px-3">
+                                <p className="font-medium text-zinc-900 dark:text-white">{item.description}</p>
+                                {item.taxable && (
+                                  <span className="text-[10px] font-semibold text-primary/80 bg-primary/10 px-1.5 py-0.5 rounded-sm mt-1 inline-block">
+                                    Taxable
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-3 px-3 text-center text-zinc-600 dark:text-zinc-400">
+                                {Number(item.quantity) || 0}
+                              </td>
+                              <td className="py-3 px-3 text-right text-zinc-600 dark:text-zinc-400">
+                                {formatCurrency(Number(item.rate) || 0)}
+                              </td>
+                              <td className="py-3 px-3 text-right font-semibold text-zinc-900 dark:text-white">
+                                {formatCurrency(Number(item.amount) || 0)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Summary and Notes */}
+                    <div className="grid grid-cols-2 gap-8 border-t border-zinc-200 dark:border-zinc-800 pt-6">
+                      {/* Notes */}
+                      <div className="space-y-4">
+                        {selectedInvoice.notes && (
+                          <div className="space-y-1.5">
+                            <h3 className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">
+                              NOTES
+                            </h3>
+                            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed bg-zinc-50 dark:bg-zinc-800/40 p-3 rounded-md border border-zinc-100 dark:border-zinc-800">
+                              {selectedInvoice.notes}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Pricing Summary */}
+                      <div className="space-y-2 text-sm max-w-[280px] ml-auto w-full">
+                        <div className="flex justify-between text-zinc-500">
+                          <span>Subtotal</span>
+                          <span>
+                            {formatCurrency(
+                              selectedInvoice.amount -
+                              selectedInvoice.tax +
+                              selectedInvoice.discount
+                            )}
+                          </span>
+                        </div>
+                        {selectedInvoice.discount > 0 && (
+                          <div className="flex justify-between text-emerald-500 font-medium">
+                            <span>Discount</span>
+                            <span>-{formatCurrency(selectedInvoice.discount)}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between text-zinc-500">
+                          <span>Tax</span>
+                          <span>{formatCurrency(selectedInvoice.tax)}</span>
+                        </div>
+                        <div className="flex justify-between font-extrabold text-zinc-900 dark:text-white border-t border-zinc-200 dark:border-zinc-800 pt-2 text-base">
+                          <span>Total</span>
+                          <span>{formatCurrency(selectedInvoice.amount)}</span>
+                        </div>
+                        {selectedInvoice.paid > 0 && (
+                          <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-bold border-t border-zinc-100 dark:border-zinc-800 pt-2">
+                            <span>Amount Paid</span>
+                            <span>{formatCurrency(selectedInvoice.paid)}</span>
+                          </div>
+                        )}
+                        {selectedInvoice.paid < selectedInvoice.amount && (
+                          <div className="flex justify-between text-red-600 dark:text-red-400 font-bold">
+                            <span>Amount Due</span>
+                            <span>
+                              {formatCurrency(selectedInvoice.amount - selectedInvoice.paid)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="border-t border-zinc-200 dark:border-zinc-800 pt-8 mt-12 text-center text-xs text-zinc-400">
+                    <p className="font-semibold text-zinc-500 dark:text-zinc-400">
+                      Thank you for your business!
+                    </p>
+                    <p className="mt-1">
+                      If you have any questions about this invoice, please contact support@zoolyum.com
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
