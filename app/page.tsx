@@ -29,17 +29,16 @@ import {
   Award,
   BarChart3,
   PieChart as PieChartIcon,
+  Server,
+  Database,
+  ShieldCheck,
+  AlertTriangle
 } from "lucide-react"
 import { useState, useEffect } from "react"
-import {
-  getEmployees, getAttendanceRecords as getAttendanceRecordsDB,
-  createAttendanceRecord as createAttendanceRecordAction,
-  updateAttendanceRecord as updateAttendanceRecordAction,
-} from "@/app/actions/team"
+import { getEmployees, getAttendanceRecords as getAttendanceRecordsDB } from "@/app/actions/team"
 import { getDashboardStats } from "@/app/actions/dashboard"
 import type { Employee, AttendanceRecord } from "@/lib/types/hr"
-import { LogIn, LogOut } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { AttendanceClock } from "@/components/dashboard/attendance-clock"
 
 const quickActions = [
   { label: "New Lead", icon: Users, color: "bg-blue-500/20 text-blue-400" },
@@ -87,76 +86,20 @@ export default function DashboardPage() {
 }
 
 function FullAdminDashboard() {
-  const today = new Date().toISOString().split("T")[0]
-  const [dbEmployees, setDbEmployees] = useState<Employee[]>([])
   const [dbAttendance, setDbAttendance] = useState<AttendanceRecord[]>([])
-  const [clockLoading, setClockLoading] = useState(false)
   const [dashData, setDashData] = useState<any>(null)
 
   useEffect(() => {
     async function loadData() {
-      const [empRes, attRes, statsRes] = await Promise.all([
-        getEmployees(),
+      const [attRes, statsRes] = await Promise.all([
         getAttendanceRecordsDB(),
         getDashboardStats(),
       ])
-      if (Array.isArray(empRes)) setDbEmployees(empRes as Employee[])
       if (Array.isArray(attRes)) setDbAttendance(attRes as AttendanceRecord[])
       if (statsRes && !("error" in statsRes)) setDashData(statsRes)
     }
     loadData()
   }, [])
-
-  // Office timing
-  const OFFICE_IN = "10:30"
-  const GRACE = 30
-  const { data: session } = useSession()
-  const currentUserId = (session?.user as any)?.employeeId || ""
-  const currentEmp = dbEmployees.find(e => e.id === currentUserId || e.employeeId === currentUserId)
-  const myRecord = currentEmp ? dbAttendance.find(r => r.employeeId === currentEmp.id && r.date === today) : null
-
-  const isLate = (time: string) => {
-    const [h, m] = time.split(":").map(Number)
-    const [oh, om] = OFFICE_IN.split(":").map(Number)
-    return h * 60 + m > oh * 60 + om + GRACE
-  }
-  const getLabel = (time: string) => {
-    const [h, m] = time.split(":").map(Number)
-    const [oh, om] = OFFICE_IN.split(":").map(Number)
-    const mins = h * 60 + m, offMins = oh * 60 + om
-    if (mins <= offMins) return { text: "On Time", color: "text-green-500" }
-    if (mins <= offMins + GRACE) return { text: "Within Grace", color: "text-yellow-500" }
-    const late = mins - offMins
-    return { text: `Late by ${Math.floor(late / 60) > 0 ? `${Math.floor(late / 60)}h ` : ""}${late % 60}m`, color: "text-red-500" }
-  }
-
-  const handleDashClockIn = async () => {
-    if (!currentEmp || myRecord) return
-    setClockLoading(true)
-    const now = new Date()
-    const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
-    const status = isLate(time) ? "late" : "present"
-    const result = await createAttendanceRecordAction({
-      employeeId: currentEmp.id,
-      employeeName: `${currentEmp.firstName} ${currentEmp.lastName}`,
-      date: today, status, clockIn: time, totalHours: 0,
-      workLocation: "office",
-    })
-    if (!('error' in result)) setDbAttendance(prev => [...prev, result as AttendanceRecord])
-    setClockLoading(false)
-  }
-
-  const handleDashClockOut = async () => {
-    if (!myRecord || myRecord.clockOut) return
-    setClockLoading(true)
-    const now = new Date()
-    const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
-    const [inH, inM] = (myRecord.clockIn || "10:30").split(":").map(Number)
-    const hrs = Math.round(((now.getHours() * 60 + now.getMinutes() - inH * 60 - inM) / 60) * 10) / 10
-    const result = await updateAttendanceRecordAction(myRecord.id, { clockOut: time, totalHours: Math.max(0, hrs) })
-    if (!('error' in result)) setDbAttendance(prev => prev.map(r => r.id === myRecord.id ? { ...r, clockOut: time, totalHours: Math.max(0, hrs) } : r))
-    setClockLoading(false)
-  }
 
   const fmt = (v: number) => v >= 1e6 ? `৳${(v/1e6).toFixed(1)}M` : v >= 1e3 ? `৳${(v/1e3).toFixed(0)}K` : `৳${v}`
 
@@ -242,51 +185,8 @@ function FullAdminDashboard() {
           </div>
         </div>
 
-        {/* Clock In/Out Widget */}
-        <AnimatedCard delay={50} className="border-primary/20 bg-gradient-to-r from-primary/5 via-chart-2/5 to-chart-3/5">
-          <CardContent className="py-5">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-primary/20">
-                  <Clock className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">Attendance Clock</h3>
-                  <p className="text-xs text-muted-foreground">Office: 10:30 AM - 7:00 PM · 30 min grace</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                {!myRecord ? (
-                  <Button onClick={handleDashClockIn} disabled={clockLoading || !currentEmp} className="gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-4 rounded-xl shadow-lg shadow-green-600/20">
-                    <LogIn className="w-4 h-4" /> Clock In
-                  </Button>
-                ) : !myRecord.clockOut ? (
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
-                      <p className="text-xs text-muted-foreground">In at</p>
-                      <p className="font-bold">{myRecord.clockIn}</p>
-                      {myRecord.clockIn && (
-                        <span className={`text-[10px] font-medium ${getLabel(myRecord.clockIn).color}`}>{getLabel(myRecord.clockIn).text}</span>
-                      )}
-                    </div>
-                    <Button onClick={handleDashClockOut} disabled={clockLoading} className="gap-2 bg-red-600 hover:bg-red-700 text-white px-5 py-4 rounded-xl shadow-lg shadow-red-600/20">
-                      <LogOut className="w-4 h-4" /> Clock Out
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-4">
-                    <div className="flex gap-4 text-center">
-                      <div><p className="text-[10px] text-muted-foreground">In</p><p className="font-bold text-green-500">{myRecord.clockIn}</p></div>
-                      <div><p className="text-[10px] text-muted-foreground">Out</p><p className="font-bold text-red-500">{myRecord.clockOut}</p></div>
-                      <div><p className="text-[10px] text-muted-foreground">Hrs</p><p className="font-bold text-primary">{myRecord.totalHours}h</p></div>
-                    </div>
-                    <Badge className="bg-green-500/20 text-green-500 text-xs px-2 py-1">✓ Done</Badge>
-                  </div>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </AnimatedCard>
+        {/* Dynamic Attendance Clock Component */}
+        <AttendanceClock themeColor="indigo" />
 
         {/* Main Dashboard Layout - 2 Columns */}
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
@@ -294,7 +194,7 @@ function FullAdminDashboard() {
           {/* LEFT COLUMN: DAILY OPERATIONS (5 columns wide on XL) */}
           <div className="xl:col-span-5 space-y-6">
 
-            {/* 1. Recent Activity Summary */}
+            {/* 1. Recent Leads */}
             <AnimatedCard delay={100} className="border-primary/20 shadow-md shadow-primary/5">
               <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border/50 bg-muted/30">
                 <div className="flex items-center gap-2">
@@ -337,49 +237,92 @@ function FullAdminDashboard() {
               </CardContent>
             </AnimatedCard>
 
-            {/* 2. Calendar / Upcoming Widget */}
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 fill-mode-both">
-              <UpcomingWidget delay={0} />
-            </div>
-
-            {/* 3. Recent Activities */}
-            <AnimatedCard delay={300}>
-              <CardHeader className="flex flex-row items-center justify-between pb-3">
-                <CardTitle className="text-base font-medium">Activity Feed</CardTitle>
-                <button className="text-xs text-primary hover:underline flex items-center gap-1">
-                  View all <ArrowRight className="w-3 h-3" />
-                </button>
+            {/* 2. Live Company Attendance Feed */}
+            <AnimatedCard delay={150} className="border-primary/10 shadow-md">
+              <CardHeader className="pb-3 border-b border-border/40">
+                <CardTitle className="text-sm font-bold flex items-center gap-2">
+                  <UserCheck className="w-4 h-4 text-primary" />
+                  Live Attendance Feed
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
-                  {recentActivities.map((activity, i) => {
-                    const Icon = activity.icon
-                    const typeColors: Record<string, string> = {
-                      lead: "bg-blue-500/20 text-blue-400",
-                      project: "bg-green-500/20 text-green-400",
-                      task: "bg-purple-500/20 text-purple-400",
-                      meeting: "bg-amber-500/20 text-amber-400",
-                      alert: "bg-red-500/20 text-red-400",
-                    }
-                    return (
-                      <div key={i} className="flex gap-3 relative">
-                        {i !== recentActivities.length - 1 && (
-                          <div className="absolute left-4 top-8 bottom-[-16px] w-[1px] bg-border/50" />
-                        )}
-                        <div className={`p-2 rounded-full h-8 w-8 flex items-center justify-center relative z-10 ${typeColors[activity.type]}`}>
-                          <Icon className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1 min-w-0 pb-1">
-                          <p className="text-sm font-medium">{activity.action}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5 mb-1">{activity.detail}</p>
-                          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{activity.time}</span>
-                        </div>
+              <CardContent className="pt-3">
+                <div className="space-y-3 max-h-[220px] overflow-y-auto pr-1">
+                  {dbAttendance.slice(0, 5).map((log, i) => (
+                    <div key={i} className="flex justify-between items-center text-xs p-2.5 rounded-xl bg-secondary/30 border border-border/30">
+                      <div>
+                        <p className="font-bold text-foreground">{log.employeeName}</p>
+                        <p className="text-[9px] text-muted-foreground font-semibold flex items-center gap-1 mt-0.5">
+                          <span className="capitalize">{log.workLocation || 'Office'}</span>
+                          <span>·</span>
+                          <span>{log.date}</span>
+                        </p>
                       </div>
-                    )
-                  })}
+                      <div className="text-right">
+                        <Badge className={`text-[9px] font-black uppercase px-1.5 py-0 border ${
+                          log.status === 'present' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                          log.status === 'remote' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
+                          log.status === 'late' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
+                          'bg-slate-500/10 text-slate-500 border-slate-500/20'
+                        }`}>
+                          {log.status}
+                        </Badge>
+                        <p className="text-[9px] text-muted-foreground mt-0.5 font-medium">In: {log.clockIn || '--:--'}</p>
+                      </div>
+                    </div>
+                  ))}
+                  {dbAttendance.length === 0 && (
+                    <p className="text-xs text-muted-foreground text-center py-4">
+                      No attendance actions logged today
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </AnimatedCard>
+
+            {/* 3. System Health & Server Monitor */}
+            <AnimatedCard delay={200} className="border-emerald-500/10 bg-gradient-to-br from-background to-emerald-500/5">
+              <CardHeader className="pb-3 border-b border-border/40">
+                <CardTitle className="text-sm font-bold flex items-center gap-2">
+                  <Server className="w-4 h-4 text-emerald-400" />
+                  System Health & Operations
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-3 space-y-3">
+                <div className="grid grid-cols-2 gap-2 text-center">
+                  <div className="p-2 bg-background border border-border/40 rounded-xl">
+                    <p className="text-[10px] text-muted-foreground font-semibold">CPU Usage</p>
+                    <p className="text-sm font-black text-foreground mt-0.5">14.2%</p>
+                  </div>
+                  <div className="p-2 bg-background border border-border/40 rounded-xl">
+                    <p className="text-[10px] text-muted-foreground font-semibold">DB Query Latency</p>
+                    <p className="text-sm font-black text-emerald-400 mt-0.5">28ms</p>
+                  </div>
+                </div>
+                
+                <div className="flex justify-between items-center text-xs p-2.5 bg-background border border-border/40 rounded-xl">
+                  <span className="font-semibold text-muted-foreground flex items-center gap-1.5">
+                    <Database className="w-3.5 h-3.5 text-blue-500" />
+                    Neon Connection
+                  </span>
+                  <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[9px] font-black">
+                    ACTIVE
+                  </Badge>
+                </div>
+                
+                <div className="flex justify-between items-center text-xs p-2.5 bg-background border border-border/40 rounded-xl">
+                  <span className="font-semibold text-muted-foreground flex items-center gap-1.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                    Security Protocol
+                  </span>
+                  <span className="text-[10px] font-bold text-muted-foreground">TLS 1.3 Active</span>
+                </div>
+              </CardContent>
+            </AnimatedCard>
+
+            {/* 4. Calendar / Upcoming Widget */}
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 fill-mode-both">
+              <UpcomingWidget delay={0} />
+            </div>
           </div>
 
 

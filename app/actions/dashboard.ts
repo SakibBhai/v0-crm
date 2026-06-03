@@ -310,6 +310,7 @@ export async function getManagerDashboardData(managerName?: string) {
       }).filter(t => t.status !== "done").length
 
       return {
+        id: emp.id,
         name: `${emp.firstName} ${emp.lastName}`,
         role: emp.jobTitle,
         status,
@@ -391,11 +392,13 @@ export async function getEmployeeDashboardData(employeeId?: string, employeeName
 
     // Task list for display
     const taskList = pendingTasks.slice(0, 6).map(t => ({
+      id: t.id,
       title: t.title,
       project: t.projectName,
+      projectName: t.projectName,
       priority: t.priority,
       due: t.dueDate ? new Date(t.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "",
-      done: false,
+      done: t.status === "done",
     }))
 
     return {
